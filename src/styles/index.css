@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Neucha&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Neucha', sans-serif;
+}
+.container {
+    display: flex;
+    justify-content: center;
+}
+.wrapper{
+    width: 1000px;
+    border: 1px solid black;
+}
+
+main{
+    height: calc(100vh - 100px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+body {
+
+}
+
+
+
+footer {
+
+}
+
+.neucha-regular {
+    font-family: "Neucha", serif;
+    font-weight: 400;
+    font-style: normal;
+}

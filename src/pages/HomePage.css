@@ -1,0 +1,29 @@
+#main_block{
+    height: calc(100vh - 100px);
+    background-image: url('../images/back_main.png'); /* Замените на путь к вашему изображению */
+    background-size: cover; /* Масштабирование изображения по высоте */
+    background-position: center; /* Центровка изображения */
+    background-repeat: no-repeat; /* Избегаем повторения изображения */
+    overflow: hidden; /* Обрезаем края */
+    position: relative;
+}
+
+.main_block_order_button{
+    position: absolute; /* Абсолютное позиционирование внутри контейнера */
+    bottom: 15%; /* Расположение на 30% выше низа контейнера */
+    left: 50%; /* Центрируем по горизонтали */
+    transform: translateX(-50%); /* Сдвигаем кнопку, чтобы она была точно по центру */
+    width: 30%;
+    padding: 20px 20px;
+    font-size: 36px;
+    color: #333; /* Цвет текста */
+    background-color: transparent; /* Прозрачный фон */
+    border: 2px solid #333; /* Граница */
+    border-radius: 50px; /* Закругленные края */
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+.main_block_order_button:hover {
+    background-color: rgba(0, 0, 0, 0.1); /* Легкое затемнение при наведении */
+    color: #000; /* Более насыщенный цвет текста */
+}
