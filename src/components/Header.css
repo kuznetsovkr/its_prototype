@@ -8,6 +8,9 @@
     border-bottom: 1px solid #ddd;
     height: 100px;
 }
+.logo {
+    cursor: pointer;
+}
 
 .logo img {
     height: 70px;
@@ -37,4 +40,80 @@ nav {
 }
 .auth-button{
     height: 30px;
+    cursor: pointer;
+}
+
+/* Модальное затемнение */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Содержимое модального окна */
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+/* Кнопка закрытия */
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* Форма авторизации */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.auth-form label {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.auth-form input {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.submit-button {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.submit-button:hover {
+    background-color: #0056b3;
+}
+
+/* Статус заказа */
+.order-status {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #28a745;
+    font-weight: bold;
 }

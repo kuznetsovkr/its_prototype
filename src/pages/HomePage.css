@@ -1,6 +1,6 @@
 #main_block{
     height: calc(100vh - 100px);
-    background-image: url('../images/back_main.png'); /* Замените на путь к вашему изображению */
+    /* background-image: url('../images/back_main.png'); Замените на путь к вашему изображению */
     background-size: cover; /* Масштабирование изображения по высоте */
     background-position: center; /* Центровка изображения */
     background-repeat: no-repeat; /* Избегаем повторения изображения */
@@ -27,3 +27,4 @@
     background-color: rgba(0, 0, 0, 0.1); /* Легкое затемнение при наведении */
     color: #000; /* Более насыщенный цвет текста */
 }
+

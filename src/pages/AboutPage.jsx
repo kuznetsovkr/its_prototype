@@ -1,12 +1,16 @@
 import React from 'react';
 
-const AboutPage = () => {
+const About = () => {
     return (
-        <main style={{ padding: '20px', textAlign: 'center' }}>
-            <h2>О нас</h2>
-            <p>Мы предлагаем лучшие материалы для творчества с доставкой по всей стране.</p>
-        </main>
+        <div className="about">
+            <h1>О нас</h1>
+            <p>
+                Наша компания была основана в 2020 году. Мы начинали с небольших заказов, 
+                а сегодня работаем с клиентами по всей стране. Мы гордимся качеством нашей 
+                продукции и стремимся к тому, чтобы каждый клиент остался доволен.
+            </p>
+        </div>
     );
 };
 
-export default AboutPage;
+export default About;
