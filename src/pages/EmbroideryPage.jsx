@@ -10,7 +10,6 @@ const EmbroideryPage = () => {
     return (
         <div className="container">
             <div className="wrapper">
-                <h1>Страница оформления заказа</h1>
                 <div className="orderBlock">
                     <EmbroiderySelector/>
                 </div>

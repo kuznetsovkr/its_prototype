@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './EmbroiderySelector.css';
+
+import face from '../images/embroidery/face.png';
+import hvost from '../images/embroidery/hvost.png';
+import sherst from '../images/embroidery/sherst.png';
+
+import car1 from '../images/embroidery/cars1.png';
+
 
 const EmbroiderySelector = () => {
     const navigate = useNavigate();
-    const [selectedType, setSelectedType] = useState(''); // Тип вышивки
+    const [selectedType, setSelectedType] = useState('Patronus');
     const [customText, setCustomText] = useState(''); // Текст для "Другая"
     const [uploadedImage, setUploadedImage] = useState(null); // Загрузка изображения
     const [comment, setComment] = useState(''); // Комментарий
@@ -27,76 +35,78 @@ const EmbroiderySelector = () => {
 
     // Определяем подписи для изображений на основе выбранного типа
     const getLabels = () => {
-        if (selectedType === 'type1') {
+        if (selectedType === 'Patronus') {
             return ['Морда', 'Шерсть', 'Живот', 'Хвост'];
-        } else if (selectedType === 'type2') {
+        } else if (selectedType === 'Car') {
             return ['Вид спереди', 'Вид слева', 'Вид сзади', 'Вид справа'];
         } else {
             return ['Вышивка 1', 'Вышивка 2', 'Вышивка 3', 'Вышивка 4'];
         }
     };
 
-    return (
-        <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <h2>Выберите тип вышивки:</h2>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '20px' }}>
-                {getLabels().map((title, index) => (
-                    <div key={index} style={{ textAlign: 'center' }}>
-                        <img
-                            src={`https://via.placeholder.com/100?text=${title}`}
-                            alt={title}
-                            style={{ width: '100px', height: '100px', marginBottom: '10px' }}
-                        />
-                        <p>{title}</p>
-                    </div>
-                ))}
-            </div>
+    const embroideryImages = {
+        Patronus: [face, hvost, sherst], // Патронусы
+        Car: [car1], // Машины
+    };
 
-            <div style={{ marginBottom: '20px' }}>
-                <label>
-                    <input
-                        type="radio"
-                        name="embroideryType"
-                        value="type1"
-                        onChange={(e) => setSelectedType(e.target.value)}
-                        checked={selectedType === 'type1'}
-                    />
-                    Тип 1
-                </label>
-                <label style={{ marginLeft: '15px' }}>
-                    <input
-                        type="radio"
-                        name="embroideryType"
-                        value="type2"
-                        onChange={(e) => setSelectedType(e.target.value)}
-                        checked={selectedType === 'type2'}
-                    />
-                    Тип 2
-                </label>
-                <label style={{ marginLeft: '15px' }}>
-                    <input
-                        type="radio"
-                        name="embroideryType"
-                        value="type3"
-                        onChange={(e) => setSelectedType(e.target.value)}
-                        checked={selectedType === 'type3'}
-                    />
-                    Тип 3
-                </label>
-                <label style={{ marginLeft: '15px' }}>
-                    <input
-                        type="radio"
-                        name="embroideryType"
-                        value="custom"
-                        onChange={(e) => setSelectedType(e.target.value)}
-                        checked={selectedType === 'custom'}
-                    />
-                    Другая
-                </label>
+
+    return (
+        <div className="blockEmbroiderySelector">
+            <h2>Детали вышивки</h2>
+            <div className="containerExampleType">
+                <div className="exampleImg">
+                    {embroideryImages[selectedType]?.map((imgSrc, index) => (
+                        <div key={index} className="image-container">
+                            <img src={imgSrc} alt={`Изображение ${index + 1}`} />
+                            <p>Пример {index + 1}</p>
+                        </div>
+                    ))}
+                </div>
+
+
+                <div className="selectorType">
+                    <label>
+                        <input
+                            type="radio"
+                            name="embroideryType"
+                            value="Patronus"
+                            onChange={(e) => setSelectedType(e.target.value)}
+                            checked={selectedType === 'Patronus'}
+                        />
+                        Патронусы
+                    </label>
+                    <label>
+                        <input
+                            type="radio"
+                            name="embroideryType"
+                            value="Car"
+                            onChange={(e) => setSelectedType(e.target.value)}
+                            checked={selectedType === 'Car'}
+                        />
+                        Машина
+                    </label>
+                    <label>
+                        <input
+                            type="radio"
+                            name="embroideryType"
+                            value="custom"
+                            onChange={(e) => setSelectedType(e.target.value)}
+                            checked={selectedType === 'custom'}
+                        />
+                        Другая
+                    </label>
+                    <button 
+                        className="stepButton"
+                        onClick={handleNext}
+                        disabled={!selectedType || (selectedType === 'custom' && !customText)} // Блокируем кнопку, если выбор не сделан
+                    >
+                        Данные о получателе
+                    </button>
+                </div>
             </div>
 
             {selectedType === 'custom' && (
-                <div style={{ marginBottom: '20px' }}>
+                <div>
                     <label>
                         Введите текст:
                         <input
@@ -111,7 +121,7 @@ const EmbroiderySelector = () => {
 
             <div style={{ marginBottom: '20px' }}>
                 <label>
-                    Загрузите изображение:
+                    Загрузите изображения по шаблону выше:
                     <input type="file" onChange={handleFileChange} style={{ marginLeft: '10px' }} />
                 </label>
             </div>
@@ -127,19 +137,11 @@ const EmbroiderySelector = () => {
                             marginTop: '10px',
                             padding: '10px',
                             width: '300px',
-                            height: '100px',
+                            height: '50px',
                         }}
                     />
                 </label>
             </div>
-
-            <button
-                onClick={handleNext}
-                style={{ padding: '10px 20px' }}
-                disabled={!selectedType || (selectedType === 'custom' && !customText)} // Блокируем кнопку, если выбор не сделан
-            >
-                Данные о получателе
-            </button>
         </div>
     );
 };

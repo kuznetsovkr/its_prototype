@@ -1,38 +1,99 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect  } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ClothingSelector.css';
-import tshirtImage from '../images/free-icon-t-shirt-2634593.png'; // Укажите путь к изображению футболки
-import sweaterImage from '../images/free-icon-hoodie-5638935.png'; // Укажите путь к изображению кофты
 import infoIcon from '../images/free-icon-font-info-3916699.png';
-import whiteTShirt from '../images/free-icon-t-shirt-2634728.png';
-import whiteHoodie from '../images/free-icon-hoodie-5638907.png'; 
+
+import blackTShirt from '../images/t-shirts/t_shirt_black.jpg';
+import blueTShirt from '../images/t-shirts/t_shirt_blue.jpg';
+import grayTShirt from '../images/t-shirts/t_shirt_gray.jpg';
+import greenTShirt from '../images/t-shirts/t_shirt_green.jpg';
+import redTShirt from '../images/t-shirts/t_shirt_red.jpeg';
+
+import blackHoodie from '../images/hoodies/hoodies_black.jpg';
+import brownHoodie from '../images/hoodies/hoodies_brown.jpg';
+import greenHoodie from '../images/hoodies/hoodies_green.jpg';
+import orangeHoodie from '../images/hoodies/hoodies_orange.jpg';
+import pinkHoodie from '../images/hoodies/hoodies_pink.jpg';
+import purpleHoodie from '../images/hoodies/hoodies_purple.jpg';
+import whiteHoodie from '../images/hoodies/hoodies_white.jpg';
+
+import blackLongsleeve from '../images/longsleeve/long_black.jpg';
+import blueLongsleeve from '../images/longsleeve/long_blue.jpg';
+import greenLongsleeve from '../images/longsleeve/long_green.jpg';
+import yellowLongsleeve from '../images/longsleeve/long_yellow.jpg';
+
+import placeholderImage from '../images/free-icon-browser-3585596.png';
+
+
+
 
 const ClothingSelector = () => {
     const [step, setStep] = useState(1); // 1 - выбор типа одежды, 2 - выбор размера
     const [selectedClothing, setSelectedClothing] = useState('tshirt'); // Тип одежды
     const [selectedSize, setSelectedSize] = useState(''); // Размер одежды
-    const [selectedColor, setSelectedColor] = useState(''); // Для цвета
+    const [selectedColor, setSelectedColor] = useState('black'); // Для цвета
     const navigate = useNavigate(); // Для навигации между страницами
+   
 
-    // Определяем изображение на основе выбранного типа одежды
-    const getClothingImage = () => {
-        // Сначала проверяем, если выбран "не цветной" вариант
-        if (selectedColor === 'not_color') {
-            return selectedClothing === 'tshirt'
-                ? whiteTShirt // Картинка белой футболки
-                : whiteHoodie; // Картинка белого худи
+    const clothingImages = {
+        tshirt: {
+            black: blackTShirt,
+            blue: blueTShirt,
+            gray: grayTShirt,
+            green: greenTShirt,
+            red: redTShirt
+        },
+        hoodies: {
+            black: blackHoodie,
+            brown: brownHoodie,
+            green: greenHoodie,
+            orange: orangeHoodie,
+            pink: pinkHoodie,
+            purple: purpleHoodie,
+            white: whiteHoodie
+        },
+        longsleeve: {
+            black: blackLongsleeve,
+            blue: blueLongsleeve,
+            green: greenLongsleeve,
+            yellow: yellowLongsleeve
         }
-
-        // Затем проверяем выбранное изделие
-        if (selectedClothing === 'tshirt') {
-            return tshirtImage; // Цветная футболка
-        } else if (selectedClothing === 'sweater') {
-            return sweaterImage; // Цветное худи
-        }
-
-        // Заглушка по умолчанию (например, если ничего не выбрано)
-        return 'https://via.placeholder.com/300?text=Select+Clothing';
     };
+
+    const clothingColors = {
+        tshirt: ['black', 'blue', 'gray', 'green','red'],
+        hoodies: ['black', 'brown', 'green', 'orange', 'pink','purple','white'],
+        longsleeve: ['black', 'blue', 'green', 'yellow']
+    };
+
+    const colorHex = {
+        black: '#000000',
+        blue: '#0000FF',
+        brown: '#8B4513',
+        gray: '#808080',
+        green: '#008000',
+        red: '#FF0000',
+        orange: '#FFA500',
+        pink: '#FFC0CB',   
+        purple: '#800080', 
+        yellow: '#FFFF00' , 
+        white: '#FFFFFF',
+        not_color: '#CCC'
+    };
+
+    const getClothingImage = () => {
+        if (selectedColor === 'not_color') {
+            return clothingImages[selectedClothing]?.black || placeholderImage;
+        }
+        return clothingImages[selectedClothing]?.[selectedColor] || placeholderImage;
+    };
+
+    // Устанавливаем первый доступный цвет при смене типа одежды
+    useEffect(() => {
+        if (clothingColors[selectedClothing]?.length > 0) {
+            setSelectedColor(clothingColors[selectedClothing][0]); // Устанавливаем первый цвет из списка
+        }
+    }, [selectedClothing]);
 
 
     // Переход на следующий шаг
@@ -48,7 +109,7 @@ const ClothingSelector = () => {
     // Переход на предыдущий шаг
     const goToPreviousStep = () => {
         if (step === 2) {
-            setSelectedColor('color'); // Сбрасываем цвет на "цветной" при возврате на шаг 1
+            setSelectedColor('black'); // Сбрасываем цвет на "цветной" при возврате на шаг 1
         }
         setStep((prevStep) => Math.max(prevStep - 1, 1));
     };
@@ -92,11 +153,21 @@ const ClothingSelector = () => {
                                 <input
                                     type="radio"
                                     name="clothing"
-                                    value="sweater"
-                                    checked={selectedClothing === 'sweater'}
+                                    value="hoodies"
+                                    checked={selectedClothing === 'hoodies'}
                                     onChange={(e) => setSelectedClothing(e.target.value)}
                                 />
                                 Худи
+                            </label>
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="clothing"
+                                    value="longsleeve"
+                                    checked={selectedClothing === 'longsleeve'}
+                                    onChange={(e) => setSelectedClothing(e.target.value)}
+                                />
+                                Лонгслив
                             </label>
                         </div>
                         <button onClick={goToNextStep}>
@@ -141,43 +212,62 @@ const ClothingSelector = () => {
                                 />
                                 L
                             </label>
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="size"
+                                    value="XL"
+                                    checked={selectedSize === 'XL'}
+                                    onChange={(e) => setSelectedSize(e.target.value)}
+                                />
+                                XL
+                            </label>
                         </div>
                         <div className="colorSelectorStep2">
-                            {['color', 'not_color'].map((color) => (
+                            {clothingColors[selectedClothing]?.map((color) => (
                                 <div
                                     key={color}
-                                    onClick={() => setSelectedColor(color)} // Обновляем выбранный цвет
+                                    onClick={() => setSelectedColor(color)}
                                     style={{
-                                        width: '15px',
-                                        height: '15px',
-                                        borderRadius: '50%',
-                                        backgroundColor: color === 'color' ? '#FF5733' : '#CCC',
+                                        width: '30px', // Увеличил немного размер для лучшей видимости эффекта
+                                        height: '30px',
+                                        borderRadius: '20%', // Сделал круги ровными
+                                        backgroundColor: colorHex[color],
                                         cursor: 'pointer',
-                                        border: selectedColor === color ? '2px solid black' : '1px solid #999', // Выделяем выбранный кружок
+                                        display: 'inline-block',
+                                        margin: '5px',
+                                        transition: 'box-shadow 0.3s ease-in-out, transform 0.2s', // Плавное появление подсветки
+                                        boxShadow: selectedColor === color 
+                                            ? '0px 0px 10px rgba(0, 0, 0, 0.5)' // Добавляем свечение при выборе
+                                            : '0px 0px 5px rgba(0, 0, 0, 0.2)', // Легкая тень для всех остальных
+                                        transform: selectedColor === color ? 'scale(1.1)' : 'scale(1)', // Немного увеличиваем выбранный цвет
                                     }}
                                 ></div>
                             ))}
                         </div>
-                        <a
-                            href="#"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                alert('Здесь будет размерная сетка'); // Замените на модальное окно или компонент
-                            }}
-                            style={{ display: 'block', marginTop: '10px', color: 'blue', textDecoration: 'underline' }}
-                        >
-                            Размерная сетка
-                        </a>
-                        <div className="buttonContainer"> 
-                            <button onClick={goToPreviousStep}>
-                                Шаг назад
-                            </button>
-                            <button
-                                onClick={goToNextStep}
-                                disabled={!selectedSize || !selectedColor} // Блокируем кнопку, если размер не выбран
-                            >
-                                Следующий шаг
-                            </button>
+                        <div className="buttonContainer">
+                            <div className="sizeButton">
+                                <a
+                                    href="#"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        alert('Здесь будет размерная сетка'); // Замените на модальное окно или компонент
+                                    }}
+                                >
+                                    Размерная сетка
+                                </a>
+                            </div>
+                            <div className="stepButton">
+                                <button onClick={goToPreviousStep}>
+                                    Шаг назад
+                                </button>
+                                <button
+                                    onClick={goToNextStep}
+                                    disabled={!selectedSize || !selectedColor} // Блокируем кнопку, если размер не выбран
+                                >
+                                    Следующий шаг
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </>

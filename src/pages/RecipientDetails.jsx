@@ -13,8 +13,69 @@ const RecipientDetails = () => {
     const [embroideryPrice, setEmbroideryPrice] = useState(1000); // Примерная цена вышивки
     const [agreementChecked, setAgreementChecked] = useState(false);
 
+    // Получение токена API CDEK
+    const getCdekToken = async () => {
+        const clientId = 'your_client_id'; // Укажи свой client_id
+        const clientSecret = 'your_client_secret'; // Укажи свой client_secret
+
+        try {
+            const response = await fetch('https://api.edu.cdek.ru/v2/oauth/token?grant_type=client_credentials', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    client_id: clientId,
+                    client_secret: clientSecret,
+                }),
+            });
+
+            const data = await response.json();
+            return data.access_token;
+        } catch (error) {
+            console.error('Ошибка при получении токена:', error);
+            return null;
+        }
+    };
+
+    // Функция расчета стоимости доставки
+    const calculateDelivery = async (cityTo) => {
+        const token = await getCdekToken();
+        if (!token) return;
+
+        const requestBody = {
+            "from_location": { "code": 270 }, // Код города отправки (пример: Москва)
+            "to_location": { "code": cityTo }, // Код города получателя
+            "packages": [{ "weight": 500, "length": 10, "width": 10, "height": 10 }]
+        };
+
+        try {
+            const response = await fetch('https://api.edu.cdek.ru/v2/calculator/tarifflist', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            const data = await response.json();
+            if (data.errors) {
+                console.error('Ошибка расчёта:', data.errors);
+                return;
+            }
+
+            // Выбираем минимальную стоимость доставки
+            const minPrice = data.tariff_codes?.reduce((min, tariff) => 
+                tariff.delivery_sum < min ? tariff.delivery_sum : min, Infinity
+            );
+
+            setDeliveryPrice(minPrice || 0);
+        } catch (error) {
+            console.error('Ошибка при расчёте доставки:', error);
+        }
+    };
+
+    // Получение пунктов выдачи CDEK
     useEffect(() => {
-        // Запрос к API СДЭК для получения пунктов выдачи
         async function fetchPickupPoints() {
             try {
                 const response = await fetch('https://api.cdek.ru/pickup_points', {
@@ -32,11 +93,18 @@ const RecipientDetails = () => {
         }
     }, [noCdekInCity]);
 
+    // Пересчет стоимости доставки при выборе пункта
+    useEffect(() => {
+        if (selectedPoint) {
+            const cityTo = 270; // Код города получения (замени на актуальный)
+            calculateDelivery(cityTo);
+        }
+    }, [selectedPoint]);
+
     const totalPrice = embroideryPrice + (noCdekInCity ? 0 : deliveryPrice);
 
     const handlePayment = () => {
-        // Генерация номера заказа
-        const orderNumber = Math.floor(100000 + Math.random() * 900000); // Пример случайного номера
+        const orderNumber = Math.floor(100000 + Math.random() * 900000); // Генерация номера заказа
         navigate('/thank-you', {
             state: { orderNumber, selectedType, customText, uploadedImage, comment },
         });

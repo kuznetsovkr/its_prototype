@@ -1,30 +1,27 @@
 import React from 'react';
 import './Footer.css';
-
+import vkIcon from '../images/vk-icon.svg';
+import telegramIcon from '../images/telegram-icon.svg';
+import instagramIcon from '../images/instagram-icon.svg';
 
 const Footer = () => {
     return (
         <footer className="footer">
             <div className="footer-content">
                 <div className="contact-info">
-                    <p>Контактный номер: <a href="tel:+79991234567">+7 (999) 123-45-67</a></p>
-                    <p>Email: <a href="mailto:info@embroideryshop.ru">info@embroideryshop.ru</a></p>
+                    
                 </div>
 
                 <div className="social-links">
-                    <a href="" target="_blank" rel="noopener noreferrer">
-                        <img  alt="VK" className="social-icon" />
+                    <a href="https://vk.com/its.custom" target="_blank" rel="noopener noreferrer">
+                        <img src={vkIcon} alt="VK" className="social-icon" />
                     </a>
-                    <a href="" target="_blank" rel="noopener noreferrer">
-                        <img alt="Telegram" className="social-icon" />
+                    <a href="https://t.me/alexchudaev123" target="_blank" rel="noopener noreferrer">
+                        <img src={telegramIcon} alt="Telegram" className="social-icon" />
                     </a>
-                    <a href="" target="_blank" rel="noopener noreferrer">
-                        <img  alt="Instagram" className="social-icon" />
+                    <a href="https://www.instagram.com/i.tak_soydet" target="_blank" rel="noopener noreferrer">
+                        <img src={instagramIcon} alt="Instagram" className="social-icon" />
                     </a>
-                </div>
-
-                <div className="size-guide">
-                    <a href="/size-guide" className="size-guide-link">Размерная сетка</a>
                 </div>
             </div>
             <p>© 2025 Магазин Вышивки. Все права защищены.</p>

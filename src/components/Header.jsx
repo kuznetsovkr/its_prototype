@@ -3,6 +3,7 @@ import './Header.css';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../images/logo_its.jpg';
 import auth from '../images/free-icon-font-user-3917688.svg';
+import AuthModal from "../AuthModal"; // Подключаем модальное окно
 
 const Header = () => {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -47,28 +48,9 @@ const Header = () => {
                         onClick={toggleAuthModal}
                     />
                 </div>
+                {/* Подключаем модальное окно авторизации */}
+                <AuthModal isAuthModalOpen={isAuthModalOpen} toggleAuthModal={toggleAuthModal} />
             </header>
-
-            {/* Модальное окно авторизации */}
-            {isAuthModalOpen && (
-                <div className="modal-overlay" onClick={toggleAuthModal}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <button className="close-button" onClick={toggleAuthModal}>×</button>
-                        <h2>Вход</h2>
-                        <form className="auth-form">
-                            <label htmlFor="phone">Мобильный телефон:</label>
-                            <input
-                                type="tel"
-                                id="phone"
-                                name="phone"
-                                placeholder="+7 (___) ___-__-__"
-                                required
-                            />
-                            <button type="submit" className="submit-button">Войти</button>
-                        </form>
-                    </div>
-                </div>
-            )}
 
             {/* Модальное окно отслеживания заказа */}
             {isOrderModalOpen && (
