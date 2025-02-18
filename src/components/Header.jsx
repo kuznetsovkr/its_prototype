@@ -1,30 +1,56 @@
-import React, { useState } from 'react';
-import './Header.css';
-import { Link, useNavigate } from 'react-router-dom';
-import logo from '../images/logo_its.jpg';
-import auth from '../images/free-icon-font-user-3917688.svg';
-import AuthModal from "../AuthModal"; // Подключаем модальное окно
+import React, { useState, useEffect } from "react";
+import "./Header.css";
+import { Link, useNavigate } from "react-router-dom";
+import logo from "../images/logo_its.jpg";
+import auth from "../images/free-icon-font-user-3917688.svg";
+import AuthModal from "../AuthModal";
 
 const Header = () => {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
     const [orderStatus, setOrderStatus] = useState(null);
-    const [orderNumber, setOrderNumber] = useState('');
+    const [orderNumber, setOrderNumber] = useState("");
+    const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
     const navigate = useNavigate();
 
-    const toggleAuthModal = () => setIsAuthModalOpen(!isAuthModalOpen);
     const toggleOrderModal = () => setIsOrderModalOpen(!isOrderModalOpen);
 
     const handleOrderSubmit = (e) => {
         e.preventDefault();
-        // Пример статуса заказа. Можно заменить на реальный запрос к API.
         setOrderStatus(`Статус заказа №${orderNumber}: В пути`);
+    };
+
+    // 🔹 Функция успешного входа, вызывается после логина
+    const handleLoginSuccess = () => {
+        setIsAuthenticated(true);
+        setIsAuthModalOpen(false);
+    };
+
+    // 🔹 Следим за изменением токена в `localStorage`
+    useEffect(() => {
+        const handleStorageChange = () => {
+            setIsAuthenticated(!!localStorage.getItem("token"));
+        };
+
+        window.addEventListener("storage", handleStorageChange);
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+        };
+    }, []);
+
+    // 🔹 Функция обработки клика на кнопку профиля
+    const handleAuthClick = () => {
+        if (isAuthenticated) {
+            navigate("/profile");
+        } else {
+            setIsAuthModalOpen(true);
+        }
     };
 
     return (
         <>
             <header className="header">
-                <div className="logo" onClick={() => navigate('/')}>
+                <div className="logo" onClick={() => navigate("/")}>
                     <img src={logo} alt="Logo" />
                 </div>
 
@@ -40,19 +66,19 @@ const Header = () => {
                     </button>
                 </div>
 
-                <div className="auth-button">
-                    <img
-                        src={auth}
-                        alt="auth"
-                        className="auth-button"
-                        onClick={toggleAuthModal}
-                    />
+                {/* 🔹 Проверяем авторизацию перед открытием окна */}
+                <div className="auth-button" onClick={handleAuthClick}>
+                    <img src={auth} alt="auth" className="auth-button" />
                 </div>
-                {/* Подключаем модальное окно авторизации */}
-                <AuthModal isAuthModalOpen={isAuthModalOpen} toggleAuthModal={toggleAuthModal} />
+
+                {/* Передаем `onLoginSuccess`, чтобы обновлять состояние при логине */}
+                <AuthModal 
+                    isAuthModalOpen={isAuthModalOpen} 
+                    toggleAuthModal={() => setIsAuthModalOpen(false)}
+                    onLoginSuccess={handleLoginSuccess}
+                />
             </header>
 
-            {/* Модальное окно отслеживания заказа */}
             {isOrderModalOpen && (
                 <div className="modal-overlay" onClick={toggleOrderModal}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>

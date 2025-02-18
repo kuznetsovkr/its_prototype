@@ -1,89 +1,92 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-const AuthModal = ({ isAuthModalOpen, toggleAuthModal }) => {
+const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
     const [phone, setPhone] = useState("");
     const [smsCode, setSmsCode] = useState("");
-    const [isCodeSent, setIsCodeSent] = useState(false);
+    const [step, setStep] = useState(1); // 1 - ввод номера, 2 - ввод кода
+    const [errorMessage, setErrorMessage] = useState(""); // ✅ Ошибки
 
-    // Отправка запроса на SMS-код
-    const requestSmsCode = async () => {
+    // ✅ Сбрасываем форму при закрытии окна
+    useEffect(() => {
+        if (!isAuthModalOpen) {
+            setPhone("");
+            setSmsCode("");
+            setStep(1);
+            setErrorMessage("");
+        }
+    }, [isAuthModalOpen]);
+
+    const handleRequestSMS = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/auth/request-sms", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phone }),
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setIsCodeSent(true);
-                alert("Код отправлен!");
-            } else {
-                alert(data.message);
-            }
+            await axios.post("http://localhost:5000/api/auth/request-sms", { phone });
+            setStep(2);
+            setErrorMessage(""); // Очистка ошибок при успешной отправке
         } catch (error) {
-            console.error("Ошибка отправки кода:", error);
+            console.error("Ошибка при запросе SMS:", error);
+            setErrorMessage("Ошибка при отправке SMS. Попробуйте снова.");
         }
     };
 
-    // Отправка запроса на авторизацию
-    const handleLogin = async (e) => {
-        e.preventDefault();
+    const handleLogin = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phone, smsCode }),
-            });
-            const data = await response.json();
-            if (response.ok) {
-                localStorage.setItem("token", data.token);
-                alert("Вы успешно вошли!");
-                toggleAuthModal();
-            } else {
-                alert(data.message);
-            }
+            const response = await axios.post("http://localhost:5000/api/auth/login", { phone, smsCode });
+            localStorage.setItem("token", response.data.token);
+            
+            if (onLoginSuccess) onLoginSuccess();
         } catch (error) {
-            console.error("Ошибка авторизации:", error);
+            console.error("Ошибка при авторизации:", error);
+            setErrorMessage("Неверный код. Попробуйте снова.");
         }
     };
 
-    return isAuthModalOpen ? (
-        <div className="modal-overlay" onClick={toggleAuthModal}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="close-button" onClick={toggleAuthModal}>×</button>
-                <h2>Вход</h2>
-                <form className="auth-form" onSubmit={isCodeSent ? handleLogin : (e) => { e.preventDefault(); requestSmsCode(); }}>
-                    <label htmlFor="phone">Мобильный телефон:</label>
-                    <input
-                        type="tel"
-                        id="phone"
-                        name="phone"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="+7 (___) ___-__-__"
-                        required
-                        disabled={isCodeSent}
-                    />
-                    {isCodeSent && (
+    return (
+        isAuthModalOpen && (
+            <div className="modal-overlay" onClick={toggleAuthModal}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                    <button className="close-button" onClick={toggleAuthModal}>×</button>
+                    <h2>Вход</h2>
+
+                    {step === 1 ? (
                         <>
-                            <label htmlFor="smsCode">Код из SMS:</label>
+                            <label htmlFor="phone">Мобильный телефон:</label>
+                            <input
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                placeholder="+7 (___) ___-__-__"
+                                required
+                            />
+                            <button onClick={handleRequestSMS} className="submit-button">
+                                Получить код
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <label htmlFor="smsCode">Введите код из SMS:</label>
                             <input
                                 type="text"
                                 id="smsCode"
                                 name="smsCode"
                                 value={smsCode}
                                 onChange={(e) => setSmsCode(e.target.value)}
+                                placeholder="Введите код"
                                 required
                             />
+                            <button onClick={handleLogin} className="submit-button">
+                                Войти
+                            </button>
                         </>
                     )}
-                    <button type="submit" className="submit-button">
-                        {isCodeSent ? "Подтвердить" : "Отправить код"}
-                    </button>
-                </form>
+
+                    {/* 🔹 Вывод ошибки */}
+                    {errorMessage && <p style={{ color: "red", marginTop: "10px" }}>{errorMessage}</p>}
+                </div>
             </div>
-        </div>
-    ) : null;
+        )
+    );
 };
 
 export default AuthModal;

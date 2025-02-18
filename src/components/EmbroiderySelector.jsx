@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation  } from 'react-router-dom';
 import './EmbroiderySelector.css';
 
 import face from '../images/embroidery/face.png';
@@ -15,6 +15,9 @@ const EmbroiderySelector = () => {
     const [customText, setCustomText] = useState(''); // Текст для "Другая"
     const [uploadedImage, setUploadedImage] = useState(null); // Загрузка изображения
     const [comment, setComment] = useState(''); // Комментарий
+    const location = useLocation();
+    const { selectedClothing, selectedSize, selectedColor } = location.state || {}; // Если данных нет, будет `undefined`
+
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -29,6 +32,9 @@ const EmbroiderySelector = () => {
                 customText,
                 uploadedImage,
                 comment,
+                productType: selectedClothing, // ✅ Добавлено
+                size: selectedSize,            // ✅ Добавлено
+                color: selectedColor,          // ✅ Добавлено
             },
         });
     };

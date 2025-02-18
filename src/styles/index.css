@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Neucha&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 * {
     margin: 0;
     padding: 0;
-    font-family: 'Neucha', sans-serif;
+    font-family: 'Montserrat', sans-serif;
 }
 .container {
     display: flex;
@@ -11,7 +11,7 @@
 }
 .wrapper{
     width: 1024px;
-    border: 1px solid black;
+    
 }
 
 main{
@@ -31,8 +31,3 @@ footer {
 
 }
 
-.neucha-regular {
-    font-family: "Neucha", serif;
-    font-weight: 400;
-    font-style: normal;
-}

@@ -1,98 +1,174 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
     const navigate = useNavigate();
-    const [trackingFormVisible, setTrackingFormVisible] = useState(false);
-    const [orderNumber, setOrderNumber] = useState('');
-    const [orderStatus, setOrderStatus] = useState('');
+    const [userData, setUserData] = useState({
+        firstName: "",
+        lastName: "",
+        middleName: "",
+        birthDate: "",
+        phone: "",
+    });
 
-    const handleTrackOrder = () => {
-        // Здесь вы можете сделать запрос к API для получения статуса заказа.
-        // Пример ниже имитирует успешный ответ.
-        if (orderNumber === '123456') {
-            setOrderStatus('Заказ доставлен.');
-        } else {
-            setOrderStatus('Заказ не найден.');
+    const [isEditing, setIsEditing] = useState(false);
+    const [isUserAuthenticated, setIsUserAuthenticated] = useState(!!localStorage.getItem("token"));
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+
+            try {
+                const response = await fetch("http://localhost:5000/api/user/me", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setUserData({
+                        firstName: data.firstName || "",
+                        lastName: data.lastName || "",
+                        middleName: data.middleName || "",
+                        birthDate: data.birthDate || "",
+                        phone: data.phone || "",
+                    });
+                }
+            } catch (error) {
+                console.error("Ошибка получения данных пользователя:", error);
+            }
+        };
+
+        if (isUserAuthenticated) {
+            fetchUserData();
+        }
+    }, [isUserAuthenticated]);
+
+    // ✅ Функция обновления данных
+    const handleSave = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        try {
+            const response = await fetch("http://localhost:5000/api/user/update", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(userData),
+            });
+
+            if (response.ok) {
+                alert("Данные успешно обновлены!");
+                setIsEditing(false);
+            } else {
+                alert("Ошибка обновления данных.");
+            }
+        } catch (error) {
+            console.error("Ошибка обновления данных:", error);
         }
     };
 
+    // ✅ Функция выхода
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        window.dispatchEvent(new Event("storage"));
+        navigate("/");
+    };
+
     return (
-        <div style={{ display: 'flex', padding: '20px', gap: '20px' }}>
-            {/* Первая колонка */}
-            <div style={{ flex: 1, borderRight: '1px solid #ccc', paddingRight: '20px' }}>
+        <div style={{ display: "flex", padding: "20px", gap: "20px" }}>
+            {/* Левая колонка */}
+            <div style={{ flex: 1, borderRight: "1px solid #ccc", paddingRight: "20px" }}>
                 <h1>Профиль</h1>
-                <p><strong>Имя:</strong> Кирилл</p>
-                <p><strong>Фамилия:</strong> Кузнецов</p>
-                <p><strong>Дата рождения:</strong> 25.09.2001</p>
-                <p><strong>Телефон:</strong> +7 996 429-25-50</p>
-            </div>
 
-            {/* Вторая колонка */}
-            <div style={{ flex: 1, paddingLeft: '20px' }}>
-                <h2>Навигация</h2>
-                <ul style={{ listStyle: 'none', padding: 0 }}>
-                    <li style={{ marginBottom: '10px' }}>
-                        <button
-                            onClick={() => navigate('/order-history')}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                color: '#007bff',
-                                cursor: 'pointer',
-                                textDecoration: 'underline',
-                            }}
-                        >
-                            История заказов
-                        </button>
-                    </li>
-                    <li style={{ marginBottom: '10px' }}>
-                        <button
-                            onClick={() => setTrackingFormVisible(!trackingFormVisible)}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                color: '#007bff',
-                                cursor: 'pointer',
-                                textDecoration: 'underline',
-                            }}
-                        >
-                            Отследить заказ
-                        </button>
-                    </li>
-                </ul>
+                <label>Фамилия:</label>
+                <input
+                    type="text"
+                    name="lastName"
+                    value={userData.lastName}
+                    onChange={(e) => setUserData({ ...userData, lastName: e.target.value })}
+                    disabled={!isEditing}
+                />
 
-                {/* Форма отслеживания заказа */}
-                {trackingFormVisible && (
-                    <div style={{ marginTop: '20px' }}>
-                        <h3>Введите номер заказа</h3>
-                        <input
-                            type="text"
-                            value={orderNumber}
-                            onChange={(e) => setOrderNumber(e.target.value)}
-                            placeholder="Номер заказа"
-                            style={{ padding: '10px', width: '70%', marginBottom: '10px' }}
-                        />
-                        <button
-                            onClick={handleTrackOrder}
-                            style={{
-                                padding: '10px 20px',
-                                backgroundColor: '#007bff',
-                                color: '#fff',
-                                border: 'none',
-                                cursor: 'pointer',
-                            }}
-                        >
-                            Отследить
-                        </button>
+                <label>Имя:</label>
+                <input
+                    type="text"
+                    name="firstName"
+                    value={userData.firstName}
+                    onChange={(e) => setUserData({ ...userData, firstName: e.target.value })}
+                    disabled={!isEditing}
+                />
 
-                        {orderStatus && (
-                            <p style={{ marginTop: '10px', fontWeight: 'bold' }}>
-                                Статус заказа: {orderStatus}
-                            </p>
-                        )}
-                    </div>
+                <label>Отчество:</label>
+                <input
+                    type="text"
+                    name="middleName"
+                    value={userData.middleName}
+                    onChange={(e) => setUserData({ ...userData, middleName: e.target.value })}
+                    disabled={!isEditing}
+                />
+
+                <label>Дата рождения:</label>
+                <input
+                    type="date"
+                    name="birthDate"
+                    value={userData.birthDate}
+                    onChange={(e) => setUserData({ ...userData, birthDate: e.target.value })}
+                    disabled={!isEditing}
+                />
+
+                <label>Телефон:</label>
+                <input type="tel" name="phone" value={userData.phone} disabled />
+
+                {/* Кнопки */}
+                {!isEditing ? (
+                    <button
+                        onClick={() => setIsEditing(true)}
+                        style={{
+                            marginTop: "10px",
+                            padding: "10px 20px",
+                            backgroundColor: "#007bff",
+                            color: "#fff",
+                            border: "none",
+                            cursor: "pointer",
+                            borderRadius: "5px",
+                        }}
+                    >
+                        Редактировать
+                    </button>
+                ) : (
+                    <button
+                        onClick={handleSave}
+                        style={{
+                            marginTop: "10px",
+                            padding: "10px 20px",
+                            backgroundColor: "#28a745",
+                            color: "#fff",
+                            border: "none",
+                            cursor: "pointer",
+                            borderRadius: "5px",
+                        }}
+                    >
+                        Сохранить
+                    </button>
                 )}
+
+                {/* Кнопка "Выйти" */}
+                <button
+                    onClick={handleLogout}
+                    style={{
+                        marginTop: "20px",
+                        padding: "10px 20px",
+                        backgroundColor: "#dc3545",
+                        color: "#fff",
+                        border: "none",
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                    }}
+                >
+                    Выйти
+                </button>
             </div>
         </div>
     );

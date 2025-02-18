@@ -1,21 +1,35 @@
 .works {
-    padding: 20px;
+  text-align: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh; /* Растягиваем по высоте экрана */
 }
 
-.gallery {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+.works h1 {
+  margin-bottom: 20px;
+  font-size: 2em;
 }
 
-.work-item {
-    text-align: center;
+/* Основная сетка */
+.masonry-grid {
+  display: flex;
+  margin-left: -10px; /* Убираем лишний отступ */
+  width: auto;
 }
 
-.work-item img {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.masonry-grid_column {
+  padding-left: 10px;
+  background-clip: padding-box;
+}
+
+/* Стили для изображений */
+.masonry-item {
+  margin-bottom: 10px;
+}
+
+.masonry-item img {
+  width: 100%;
+  border-radius: 8px; /* Округлённые углы */
+  display: block;
+  object-fit: cover;
 }
