@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./ClothingSelector.css";
 import infoIcon from "../images/free-icon-font-info-3916699.png";
 
 import blackTShirt from "../images/t-shirts/t_shirt_black.jpg";
@@ -93,7 +92,7 @@ const ClothingSelector = () => {
                                 key={color}
                                 onClick={() => setSelectedColor(color)}
                                 style={{
-                                    width: "30px", height: "30px", borderRadius: "50%", backgroundColor: colorHex[color],
+                                    width: "30px", height: "30px", borderRadius: "30%", backgroundColor: colorHex[color],
                                     cursor: "pointer", display: "inline-block", margin: "5px",
                                     boxShadow: selectedColor === color ? "0px 0px 10px rgba(0, 0, 0, 0.5)" : "none",
                                     transform: selectedColor === color ? "scale(1.1)" : "scale(1)"

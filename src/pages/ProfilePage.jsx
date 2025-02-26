@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
     const navigate = useNavigate();
+     const [role, setRole] = useState(localStorage.getItem("role") || "user");
     const [userData, setUserData] = useState({
         firstName: "",
         lastName: "",
@@ -15,6 +16,7 @@ const ProfilePage = () => {
     const [isUserAuthenticated, setIsUserAuthenticated] = useState(!!localStorage.getItem("token"));
 
     useEffect(() => {
+        setRole(localStorage.getItem("role") || "user");
         const fetchUserData = async () => {
             const token = localStorage.getItem("token");
             if (!token) return;
@@ -72,12 +74,30 @@ const ProfilePage = () => {
     // ✅ Функция выхода
     const handleLogout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("role");
         window.dispatchEvent(new Event("storage"));
         navigate("/");
     };
-
     return (
         <div style={{ display: "flex", padding: "20px", gap: "20px" }}>
+            <div style={{ display: "flex", padding: "20px", gap: "20px" }}>
+                <div style={{ flex: 1, borderRight: "1px solid #ccc", paddingRight: "20px" }}>
+                    <h1>Профиль</h1>
+                    <p><strong>Роль:</strong> {role === "admin" ? "Администратор" : "Пользователь"}</p>
+
+                    {role === "admin" ? (
+                        <button onClick={() => navigate("/admin-panel")}>
+                            Перейти в админ-панель
+                        </button>
+                    ) : (
+                        <button onClick={() => navigate("/order-history")}>
+                            История заказов
+                        </button>
+                    )}
+
+                    <button onClick={handleLogout}>Выйти</button>
+                </div>
+            </div>
             {/* Левая колонка */}
             <div style={{ flex: 1, borderRight: "1px solid #ccc", paddingRight: "20px" }}>
                 <h1>Профиль</h1>

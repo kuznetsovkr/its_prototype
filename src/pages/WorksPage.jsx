@@ -1,6 +1,4 @@
 import React from "react";
-import Masonry from "react-masonry-css";
-import "./WorksPage.css";
 
 // Импортируем изображения
 import img1 from "../images/works/1.jpg";
@@ -29,22 +27,6 @@ const Works = () => {
   return (
     <div className="works">
       <h1>Примеры работ</h1>
-      <Masonry
-        breakpointCols={{
-          default: 4, // 4 колонки по умолчанию
-          1200: 3, // 3 колонки при ширине экрана <1200px
-          768: 2,  // 2 колонки при ширине <768px
-          480: 1,  // 1 колонка при ширине <480px
-        }}
-        className="masonry-grid"
-        columnClassName="masonry-grid_column"
-      >
-        {repeatedImages.map((src, index) => (
-          <div key={index} className="masonry-item">
-            <img src={src} alt={`Work ${index + 1}`} />
-          </div>
-        ))}
-      </Masonry>
     </div>
   );
 };

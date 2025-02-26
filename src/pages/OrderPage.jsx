@@ -1,5 +1,4 @@
 import React from 'react';
-import './OrderPage.css';
 import ClothingSelector from "../components/ClothingSelector";
 
 const OrderPage = () => {

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate,useLocation  } from 'react-router-dom';
-import './EmbroiderySelector.css';
 
 import face from '../images/embroidery/face.png';
 import hvost from '../images/embroidery/hvost.png';

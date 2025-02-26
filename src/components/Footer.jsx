@@ -1,5 +1,4 @@
 import React from 'react';
-import './Footer.css';
 import vkIcon from '../images/vk-icon.svg';
 import telegramIcon from '../images/telegram-icon.svg';
 import instagramIcon from '../images/instagram-icon.svg';

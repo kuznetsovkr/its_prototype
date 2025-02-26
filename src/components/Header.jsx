@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "./Header.css";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../images/logo_its.jpg";
 import auth from "../images/free-icon-font-user-3917688.svg";
