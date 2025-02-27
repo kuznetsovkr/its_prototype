@@ -9,35 +9,54 @@ const Header = () => {
     const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
     const [orderStatus, setOrderStatus] = useState(null);
     const [orderNumber, setOrderNumber] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
     const navigate = useNavigate();
 
-    const toggleOrderModal = () => setIsOrderModalOpen(!isOrderModalOpen);
-
-    const handleOrderSubmit = (e) => {
-        e.preventDefault();
-        setOrderStatus(`Статус заказа №${orderNumber}: В пути`);
+    const toggleOrderModal = () => {
+        setIsOrderModalOpen(!isOrderModalOpen);
+        setOrderStatus(null); // Очищаем статус при закрытии
+        setOrderNumber(""); // Очищаем поле ввода
     };
 
-    // 🔹 Функция успешного входа, вызывается после логина
+    const handleOrderSubmit = async (e) => {
+        e.preventDefault();
+        if (!orderNumber) return;
+
+        setIsLoading(true);
+        setOrderStatus(null);
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/orders/status/${orderNumber}`);
+            if (response.ok) {
+                const data = await response.json();
+                setOrderStatus(`Статус заказа №${orderNumber}: ${data.status}`);
+            } else {
+                setOrderStatus("Заказ не найден. Проверьте номер.");
+            }
+        } catch (error) {
+            console.error("Ошибка получения статуса заказа:", error);
+            setOrderStatus("Ошибка сервера. Попробуйте позже.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleLoginSuccess = () => {
         setIsAuthenticated(true);
         setIsAuthModalOpen(false);
     };
 
-    // 🔹 Следим за изменением токена в `localStorage`
     useEffect(() => {
         const handleStorageChange = () => {
             setIsAuthenticated(!!localStorage.getItem("token"));
         };
-
         window.addEventListener("storage", handleStorageChange);
         return () => {
             window.removeEventListener("storage", handleStorageChange);
         };
     }, []);
 
-    // 🔹 Функция обработки клика на кнопку профиля
     const handleAuthClick = () => {
         if (isAuthenticated) {
             navigate("/profile");
@@ -65,12 +84,10 @@ const Header = () => {
                     </button>
                 </div>
 
-                {/* 🔹 Проверяем авторизацию перед открытием окна */}
                 <div className="auth-button" onClick={handleAuthClick}>
                     <img src={auth} alt="auth" className="auth-button" />
                 </div>
 
-                {/* Передаем `onLoginSuccess`, чтобы обновлять состояние при логине */}
                 <AuthModal 
                     isAuthModalOpen={isAuthModalOpen} 
                     toggleAuthModal={() => setIsAuthModalOpen(false)}
@@ -93,7 +110,9 @@ const Header = () => {
                                 placeholder="Введите номер заказа"
                                 required
                             />
-                            <button type="submit" className="submit-button">Проверить</button>
+                            <button type="submit" className="submit-button" disabled={isLoading}>
+                                {isLoading ? "Проверяем..." : "Проверить"}
+                            </button>
                         </form>
                         {orderStatus && <p className="order-status">{orderStatus}</p>}
                     </div>

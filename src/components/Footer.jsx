@@ -7,10 +7,6 @@ const Footer = () => {
     return (
         <footer className="footer">
             <div className="footer-content">
-                <div className="contact-info">
-                    
-                </div>
-
                 <div className="social-links">
                     <a href="https://vk.com/its.custom" target="_blank" rel="noopener noreferrer">
                         <img src={vkIcon} alt="VK" className="social-icon" />
