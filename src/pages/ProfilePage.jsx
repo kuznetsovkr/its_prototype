@@ -2,196 +2,188 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
-    const navigate = useNavigate();
-     const [role, setRole] = useState(localStorage.getItem("role") || "user");
-    const [userData, setUserData] = useState({
-        firstName: "",
-        lastName: "",
-        middleName: "",
-        birthDate: "",
-        phone: "",
-    });
+  const navigate = useNavigate();
 
-    const [isEditing, setIsEditing] = useState(false);
-    const [isUserAuthenticated, setIsUserAuthenticated] = useState(!!localStorage.getItem("token"));
+  // Роль (admin / user)
+  const [role, setRole] = useState(localStorage.getItem("role") || "user");
 
-    useEffect(() => {
-        setRole(localStorage.getItem("role") || "user");
-        const fetchUserData = async () => {
-            const token = localStorage.getItem("token");
-            if (!token) return;
+  // Данные пользователя
+  const [userData, setUserData] = useState({
+    firstName: "",
+    lastName: "",
+    middleName: "",
+    birthDate: "",
+    phone: "",
+  });
 
-            try {
-                const response = await fetch("http://localhost:5000/api/user/me", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    setUserData({
-                        firstName: data.firstName || "",
-                        lastName: data.lastName || "",
-                        middleName: data.middleName || "",
-                        birthDate: data.birthDate || "",
-                        phone: data.phone || "",
-                    });
-                }
-            } catch (error) {
-                console.error("Ошибка получения данных пользователя:", error);
-            }
-        };
+  // Редактирование
+  const [isEditing, setIsEditing] = useState(false);
 
-        if (isUserAuthenticated) {
-            fetchUserData();
+  // Авторизация
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState(
+    !!localStorage.getItem("token")
+  );
+
+  useEffect(() => {
+    setRole(localStorage.getItem("role") || "user");
+
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const response = await fetch("http://localhost:5000/api/user/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setUserData({
+            firstName: data.firstName || "",
+            lastName: data.lastName || "",
+            middleName: data.middleName || "",
+            birthDate: data.birthDate || "",
+            phone: data.phone || "",
+          });
         }
-    }, [isUserAuthenticated]);
-
-    // ✅ Функция обновления данных
-    const handleSave = async () => {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
-        try {
-            const response = await fetch("http://localhost:5000/api/user/update", {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(userData),
-            });
-
-            if (response.ok) {
-                alert("Данные успешно обновлены!");
-                setIsEditing(false);
-            } else {
-                alert("Ошибка обновления данных.");
-            }
-        } catch (error) {
-            console.error("Ошибка обновления данных:", error);
-        }
+      } catch (error) {
+        console.error("Ошибка получения данных пользователя:", error);
+      }
     };
 
-    // ✅ Функция выхода
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        window.dispatchEvent(new Event("storage"));
-        navigate("/");
-    };
-    return (
-        <div style={{ display: "flex", padding: "20px", gap: "20px" }}>
-            <div style={{ display: "flex", padding: "20px", gap: "20px" }}>
-                <div style={{ flex: 1, borderRight: "1px solid #ccc", paddingRight: "20px" }}>
-                    <h1>Профиль</h1>
-                    <p><strong>Роль:</strong> {role === "admin" ? "Администратор" : "Пользователь"}</p>
+    if (isUserAuthenticated) {
+      fetchUserData();
+    }
+  }, [isUserAuthenticated]);
 
-                    {role === "admin" ? (
-                        <button onClick={() => navigate("/admin-panel")}>
-                            Перейти в админ-панель
-                        </button>
-                    ) : (
-                        <button onClick={() => navigate("/order-history")}>
-                            История заказов
-                        </button>
-                    )}
+  // Сохранение данных
+  const handleSave = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-                    <button onClick={handleLogout}>Выйти</button>
-                </div>
-            </div>
-            {/* Левая колонка */}
-            <div style={{ flex: 1, borderRight: "1px solid #ccc", paddingRight: "20px" }}>
-                <h1>Профиль</h1>
+    try {
+      const response = await fetch("http://localhost:5000/api/user/update", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(userData),
+      });
 
-                <label>Фамилия:</label>
-                <input
-                    type="text"
-                    name="lastName"
-                    value={userData.lastName}
-                    onChange={(e) => setUserData({ ...userData, lastName: e.target.value })}
-                    disabled={!isEditing}
-                />
+      if (response.ok) {
+        alert("Данные успешно обновлены!");
+        setIsEditing(false);
+      } else {
+        alert("Ошибка обновления данных.");
+      }
+    } catch (error) {
+      console.error("Ошибка обновления данных:", error);
+    }
+  };
 
-                <label>Имя:</label>
-                <input
-                    type="text"
-                    name="firstName"
-                    value={userData.firstName}
-                    onChange={(e) => setUserData({ ...userData, firstName: e.target.value })}
-                    disabled={!isEditing}
-                />
+  // Выход
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    window.dispatchEvent(new Event("storage"));
+    navigate("/");
+  };
 
-                <label>Отчество:</label>
-                <input
-                    type="text"
-                    name="middleName"
-                    value={userData.middleName}
-                    onChange={(e) => setUserData({ ...userData, middleName: e.target.value })}
-                    disabled={!isEditing}
-                />
+  return (
+    <div className="profile-page">
+      {/* Левая колонка */}
+      <div className="profile-sidebar">
+        {/* Если админ — показываем кнопку "Админ панель" */}
+        {role === "admin" && (
+          <button
+            className="admin-button"
+            onClick={() => navigate("/admin-panel")}
+          >
+            Админ панель
+          </button>
+        )}
 
-                <label>Дата рождения:</label>
-                <input
-                    type="date"
-                    name="birthDate"
-                    value={userData.birthDate}
-                    onChange={(e) => setUserData({ ...userData, birthDate: e.target.value })}
-                    disabled={!isEditing}
-                />
+        {/* Блок с данными пользователя */}
+        <div className="user-info">
+          <label>Фамилия:</label>
+          <input
+            type="text"
+            value={userData.lastName}
+            onChange={(e) =>
+              setUserData({ ...userData, lastName: e.target.value })
+            }
+            disabled={!isEditing}
+          />
 
-                <label>Телефон:</label>
-                <input type="tel" name="phone" value={userData.phone} disabled />
+          <label>Имя:</label>
+          <input
+            type="text"
+            value={userData.firstName}
+            onChange={(e) =>
+              setUserData({ ...userData, firstName: e.target.value })
+            }
+            disabled={!isEditing}
+          />
 
-                {/* Кнопки */}
-                {!isEditing ? (
-                    <button
-                        onClick={() => setIsEditing(true)}
-                        style={{
-                            marginTop: "10px",
-                            padding: "10px 20px",
-                            backgroundColor: "#007bff",
-                            color: "#fff",
-                            border: "none",
-                            cursor: "pointer",
-                            borderRadius: "5px",
-                        }}
-                    >
-                        Редактировать
-                    </button>
-                ) : (
-                    <button
-                        onClick={handleSave}
-                        style={{
-                            marginTop: "10px",
-                            padding: "10px 20px",
-                            backgroundColor: "#28a745",
-                            color: "#fff",
-                            border: "none",
-                            cursor: "pointer",
-                            borderRadius: "5px",
-                        }}
-                    >
-                        Сохранить
-                    </button>
-                )}
+          <label>Отчество:</label>
+          <input
+            type="text"
+            value={userData.middleName}
+            onChange={(e) =>
+              setUserData({ ...userData, middleName: e.target.value })
+            }
+            disabled={!isEditing}
+          />
 
-                {/* Кнопка "Выйти" */}
-                <button
-                    onClick={handleLogout}
-                    style={{
-                        marginTop: "20px",
-                        padding: "10px 20px",
-                        backgroundColor: "#dc3545",
-                        color: "#fff",
-                        border: "none",
-                        cursor: "pointer",
-                        borderRadius: "5px",
-                    }}
-                >
-                    Выйти
-                </button>
-            </div>
+          <label>Дата рождения:</label>
+          <input
+            type="date"
+            value={userData.birthDate}
+            onChange={(e) =>
+              setUserData({ ...userData, birthDate: e.target.value })
+            }
+            disabled={!isEditing}
+          />
+
+          <label>Телефон:</label>
+          <input
+            type="tel"
+            value={userData.phone}
+            disabled
+          />
         </div>
-    );
+
+        {/* Блок с кнопками "Редактировать / Сохранить" и "Выйти" */}
+        <div className="profile-actions">
+          {!isEditing ? (
+            <button onClick={() => setIsEditing(true)}>
+              Редактировать
+            </button>
+          ) : (
+            <button onClick={handleSave}>
+              Сохранить
+            </button>
+          )}
+          <button onClick={handleLogout}>
+            Выйти
+          </button>
+        </div>
+      </div>
+
+      {/* Правая колонка */}
+      <div className="profile-content">
+        <button
+          className="order-history-button"
+          onClick={() => navigate("/order-history")}
+        >
+          История заказов
+        </button>
+
+        {/* При желании здесь можно разместить контент, например, 
+            список заказов, если бы мы подгружали их на этой же странице. */}
+      </div>
+    </div>
+  );
 };
 
 export default ProfilePage;

@@ -1,0 +1,120 @@
+/* Основной контейнер */
+.profile-page {
+  display: flex;
+  /* Чтобы колонки влезали рядом */
+  flex-direction: row;
+  gap: 20px;
+  padding: 20px;
+  /* Если хотите фон как в хедере (f8f8f8), можете здесь: */
+  background-color: #f8f8f8;
+
+  /* На узком экране - колонки друг под другом */
+  @include respond-to(md) {
+    flex-direction: column;
+  }
+}
+
+/* Левая колонка (sidebar) */
+.profile-sidebar {
+  flex: 0 0 300px;
+  background-color: #fff; /* Или оставьте прозрачным */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+
+  /* На узких экранах пусть занимает 100% */
+  @include respond-to(md) {
+    flex: none;
+  }
+
+  /* Кнопка админ-панели */
+  .admin-button {
+    display: block;
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: transparent;
+    border: 2px solid #333;
+    border-radius: 10px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  /* Данные пользователя */
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    label {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    input {
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      &:disabled {
+        background-color: #eee;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  /* Кнопки "Редактировать / Сохранить" и "Выйти" */
+  .profile-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+
+    button {
+      padding: 10px;
+      font-size: 16px;
+      background-color: transparent;
+      border: 2px solid #333;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+}
+
+/* Правая колонка (content) */
+.profile-content {
+  flex: 1; 
+  /* чтобы занимала всё оставшееся пространство */
+  background-color: #fff; 
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+
+  @include respond-to(md) {
+    flex: none;
+    margin-top: 20px;
+  }
+
+  .order-history-button {
+    padding: 10px;
+    font-size: 18px;
+    background-color: transparent;
+    border: 2px solid #333;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+  }
+}

@@ -8,23 +8,57 @@
     position: relative;
 }
 
-.main_block_order_button{
-    position: absolute; /* Абсолютное позиционирование внутри контейнера */
-    bottom: 15%; /* Расположение на 30% выше низа контейнера */
-    left: 50%; /* Центрируем по горизонтали */
-    transform: translateX(-50%); /* Сдвигаем кнопку, чтобы она была точно по центру */
-    width: 30%;
-    padding: 20px 20px;
-    font-size: 36px;
-    color: #333; /* Цвет текста */
-    background-color: #f8f8f8; /* Прозрачный фон */
-    border: 2px solid #333; /* Граница */
-    border-radius: 50px; /* Закругленные края */
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
+.main_block_order_button {
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30%;
+  padding: 20px;
+  font-size: 36px;
+  color: #222;
+  background: linear-gradient(135deg, #fdfdfd, #dcdcdc);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+  &:hover {
+    background: linear-gradient(135deg, #f0f0f0, #d4d4d4);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    transform: translateX(-50%) scale(1.02);
+  }
+
+  &:active {
+    transform: translateX(-50%) scale(0.98);
+  }
+
+  /* 📱 Адаптивность */
+  @include respond-to(lg) {
+    font-size: 28px;
+    padding: 15px;
+    width: 40%;
+  }
+
+  @include respond-to(md) {
+    font-size: 24px;
+    padding: 12px;
+    width: 50%;
+  }
+
+  @include respond-to(sm) {
+    font-size: 20px;
+    padding: 10px;
+    width: 60%;
+  }
+
+  @include respond-to(xs) {
+    font-size: 18px;
+    padding: 8px;
+    width: 70%;
+  }
 }
-.main_block_order_button:hover {
-    background-color: rgba(255, 255, 255, 0.911); /* Легкое затемнение при наведении */
-    color: #000000; /* Более насыщенный цвет текста */
-}
+
+
 
