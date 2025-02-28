@@ -16,13 +16,35 @@ const ProfilePage = () => {
     phone: "",
   });
 
-  // Редактирование
+ // Редактирование
   const [isEditing, setIsEditing] = useState(false);
+
+  // История заказов
+  const [orders, setOrders] = useState([]);
 
   // Авторизация
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(
     !!localStorage.getItem("token")
   );
+  const fetchOrders = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+          const response = await fetch("http://localhost:5000/api/orders/user", {
+              headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (response.ok) {
+              const data = await response.json();
+              setOrders(data);
+          } else {
+              setOrders([]); // Нет заказов
+          }
+      } catch (error) {
+          console.error("Ошибка загрузки заказов:", error);
+      }
+  };
 
   useEffect(() => {
     setRole(localStorage.getItem("role") || "user");
@@ -52,6 +74,7 @@ const ProfilePage = () => {
 
     if (isUserAuthenticated) {
       fetchUserData();
+      fetchOrders();
     }
   }, [isUserAuthenticated]);
 
@@ -93,7 +116,6 @@ const ProfilePage = () => {
     <div className="profile-page">
       {/* Левая колонка */}
       <div className="profile-sidebar">
-        {/* Если админ — показываем кнопку "Админ панель" */}
         {role === "admin" && (
           <button
             className="admin-button"
@@ -103,8 +125,7 @@ const ProfilePage = () => {
           </button>
         )}
 
-        {/* Блок с данными пользователя */}
-        <div className="user-info">
+               <div className="user-info">
           <label>Фамилия:</label>
           <input
             type="text"
@@ -167,20 +188,34 @@ const ProfilePage = () => {
           <button onClick={handleLogout}>
             Выйти
           </button>
-        </div>
-      </div>
+        </div>      
+</div>
 
-      {/* Правая колонка */}
+      {/* Правая колонка с заказами */}
       <div className="profile-content">
-        <button
-          className="order-history-button"
-          onClick={() => navigate("/order-history")}
-        >
-          История заказов
-        </button>
-
-        {/* При желании здесь можно разместить контент, например, 
-            список заказов, если бы мы подгружали их на этой же странице. */}
+        <h2>История заказов</h2>
+        {orders.length > 0 ? (
+          <table className="orders-table">
+            <thead>
+              <tr>
+                <th>Тип продукта</th>
+                <th>Дата заказа</th>
+                <th>Статус</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.id}>
+                  <td>{order.productType}</td>
+                  <td>{new Date(order.orderDate).toLocaleDateString()}</td>
+                  <td>{order.status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>Ещё нет заказов</p>
+        )}
       </div>
     </div>
   );
