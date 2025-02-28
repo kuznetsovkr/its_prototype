@@ -19,6 +19,7 @@ const Header = () => {
   const [orderStatus, setOrderStatus] = useState(null);
   const [orderNumber, setOrderNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Авторизация
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -74,6 +75,21 @@ const Header = () => {
     };
   }, []);
 
+  // При открытии модалки -> body.style.overflow = 'hidden'
+  // При закрытии -> body.style.overflow = 'auto'
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    // Чистка: если компонент размонтируется, вернуть scroll назад
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isModalOpen]);
+
   // Переход в профиль или открытие окна авторизации
   const handleAuthClick = () => {
     if (isAuthenticated) {
@@ -112,13 +128,20 @@ const Header = () => {
         </nav>
 
         <div className="order-tracking desktop-only">
-          <button className="track-order-button" onClick={toggleOrderModal}>
+          <button className="track-order-button"   
+              onClick={() => {
+                toggleOrderModal();   // первое действие
+                setIsModalOpen(true);       // второе действие
+              }}>
             Отследить заказ
           </button>
         </div>
 
         {/* Иконка авторизации - только на десктопах */}
-        <div className="auth-button desktop-only" onClick={handleAuthClick}>
+        <div className="auth-button desktop-only"
+              onClick={() => {
+                handleAuthClick();   // первое действие
+              }}>
           <img src={auth} alt="auth" />
         </div>
 
@@ -167,7 +190,14 @@ const Header = () => {
       {isOrderModalOpen && (
         <div className="modal-overlay" onClick={toggleOrderModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-button" onClick={toggleOrderModal}>×</button>
+            <button className="close-button" 
+              onClick={()=>{
+                toggleOrderModal();
+                setIsModalOpen(false);
+              }}
+            >
+              ×
+            </button>
             <h2>Отслеживание заказа</h2>
             <form onSubmit={handleOrderSubmit}>
               <label htmlFor="order">Введите номер заказа:</label>
