@@ -7,12 +7,28 @@
   background-color: #f8f8f8;
   border-bottom: 1px solid #ddd;
   height: 100px;
+    /* Для ширины меньше 768px — берем, например, 70vh 
+      (на 30% меньше, чем 100vh) */
+  @media (max-width: 767px) {
+    height: 50px;
+    .logo {
+      img {
+        height: 40px;
+      }
+    }
+  }
+  @media (min-width: 768px) {
+    .logo {
+      img {
+        height: 70px;
+      }
+    }
+  }
 
   .logo {
     cursor: pointer;
 
     img {
-      height: 70px;
       width: auto;
     }
   }
