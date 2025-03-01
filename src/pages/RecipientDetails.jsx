@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import MyCdekWidget from "../components/MyCdekWidget";
 
 const RecipientDetails = () => {
     const location = useLocation();
@@ -95,10 +96,10 @@ const RecipientDetails = () => {
                 <label>Телефон:</label>
                 <input type="tel" name="phone" value={userData.phone} onChange={handleInputChange} disabled={isUserAuthenticated} />
 
-                <h2>Выбор пункта выдачи</h2>
-                <select>
-                    <option>Выберите пункт выдачи</option>
-                </select>
+                <div id="cdek-map" style={{ width: "800px", height:"600px" }}>
+                    <h2>Выбор пункта выдачи (СДЭК)</h2>
+                    <MyCdekWidget />
+                </div>
 
                 <button onClick={handlePayment}>Перейти к оплате</button>
             </div>
