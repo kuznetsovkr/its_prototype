@@ -117,12 +117,7 @@ const ProfilePage = () => {
       {/* Левая колонка */}
       <div className="profile-sidebar">
         {role === "admin" && (
-          <button
-            className="admin-button"
-            onClick={() => navigate("/admin-panel")}
-          >
-            Админ панель
-          </button>
+           <button onClick={() => navigate("/admin/inventory")}>Управление складом</button>          
         )}
 
                <div className="user-info">

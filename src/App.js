@@ -14,6 +14,7 @@ import AboutPage from './pages/AboutPage';
 import DeliveryPage from './pages/DeliveryPage';
 import SizeGuidePage from './pages/SizeGuidePage';
 import PaymentPage from './pages/PaymentPage';
+import AdminInventory from "./admin/AdminInventory";
 
 const App = () => {
     return (
@@ -36,7 +37,8 @@ const App = () => {
                         <Route path="/about" element={<AboutPage />} />
                         <Route path="/delivery" element={<DeliveryPage />} />
                         <Route path="/size-guide" element={<SizeGuidePage />} />
-                        <Route path="/payment" element={<PaymentPage />} /> {/* ✅ Добавили маршрут */}
+                        <Route path="/payment" element={<PaymentPage />} />
+                        <Route path="/admin/inventory" element={<AdminInventory />} />
                     </Routes>
                 </main>
                 <Footer />
