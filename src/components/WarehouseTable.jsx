@@ -9,11 +9,12 @@ const WarehouseTable = ({ inventory, fetchInventory, deleteItem }) => {
     const [editingItemId, setEditingItemId] = useState(null);
     const [editData, setEditData] = useState({});
     const [newImage, setNewImage] = useState(null);
+    const [showSuggestions, setShowSuggestions] = useState({ type: false, color: false, size: false });
 
     const startEditing = (item) => {
         setEditingItemId(item.id);
         setEditData({ ...item });
-        setNewImage(null); // Сброс фото
+        setNewImage(null);
     };
 
     const handleEditChange = (e, field) => {
@@ -32,7 +33,7 @@ const WarehouseTable = ({ inventory, fetchInventory, deleteItem }) => {
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
-            setNewImage(response.data.imageUrl); // Сохраняем ссылку на новое фото
+            setNewImage(response.data.imageUrl);
         } catch (err) {
             console.error("Ошибка загрузки изображения:", err);
         }
@@ -42,7 +43,7 @@ const WarehouseTable = ({ inventory, fetchInventory, deleteItem }) => {
         try {
             const updatedData = { ...editData };
             if (newImage) {
-                updatedData.imageUrl = newImage; // Если фото обновилось, добавляем его в объект
+                updatedData.imageUrl = newImage;
             }
 
             await axios.put(`http://localhost:5000/api/inventory/${editData.id}`, updatedData);
@@ -74,19 +75,27 @@ const WarehouseTable = ({ inventory, fetchInventory, deleteItem }) => {
                         {/* 🔹 Выбор или ввод типа */}
                         <td>
                             {editingItemId === item.id ? (
-                                <input
-                                    list="types"
-                                    value={editData.productType}
-                                    onChange={(e) => handleEditChange(e, "productType")}
-                                />
+                                <div style={{ position: "relative" }}>
+                                    <input
+                                        type="text"
+                                        value={editData.productType}
+                                        onChange={(e) => handleEditChange(e, "productType")}
+                                        onFocus={() => setShowSuggestions({ ...showSuggestions, type: true })}
+                                        onBlur={() => setTimeout(() => setShowSuggestions({ ...showSuggestions, type: false }), 200)}
+                                    />
+                                    {showSuggestions.type && (
+                                        <div className="suggestions">
+                                            {popularTypes.map((type) => (
+                                                <div key={type} onClick={() => handleEditChange({ target: { value: type } }, "productType")}>
+                                                    {type}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             ) : (
                                 item.productType
                             )}
-                            <datalist id="types">
-                                {popularTypes.map((type) => (
-                                    <option key={type} value={type} />
-                                ))}
-                            </datalist>
                         </td>
 
                         {/* 🔹 Фото + обновление */}
@@ -109,37 +118,53 @@ const WarehouseTable = ({ inventory, fetchInventory, deleteItem }) => {
                         {/* 🔹 Выбор или ввод цвета */}
                         <td>
                             {editingItemId === item.id ? (
-                                <input
-                                    list="colors"
-                                    value={editData.color}
-                                    onChange={(e) => handleEditChange(e, "color")}
-                                />
+                                <div style={{ position: "relative" }}>
+                                    <input
+                                        type="text"
+                                        value={editData.color}
+                                        onChange={(e) => handleEditChange(e, "color")}
+                                        onFocus={() => setShowSuggestions({ ...showSuggestions, color: true })}
+                                        onBlur={() => setTimeout(() => setShowSuggestions({ ...showSuggestions, color: false }), 200)}
+                                    />
+                                    {showSuggestions.color && (
+                                        <div className="suggestions">
+                                            {popularColors.map((color) => (
+                                                <div key={color} onClick={() => handleEditChange({ target: { value: color } }, "color")}>
+                                                    {color}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             ) : (
                                 item.color
                             )}
-                            <datalist id="colors">
-                                {popularColors.map((color) => (
-                                    <option key={color} value={color} />
-                                ))}
-                            </datalist>
                         </td>
 
                         {/* 🔹 Выбор или ввод размера */}
                         <td>
                             {editingItemId === item.id ? (
-                                <input
-                                    list="sizes"
-                                    value={editData.size}
-                                    onChange={(e) => handleEditChange(e, "size")}
-                                />
+                                <div style={{ position: "relative" }}>
+                                    <input
+                                        type="text"
+                                        value={editData.size}
+                                        onChange={(e) => handleEditChange(e, "size")}
+                                        onFocus={() => setShowSuggestions({ ...showSuggestions, size: true })}
+                                        onBlur={() => setTimeout(() => setShowSuggestions({ ...showSuggestions, size: false }), 200)}
+                                    />
+                                    {showSuggestions.size && (
+                                        <div className="suggestions">
+                                            {popularSizes.map((size) => (
+                                                <div key={size} onClick={() => handleEditChange({ target: { value: size } }, "size")}>
+                                                    {size}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             ) : (
                                 item.size
                             )}
-                            <datalist id="sizes">
-                                {popularSizes.map((size) => (
-                                    <option key={size} value={size} />
-                                ))}
-                            </datalist>
                         </td>
 
                         {/* 🔹 Количество */}
