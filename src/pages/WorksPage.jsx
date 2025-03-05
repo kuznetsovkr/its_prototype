@@ -18,15 +18,23 @@ import img14 from "../images/works/2.jpg";
 import img15 from "../images/works/3.jpg";
 
 // Создаём массив изображений (можно дублировать)
-const images = [img1, img2, img3, img4, img5,img6, img7, img8, img9, img10,img11, img12, img13, img14, img15];
 
-// Если изображений мало — дублируем, чтобы заполнить экран
-const repeatedImages = [...images, ...images, ...images];
+
 
 const Works = () => {
+  // Пример массива картинок
+  const images = [img1, img2, img3, img4, img5,img6, img7, img8, img9, img10,img11, img12, img13, img14, img15];
+
   return (
-    <div className="works">
+    <div className="works-page">
       <h1>Примеры работ</h1>
+      <div className="gallery">
+        {images.map((imgSrc, i) => (
+          <div className="gallery-item" key={i}>
+            <img src={imgSrc} alt={`Work ${i + 1}`} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

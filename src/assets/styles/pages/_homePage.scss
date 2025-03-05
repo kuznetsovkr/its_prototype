@@ -60,5 +60,107 @@
   }
 }
 
+/* Секция с этапами изготовления */
+.production-steps {
+  max-width: 1200px;
+  margin: 0 auto 40px; /* центрируем и задаем нижний отступ */
+  background: #fff; 
+  border-radius: 8px;
+  padding: 20px;
+
+  h2 {
+    text-align: center;
+    color: #333;
+    margin: 0 0 30px; /* отступ снизу */
+    font-size: 24px;
+  }
+
+  /* Каждый шаг (Шаг 1, Шаг 2, ...) */
+  .step {
+    position: relative; 
+    background: #f8f8f8; /* фон шага */
+    border-radius: 8px;
+    padding: 20px 20px 20px 60px; /* слева побольше, чтобы было место под "линию" */
+    margin-bottom: 20px;
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      color: #333;
+    }
+
+    p {
+      margin: 0;
+      color: #555;
+    }
+
+    /* Для всех, кроме последнего, рисуем "линию" и "стрелку" */
+    &:not(:last-child) {
+      &::after {
+        content: "";
+        position: absolute;
+        left: 30px;       /* где рисуем вертикальную линию */
+        top: calc(50% + 20px); 
+          /* начинаем чуть ниже середины этого блока,
+             т.к. padding-top = 20px => (50% + 20px) даст примерно центр */
+        width: 2px;
+        height: calc(100% + 20px); 
+          /* линия "протянется" вниз на высоту шага + небольшой хвост */
+        background: #333;
+      }
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: 24px;
+        top: calc(50% + 20px - 6px); 
+          /* ставим стрелку на середине, 
+             -6px т.к. border=6px => центр треугольника */
+        border: 6px solid transparent;
+        border-top-color: #333; 
+        transform: rotate(90deg); 
+          /* поворот, чтобы указывала вниз */
+      }
+    }
+  }
+}
+
+/* Адаптивность: на мобильных можем уменьшить отступы и размер шрифта */
+@media (max-width: 767px) {
+  .production-steps {
+    padding: 15px;
+    margin-bottom: 20px;
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    .step {
+      padding: 15px 15px 15px 40px;
+      margin-bottom: 15px;
+
+      h3 {
+        font-size: 18px;
+      }
+      p {
+        font-size: 14px;
+      }
+
+      /* Линию тоже можно чуть сдвинуть */
+      &:not(:last-child) {
+        &::after {
+          left: 20px;
+          top: calc(50% + 15px);
+          height: calc(100% + 15px);
+        }
+        &::before {
+          left: 14px;
+          top: calc(50% + 15px - 6px);
+        }
+      }
+    }
+  }
+}
 
 

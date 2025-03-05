@@ -26,25 +26,25 @@ const ProfilePage = () => {
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(
     !!localStorage.getItem("token")
   );
+
   const fetchOrders = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+        const token = localStorage.getItem("token");
+        if (!token) return;
 
-      try {
-          const response = await fetch("http://localhost:5000/api/orders/user", {
-              headers: { Authorization: `Bearer ${token}` },
-          });
+        try {
+            const endpoint = role === "admin" ? "http://localhost:5000/api/orders/all" : "http://localhost:5000/api/orders/user";
+            const response = await fetch(endpoint, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
 
-          if (response.ok) {
-              const data = await response.json();
-              setOrders(data);
-          } else {
-              setOrders([]); // Нет заказов
-          }
-      } catch (error) {
-          console.error("Ошибка загрузки заказов:", error);
-      }
-  };
+            if (response.ok) {
+                const data = await response.json();
+                setOrders(data);
+            }
+        } catch (error) {
+            console.error("Ошибка получения заказов:", error);
+        }
+    };
 
   useEffect(() => {
     setRole(localStorage.getItem("role") || "user");
@@ -74,7 +74,7 @@ const ProfilePage = () => {
 
     if (isUserAuthenticated) {
       fetchUserData();
-      fetchOrders();
+      fetchOrders(role);
     }
   }, [isUserAuthenticated]);
 
@@ -193,6 +193,7 @@ const ProfilePage = () => {
           <table className="orders-table">
             <thead>
               <tr>
+                 {role === "admin" && <th>Пользователь</th>} {/* 👀 Показываем имя только админам */}
                 <th>Тип продукта</th>
                 <th>Дата заказа</th>
                 <th>Статус</th>
@@ -201,6 +202,7 @@ const ProfilePage = () => {
             <tbody>
               {orders.map((order) => (
                 <tr key={order.id}>
+                  {role === "admin" && <td>{order.phone || "Неизвестный"}</td>}
                   <td>{order.productType}</td>
                   <td>{new Date(order.orderDate).toLocaleDateString()}</td>
                   <td>{order.status}</td>

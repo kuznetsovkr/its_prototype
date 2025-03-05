@@ -1,0 +1,59 @@
+.works-page {
+  max-width: 1200px;  /* Ширина контейнера */
+  margin: 0 auto;     /* Центрируем */
+  padding: 20px;
+  border-radius: 8px;
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 24px;
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 10px; /* Расстояние между картинками */
+
+    /* Можно также добавить margin-bottom, если нужно */
+  }
+
+  .gallery-item {
+    position: relative;
+    overflow: hidden;    /* чтобы не было прокрутки при увеличении */
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+
+    /* Можно добавить легкую рамку, если хотите */
+    /* border: 1px solid #ddd; */
+
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.3s;
+      /* Можно object-fit: cover, если нужны картинки обрезанные по блоку */
+    }
+
+    /* Небольшой эффект приближения при наведении */
+    &:hover img {
+      transform: scale(1.05);
+    }
+  }
+}
+
+/* Адаптив: на совсем узких экранах (например, < 480px)
+   можно увеличить разрыв, уменьшить min-width и т.д. */
+@media (max-width: 480px) {
+  .works-page {
+    padding: 10px;
+  }
+  .gallery {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+  }
+  .gallery-item {
+    border-radius: 4px;
+  }
+}

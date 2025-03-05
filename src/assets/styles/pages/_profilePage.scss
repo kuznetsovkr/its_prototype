@@ -92,29 +92,49 @@
 
 /* Правая колонка (content) */
 .profile-content {
-  flex: 1; 
-  /* чтобы занимала всё оставшееся пространство */
-  background-color: #fff; 
+  flex: 1;
+  background: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 20px;
 
-  @include respond-to(md) {
-    flex: none;
-    margin-top: 20px;
+  h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+    text-align: center;
   }
 
-  .order-history-button {
-    padding: 10px;
-    font-size: 18px;
-    background-color: transparent;
-    border: 2px solid #333;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+  .orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
 
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.1);
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f8f8f8; /* Светлый фон для заголовков */
+      font-weight: 600;
+      color: #333;
+      /* Можно чуть увеличить шрифт */
+      font-size: 16px;
+    }
+
+    td {
+      color: #555;
+      font-size: 15px;
+    }
+
+    /* Эффект при наведении на строку */
+    tbody tr:hover {
+      background-color: rgba(0, 0, 0, 0.05);
     }
   }
 }
+
