@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { RadioGroup } from '@headlessui/react';
 import infoIcon from "../images/free-icon-font-info-3916699.png";
 
-// 🎨 Цвета HEX
 const colorHex = {
   black: "#000000",
   blue: "#0000FF",
@@ -25,29 +25,37 @@ const ClothingSelector = () => {
   const [selectedColor, setSelectedColor] = useState(""); // Выбранный цвет
   const [selectedSize, setSelectedSize] = useState(""); // Выбранный размер
 
-  // 🔹 Загружаем склад
+  // Загружаем склад
   useEffect(() => {
     const fetchInventory = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/inventory");
-        setInventory(response.data);
+        const data = response.data;
+        setInventory(data);
+  
+        // Выбираем первый доступный тип одежды
+        const firstType = [...new Set(data.map(item => item.productType))][0];
+        if (firstType) {
+          setSelectedClothing(firstType);
+        }
+  
       } catch (err) {
         console.error("Ошибка загрузки склада:", err);
       }
     };
     fetchInventory();
   }, []);
-
-  // 🔹 Получаем **уникальные** типы одежды
+  
+  //  Получаем уникальные типы одежды
   const availableTypes = [...new Set(inventory.map(item => item.productType))];
 
-  // 🔹 Доступные цвета для выбранного типа
+  //  Доступные цвета для выбранного типа
   const availableColors = [...new Set(inventory
     .filter(item => item.productType === selectedClothing)
     .map(item => item.color)
   )];
 
-  // 🔹 Доступные размеры для выбранного типа и цвета
+  //  Доступные размеры для выбранного типа и цвета
   const availableSizes = inventory
     .filter(item => item.productType === selectedClothing && item.color === selectedColor)
     .reduce((sizes, item) => {
@@ -55,7 +63,7 @@ const ClothingSelector = () => {
       return sizes;
     }, []);
 
-  // 🔹 Обновляем выбранный цвет (по умолчанию первый доступный)
+  //  Обновляем выбранный цвет (по умолчанию первый доступный)
   useEffect(() => {
     if (availableColors.length > 0) {
       setSelectedColor(availableColors[0]);
@@ -64,11 +72,10 @@ const ClothingSelector = () => {
     }
   }, [selectedClothing]);
 
-  // 🔹 Обновляем выбранный размер (по умолчанию первый доступный)
+  //  Обновляем выбранный размер (по умолчанию первый доступный)
   useEffect(() => {
-    if (availableSizes.length > 0) {
-      setSelectedSize(availableSizes[0]);
-    } else {
+    // Если доступных размеров нет, сбрасываем выбор
+    if (availableSizes.length === 0) {
       setSelectedSize("");
     }
   }, [selectedColor]);
@@ -106,9 +113,8 @@ const ClothingSelector = () => {
       {/* Правая часть */}
       <div className="blockSelection">
 
-        {/* Выбор типа */}
         <div className="selectorGroup">
-          <h3>Тип изделия:</h3>
+          <p className="title">Тип изделия:</p>
           <div className="selector">
             {availableTypes.map(type => (
               <label key={type}>
@@ -124,16 +130,15 @@ const ClothingSelector = () => {
             ))}
           </div>
         </div>
-
-        {/* Выбор цвета */}
+        
         <div className="selectorGroup">
-          <h3>Цвет:</h3>
+          <p className="title">Цвет:</p>
           <div className="colorSelector">
             {availableColors.map(color => (
               <div
                 key={color}
                 className={`colorSquare ${selectedColor === color ? "active" : ""}`}
-                style={{ backgroundColor: colorHex[color] || "#ccc" }}
+                style={{ backgroundColor: color }}
                 onClick={() => setSelectedColor(color)}
               />
             ))}
@@ -142,23 +147,30 @@ const ClothingSelector = () => {
 
         {/* Выбор размера */}
         <div className="selectorGroup">
-          <h3>Размер:</h3>
-          <div className="selector">
-            {["S", "M", "L", "XL", "XXL"].map(size => (
-              <label key={size} className={availableSizes.includes(size) ? "" : "disabled"}>
-                <input
-                  type="radio"
-                  name="size"
-                  value={size}
-                  checked={selectedSize === size}
-                  onChange={(e) => setSelectedSize(e.target.value)}
-                  disabled={!availableSizes.includes(size)}
-                />
-                {size}
-              </label>
-            ))}
+          <p className="title">Размер:</p>
+          <div className="sizeSelector">
+            {["XS","S", "M", "L", "XL", "XXL"].map(size => {
+              const isAvailable = availableSizes.includes(size);
+              return (
+                <label
+                  key={size}
+                  className={`sizeLabel ${!isAvailable ? "disabled" : ""}`}
+                >
+                  <input
+                    type="radio"
+                    name="size"
+                    value={size}
+                    checked={selectedSize === size}
+                    onChange={(e) => setSelectedSize(e.target.value)}
+                    disabled={!isAvailable}
+                  />
+                  <span className="sizeCircle">{size}</span>
+                </label>
+              );
+            })}
           </div>
         </div>
+
 
         <button
           className="confirmButton"

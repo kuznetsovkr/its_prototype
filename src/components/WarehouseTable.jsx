@@ -72,7 +72,7 @@ const WarehouseTable = ({ inventory, fetchInventory, deleteItem }) => {
                     <tr key={item.id}>
                         <td>{item.id}</td>
 
-                        {/* 🔹 Выбор или ввод типа */}
+                        {/*  Выбор или ввод типа */}
                         <td>
                             {editingItemId === item.id ? (
                                 <div style={{ position: "relative" }}>
@@ -98,7 +98,7 @@ const WarehouseTable = ({ inventory, fetchInventory, deleteItem }) => {
                             )}
                         </td>
 
-                        {/* 🔹 Фото + обновление */}
+                        {/*  Фото + обновление */}
                         <td>
                             {item.imageUrl ? (
                                 <img
@@ -115,7 +115,7 @@ const WarehouseTable = ({ inventory, fetchInventory, deleteItem }) => {
                             )}
                         </td>
 
-                        {/* 🔹 Выбор или ввод цвета */}
+                        {/*  Выбор или ввод цвета */}
                         <td>
                             {editingItemId === item.id ? (
                                 <div style={{ position: "relative" }}>
@@ -141,7 +141,7 @@ const WarehouseTable = ({ inventory, fetchInventory, deleteItem }) => {
                             )}
                         </td>
 
-                        {/* 🔹 Выбор или ввод размера */}
+                        {/*  Выбор или ввод размера */}
                         <td>
                             {editingItemId === item.id ? (
                                 <div style={{ position: "relative" }}>
@@ -167,7 +167,7 @@ const WarehouseTable = ({ inventory, fetchInventory, deleteItem }) => {
                             )}
                         </td>
 
-                        {/* 🔹 Количество */}
+                        {/*  Количество */}
                         <td>
                             {editingItemId === item.id ? (
                                 <input
@@ -180,7 +180,7 @@ const WarehouseTable = ({ inventory, fetchInventory, deleteItem }) => {
                             )}
                         </td>
 
-                        {/* 🔹 Действия */}
+                        {/*  Действия */}
                         <td>
                             {editingItemId === item.id ? (
                                 <button onClick={saveEdit}>Сохранить</button>

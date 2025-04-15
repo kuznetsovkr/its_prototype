@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import face from "../images/embroidery/face.png";
 import hvost from "../images/embroidery/hvost.png";
@@ -22,29 +22,9 @@ const EmbroiderySelector = () => {
   const { selectedClothing, selectedSize, selectedColor } = location.state || {};
 
   const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    let validFiles = [];
+    const files = Array.from(e.target.files).slice(0, 10);
 
-    // Проверяем файлы
-    for (let file of files) {
-      if (!ALLOWED_TYPES.includes(file.type)) {
-        setError("Допустимы только изображения (JPG, PNG, GIF).");
-        return;
-      }
-      if (file.size > MAX_FILE_SIZE) {
-        setError(`Файл "${file.name}" превышает 2MB.`);
-        return;
-      }
-      validFiles.push(file);
-    }
-
-    if (uploadedImage.length + validFiles.length > MAX_FILES) {
-      setError(`Можно загрузить не более ${MAX_FILES} изображений.`);
-      return;
-    }
-
-    setUploadedImage([...uploadedImage, ...validFiles]);
-    setError("");
+    setUploadedImage(files);
   };
 
   const handleRemoveImage = (index) => {
@@ -52,12 +32,11 @@ const EmbroiderySelector = () => {
   };
 
   const handleNext = () => {
-    const uploadedPaths = uploadedImage.map(file => file.url); // Берём только URL
     navigate("/recipient", {
       state: {
         selectedType,
         customText,
-        uploadedImage: uploadedPaths,
+        uploadedImage,
         comment,
         productType: selectedClothing,
         size: selectedSize,
@@ -70,11 +49,17 @@ const EmbroiderySelector = () => {
     Patronus: [face, hvost, sherst],
     Car: [car1],
   };
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, [comment]);
 
   return (
-    <div className="blockEmbroiderySelector">
-      <h2>Детали вышивки</h2>
-
       <div className="containerExampleType">
         {/* Блок с примерами изображений */}
         <div className="exampleImg">
@@ -88,44 +73,49 @@ const EmbroiderySelector = () => {
 
         {/* Блок с выбором типа вышивки */}
         <div className="selectorType">
-          <label>
-            <input
-              type="radio"
-              name="embroideryType"
-              value="Patronus"
-              onChange={(e) => setSelectedType(e.target.value)}
-              checked={selectedType === "Patronus"}
-            />
-            Патронусы
-          </label>
+          <div className="selectorGroup">
+            <p className="title">Выберите тип вышивки</p>
+            <div className="selector">
+              <label>
+                <input
+                  type="radio"
+                  name="embroideryType"
+                  value="Patronus"
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  checked={selectedType === "Patronus"}
+                />
+                Патронусы
+              </label>
 
-          <label>
-            <input
-              type="radio"
-              name="embroideryType"
-              value="Car"
-              onChange={(e) => setSelectedType(e.target.value)}
-              checked={selectedType === "Car"}
-            />
-            Машина
-          </label>
+              <label>
+                <input
+                  type="radio"
+                  name="embroideryType"
+                  value="Car"
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  checked={selectedType === "Car"}
+                />
+                Машина
+              </label>
 
-          <label>
-            <input
-              type="radio"
-              name="embroideryType"
-              value="custom"
-              onChange={(e) => setSelectedType(e.target.value)}
-              checked={selectedType === "custom"}
-            />
-            Другая
-          </label>
+              <label>
+                <input
+                  type="radio"
+                  name="embroideryType"
+                  value="custom"
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  checked={selectedType === "custom"}
+                />
+                Другая
+              </label>
+            </div>
+          </div>
 
-          {/* Загрузка изображений */}
+
           <div className="uploadBlock">
+            <p className="title">Загрузите изображения</p>
             <label>
-              Загрузите изображения (до 10 файлов, не более 2MB каждый):
-              <input type="file" multiple onChange={handleFileChange} />
+              <input type="file" multiple accept="image/*" onChange={handleFileChange} />
             </label>
             {error && <p style={{ color: "red" }}>{error}</p>}
 
@@ -139,30 +129,23 @@ const EmbroiderySelector = () => {
             </div>
           </div>
 
-          {/* Комментарий */}
           <div className="commentBlock">
+            <p className="title">Комментарий:</p>
             <label>
-              Комментарий:
-              <textarea value={comment} onChange={(e) => setComment(e.target.value)} />
+              <textarea 
+                ref={textareaRef}
+                className="autoTextarea"
+                value={comment} 
+                onChange={(e) => setComment(e.target.value)} 
+                placeholder="Введите ваши пожелания, которые учтут наши дизайнеры"/>
             </label>
           </div>
 
-          <button className="stepButton" onClick={handleNext} disabled={!selectedType}>
+          <button className="confirmButton" onClick={handleNext} disabled={!selectedType}>
             Перейти к оформлению
           </button>
         </div>
-      </div>
-
-      {/* Поле для ввода текста, если выбрана "Другая" */}
-      {selectedType === "custom" && (
-        <div className="customTextBlock">
-          <label>
-            Введите текст:
-            <input type="text" value={customText} onChange={(e) => setCustomText(e.target.value)} />
-          </label>
-        </div>
-      )}
-    </div>
+      </div>    
   );
 };
 

@@ -1,11 +1,12 @@
 #main_block{
     height: calc(100vh - 100px);
     background-image: url('../../../images/file.jpg');
-    background-size: cover; /* Масштабирование изображения по высоте */
-    background-position: center; /* Центровка изображения */
-    background-repeat: no-repeat; /* Избегаем повторения изображения */
-    overflow: hidden; /* Обрезаем края */
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
+    overflow: hidden; 
     position: relative;
+    box-shadow: 0 10px 8px rgba(0, 0, 0, 0.1);
 }
 
 .main_block_order_button {
@@ -13,13 +14,14 @@
   bottom: 15%;
   left: 50%;
   transform: translateX(-50%);
-  width: 30%;
+  width: 40%;
   padding: 20px;
-  font-size: 36px;
+  font-size: 48px;
+  font-weight: 600;
   color: #222;
   background: linear-gradient(135deg, #fdfdfd, #dcdcdc);
   border: none;
-  border-radius: 50px;
+  border-radius: 20px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
@@ -27,140 +29,88 @@
   &:hover {
     background: linear-gradient(135deg, #f0f0f0, #d4d4d4);
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-    transform: translateX(-50%) scale(1.02);
   }
 
-  &:active {
-    transform: translateX(-50%) scale(0.98);
-  }
-
-  /* 📱 Адаптивность */
   @include respond-to(lg) {
-    font-size: 28px;
-    padding: 15px;
+    font-size: 36px;
     width: 40%;
   }
 
   @include respond-to(md) {
-    font-size: 24px;
-    padding: 12px;
+    font-size: 32px;
     width: 50%;
   }
 
   @include respond-to(sm) {
-    font-size: 20px;
-    padding: 10px;
+    font-size: 28px;
     width: 60%;
   }
 
   @include respond-to(xs) {
-    font-size: 18px;
-    padding: 8px;
+    font-size: 24px;
     width: 70%;
   }
 }
 
-/* Секция с этапами изготовления */
-.production-steps {
-  max-width: 1200px;
-  margin: 0 auto 40px; /* центрируем и задаем нижний отступ */
-  background: #fff; 
-  border-radius: 8px;
-  padding: 20px;
-
-  h2 {
+#roadmap_block{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap:10px;
+  img{
+    width: 100%;
+    height: auto;
+    max-width: 1024px;
+    display: block;
+  }
+  .title{
+    font-size: clamp(36px, 5vw, 48px);
+    font-weight: 700;
     text-align: center;
-    color: #333;
-    margin: 0 0 30px; /* отступ снизу */
-    font-size: 24px;
   }
-
-  /* Каждый шаг (Шаг 1, Шаг 2, ...) */
-  .step {
-    position: relative; 
-    background: #f8f8f8; /* фон шага */
-    border-radius: 8px;
-    padding: 20px 20px 20px 60px; /* слева побольше, чтобы было место под "линию" */
-    margin-bottom: 20px;
-
-    h3 {
-      margin: 0 0 8px;
-      font-size: 20px;
-      color: #333;
+  .roadmap_button {
+    width: 40%;
+    padding: 20px;
+    font-size: 48px;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #2e2e2e, #000000);
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  
+    &:hover {
+      background: linear-gradient(135deg, #3b3b3b, #131313);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
     }
-
-    p {
-      margin: 0;
-      color: #555;
+  
+    &:active {
+      transform: translateX(-50%) scale(0.98);
     }
-
-    /* Для всех, кроме последнего, рисуем "линию" и "стрелку" */
-    &:not(:last-child) {
-      &::after {
-        content: "";
-        position: absolute;
-        left: 30px;       /* где рисуем вертикальную линию */
-        top: calc(50% + 20px); 
-          /* начинаем чуть ниже середины этого блока,
-             т.к. padding-top = 20px => (50% + 20px) даст примерно центр */
-        width: 2px;
-        height: calc(100% + 20px); 
-          /* линия "протянется" вниз на высоту шага + небольшой хвост */
-        background: #333;
-      }
-
-      &::before {
-        content: "";
-        position: absolute;
-        left: 24px;
-        top: calc(50% + 20px - 6px); 
-          /* ставим стрелку на середине, 
-             -6px т.к. border=6px => центр треугольника */
-        border: 6px solid transparent;
-        border-top-color: #333; 
-        transform: rotate(90deg); 
-          /* поворот, чтобы указывала вниз */
-      }
+  
+    /* 📱 Адаптивность */
+    @include respond-to(lg) {
+      font-size: 36px;
+      width: 40%;
     }
-  }
-}
-
-/* Адаптивность: на мобильных можем уменьшить отступы и размер шрифта */
-@media (max-width: 767px) {
-  .production-steps {
-    padding: 15px;
-    margin-bottom: 20px;
-
-    h2 {
-      font-size: 20px;
-      margin-bottom: 20px;
+  
+    @include respond-to(md) {
+      font-size: 32px;
+      width: 50%;
     }
-
-    .step {
-      padding: 15px 15px 15px 40px;
-      margin-bottom: 15px;
-
-      h3 {
-        font-size: 18px;
-      }
-      p {
-        font-size: 14px;
-      }
-
-      /* Линию тоже можно чуть сдвинуть */
-      &:not(:last-child) {
-        &::after {
-          left: 20px;
-          top: calc(50% + 15px);
-          height: calc(100% + 15px);
-        }
-        &::before {
-          left: 14px;
-          top: calc(50% + 15px - 6px);
-        }
-      }
+  
+    @include respond-to(sm) {
+      font-size: 28px;
+      width: 60%;
     }
-  }
+  
+    @include respond-to(xs) {
+      font-size: 24px;
+      width: 70%;
+    }
+  }  
 }
 
 

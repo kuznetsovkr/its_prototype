@@ -19,9 +19,18 @@ html, body {
     display: flex;
     justify-content: center;
 }
-.wrapper{
-    width: 1024px;
+.wrapper {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+
+  @media (max-width: 480px) {
+    padding: 10px;
+  }
 }
+
 
 main{
     flex: 1; 

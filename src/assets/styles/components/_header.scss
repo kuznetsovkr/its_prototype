@@ -7,20 +7,19 @@
   background-color: #f8f8f8;
   border-bottom: 1px solid #ddd;
   height: 100px;
-    /* Для ширины меньше 768px — берем, например, 70vh 
-      (на 30% меньше, чем 100vh) */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
   @media (max-width: 767px) {
-    height: 50px;
     .logo {
       img {
-        height: 40px;
+        height: 50px;
       }
     }
   }
   @media (min-width: 768px) {
     .logo {
       img {
-        height: 70px;
+        height: 100px;
       }
     }
   }
@@ -34,16 +33,15 @@
   }
 }
 
-/* Обычная навигация */
 .navigation {
   display: flex;
-  gap: 30px;
+  gap: 40px;
   
   .nav-link {
     text-decoration: none;
     color: inherit;
     @media (min-width: 768px) {
-        font-size: clamp(14px, 2vw, 22px);
+        font-size: clamp(14px, 2vw, 24px);
     }
   }
 }
@@ -67,14 +65,12 @@
   }
 }
 
-/* Прячем на мобильных/планшетах */
 .desktop-only {
   @include respond-to(md) {
     display: none;
   }
 }
 
-/* Прячем на десктопах */
 .mobile-only {
   display: none;
   @include respond-to(md) {
@@ -82,7 +78,7 @@
   }
 }
 
-/* Стили бургер-иконки */
+
 .burger-icon {
   width: 30px;
   height: 22px;
@@ -109,7 +105,6 @@
   }
 }
 
-/* Мобильное (выезжающее) меню */
 .mobile-menu {
   position: fixed;
   top: 0;
@@ -143,8 +138,8 @@
     .mobile-nav {
         display: flex;
         flex-direction: column;
-        align-items: center;   // горизонтальная центровка
-        text-align: center;    // текст по центру
+        align-items: center;   
+        text-align: center;    
         gap: 20px;
         margin-top: 50px;
 
@@ -170,7 +165,7 @@
   }
 }
 
-/* Модальное окно для "Отследить заказ" */
+/* Модальное окно для "Отследить заказ" сейчас скрыто */
 .modal-overlay {
   position: fixed;
   top: 0;

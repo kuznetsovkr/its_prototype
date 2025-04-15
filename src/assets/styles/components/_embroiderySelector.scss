@@ -1,56 +1,19 @@
-/* Общая обёртка */
-.blockEmbroiderySelector {
-  background-color: #f8f8f8; /* Светлый фон как в хедере */
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin: 20px auto; /* Центрируем по горизонтали */
-  max-width: 1024px; /* Ограничиваем ширину */
-
-  h2 {
-    margin-top: 0;
-    font-size: 24px;
-    text-align: center;
-    color: #333;
-  }
-
   /* Основной блок, содержащий слева примеры, справа выбор типа */
   .containerExampleType {
     display: flex;
-    gap: 20px; 
-    margin-top: 20px;
-
-    /* На мобильных экранах (до 768px) сложим столбиком */
-    @include respond-to(md) {
-      flex-direction: column;
-    }
 
     .exampleImg {
-      flex: 1; /* Занимает часть ширины */
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 20px;
-
-      /* Сетка для картинок */
-      display: grid;
-      grid-template-columns: 1fr 1fr; /* Можно две колонки */
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
       gap: 20px;
-
-      @include respond-to(sm) {
-        grid-template-columns: 1fr; /* На очень узких экранах по одной */
-      }
-
+      justify-content: space-around;
+      width: 60%;
       .image-container {
         text-align: center;
 
         img {
-          max-width: 70%;
-          height: auto;
-          display: block;
-          margin: 0 auto 10px;
-          border: 1px solid #ccc;
-          border-radius: 4px;
+          max-width: 300px;
         }
 
         p {
@@ -62,83 +25,106 @@
 
     /* Правая часть - выбор типа вышивки + кнопка */
     .selectorType {
-      flex: 0 0 300px; /* Зафиксируем ширину (при большой ширине) */
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 20px;
+      width: 40%;
       display: flex;
       flex-direction: column;
-      gap: 10px; /* Расстояние между элементами */
-
-      label {
-        font-size: 16px;
-        color: #333;
+      gap: 40px; 
+      .title {
+        font-size: clamp(24px, 4vw, 36px);
+        font-weight: 500;
+        margin-bottom: 16px;
+      }
+      .selector {
         display: flex;
-        align-items: center;
-        gap: 5px;
+        flex-direction: column;
+        gap: 20px;
+        flex-wrap: wrap;
+
+        label {
+          display: inline-flex;
+          align-items: center;
+          cursor: pointer;
+          margin-right: 16px;
+          position: relative;
+          padding-left: 28px;
+          font-size: clamp(18px, 3vw, 24px);
+        }
         
         input[type="radio"] {
+          appearance: none;
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 24px;
+          height: 24px;
+          border: 2px solid black;
+          border-radius: 50%;
+          background-color: white;
           cursor: pointer;
-          accent-color: #333; /* Цвет радиокнопки */
+          transition: background-color 0.2s ease;
         }
+        
+        input[type="radio"]:checked {
+          background-color: black;
+        }        
       }
 
-      /* Кнопка "Данные о получателе" */
-      .stepButton {
-        margin-top: auto; /* Сдвигает кнопку в нижнюю часть блока */
-        padding: 10px;
-        font-size: 16px;
-        background-color: transparent;
-        border: 2px solid #333;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        &:hover:not(:disabled) {
-          background-color: rgba(0, 0, 0, 0.1);
+      label {
+        input[type="radio"] {
+          cursor: pointer;
+          accent-color: #333;
         }
       }
     }
   }
 
-  /* Дополнительные блоки */
-  .customTextBlock,
   .uploadBlock,
   .commentBlock {
-    margin-top: 20px;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-
-    label {
-      display: block;
-      font-size: 16px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 10px;
-    }
-
+    width: 100%;
     input[type="text"],
     input[type="file"],
-    textarea {
-      width: 100%;
-      padding: 8px;
-      font-size: 14px;
-      color: #333;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
 
-    textarea {
+    .autoTextarea {
+      font-size: 24px;
+      color: black;
+      width: 100%;
       min-height: 80px;
-      resize: vertical; /* Позволяем менять высоту */
+      max-height: 200px;
+      resize: none; 
+      overflow-y: auto; 
+      font-size: 18px;
+      line-height: 1.4;
+      transition: border 0.2s ease;
+    
+      &:focus {
+        outline: none;         
+        border-color: #888;    
+      }
+    
+      &::placeholder {
+        color: #aaa;
+        font-style: italic;
+      }
+    }    
+  }
+
+  @media (max-width: 768px) {
+    .containerExampleType {
+      flex-direction: column;
+      .exampleImg{
+        width: 100%;
+        .image-container {
+          img{
+            max-width: 200px;
+          }
+        } 
+      }
+      .selectorType{
+        width: 100%;
+        gap:15px;
+      }
     }
   }
-}

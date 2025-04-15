@@ -73,7 +73,7 @@ const AdminInventory = () => {
                 headers: { "Content-Type": "multipart/form-data" },
             });
     
-            setNewItem({ ...newItem, imageUrl: response.data.imageUrl }); // ✅ Сохраняем URL в `newItem`
+            setNewItem({ ...newItem, imageUrl: response.data.imageUrl }); // Сохраняем URL в `newItem`
         } catch (err) {
             console.error("Ошибка загрузки изображения:", err);
         }
@@ -143,7 +143,6 @@ const AdminInventory = () => {
                 <button onClick={addItem}>Добавить</button>
             </div>
 
-            {/* 🔹 Используем новый компонент WarehouseTable */}
             <WarehouseTable 
                 inventory={inventory} 
                 updateQuantity={updateQuantity} 

@@ -1,5 +1,3 @@
-// Миксины (адаптивность, тени, градиенты)
-
 @mixin respond-to($size) {
   @if map-has-key($breakpoints, $size) {
     @media (max-width: map-get($breakpoints, $size)) {

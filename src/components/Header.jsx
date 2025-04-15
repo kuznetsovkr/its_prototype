@@ -124,9 +124,10 @@ const Header = () => {
         <nav className="navigation desktop-only">
           <Link to="/works" className="nav-link">Примеры работ</Link>
           <Link to="/about" className="nav-link">О нас</Link>
-          <Link to="/delivery" className="nav-link">Доставка и оплата</Link>
+          <Link to="/faq" className="nav-link">Ответы на частые вопросы</Link>
         </nav>
 
+      {/*
         <div className="order-tracking desktop-only">
           <button className="track-order-button"   
               onClick={() => {
@@ -136,6 +137,7 @@ const Header = () => {
             Отследить заказ
           </button>
         </div>
+        */}
 
         {/* Иконка авторизации - только на десктопах */}
         <div className="auth-button desktop-only"
@@ -160,8 +162,9 @@ const Header = () => {
           <nav className="mobile-nav">
             <Link to="/works" onClick={toggleMenu}>Примеры работ</Link>
             <Link to="/about" onClick={toggleMenu}>О нас</Link>
-            <Link to="/delivery" onClick={toggleMenu}>Доставка и оплата</Link>
+            <Link to="/faq" onClick={toggleMenu}>Ответы на частые вопросы</Link>
 
+            {/*
             <button
               className="track-order-button"
               onClick={() => {
@@ -171,6 +174,7 @@ const Header = () => {
             >
               Отследить заказ
             </button>
+            */}
 
             {/* У кнопки "Личный кабинет" уберём подсветку/hover */}
             <button

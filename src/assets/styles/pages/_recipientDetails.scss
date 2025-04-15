@@ -1,0 +1,95 @@
+.recipientDetails{
+    display: flex;
+    flex-direction: column;
+    gap:10px;
+    .recipientInfo{
+        .title{
+            font-size: clamp(24px, 4vw, 36px);
+            font-weight: 600;
+        }
+        .data{
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+            .element{
+                font-size: clamp(18px, 3vw, 24px);
+                input{
+                    font-size: clamp(18px, 3vw, 24px);
+                    margin-left: 10px;
+                    padding: 5px;
+                    border-radius: 5px;
+                    &:focus {
+                        outline: none;        
+                      }
+                }
+            }
+        }
+    }
+    .deliveryInfo{
+        display: flex;
+        flex-direction: row;
+        .blockCDEK{
+            width: 70%;
+
+            .title{
+                font-size: clamp(24px, 4vw, 36px);
+                font-weight: 600;
+            }
+            #cdek-map{
+                margin-top: 15px;
+                min-width: 400px;
+                
+                height: 600px;
+            }
+        }
+        .deliveryCost{
+            display: flex;
+            flex-direction: column;
+            gap:20px;
+            width: 30%;
+            margin-left: 10px;
+            p{
+                font-size: clamp(18px, 3vw, 24px);
+            }
+            .title{
+                font-size: clamp(24px, 4vw, 36px);
+                font-weight: 600;
+            }
+            .summaryCost{
+                font-weight: 700;
+            }
+        }
+    }
+}
+
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .tooltip-text {
+    visibility: hidden;
+    background-color: #333;
+    color: #fff;
+    font-size: 13px;
+    text-align: center;
+    border-radius: 5px;
+    padding: 6px 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 130%; 
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  
+  .tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
+  

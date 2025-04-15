@@ -15,32 +15,36 @@ import DeliveryPage from './pages/DeliveryPage';
 import SizeGuidePage from './pages/SizeGuidePage';
 import PaymentPage from './pages/PaymentPage';
 import AdminInventory from "./admin/AdminInventory";
+import PageLayout from './components/PageLayout';
+import FakePayment from './pages/FakePayment';
+
+
 
 const App = () => {
     return (
         <Router>
             <div className="App">
                 <Header />
-                <main>
-                    <Routes>
-                        {/* Главная страница */}
-                        <Route path="/" element={<HomePage />} />
+                    <main>
+                        <Routes>
+                            <Route path="/" element={<HomePage />} />
+                            <Route path="/order" element={<PageLayout><OrderPage /></PageLayout>} />
+                            <Route path="/embroidery" element={<PageLayout><EmbroideryPage /></PageLayout>} />
+                            <Route path="/recipient" element={<PageLayout><RecipientDetails /></PageLayout>} />
+                            <Route path="/thank-you" element={<PageLayout><ThankYouPage /></PageLayout>} />
+                            <Route path="/profile" element={<PageLayout><ProfilePage /></PageLayout>} />
+                            <Route path="/order-history" element={<PageLayout><OrderHistoryPage /></PageLayout>} />
+                            <Route path="/works" element={<WorksPage/>} />
+                            <Route path="/about" element={<PageLayout><AboutPage /></PageLayout>} />
+                            <Route path="/faq" element={<PageLayout><DeliveryPage /></PageLayout>} />
+                            <Route path="/size-guide" element={<PageLayout><SizeGuidePage /></PageLayout>} />
+                            <Route path="/payment" element={<PageLayout><PaymentPage /></PageLayout>} />
+                            <Route path="/fake-payment" element={<FakePayment />} />
 
-                        {/* Страница заказа */}
-                        <Route path="/order" element={<OrderPage />} />
-                        <Route path="/embroidery" element={<EmbroideryPage />} />
-                        <Route path="/recipient" element={<RecipientDetails />} />
-                        <Route path="/thank-you" element={<ThankYouPage />} />
-                        <Route path="/profile" element={<ProfilePage />} />
-                        <Route path="/order-history" element={<OrderHistoryPage />} />
-                        <Route path="/works" element={<WorksPage />} />
-                        <Route path="/about" element={<AboutPage />} />
-                        <Route path="/delivery" element={<DeliveryPage />} />
-                        <Route path="/size-guide" element={<SizeGuidePage />} />
-                        <Route path="/payment" element={<PaymentPage />} />
-                        <Route path="/admin/inventory" element={<AdminInventory />} />
-                    </Routes>
-                </main>
+                            {/* Админку можно оставить без layout-а, если она отдельная */}
+                            <Route path="/admin/inventory" element={<PageLayout><AdminInventory /></PageLayout>} />
+                        </Routes>
+                    </main>
                 <Footer />
             </div>
         </Router>

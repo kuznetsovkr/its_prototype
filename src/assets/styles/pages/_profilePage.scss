@@ -1,33 +1,26 @@
-/* Основной контейнер */
 .profile-page {
   display: flex;
-  /* Чтобы колонки влезали рядом */
   flex-direction: row;
   gap: 20px;
   padding: 20px;
-  /* Если хотите фон как в хедере (f8f8f8), можете здесь: */
   background-color: #f8f8f8;
 
-  /* На узком экране - колонки друг под другом */
   @include respond-to(md) {
     flex-direction: column;
   }
 }
 
-/* Левая колонка (sidebar) */
 .profile-sidebar {
   flex: 0 0 300px;
-  background-color: #fff; /* Или оставьте прозрачным */
+  background-color: #fff; 
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 20px;
 
-  /* На узких экранах пусть занимает 100% */
   @include respond-to(md) {
     flex: none;
   }
 
-  /* Кнопка админ-панели */
   .admin-button {
     display: block;
     width: 100%;
@@ -45,7 +38,6 @@
     }
   }
 
-  /* Данные пользователя */
   .user-info {
     display: flex;
     flex-direction: column;
@@ -68,7 +60,6 @@
     }
   }
 
-  /* Кнопки "Редактировать / Сохранить" и "Выйти" */
   .profile-actions {
     margin-top: 20px;
     display: flex;
@@ -90,7 +81,6 @@
   }
 }
 
-/* Правая колонка (content) */
 .profile-content {
   flex: 1;
   background: #fff;
@@ -119,10 +109,9 @@
     }
 
     th {
-      background-color: #f8f8f8; /* Светлый фон для заголовков */
+      background-color: #f8f8f8; 
       font-weight: 600;
       color: #333;
-      /* Можно чуть увеличить шрифт */
       font-size: 16px;
     }
 
@@ -131,7 +120,6 @@
       font-size: 15px;
     }
 
-    /* Эффект при наведении на строку */
     tbody tr:hover {
       background-color: rgba(0, 0, 0, 0.05);
     }

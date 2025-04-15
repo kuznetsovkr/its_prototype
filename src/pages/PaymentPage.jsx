@@ -9,10 +9,31 @@ const PaymentPage = () => {
     console.log ("юзер");
     console.log (userData);
 
-useEffect(() => {
-    let isMounted = true; // Флаг для предотвращения дублирования
+    const formData = new FormData();
 
-    const processPayment = async () => {
+    formData.append("firstName", userData.firstName);
+    formData.append("lastName", userData.lastName);
+    formData.append("middleName", userData.middleName);
+    formData.append("phone", userData.phone);
+    formData.append("productType", selectedProduct.productType);
+    formData.append("color", selectedProduct.color);
+    formData.append("size", selectedProduct.size);
+    formData.append("embroideryType", selectedProduct.embroideryType);
+    formData.append("customText", selectedProduct.customText || "");
+    formData.append("comment", selectedProduct.comment || "");
+    formData.append("deliveryAddress", location.state.deliveryAddress || "Не указан");
+    formData.append("totalPrice", location.state.totalPrice || "Неопределенна");
+
+    // Добавим изображения (до 10)
+    selectedProduct.uploadedImage?.forEach((file, index) => {
+    formData.append("images", file, `image_${index}.jpg`);
+    });
+
+
+    useEffect(() => {
+        let isMounted = true; // Флаг для предотвращения дублирования
+
+        const processPayment = async () => {
         if (!isMounted) return; // Если компонент размонтирован — не выполняем код
 
         console.log("🛒 Имитация оплаты...");
@@ -40,23 +61,10 @@ useEffect(() => {
                 const response = await fetch("http://localhost:5000/api/orders/create", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
-                    body: JSON.stringify({
-                        firstName: userData?.firstName || "",
-                        lastName: userData?.lastName || "",
-                        middleName: userData?.middleName || "",
-                        phone: userData?.phone || "",
-                        productType: selectedProduct.productType,
-                        color: selectedProduct.color,
-                        size: selectedProduct.size,
-                        embroideryType: selectedProduct.embroideryType,
-                        customText: selectedProduct.customText,
-                        uploadedImage: selectedProduct.uploadedImage,
-                        comment: selectedProduct.comment,
-                    }),
-                });
+                    body: formData,
+                  });
 
                 const data = await response.json();
                 if (response.ok) {
@@ -76,7 +84,7 @@ useEffect(() => {
     return () => {
         isMounted = false; // Перед выходом из компонента отключаем повторный вызов
     };
-}, []);  // ✅ Убрали `navigate, location.state`, теперь сработает только 1 раз
+}, []); 
 
 
 

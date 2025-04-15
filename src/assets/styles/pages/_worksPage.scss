@@ -1,59 +1,109 @@
-.works-page {
-  max-width: 1200px;  /* Ширина контейнера */
-  margin: 0 auto;     /* Центрируем */
-  padding: 20px;
-  border-radius: 8px;
-
-  h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #333;
-    font-size: 24px;
-  }
-
-  .gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 10px; /* Расстояние между картинками */
-
-    /* Можно также добавить margin-bottom, если нужно */
-  }
-
-  .gallery-item {
-    position: relative;
-    overflow: hidden;    /* чтобы не было прокрутки при увеличении */
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-
-    /* Можно добавить легкую рамку, если хотите */
-    /* border: 1px solid #ddd; */
-
-    img {
-      width: 100%;
-      height: auto;
-      display: block;
-      transition: transform 0.3s;
-      /* Можно object-fit: cover, если нужны картинки обрезанные по блоку */
-    }
-
-    /* Небольшой эффект приближения при наведении */
-    &:hover img {
-      transform: scale(1.05);
-    }
-  }
+.grid-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  grid-auto-rows: 150px;
+  gap: 1px;
 }
 
-/* Адаптив: на совсем узких экранах (например, < 480px)
-   можно увеличить разрыв, уменьшить min-width и т.д. */
-@media (max-width: 480px) {
-  .works-page {
-    padding: 10px;
-  }
-  .gallery {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 8px;
-  }
-  .gallery-item {
-    border-radius: 4px;
+
+.grid-item {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s;
+}
+
+.grid-item:hover img {
+  transform: scale(1.05);
+}
+
+/* размеры карточек */
+.grid-item.small {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+.grid-item.tall {
+  grid-column: span 1;
+  grid-row: span 2;
+}
+
+.grid-item.wide {
+  grid-column: span 2;
+  grid-row: span 1;
+}
+
+.grid-item.large {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+/* модалка */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-content img {
+  max-width: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.modal-content p {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.gallery-scroll-container {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.scrollable-content {
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
   }
 }

@@ -58,11 +58,11 @@
     transition: 0.3s;
 
     &:hover {
-      background: linear-gradient(135deg, #0F0F0F, #333); // Чуть темнее
+      background: linear-gradient(135deg, #0F0F0F, #333); 
     }
 
     &:active {
-      transform: scale(0.98); // Эффект нажатия
+      transform: scale(0.98); 
     }
   }
 
