@@ -1,21 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { RadioGroup } from '@headlessui/react';
 import infoIcon from "../images/free-icon-font-info-3916699.png";
 
-const colorHex = {
-  black: "#000000",
-  blue: "#0000FF",
-  brown: "#8B4513",
-  gray: "#808080",
-  green: "#008000",
-  red: "#FF0000",
-  orange: "#FFA500",
-  pink: "#FFC0CB",
-  purple: "#800080",
-  yellow: "#FFFF00"
-};
 
 const ClothingSelector = () => {
   const navigate = useNavigate();
@@ -102,10 +89,6 @@ const ClothingSelector = () => {
           ) : (
             <img src="placeholder.png" alt="Выберите одежду" className="clotheImage" />
           )}
-          <div className="info-icon-wrapper">
-            <img src={infoIcon} alt="Info" className="info-icon" />
-            <div className="tooltip">Состав: 100% хлопок</div>
-          </div>
         </div>
       </div>
 
@@ -114,8 +97,8 @@ const ClothingSelector = () => {
       <div className="blockSelection">
 
         <div className="selectorGroup">
-          <p className="title">Тип изделия:</p>
-          <div className="selector">
+          <p className="title">ТИП ИЗДЕЛИЯ:</p>
+          <div className="selectorType">
             {availableTypes.map(type => (
               <label key={type}>
                 <input
@@ -132,7 +115,7 @@ const ClothingSelector = () => {
         </div>
         
         <div className="selectorGroup">
-          <p className="title">Цвет:</p>
+          <p className="title">ЦВЕТ:</p>
           <div className="colorSelector">
             {availableColors.map(color => (
               <div
@@ -147,8 +130,8 @@ const ClothingSelector = () => {
 
         {/* Выбор размера */}
         <div className="selectorGroup">
-          <p className="title">Размер:</p>
-          <div className="sizeSelector">
+          <p className="title">РАЗМЕР:</p>
+          <div className="selectorSize">
             {["XS","S", "M", "L", "XL", "XXL"].map(size => {
               const isAvailable = availableSizes.includes(size);
               return (
@@ -177,7 +160,7 @@ const ClothingSelector = () => {
           onClick={handleConfirm}
           disabled={!selectedSize}
         >
-          Перейти к вышивке
+          ПЕРЕЙТИ К ВЫШИВКЕ
         </button>
       </div>
     </div>

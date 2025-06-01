@@ -1,13 +1,5 @@
-import React, { useState,useRef, useEffect } from "react";
+import { useState,useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import face from "../images/embroidery/face.png";
-import hvost from "../images/embroidery/hvost.png";
-import sherst from "../images/embroidery/sherst.png";
-import car1 from "../images/embroidery/cars1.png";
-
-const MAX_FILES = 10; // Максимальное число файлов
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif"]; // Разрешённые форматы
 
 const EmbroiderySelector = () => {
   const navigate = useNavigate();
@@ -46,8 +38,8 @@ const EmbroiderySelector = () => {
   };
 
   const embroideryImages = {
-    Patronus: [face, hvost, sherst],
-    Car: [car1],
+    Patronus: [],
+    Car: [],
   };
   const textareaRef = useRef(null);
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../images/logo_its.jpg";
-import auth from "../images/free-icon-font-user-3917688.svg";
+import auth from "../images/auth.svg";
 import AuthModal from "../AuthModal";
 
 // Иконка "три полоски"
@@ -122,22 +122,10 @@ const Header = () => {
 
         {/* Навигация для десктопа */}
         <nav className="navigation desktop-only">
-          <Link to="/works" className="nav-link">Примеры работ</Link>
-          <Link to="/about" className="nav-link">О нас</Link>
-          <Link to="/faq" className="nav-link">Ответы на частые вопросы</Link>
+          <Link to="/works" className="nav-link">примеры работ</Link>
+          <Link to="/about" className="nav-link">о нас</Link>
+          <Link to="/faq" className="nav-link">ответы на самые частые вопросы</Link>
         </nav>
-
-      {/*
-        <div className="order-tracking desktop-only">
-          <button className="track-order-button"   
-              onClick={() => {
-                toggleOrderModal();   // первое действие
-                setIsModalOpen(true);       // второе действие
-              }}>
-            Отследить заказ
-          </button>
-        </div>
-        */}
 
         {/* Иконка авторизации - только на десктопах */}
         <div className="auth-button desktop-only"
