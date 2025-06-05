@@ -10,15 +10,15 @@
   bottom: 15%;
   left: 50%;
   transform: translateX(-50%);
-  width: 316px;
-  height: 69px;
+  width: clamp(316px, 27.43vw, 474px);
+  height: clamp(69px, 5.97vw, 103.5px);
   border: 2px solid #440a18;
   border-radius: 20px;
   padding: 20px 60px;
   cursor: pointer;
   font-family: 'RightGrotesk', sans-serif;
   font-weight: 500;
-  font-size: 24px;
+  font-size: clamp(24px, 2.08vw, 36px);
   color: #440a18;
   background: transparent;
 

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import infoIcon from "../images/free-icon-font-info-3916699.png";
+import { ReactComponent as CheckIcon } from '../images/Vector.svg'
+
 
 
 const ClothingSelector = () => {
@@ -11,6 +12,7 @@ const ClothingSelector = () => {
   const [selectedClothing, setSelectedClothing] = useState(""); // Выбранный тип
   const [selectedColor, setSelectedColor] = useState(""); // Выбранный цвет
   const [selectedSize, setSelectedSize] = useState(""); // Выбранный размер
+  const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
   // Загружаем склад
   useEffect(() => {
@@ -100,7 +102,7 @@ const ClothingSelector = () => {
           <p className="title">ТИП ИЗДЕЛИЯ:</p>
           <div className="selectorType">
             {availableTypes.map(type => (
-              <label key={type}>
+              <label className="selectorType__item" key={type}>
                 <input
                   type="radio"
                   name="clothing"
@@ -108,6 +110,9 @@ const ClothingSelector = () => {
                   checked={selectedClothing === type}
                   onChange={(e) => setSelectedClothing(e.target.value)}
                 />
+                <span className="selectorType__custom">
+                    <CheckIcon className="selectorType__check" />
+                </span>
                 {type}
               </label>
             ))}
@@ -131,29 +136,24 @@ const ClothingSelector = () => {
         {/* Выбор размера */}
         <div className="selectorGroup">
           <p className="title">РАЗМЕР:</p>
-          <div className="selectorSize">
-            {["XS","S", "M", "L", "XL", "XXL"].map(size => {
-              const isAvailable = availableSizes.includes(size);
-              return (
-                <label
-                  key={size}
-                  className={`sizeLabel ${!isAvailable ? "disabled" : ""}`}
-                >
-                  <input
-                    type="radio"
-                    name="size"
-                    value={size}
-                    checked={selectedSize === size}
-                    onChange={(e) => setSelectedSize(e.target.value)}
-                    disabled={!isAvailable}
-                  />
-                  <span className="sizeCircle">{size}</span>
-                </label>
-              );
-            })}
+          <div className="sizeSelector">
+            {sizes.map(size => (
+              <label className="sizeSelector__item" key={size}>
+                <input
+                  type="radio"
+                  name="size"
+                  value={size}
+                  checked={selectedSize === size}
+                  onChange={(e) => setSelectedSize(e.target.value)}
+                />
+                <span className="sizeSelector__box">{size}</span>
+              </label>
+            ))}
+          </div>
+          <div className="tableSize">
+            таблица размеров
           </div>
         </div>
-
 
         <button
           className="confirmButton"

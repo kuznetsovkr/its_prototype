@@ -1,5 +1,6 @@
 import { useState,useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { ReactComponent as CheckIcon } from '../images/Vector.svg'
 
 const EmbroiderySelector = () => {
   const navigate = useNavigate();
@@ -55,20 +56,15 @@ const EmbroiderySelector = () => {
       <div className="containerExampleType">
         {/* Блок с примерами изображений */}
         <div className="exampleImg">
-          {embroideryImages[selectedType]?.map((imgSrc, index) => (
-            <div key={index} className="image-container">
-              <img src={imgSrc} alt={`Пример ${index + 1}`} />
-              <p>Пример {index + 1}</p>
-            </div>
-          ))}
+
         </div>
 
         {/* Блок с выбором типа вышивки */}
-        <div className="selectorType">
+        <div className="containterType">
           <div className="selectorGroup">
-            <p className="title">Выберите тип вышивки</p>
+            <p className="title">ВЫБЕРИТЕ ТИП ВЫШИВКИ</p>
             <div className="selector">
-              <label>
+              <label className="selector__item">
                 <input
                   type="radio"
                   name="embroideryType"
@@ -76,10 +72,13 @@ const EmbroiderySelector = () => {
                   onChange={(e) => setSelectedType(e.target.value)}
                   checked={selectedType === "Patronus"}
                 />
-                Патронусы
+                <span className="selector__custom">
+                    <CheckIcon className="selector__check" />
+                </span>
+                патронусы
               </label>
 
-              <label>
+              <label className="selector__item">
                 <input
                   type="radio"
                   name="embroideryType"
@@ -87,10 +86,27 @@ const EmbroiderySelector = () => {
                   onChange={(e) => setSelectedType(e.target.value)}
                   checked={selectedType === "Car"}
                 />
-                Машина
+                <span className="selector__custom">
+                    <CheckIcon className="selector__check" />
+                </span>
+                автомобиль
               </label>
 
-              <label>
+              <label className="selector__item">
+                <input
+                  type="radio"
+                  name="embroideryType"
+                  value="petFace"
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  checked={selectedType === "petFace"}
+                />
+                <span className="selector__custom">
+                    <CheckIcon className="selector__check" />
+                </span>
+                вышивка мордочки питомца по фото
+              </label>
+
+              <label className="selector__item">
                 <input
                   type="radio"
                   name="embroideryType"
@@ -98,16 +114,19 @@ const EmbroiderySelector = () => {
                   onChange={(e) => setSelectedType(e.target.value)}
                   checked={selectedType === "custom"}
                 />
-                Другая
+                <span className="selector__custom">
+                    <CheckIcon className="selector__check" />
+                </span>
+                другая
               </label>
             </div>
           </div>
 
 
           <div className="uploadBlock">
-            <p className="title">Загрузите изображения</p>
+            <p className="title">ЗАГРУЗИТЕ ИЗОБРАЖЕНИЕ</p>
             <label>
-              <input type="file" multiple accept="image/*" onChange={handleFileChange} />
+              <input className="loadButton" type="file" multiple accept="image/*" onChange={handleFileChange} />
             </label>
             {error && <p style={{ color: "red" }}>{error}</p>}
 
@@ -122,19 +141,19 @@ const EmbroiderySelector = () => {
           </div>
 
           <div className="commentBlock">
-            <p className="title">Комментарий:</p>
+            <p className="title">КОММЕНТАРИЙ:</p>
             <label>
               <textarea 
                 ref={textareaRef}
                 className="autoTextarea"
                 value={comment} 
                 onChange={(e) => setComment(e.target.value)} 
-                placeholder="Введите ваши пожелания, которые учтут наши дизайнеры"/>
+                placeholder="Напишите ваши пожелания, которые учтут наши дизайнеры"/>
             </label>
           </div>
 
           <button className="confirmButton" onClick={handleNext} disabled={!selectedType}>
-            Перейти к оформлению
+            ПЕРЕЙТИ К ОФОРМЛЕНИЮ
           </button>
         </div>
       </div>    

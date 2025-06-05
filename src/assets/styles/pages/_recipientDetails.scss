@@ -1,79 +1,141 @@
-.recipientDetails{
+.containerDetails{
     display: flex;
-    flex-direction: column;
-    gap:10px;
-    .recipientInfo{
-        .title{
-            font-size: clamp(24px, 4vw, 36px);
-            font-weight: 600;
-        }
-        .data{
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin: 20px 0;
-            .element{
-                font-size: clamp(18px, 3vw, 24px);
-                input{
-                    font-size: clamp(18px, 3vw, 24px);
-                    margin-left: 10px;
-                    padding: 5px;
-                    border-radius: 5px;
+    flex-direction: row;
+    gap: clamp(20px, 1.74vw, 30px);
+
+    .firstColumn{
+        display: flex;
+    
+        flex-direction: column;
+        gap: clamp(40px, 3.47vw, 60px);
+        .recipientInfo{
+            .title{
+                font-family: 'RightGrotesk', sans-serif;
+                font-weight: 500;
+                font-size: clamp(36px, 3.125vw, 54px);
+                color: #440a18;
+                margin-bottom: 30px;
+            }
+            .data{
+                display: flex;
+                flex-direction: row;
+                gap: clamp(20px, 1.74vw, 30px);
+                input {
+                    box-sizing: border-box;
+                    width: 433px;
+                    height: 43px;
+                    padding: 10px 10px 10px 20px;
+                    border: 1px solid #121319;
+                    border-radius: 10px;
+                    font-weight: 400;
+                    font-size: clamp(20px, 1.736vw, 30px);
+                    font-family: 'Raleway', sans-serif;
+                    transition: border 0.2s ease-in-out;
+
+                    &::placeholder {
+                        color: rgba(18, 19, 25, 0.5);
+                    }
+
                     &:focus {
-                        outline: none;        
-                      }
+                        outline: none;
+                        border-color: #440a18;
+                    }
+
+                    &:disabled {
+                        background-color: #fff;
+                    }
+                }
+            }
+            .FIO{
+                display: flex;
+                flex-direction: column;
+                gap: clamp(10px, 0.83vw, 15px);
+            }
+        }
+
+        .deliveryInfo{
+            display: flex;
+            flex-direction: column;
+            .title{
+                font-family: 'RightGrotesk', sans-serif;
+                font-weight: 500;
+                font-size: clamp(36px, 3.125vw, 54px);
+                color: #440a18;
+                margin-bottom: 30px;
+            }
+            .blockCDEK{
+                #cdek-map{
+                    border-radius: 20px;
+                    width: 887px;
+                    height: 430px;
+                    border: 2px solid #440a18;
                 }
             }
         }
     }
-    .deliveryInfo{
-        display: flex;
-        flex-direction: row;
-        .blockCDEK{
-            width: 70%;
 
-            .title{
-                font-size: clamp(24px, 4vw, 36px);
-                font-weight: 600;
-            }
-            #cdek-map{
-                margin-top: 15px;
-                min-width: 400px;
-                
-                height: 600px;
-            }
-        }
+    .secondColumn{
+        width: 100%;
         .deliveryCost{
             display: flex;
             flex-direction: column;
-            gap:20px;
-            width: 30%;
-            margin-left: 10px;
-            p{
-                font-size: clamp(18px, 3vw, 24px);
-            }
             .title{
-                font-size: clamp(24px, 4vw, 36px);
-                font-weight: 600;
+                font-family: 'RightGrotesk', sans-serif;
+                font-weight: 500;
+                font-size: clamp(36px, 3.125vw, 54px);
+                color: #440a18;
+                margin-bottom: 30px;
             }
-            .summaryCost{
-                font-weight: 700;
+            .aboutPrice{
+                font-family: 'Raleway', sans-serif;
+                font-weight: 400;
+                font-size: clamp(24px, 2.08vw, 36px);
+                color: #121319;
+                &_calculate{
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                }
+                .summaryCost{
+                    font-family: 'RightGrotesk', sans-serif;
+                    margin-top: 30px;
+                    font-weight: 500;
+                    font-size: clamp(24px, 2.08vw, 36px);
+                    color: #440a18;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                }
             }
         }
     }
 }
 
 .tooltip-container {
+    margin-top: 40px;
     position: relative;
     display: inline-block;
-  }
+    .confirmButton{
+        border-radius: 20px;
+        height: clamp(68px, 5.9vw, 102px);
+        background: #440a18;
+        font-family: 'Raleway', sans-serif;
+        font-weight: 500;
+        font-size: clamp(24px, 2.08vw, 36px);
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+    }
+}
   
   .tooltip-text {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 400;
+    font-size: clamp(14px, 1.22vw, 21px);
     visibility: hidden;
     background-color: #333;
     color: #fff;
-    font-size: 13px;
     text-align: center;
     border-radius: 5px;
     padding: 6px 8px;

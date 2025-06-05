@@ -1,5 +1,3 @@
-import React from "react";
-
 const FakePayment = () => {
     const handleSuccess = () => {
         window.opener.postMessage("payment_success", "*");

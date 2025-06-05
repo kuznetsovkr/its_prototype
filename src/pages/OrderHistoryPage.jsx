@@ -1,5 +1,3 @@
-import React from 'react';
-
 const OrderHistoryPage = () => {
     const orders = [
         { id: '123456', date: '2025-01-20', status: 'Доставлен' },

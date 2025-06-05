@@ -1,5 +1,3 @@
-import React from 'react';
-
 const ContactPage = () => {
     return (
         <main style={{ padding: '20px', textAlign: 'center' }}>

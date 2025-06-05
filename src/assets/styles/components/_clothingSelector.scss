@@ -1,16 +1,21 @@
 .orderBlock{
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
 
 .blockClothingSelector {
   display: flex;
-  gap: 50px;
+  flex-direction: row;
+  justify-content: center;
+  gap: clamp(50px, 4.31vw, 75px);
   width: 100%;
 
   /* Левая часть — блок с изображением */
   .clothing-block {
-    width: 510px;
-    height: 672px;
+    width: clamp(510px, 50vw, 765px);
+    height: clamp(672px, 70vw, 1008px);
     border: 0.25px solid #121319;
     border-radius: 20px;
 
@@ -32,31 +37,129 @@
   .blockSelection {
     display: flex;
     flex-direction: column;
-    gap:30px;
+    gap: clamp(60px, 5.21vw, 90px);
 
     .title {
       font-family: 'RightGrotesk', sans-serif;
       font-weight: 500;
-      font-size: 36px;
+      font-size: clamp(36px, 3.125vw, 54px);
       color: #440a18;
+      margin-bottom: 20px;
     }
 
+
+
     .selectorGroup {
-      .selector {
-     
-      }
+      .selectorType {
+        display: flex;
+        flex-direction: column;
+        gap: clamp(10px, 0.83vw, 15px);
+        .selectorType__item {
+          display: flex;
+          align-items: center;
+          gap: clamp(10px, 0.83vw, 15px);
+          cursor: pointer;
+          text-transform: lowercase;
+          font-family: 'Raleway', sans-serif;
+          font-weight: 400;
+          font-size: clamp(20px, 1.736vw, 30px);
+          color: #121319;
 
-      .colorSelector {
+          input {
+            display: none;
+          }
 
+          .selectorType__custom {
+            width: clamp(26px, 2.26vw, 39px);
+            height: clamp(26px, 2.26vw, 39px);
+            border: 2px solid #440a18;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.5s ease-in-out;
+
+            .selectorType__check {
+              width: clamp(16px, 1.39vw, 24px);
+              height: clamp(16px, 1.39vw, 24px);
+              display: none;
+            }
+          }
+
+          input:checked + .selectorType__custom {
+            background-color: #440a18;
+            border: 2px solid transparent;
+
+            .selectorType__check {
+              display: block;
+            }
+          }
+        }
       }
 
       .sizeSelector {
+        display: flex;
+        gap: clamp(8px, 0.7vw, 12px);
+        flex-wrap: wrap;
 
+        &__item {
+          position: relative;
+          cursor: pointer;
+
+          input {
+            display: none;
+          }
+
+          .sizeSelector__box {
+            width: clamp(48px, 4.17vw, 72px);
+            height: clamp(46px, 4.03vw, 69px);
+            border: 1px solid #121319;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 400;
+            font-size: clamp(24px, 2.08vw, 36px);
+            color: #121319;
+            transition: all 0.2s ease-in-out;
+          }
+
+          input:checked + .sizeSelector__box {
+            background-color: #440a18;
+            border: 1px solid transparent;
+            color: white;
+          }
+        }
+      }
+      .tableSize{
+        margin-top: 20px;
+        font-family: 'Raleway', sans-serif;
+        font-weight: 400;
+        font-size: clamp(20px, 1.736vw, 30px);
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-decoration-skip-ink: none;
+        color: rgba(18, 19, 25, 0.8);
       }
       
-      
     }
+
+
   }
+}
+
+.confirmButton{
+  border-radius: 20px;
+  width: clamp(350px, 30.35vw, 525px);
+  height: clamp(68px, 5.9vw, 102px);
+  background: #440a18;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 500;
+  font-size: clamp(24px, 2.08vw, 36px);
+  color: #fff;
+  border: none;
+  cursor: pointer;
 }
 
 @media (max-width: 768px) {

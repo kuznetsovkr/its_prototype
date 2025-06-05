@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import CDEKWidget from '@cdek-it/widget';
 
 const MyCdekWidget = ({ onAddressSelect, onRateSelect }) => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import MyCdekWidget from "../components/MyCdekWidget";
 import { AddressSuggestions } from 'react-dadata';
@@ -147,92 +147,86 @@ const RecipientDetails = () => {
 
 
     return (
-        <div className="recipientDetails">
-            <div className="recipientInfo">
-                <p className="title">Данные о получателе</p>
-                <div className="data">
-                    <div className="element">
-                        <label>Фамилия:</label>
-                        <input type="text" name="lastName" value={userData.lastName} onChange={handleInputChange} disabled={isUserAuthenticated && !isDifferentRecipient} />
+        <div className="containerDetails">
+            <div className="firstColumn">
+                <div className="recipientInfo">
+                    <p className="title">ДАННЫЕ О ПОЛУЧАТЕЛЕ:</p>
+                    <div className="data">
+                        <div className="FIO">
+                            <input type="text" name="lastName" placeholder="Фамилия" value={userData.lastName} onChange={handleInputChange}  />
+                            <input type="text" name="firstName" placeholder="Имя" value={userData.firstName} onChange={handleInputChange} disabled={isUserAuthenticated && !isDifferentRecipient} />
+                            <input type="text" name="middleName" placeholder="Отчество" value={userData.middleName} onChange={handleInputChange} disabled={isUserAuthenticated && !isDifferentRecipient} />
+                        </div>
+                        <div>
+                            <input type="tel" name="phone" placeholder="Номер телефона" value={userData.phone} onChange={handleInputChange} disabled={isUserAuthenticated && !isDifferentRecipient} />
+                        </div>
                     </div>
-                    <div className="element">
-                        <label>Имя:</label>
-                        <input type="text" name="firstName" value={userData.firstName} onChange={handleInputChange} disabled={isUserAuthenticated && !isDifferentRecipient} />
-                    </div>
-                    <div className="element">
-                        <label>Отчество:</label>
-                        <input type="text" name="middleName" value={userData.middleName} onChange={handleInputChange} disabled={isUserAuthenticated && !isDifferentRecipient} />
-                    </div>
-                    <div className="element">
-                        <label>Телефон:</label>
-                        <input type="tel" name="phone" value={userData.phone} onChange={handleInputChange} disabled={isUserAuthenticated && !isDifferentRecipient} />
-                    </div>
+                    {isUserDataFilled && (
+                        <div className="checkboxBlock">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={isDifferentRecipient}
+                                    onChange={() => setIsDifferentRecipient((prev) => !prev)}
+                                />
+                                Получатель другой человек
+                            </label>
+                        </div>
+                    )}
                 </div>
-                {isUserDataFilled && (
-                    <div className="checkboxBlock">
+
+                <div className = "deliveryInfo">
+                    <p className="title">Выбор пункта выдачи (СДЭК)</p>
+                    <div className="blockCDEK">
+                        <div id="cdek-map">
+                            <MyCdekWidget 
+                                onAddressSelect={setPickupPoint}
+                                onRateSelect={setDeliveryPrice}
+                            />
+                        </div>
                         <label>
                             <input
                                 type="checkbox"
-                                checked={isDifferentRecipient}
-                                onChange={() => setIsDifferentRecipient((prev) => !prev)}
+                                checked={isNoCdek}
+                                onChange={() => setIsNoCdek(prev => !prev)}
                             />
-                            Получатель другой человек
+                            В моём городе нет СДЭКа
                         </label>
+
+                        {isNoCdek && (
+                            <div style={{ marginTop: '12px', maxWidth: '400px' }}>
+                                <p>Введите адрес вручную:</p>
+                                <AddressSuggestions 
+                                    token={dadataToken}
+                                    placeholder="Начните вводить адрес..."
+                                    query={manualAddress?.value}
+                                    onChange={(suggestion) => setManualAddress(suggestion)}
+                                />
+                                {manualAddress && (
+                                    <p style={{ marginTop: '8px' }}>Вы выбрали: {manualAddress.value}</p>
+                                )}
+                            </div>
+                        )}
+    
                     </div>
-                )}
+                </div>
             </div>
 
-            <div className = "deliveryInfo">
-                <div className="blockCDEK">
-                    <p className="title">Выбор пункта выдачи (СДЭК)</p>
-                    <div id="cdek-map">
-                        <MyCdekWidget 
-                            onAddressSelect={setPickupPoint}
-                            onRateSelect={setDeliveryPrice}
-                        />
-                    </div>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
-                        <input
-                            type="checkbox"
-                            checked={isNoCdek}
-                            onChange={() => setIsNoCdek(prev => !prev)}
-                        />
-                        В моём городе нет СДЭКа
-                    </label>
-
-                    {isNoCdek && (
-                        <div style={{ marginTop: '12px', maxWidth: '400px' }}>
-                            <p>Введите адрес вручную:</p>
-                            <AddressSuggestions 
-                                token={dadataToken}
-                                placeholder="Начните вводить адрес..."
-                                query={manualAddress?.value}
-                                onChange={(suggestion) => setManualAddress(suggestion)}
-                            />
-                            {manualAddress && (
-                                <p style={{ marginTop: '8px' }}>Вы выбрали: {manualAddress.value}</p>
-                            )}
-                        </div>
-                    )}
- 
-                </div>
+            <div className="secondColumn">
                 <div className="deliveryCost">
-                    <p className="title">Рассчёт стоимости</p> 
+                    <p className="title">РАСЧЁТ СТОИМОСТИ</p> 
                     <div className="aboutPrice">
-                        <p >Вышивка: </p> 
-                        <p >Доставка:  {deliveryPrice !== null ? `${deliveryPrice} ₽` : "не рассчитана"}</p> 
-                        <p className="summaryCost">Стоимость: </p> 
+                        <div className="aboutPrice_calculate"><p >Вышивка:</p>  {deliveryPrice !== null ? `${deliveryPrice} ₽` : "0 р."}</div>
+                        <div className="aboutPrice_calculate"><p >Доставка:</p> {deliveryPrice !== null ? `${deliveryPrice} ₽` : "0 р."}</div>
+                        <div className="summaryCost"><p >ИТОГО:</p> {deliveryPrice !== null ? `${deliveryPrice} ₽` : "0 р."}</div>
                     </div>
                     <div className="tooltip-container">
                         <button
                             onClick={handlePayment}
                             disabled={!isFormValid}
-                            style={{
-                                opacity: isFormValid ? 1 : 0.5,
-                                cursor: isFormValid ? "pointer" : "not-allowed"
-                            }}
+                            className="confirmButton"
                         >
-                            Перейти к оплате
+                            ПЕРЕЙТИ К ОПЛАТЕ
                         </button>
                         {!isFormValid && (
                             <div className="tooltip-text">

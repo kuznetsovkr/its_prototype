@@ -1,130 +1,88 @@
-  /* Основной блок, содержащий слева примеры, справа выбор типа */
   .containerExampleType {
     display: flex;
+    flex-direction: row;
+    gap: clamp(50px, 4.31vw, 75px);
 
     .exampleImg {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: space-around;
-      width: 60%;
-      .image-container {
-        text-align: center;
-
-        img {
-          max-width: 300px;
-        }
-
-        p {
-          font-size: 16px;
-          color: #333;
-        }
-      }
+      border-radius: 20px;
+      width: clamp(510px, 50vw, 765px);
+      height: clamp(672px, 70vw, 1008px);
+      background: #d9d9d9;
     }
 
-    /* Правая часть - выбор типа вышивки + кнопка */
-    .selectorType {
-      width: 40%;
+    .containterType {
       display: flex;
       flex-direction: column;
-      gap: 40px; 
+      gap: clamp(60px, 5.21vw, 90px);
+
       .title {
-        font-size: clamp(24px, 4vw, 36px);
+        margin-bottom: 20px;
+        font-family: 'RightGrotesk', sans-serif;
         font-weight: 500;
-        margin-bottom: 16px;
-      }
-      .selector {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        flex-wrap: wrap;
-
-        label {
-          display: inline-flex;
-          align-items: center;
-          cursor: pointer;
-          margin-right: 16px;
-          position: relative;
-          padding-left: 28px;
-          font-size: clamp(18px, 3vw, 24px);
-        }
-        
-        input[type="radio"] {
-          appearance: none;
-          -webkit-appearance: none;
-          -moz-appearance: none;
-          position: absolute;
-          left: 0;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 24px;
-          height: 24px;
-          border: 2px solid black;
-          border-radius: 50%;
-          background-color: white;
-          cursor: pointer;
-          transition: background-color 0.2s ease;
-        }
-        
-        input[type="radio"]:checked {
-          background-color: black;
-        }        
+        font-size: clamp(36px, 3.125vw, 54px);
+        color: #440a18;
       }
 
-      label {
-        input[type="radio"] {
-          cursor: pointer;
-          accent-color: #333;
+      .selectorGroup{
+        .selector {
+          display: flex;
+          flex-direction: column;
+          gap: clamp(10px, 0.83vw, 15px);
+          .selector__item {
+            display: flex;
+            align-items: center;
+            gap: clamp(10px, 0.83vw, 15px);
+            cursor: pointer;
+            text-transform: lowercase;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 400;
+            font-size: clamp(20px, 1.736vw, 30px);
+            color: #121319;
+
+            input {
+              display: none;
+            }
+
+            .selector__custom {
+              width: clamp(26px, 2.26vw, 39px);
+              height: clamp(26px, 2.26vw, 39px);
+              border: 2px solid #440a18;
+              border-radius: 10px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              transition: background-color 0.5s ease-in-out;
+
+              .selector__check {
+                width: clamp(16px, 1.39vw, 24px);
+                height: clamp(16px, 1.39vw, 24px);
+                display: none;
+              }
+            }
+
+            input:checked + .selector__custom {
+              background-color: #440a18;
+              border: 2px solid transparent;
+
+              .selector__check {
+                display: block;
+              }
+            }
+          }
+        }
+      }
+
+      .uploadBlock{
+        .loadButton{
+
         }
       }
     }
   }
 
-  .uploadBlock,
-  .commentBlock {
-    width: 100%;
-    input[type="text"],
-    input[type="file"],
-
-    .autoTextarea {
-      font-size: 24px;
-      color: black;
-      width: 100%;
-      min-height: 80px;
-      max-height: 200px;
-      resize: none; 
-      overflow-y: auto; 
-      font-size: 18px;
-      line-height: 1.4;
-      transition: border 0.2s ease;
-    
-      &:focus {
-        outline: none;         
-        border-color: #888;    
-      }
-    
-      &::placeholder {
-        color: #aaa;
-        font-style: italic;
-      }
-    }    
-  }
 
   @media (max-width: 768px) {
     .containerExampleType {
-      flex-direction: column;
-      .exampleImg{
-        width: 100%;
-        .image-container {
-          img{
-            max-width: 200px;
-          }
-        } 
-      }
-      .selectorType{
-        width: 100%;
-        gap:15px;
-      }
+
     }
   }
