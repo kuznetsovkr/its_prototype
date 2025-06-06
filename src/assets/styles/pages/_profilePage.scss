@@ -1,128 +1,25 @@
 .profile-page {
   display: flex;
   flex-direction: row;
-  gap: 20px;
-  padding: 20px;
-  background-color: #f8f8f8;
-
-  @include respond-to(md) {
-    flex-direction: column;
-  }
 }
 
 .profile-sidebar {
-  flex: 0 0 300px;
-  background-color: #fff; 
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
 
-  @include respond-to(md) {
-    flex: none;
-  }
 
   .admin-button {
-    display: block;
-    width: 100%;
-    margin-bottom: 20px;
-    padding: 10px;
-    font-size: 18px;
-    font-weight: bold;
-    background-color: transparent;
-    border: 2px solid #333;
-    border-radius: 10px;
-    cursor: pointer;
 
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.1);
-    }
   }
 
   .user-info {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
 
-    label {
-      font-weight: bold;
-      font-size: 16px;
-    }
-
-    input {
-      padding: 8px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      &:disabled {
-        background-color: #eee;
-        cursor: not-allowed;
-      }
-    }
   }
 
   .profile-actions {
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
 
-    button {
-      padding: 10px;
-      font-size: 16px;
-      background-color: transparent;
-      border: 2px solid #333;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.1);
-      }
-    }
   }
 }
 
 .profile-content {
-  flex: 1;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
 
-  h2 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: #333;
-    text-align: center;
-  }
-
-  .orders-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-
-    th,
-    td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
-
-    th {
-      background-color: #f8f8f8; 
-      font-weight: 600;
-      color: #333;
-      font-size: 16px;
-    }
-
-    td {
-      color: #555;
-      font-size: 15px;
-    }
-
-    tbody tr:hover {
-      background-color: rgba(0, 0, 0, 0.05);
-    }
-  }
 }
 

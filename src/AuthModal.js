@@ -46,7 +46,7 @@ const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
     const validatePhone = () => {
         const cleanNumber = phone.replace(/\D/g, "");
         if (cleanNumber.length !== 11) {
-            setErrorMessage("Введите корректный номер телефона.");
+            setErrorMessage("введите корректный номер телефона.");
             return false;
         }
         return true;
@@ -76,14 +76,14 @@ const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
             setErrorMessage("");
         } catch (error) {
             console.error("❌ Ошибка при запросе SMS:", error);
-            setErrorMessage("Ошибка при отправке SMS. Попробуйте снова.");
+            setErrorMessage("ошибка при отправке SMS, попробуйте снова.");
         }
     };
 
 
     const handleLogin = async () => {
         if (!smsCode || smsCode.length < 4) {
-            setErrorMessage("Введите корректный код из SMS.");
+            setErrorMessage("введите корректный код из SMS.");
             return;
         }
 
@@ -93,7 +93,7 @@ const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
             if (onLoginSuccess) onLoginSuccess();
         } catch (error) {
             console.error("Ошибка при авторизации:", error);
-            setErrorMessage("Неверный код. Попробуйте снова.");
+            setErrorMessage("неверный код, попробуйте снова.");
         }
     };
 
@@ -114,7 +114,7 @@ const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
             if (onLoginSuccess) onLoginSuccess();
         } catch (error) {
             console.error("Ошибка при входе админа:", error);
-            setErrorMessage("Неверный пароль.");
+            setErrorMessage("неверный пароль.");
         }
     };
 
@@ -124,11 +124,10 @@ const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
             <div className="modal-overlay" onClick={toggleAuthModal}>
                 <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                     <button className="close-button" onClick={toggleAuthModal}>×</button>
-                    <h2>Авторизация по номеру телефона</h2>
+                    <p className="modal-title">АВТОРИЗАЦИЯ ПО НОМЕРУ ТЕЛЕФОНА</p>
 
                    {step === 1 ? (
                         <>
-                            <label htmlFor="phone">Введите номер телефона:</label>
                             <input
                                 type="tel"
                                 id="phone"
@@ -142,45 +141,43 @@ const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
                             {errorMessage && <p className="error-message">{errorMessage}</p>}
 
                             <button onClick={handleRequestSMS} className="submit-button">
-                                Получить код
+                                ПОЛУЧИТЬ КОД
                             </button>
                         </>
                     ) : step === 2 ? (
                         <>
-                            <label htmlFor="smsCode">Введите код из SMS:</label>
                             <input
                                 type="text"
                                 id="smsCode"
                                 name="smsCode"
                                 value={smsCode}
                                 onChange={(e) => setSmsCode(e.target.value)}
-                                placeholder="Введите код"
+                                placeholder="Введите код из SMS"
                                 required
                                 maxLength={6}
                             />
                             {errorMessage && <p className="error-message">{errorMessage}</p>}
 
                             <button onClick={handleLogin} className="submit-button">
-                                Войти
+                                ВОЙТИ
                             </button>
                         </>
                     ) : (
                         // ✅ Новый шаг для входа администратора по паролю
                         <>
-                            <label htmlFor="password">Введите пароль:</label>
                             <input
                                 type="password"
                                 id="password"
                                 name="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Введите пароль"
+                                placeholder="Введите пароль для администратора"
                                 required
                             />
                             {errorMessage && <p className="error-message">{errorMessage}</p>}
 
                             <button onClick={handleAdminLogin} className="submit-button">
-                                Войти как админ
+                                ВОЙТИ КАК АДМИН
                             </button>
                         </>
                     )}

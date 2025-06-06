@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
@@ -186,9 +186,8 @@ const ProfilePage = () => {
         </div>      
 </div>
 
-      {/* Правая колонка с заказами */}
       <div className="profile-content">
-        <h2>История заказов</h2>
+        <p>История заказов</p>
         {orders.length > 0 ? (
           <table className="orders-table">
             <thead>

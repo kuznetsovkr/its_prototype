@@ -8,7 +8,6 @@ import EmbroideryPage from './pages/EmbroideryPage';
 import RecipientDetails from './pages/RecipientDetails';
 import ThankYouPage from './pages/ThankYouPage';
 import ProfilePage from './pages/ProfilePage';
-import OrderHistoryPage from './pages/OrderHistoryPage';
 import WorksPage from './pages/WorksPage';
 import AboutPage from './pages/AboutPage';
 import DeliveryPage from './pages/DeliveryPage';
@@ -33,7 +32,6 @@ const App = () => {
                             <Route path="/recipient" element={<PageLayout><RecipientDetails /></PageLayout>} />
                             <Route path="/thank-you" element={<PageLayout><ThankYouPage /></PageLayout>} />
                             <Route path="/profile" element={<PageLayout><ProfilePage /></PageLayout>} />
-                            <Route path="/order-history" element={<PageLayout><OrderHistoryPage /></PageLayout>} />
                             <Route path="/works" element={<WorksPage/>} />
                             <Route path="/about" element={<PageLayout><AboutPage /></PageLayout>} />
                             <Route path="/faq" element={<PageLayout><DeliveryPage /></PageLayout>} />

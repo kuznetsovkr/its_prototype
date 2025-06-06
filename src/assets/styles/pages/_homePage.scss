@@ -45,65 +45,84 @@
   }
 }
 
-#roadmap_block{
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap:10px;
-  img{
-    width: 100%;
-    height: auto;
-    max-width: 1024px;
-    display: block;
-  }
-  .title{
-    font-size: clamp(36px, 5vw, 48px);
-    font-weight: 700;
-    text-align: center;
-  }
-  .roadmap_button {
-    width: 40%;
-    padding: 20px;
-    font-size: 48px;
-    font-weight: 600;
-    color: white;
-    background: linear-gradient(135deg, #2e2e2e, #000000);
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  
-    &:hover {
-      background: linear-gradient(135deg, #3b3b3b, #131313);
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+.roadmap{
+  margin-bottom: 50px;
+  .titleRoadmap{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap:27px;
+    margin: 120px 0 40px;
+    font-family: 'RightGrotesk', sans-serif;
+    .titleFirstColumn{
+      font-weight: 900;
+      font-size: 96px;
+      color: #440a18;
     }
-  
-    &:active {
-      transform: translateX(-50%) scale(0.98);
-    }
-  
-    /* 📱 Адаптивность */
-    @include respond-to(lg) {
+    .titleSecondColumn{
+      display: flex;
+      flex-direction: column;
+      justify-content: end;
+      font-weight: 500;
       font-size: 36px;
-      width: 40%;
+      color: #000;
+      margin-bottom: 11px;
+    }
+  }
+  .steps{
+    display: flex;
+    flex-direction: column;
+    .step{
+      width: 433px;
+      height: 456px;
+      .firstRow{
+        display: flex;
+        flex-direction: row;
+        .number{
+          font-family: 'RightGrotesk', sans-serif;
+          font-weight: 500;
+          font-size: 180px;
+          color: #440a18;
+        }
+        .text{
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap:20px;
+          .nameStep{
+            font-family: 'RightGrotesk', sans-serif;
+            font-weight: 500;
+            font-size: 36px;
+            color: #440a18;
+          }
+          .descriptionStep{
+            font-family: 'Raleway', sans-serif;
+            font-weight: 400;
+            font-size: 24px;
+            color: #121319;
+          }
+        }
+      }
+
+      .image-placeholder{
+        border-radius: 20px;
+        width: 433px;
+        height: 240px;
+        background: #d9d9d9;
+      }
+
     }
   
-    @include respond-to(md) {
-      font-size: 32px;
-      width: 50%;
+    #step-1, #step-4{
+      align-self: flex-start;
     }
-  
-    @include respond-to(sm) {
-      font-size: 28px;
-      width: 60%;
+    #step-2, #step-5{
+       align-self: flex-end;
     }
-  
-    @include respond-to(xs) {
-      font-size: 24px;
-      width: 70%;
+    #step-3{
+      align-self: center;
     }
-  }  
+  }
 }
 
 
