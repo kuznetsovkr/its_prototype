@@ -122,7 +122,43 @@
     #step-3{
       align-self: center;
     }
+
+    #step-2 {
+      margin-top: -200px; // "залазит" на step-1
+    }
+
+    #step-5 {
+      margin-top: -200px; // "залазит" на step-4
+    }
+
   }
 }
 
+.step {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  will-change: opacity, transform;
 
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.arrow {
+  position: absolute;
+  width: 250px;
+  height: 100px;
+  left: calc(50% - 125px); // отцентрировано между step-1 и step-2
+  top: 420px;
+
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

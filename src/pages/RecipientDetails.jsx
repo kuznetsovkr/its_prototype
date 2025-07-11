@@ -161,18 +161,7 @@ const RecipientDetails = () => {
                             <input type="tel" name="phone" placeholder="Номер телефона" value={userData.phone} onChange={handleInputChange} disabled={isUserAuthenticated && !isDifferentRecipient} />
                         </div>
                     </div>
-                    {isUserDataFilled && (
-                        <div className="checkboxBlock">
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={isDifferentRecipient}
-                                    onChange={() => setIsDifferentRecipient((prev) => !prev)}
-                                />
-                                Получатель другой человек
-                            </label>
-                        </div>
-                    )}
+
                 </div>
 
                 <div className = "deliveryInfo">
@@ -195,7 +184,6 @@ const RecipientDetails = () => {
 
                         {isNoCdek && (
                             <div style={{ marginTop: '12px', maxWidth: '400px' }}>
-                                <p>Введите адрес вручную:</p>
                                 <AddressSuggestions 
                                     token={dadataToken}
                                     placeholder="Начните вводить адрес..."

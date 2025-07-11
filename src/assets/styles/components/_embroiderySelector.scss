@@ -1,25 +1,26 @@
   .containerExampleType {
     display: flex;
     flex-direction: row;
-    gap: clamp(50px, 4.31vw, 75px);
+    gap: clamp(50px, 2vw, 75px);
+    min-height: min(calc(100vh - 200px), 1008px);
 
     .exampleImg {
       border-radius: 20px;
-      width: clamp(510px, 50vw, 765px);
-      height: clamp(672px, 70vw, 1008px);
+      width: clamp(510px, 20vw, 765px);
+      height: clamp(600px, 30vw, 1008px);
       background: #d9d9d9;
     }
 
     .containterType {
       display: flex;
       flex-direction: column;
-      gap: clamp(60px, 5.21vw, 90px);
+      gap: min(1.5vw, 60px);
 
       .title {
         margin-bottom: 20px;
         font-family: 'RightGrotesk', sans-serif;
         font-weight: 500;
-        font-size: clamp(36px, 3.125vw, 54px);
+        font-size: clamp(36px, 1vw, 54px);
         color: #440a18;
       }
 
@@ -27,16 +28,16 @@
         .selector {
           display: flex;
           flex-direction: column;
-          gap: clamp(10px, 0.83vw, 15px);
+          gap: clamp(10px, 0.5vw, 15px);
           .selector__item {
             display: flex;
             align-items: center;
-            gap: clamp(10px, 0.83vw, 15px);
+            gap: clamp(10px, 0.5vw, 15px);
             cursor: pointer;
             text-transform: lowercase;
             font-family: 'Raleway', sans-serif;
             font-weight: 400;
-            font-size: clamp(20px, 1.736vw, 30px);
+            font-size: clamp(20px, 1vw, 30px);
             color: #121319;
 
             input {
@@ -44,8 +45,8 @@
             }
 
             .selector__custom {
-              width: clamp(26px, 2.26vw, 39px);
-              height: clamp(26px, 2.26vw, 39px);
+              width: clamp(26px, 1vw, 39px);
+              height: clamp(26px, 1vw, 39px);
               border: 2px solid #440a18;
               border-radius: 10px;
               display: flex;
@@ -54,8 +55,8 @@
               transition: background-color 0.5s ease-in-out;
 
               .selector__check {
-                width: clamp(16px, 1.39vw, 24px);
-                height: clamp(16px, 1.39vw, 24px);
+                width: clamp(16px, 0.5vw, 24px);
+                height: clamp(16px, 0.5vw, 24px);
                 display: none;
               }
             }
@@ -72,11 +73,81 @@
         }
       }
 
-      .uploadBlock{
-        .loadButton{
+      .uploadBlock {
+        .fileInputWrapper {
+          position: relative;
+          display: inline-block;
 
+          .fileLimitNote {
+            position: absolute;
+            right: -150px;
+            font-weight: 400;
+            font-size: 14px;
+            color: #121319;
+            font-family: 'Raleway', sans-serif;
+          }
+
+          .customFileButton {
+            display: inline-block;
+            border: 1px solid #121319;
+            border-radius: 10px;
+            padding: 10px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 14px;
+            color: #121319;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            font-weight: 400;
+            font-size: 20px;
+            color: #121319;
+          }
+
+          .hiddenFileInput {
+            display: none;
+          }
         }
       }
+
+      .patronusCounter {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-family: 'Raleway', sans-serif;
+        font-size: 18px;
+        color: #121319;
+        margin-left: 30px;
+
+        .circleButton {
+          border: 1px solid #440a18;
+          border-radius: 10px;
+          padding: 4px;
+          width: 40px;
+          height: 40px;
+          background: white;
+          color: #121319;
+          font-size: 18px;
+          line-height: 1;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .countValue {
+          font-size: 20px;
+          min-width: 20px;
+          text-align: center;
+        }
+
+        .limitText {
+          font-size: 14px;
+          color: #440a18;
+          margin-left: 8px;
+        }
+      }
+
     }
   }
 
@@ -86,3 +157,70 @@
 
     }
   }
+
+  .autoTextarea{
+    resize: none;
+    border: 1px solid #121319;
+    outline: none;
+    border-radius: 10px;
+    padding: 10px;
+    width: 431px;
+    height: 70px;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #121319; // ← цвет текста пользователя
+    font-family: 'Raleway', sans-serif;
+
+    &::placeholder {
+      color: rgba(18, 19, 25, 0.5);
+    }
+  }
+
+  .navigationButtons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap:10px;
+
+    .backButton {
+      background: none;
+      border: none;
+      font-family: 'Raleway', sans-serif;
+      cursor: pointer;
+      padding: 0;
+      font-weight: 400;
+      font-size: 20px;
+      text-decoration: underline;
+      text-decoration-skip-ink: none;
+      color: rgba(18, 19, 25, 0.8);
+    }
+}
+
+.customTextBlock textarea {
+    resize: none;
+    border: 1px solid #121319;
+    outline: none;
+    border-radius: 10px;
+    padding: 10px;
+    width: 431px;
+    height: 70px;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #121319; // ← цвет текста пользователя
+    font-family: 'Raleway', sans-serif;
+
+    &::placeholder {
+      color: rgba(18, 19, 25, 0.5);
+    }
+}
+
+.fontSelectBlock select {
+  outline: none;
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}

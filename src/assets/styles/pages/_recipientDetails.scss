@@ -1,25 +1,27 @@
 .containerDetails{
     display: flex;
     flex-direction: row;
-    gap: clamp(20px, 1.74vw, 30px);
+    gap: clamp(20px, 1vw, 30px);
+    min-height: min(calc(100vh - 200px), 1008px);
+    margin-top: 10px;
 
     .firstColumn{
         display: flex;
     
         flex-direction: column;
-        gap: clamp(40px, 3.47vw, 60px);
+        gap: clamp(40px, 2vw, 60px);
         .recipientInfo{
             .title{
                 font-family: 'RightGrotesk', sans-serif;
                 font-weight: 500;
-                font-size: clamp(36px, 3.125vw, 54px);
+                font-size: clamp(36px, 2vw, 54px);
                 color: #440a18;
                 margin-bottom: 30px;
             }
             .data{
                 display: flex;
                 flex-direction: row;
-                gap: clamp(20px, 1.74vw, 30px);
+                gap: clamp(20px, 1vw, 30px);
                 input {
                     box-sizing: border-box;
                     width: 433px;
@@ -28,7 +30,7 @@
                     border: 1px solid #121319;
                     border-radius: 10px;
                     font-weight: 400;
-                    font-size: clamp(20px, 1.736vw, 30px);
+                    font-size: clamp(20px, 1vw, 30px);
                     font-family: 'Raleway', sans-serif;
                     transition: border 0.2s ease-in-out;
 
@@ -49,7 +51,7 @@
             .FIO{
                 display: flex;
                 flex-direction: column;
-                gap: clamp(10px, 0.83vw, 15px);
+                gap: clamp(10px, 0.5vw, 15px);
             }
         }
 
@@ -59,7 +61,7 @@
             .title{
                 font-family: 'RightGrotesk', sans-serif;
                 font-weight: 500;
-                font-size: clamp(36px, 3.125vw, 54px);
+                font-size: clamp(36px, 2vw, 54px);
                 color: #440a18;
                 margin-bottom: 30px;
             }
@@ -69,6 +71,22 @@
                     width: 887px;
                     height: 430px;
                     border: 2px solid #440a18;
+                }
+                label {
+                    font-family: 'Raleway', sans-serif;
+                    font-weight: 400;
+                    font-size: 20px;
+                    color: #121319;
+                    margin-top: 20px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+
+                    input[type="checkbox"] {
+                        width: 18px;
+                        height: 18px;
+                        cursor: pointer;
+                    }
                 }
             }
         }
@@ -82,14 +100,14 @@
             .title{
                 font-family: 'RightGrotesk', sans-serif;
                 font-weight: 500;
-                font-size: clamp(36px, 3.125vw, 54px);
+                font-size: clamp(36px, 2vw, 54px);
                 color: #440a18;
                 margin-bottom: 30px;
             }
             .aboutPrice{
                 font-family: 'Raleway', sans-serif;
                 font-weight: 400;
-                font-size: clamp(24px, 2.08vw, 36px);
+                font-size: clamp(24px, 1vw, 36px);
                 color: #121319;
                 &_calculate{
                     display: flex;
@@ -100,7 +118,7 @@
                     font-family: 'RightGrotesk', sans-serif;
                     margin-top: 30px;
                     font-weight: 500;
-                    font-size: clamp(24px, 2.08vw, 36px);
+                    font-size: clamp(24px, 1vw, 36px);
                     color: #440a18;
                     display: flex;
                     flex-direction: row;
@@ -117,11 +135,11 @@
     display: inline-block;
     .confirmButton{
         border-radius: 20px;
-        height: clamp(68px, 5.9vw, 102px);
+        height: clamp(68px, 3vw, 102px);
         background: #440a18;
         font-family: 'Raleway', sans-serif;
         font-weight: 500;
-        font-size: clamp(24px, 2.08vw, 36px);
+        font-size: clamp(24px, 1vw, 36px);
         color: #fff;
         border: none;
         cursor: pointer;
@@ -132,7 +150,7 @@
   .tooltip-text {
     font-family: 'Raleway', sans-serif;
     font-weight: 400;
-    font-size: clamp(14px, 1.22vw, 21px);
+    font-size: clamp(14px, 1vw, 21px);
     visibility: hidden;
     background-color: #333;
     color: #fff;
@@ -155,3 +173,83 @@
     opacity: 1;
   }
   
+
+  .react-dadata__container {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  color: #121319;
+  width: 100%;
+
+  input.react-dadata__input {
+    width: 100%;
+    height: 43px;
+    border: 1px solid #121319;
+    border-radius: 10px;
+    font-size: 20px;
+    font-family: 'Raleway', sans-serif;
+
+    &::placeholder {
+      color: rgba(18, 19, 25, 0.5);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: #440a18;
+    }
+  }
+  .react-dadata__input {
+    width: 100%;
+    height: 43px;
+    padding: 10px 20px;
+    border: 1px solid #121319;
+    border-radius: 10px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 20px;
+
+    &::placeholder {
+        color: rgba(18, 19, 25, 0.5);
+    }
+
+    &:focus {
+        border-color: #440a18;
+        outline: none;
+    }
+    }
+
+
+    .react-dadata__suggestions {
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    font-family: 'Raleway', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: #121319;
+    max-height: 250px;
+    overflow-y: auto;
+
+    .react-dadata__suggestion {
+        padding: 10px 16px;
+        cursor: default;
+        border-top: 1px solid #eee;
+
+        &:hover {
+        background-color: #f9f9f9;
+        }
+
+        &--current {
+        background-color: #f0f0f0;
+        }
+
+        mark {
+        background: none;
+        font-weight: 600;
+        color: #440a18;
+        }
+    }
+    }
+
+}

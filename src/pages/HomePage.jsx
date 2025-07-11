@@ -1,10 +1,36 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import to2 from "../images/lines/Line1_2.svg";
+import to3 from "../images/lines/Line2_3.svg";
+import to4 from "../images/lines/Line3_4.svg";
+import to5 from "../images/lines/Line4_5.svg";
 
 const HomePage = () => {
     const navigate = useNavigate();
     const handleOrder = () => {
         navigate('/order');
     };
+
+    useEffect(() => {
+    const observer = new IntersectionObserver(
+        entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            } else {
+            entry.target.classList.remove('visible');
+            }
+        });
+        },
+        { threshold: 0.2 }
+    );
+
+    const allAnimated = document.querySelectorAll('.step, .arrow');
+    allAnimated.forEach(el => observer.observe(el));
+    
+
+    return () => observer.disconnect();
+    }, []);
 
     return (
         <div>
@@ -34,6 +60,7 @@ const HomePage = () => {
                                 </div>
                                 <div class="image-placeholder"></div>
                             </div>
+
                             <div class="step" id="step-2">
                                 <div class="firstRow">
                                     <div class="number">2.</div>
@@ -44,6 +71,7 @@ const HomePage = () => {
                                 </div>
                                 <div class="image-placeholder"></div>
                             </div>
+                           
                             <div class="step" id="step-3">
                                 <div class="firstRow">
                                     <div class="number">3.</div>
@@ -54,6 +82,7 @@ const HomePage = () => {
                                 </div>
                                 <div class="image-placeholder"></div>
                             </div>
+                      
                             <div class="step" id="step-4">
                                 <div class="firstRow">
                                     <div class="number">4.</div>
@@ -64,6 +93,7 @@ const HomePage = () => {
                                 </div>
                                 <div class="image-placeholder"></div>
                             </div>
+                   
                             <div class="step" id="step-5">
                                 <div class="firstRow">
                                     <div class="number">5.</div>

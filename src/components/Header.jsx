@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../images/logo_its.jpg";
+import logo from "../images/logo_its.svg";
 import auth from "../images/auth.svg";
 import AuthModal from "../AuthModal";
 

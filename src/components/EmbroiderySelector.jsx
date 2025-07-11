@@ -11,6 +11,13 @@ const EmbroiderySelector = () => {
   const [uploadedImage, setUploadedImage] = useState([]); // Массив загруженных изображений
   const [comment, setComment] = useState("");
   const [error, setError] = useState("");
+  const [patronusCount, setPatronusCount] = useState(1);
+  const [customOption, setCustomOption] = useState({
+    image: false,
+    text: false,
+  });
+  const [customTextFont, setCustomTextFont] = useState("Arial");
+
 
   const { selectedClothing, selectedSize, selectedColor } = location.state || {};
 
@@ -52,6 +59,14 @@ const EmbroiderySelector = () => {
     }
   }, [comment]);
 
+  useEffect(() => {
+    if (selectedType !== "custom") {
+      setCustomOption({ image: false, text: false });
+      setCustomText("");
+      setCustomTextFont("Arial");
+    }
+  }, [selectedType]);
+
   return (
       <div className="containerExampleType">
         {/* Блок с примерами изображений */}
@@ -77,6 +92,26 @@ const EmbroiderySelector = () => {
                 </span>
                 патронусы
               </label>
+              
+              {selectedType === "Patronus" && (
+                <div className="patronusCounter">
+                  <button
+                    className="circleButton"
+                    onClick={() => setPatronusCount((prev) => Math.max(1, prev - 1))}
+                  >
+                    −
+                  </button>
+                  <span className="countValue">{patronusCount}</span>
+                  <button
+                    className="circleButton"
+                    onClick={() => setPatronusCount((prev) => Math.min(5, prev + 1))}
+                  >
+                    +
+                  </button>
+                  <span className="limitText">*не более 5</span>
+                </div>
+              )}
+
 
               <label className="selector__item">
                 <input
@@ -124,21 +159,109 @@ const EmbroiderySelector = () => {
 
 
           <div className="uploadBlock">
-            <p className="title">ЗАГРУЗИТЕ ИЗОБРАЖЕНИЕ</p>
-            <label>
-              <input className="loadButton" type="file" multiple accept="image/*" onChange={handleFileChange} />
-            </label>
-            {error && <p style={{ color: "red" }}>{error}</p>}
+            <p className="title">
+              {selectedType === "custom" ? "ВЫБЕРИТЕ ПРИНТ" : "ЗАГРУЗИТЕ ИЗОБРАЖЕНИЕ"}
+            </p>
 
-            <div className="image-preview">
-              {uploadedImage.map((file, index) => (
-                <div key={index} className="image-thumbnail">
-                  <img src={URL.createObjectURL(file)} alt={`Фото ${index + 1}`} width="80" />
-                  <button onClick={() => handleRemoveImage(index)}>Удалить</button>
+            {selectedType === "custom" && (
+              <div className="selectorGroup">
+                <div className="selector">
+                  <label className="selector__item">
+                    <input
+                      type="radio"
+                      name="embroideryType"
+                      checked={customOption.image}
+                      onChange={(e) =>
+                        setCustomOption((prev) => ({ ...prev, image: e.target.checked }))
+                      }
+                    />
+                    <span className="selector__custom">
+                      <CheckIcon className="selector__check" />
+                    </span>
+                    изображение
+                  </label>
+
+                  <label className="selector__item" style={{ marginBottom: '10px' }}>
+                    <input
+                      type="checkbox"
+                      checked={customOption.text}
+                      onChange={(e) =>
+                        setCustomOption((prev) => ({ ...prev, text: e.target.checked }))
+                      }
+                    />
+                    <span className="selector__custom">
+                      <CheckIcon className="selector__check" />
+                    </span>
+                    надпись
+                  </label>
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
+
+            {/* Загрузка изображений — показываем, если выбран не custom, или выбрана опция image */}
+            {(selectedType !== "custom" || customOption.image) && (
+              <>
+                <div className="fileInputWrapper">
+                  <span className="fileLimitNote">
+                    *не более {selectedType === "petFace" ? 5 : 10} файлов
+                  </span>
+
+                  <label className="customFileButton">
+                    Выберите файлы
+                    <input
+                      className="hiddenFileInput"
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                  </label>
+                </div>
+
+                <div className="image-preview">
+                  {uploadedImage.map((file, index) => (
+                    <div key={index} className="image-thumbnail">
+                      <img src={URL.createObjectURL(file)} alt={`Фото ${index + 1}`} width="80" />
+                      <button onClick={() => handleRemoveImage(index)}>Удалить</button>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Текстовая надпись при выборе "надпись" */}
+            {customOption.text && (
+              <>
+                <div className="customTextBlock">
+                  <p className="title">ТЕКСТ ДЛЯ ВЫШИВКИ:</p>
+                  <textarea
+                    value={customText}
+                    onChange={(e) => setCustomText(e.target.value)}
+                    placeholder="Введите надпись"
+                    style={{ fontFamily: customTextFont }}
+                  />
+                </div>
+
+                <div className="fontSelectBlock">
+                  <p className="title">ВЫБЕРИТЕ ШРИФТ:</p>
+                  <select
+                    value={customTextFont}
+                    onChange={(e) => setCustomTextFont(e.target.value)}
+                  >
+                    <option value="Arial">Arial</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Comic Sans MS">Comic Sans MS</option>
+                  </select>
+                </div>
+              </>
+            )}
+
+            {error && <p style={{ color: "red" }}>{error}</p>}
           </div>
+
+
 
           <div className="commentBlock">
             <p className="title">КОММЕНТАРИЙ:</p>
@@ -152,9 +275,16 @@ const EmbroiderySelector = () => {
             </label>
           </div>
 
-          <button className="confirmButton" onClick={handleNext} disabled={!selectedType}>
-            ПЕРЕЙТИ К ОФОРМЛЕНИЮ
-          </button>
+          <div className="navigationButtons">
+            <button className="confirmButton" onClick={handleNext} disabled={!selectedType}>
+              ПЕРЕЙТИ К ОФОРМЛЕНИЮ
+            </button>
+
+            <button className="backButton" onClick={() => navigate(-1)}>
+              вернуться назад
+            </button>
+          </div>
+
         </div>
       </div>    
   );

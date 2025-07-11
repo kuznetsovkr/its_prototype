@@ -3,31 +3,33 @@
   display: flex;
   flex-direction: row;
   justify-content: center;
+  margin-top: 10px;
 }
 
 .blockClothingSelector {
   display: flex;
   flex-direction: row;
   justify-content: center;
+  height: min(calc(100vh - 200px), 1008px);
   gap: clamp(50px, 4.31vw, 75px);
   width: 100%;
 
   /* Левая часть — блок с изображением */
   .clothing-block {
-    width: clamp(510px, 50vw, 765px);
-    height: clamp(672px, 70vw, 1008px);
+    width: clamp(530px, 20vw, 765px);
     border: 0.25px solid #121319;
     border-radius: 20px;
 
     .image-wrapper {
       display: flex;
       align-items: center;
+      justify-content: center;
       width: 100%;
       height: 100%;
       box-sizing: border-box;
       padding: 10px;
       .clotheImage {
-        width: 100%;
+        height: 100%;
       }
     }
     
@@ -37,12 +39,12 @@
   .blockSelection {
     display: flex;
     flex-direction: column;
-    gap: clamp(60px, 5.21vw, 90px);
+    gap: min(1.5vw, 60px);
 
     .title {
       font-family: 'RightGrotesk', sans-serif;
       font-weight: 500;
-      font-size: clamp(36px, 3.125vw, 54px);
+      font-size: clamp(36px, 2vw, 54px);
       color: #440a18;
       margin-bottom: 20px;
     }
@@ -53,16 +55,16 @@
       .selectorType {
         display: flex;
         flex-direction: column;
-        gap: clamp(10px, 0.83vw, 15px);
+        gap: clamp(10px, 0.5vw, 15px);
         .selectorType__item {
           display: flex;
           align-items: center;
-          gap: clamp(10px, 0.83vw, 15px);
+          gap: clamp(10px, 0.5vw, 15px);
           cursor: pointer;
           text-transform: lowercase;
           font-family: 'Raleway', sans-serif;
           font-weight: 400;
-          font-size: clamp(20px, 1.736vw, 30px);
+          font-size: clamp(20px, 1vw, 30px);
           color: #121319;
 
           input {
@@ -70,8 +72,8 @@
           }
 
           .selectorType__custom {
-            width: clamp(26px, 2.26vw, 39px);
-            height: clamp(26px, 2.26vw, 39px);
+            width: clamp(26px, 1vw, 39px);
+            height: clamp(26px, 1vw, 39px);
             border: 2px solid #440a18;
             border-radius: 10px;
             display: flex;
@@ -80,8 +82,8 @@
             transition: background-color 0.5s ease-in-out;
 
             .selectorType__check {
-              width: clamp(16px, 1.39vw, 24px);
-              height: clamp(16px, 1.39vw, 24px);
+              width: clamp(16px, 1vw, 24px);
+              height: clamp(16px, 1vw, 24px);
               display: none;
             }
           }
@@ -111,8 +113,8 @@
           }
 
           .sizeSelector__box {
-            width: clamp(48px, 4.17vw, 72px);
-            height: clamp(46px, 4.03vw, 69px);
+            width: clamp(48px, 2vw, 72px);
+            height: clamp(46px, 2vw, 69px);
             border: 1px solid #121319;
             border-radius: 10px;
             display: flex;
@@ -120,7 +122,7 @@
             justify-content: center;
             font-family: 'Raleway', sans-serif;
             font-weight: 400;
-            font-size: clamp(24px, 2.08vw, 36px);
+            font-size: clamp(24px, 1vw, 36px);
             color: #121319;
             transition: all 0.2s ease-in-out;
           }
@@ -133,10 +135,11 @@
         }
       }
       .tableSize{
+        cursor: pointer;
         margin-top: 20px;
         font-family: 'Raleway', sans-serif;
         font-weight: 400;
-        font-size: clamp(20px, 1.736vw, 30px);
+        font-size: clamp(20px, 1vw, 30px);
         text-decoration: underline;
         text-decoration-thickness: 1px;
         text-decoration-skip-ink: none;
@@ -151,12 +154,12 @@
 
 .confirmButton{
   border-radius: 20px;
-  width: clamp(350px, 30.35vw, 525px);
-  height: clamp(68px, 5.9vw, 102px);
+  width: clamp(350px, 20vw, 525px);
+  height: clamp(68px, 3vw, 102px);
   background: #440a18;
   font-family: 'Raleway', sans-serif;
   font-weight: 500;
-  font-size: clamp(24px, 2.08vw, 36px);
+  font-size: clamp(24px, 1vw, 36px);
   color: #fff;
   border: none;
   cursor: pointer;
@@ -199,6 +202,77 @@
           height: auto;         
         }
       }
+    }
+  }
+}
+
+.selectorType--inner {
+  margin-top: 20px;
+  margin-left: 30px;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalContent {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+
+  button {
+    padding: 10px 20px;
+    background: transparent;
+    border: 2px solid #440a18;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Raleway', sans-serif;
+    font-size: 18px;
+    color: #440a18;
+    transition: all 0.3s;
+
+    &.active {
+      background: #440a18;
+      color: white;
+    }
+  }
+}
+
+.sizeTable {
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Raleway', sans-serif;
+    font-size: 16px;
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f0f0f0;
+      font-weight: 600;
     }
   }
 }
