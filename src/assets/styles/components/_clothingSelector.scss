@@ -152,6 +152,18 @@
   }
 }
 
+.sizeSelector__item.is-disabled {
+  opacity: 0.45;
+  pointer-events: none; /* чтобы не кликалось */
+}
+.sizeSelector__item.is-disabled .sizeSelector__box {
+  cursor: not-allowed;
+}
+.confirmButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .confirmButton{
   border-radius: 20px;
   width: clamp(350px, 20vw, 525px);
@@ -207,7 +219,6 @@
 }
 
 .selectorType--inner {
-  margin-top: 20px;
   margin-left: 30px;
 }
 
@@ -275,4 +286,51 @@
       font-weight: 600;
     }
   }
+}
+
+
+:root {
+  --brand: #440a18;
+  --text: #121319;
+}
+
+.colorSelector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.colorSquare {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(18,19,25,0.15);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  position: relative;
+  transition: transform .06s ease, box-shadow .15s ease, border-color .15s ease;
+  background-clip: padding-box;
+}
+
+.colorSquare:hover {
+  box-shadow: 0 3px 10px rgba(0,0,0,.08);
+  border-color: rgba(18,19,25,0.3);
+}
+
+.colorSquare.active {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.colorSquare__check {
+  width: 24px;
+  height: 24px;
+  /* важное переопределение цвета штриха SVG */
+}
+.colorSquare__check path {
+  stroke: currentColor; /* перекрашиваем чек-иконку цветом 'color' */
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }

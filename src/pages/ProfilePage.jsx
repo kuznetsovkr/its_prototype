@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+
 const ProfilePage = () => {
   const navigate = useNavigate();
 
@@ -16,7 +17,7 @@ const ProfilePage = () => {
     phone: "",
   });
 
- // Редактирование
+  // Редактирование
   const [isEditing, setIsEditing] = useState(false);
 
   // История заказов
@@ -28,23 +29,27 @@ const ProfilePage = () => {
   );
 
   const fetchOrders = async () => {
-        const token = localStorage.getItem("token");
-        if (!token) return;
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-        try {
-            const endpoint = role === "admin" ? "http://localhost:5000/api/orders/all" : "http://localhost:5000/api/orders/user";
-            const response = await fetch(endpoint, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+    try {
+      const endpoint =
+        role === "admin"
+          ? "http://localhost:5000/api/orders/all"
+          : "http://localhost:5000/api/orders/user";
 
-            if (response.ok) {
-                const data = await response.json();
-                setOrders(data);
-            }
-        } catch (error) {
-            console.error("Ошибка получения заказов:", error);
-        }
-    };
+      const response = await fetch(endpoint, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setOrders(data || []);
+      }
+    } catch (error) {
+      console.error("Ошибка получения заказов:", error);
+    }
+  };
 
   useEffect(() => {
     setRole(localStorage.getItem("role") || "user");
@@ -74,9 +79,9 @@ const ProfilePage = () => {
 
     if (isUserAuthenticated) {
       fetchUserData();
-      fetchOrders(role);
+      fetchOrders();
     }
-  }, [isUserAuthenticated]);
+  }, [isUserAuthenticated, role]); // подхватываем смену роли тоже
 
   // Сохранение данных
   const handleSave = async () => {
@@ -92,13 +97,6 @@ const ProfilePage = () => {
         },
         body: JSON.stringify(userData),
       });
-
-      if (response.ok) {
-        alert("Данные успешно обновлены!");
-        setIsEditing(false);
-      } else {
-        alert("Ошибка обновления данных.");
-      }
     } catch (error) {
       console.error("Ошибка обновления данных:", error);
     }
@@ -113,107 +111,128 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="profile-page">
-      {/* Левая колонка */}
-      <div className="profile-sidebar">
-        {role === "admin" && (
-           <button onClick={() => navigate("/admin/inventory")}>Управление складом</button>          
-        )}
+    <section className="profile-page">
+      {/* Левая колонка — профиль */}
+      <div className="user-card">
+        <h2 className="heading">Мой профиль</h2>
 
-               <div className="user-info">
-          <label>Фамилия:</label>
-          <input
-            type="text"
-            value={userData.lastName}
-            onChange={(e) =>
-              setUserData({ ...userData, lastName: e.target.value })
-            }
-            disabled={!isEditing}
-          />
+        <div className="fields">
+          <div className="field">
+            <label className="label">Фамилия</label>
+            <input
+              className="input"
+              type="text"
+              value={userData.lastName}
+              onChange={(e) =>
+                setUserData({ ...userData, lastName: e.target.value })
+              }
+              disabled={!isEditing}
+            />
+          </div>
 
-          <label>Имя:</label>
-          <input
-            type="text"
-            value={userData.firstName}
-            onChange={(e) =>
-              setUserData({ ...userData, firstName: e.target.value })
-            }
-            disabled={!isEditing}
-          />
+          <div className="field">
+            <label className="label">Имя</label>
+            <input
+              className="input"
+              type="text"
+              value={userData.firstName}
+              onChange={(e) =>
+                setUserData({ ...userData, firstName: e.target.value })
+              }
+              disabled={!isEditing}
+            />
+          </div>
 
-          <label>Отчество:</label>
-          <input
-            type="text"
-            value={userData.middleName}
-            onChange={(e) =>
-              setUserData({ ...userData, middleName: e.target.value })
-            }
-            disabled={!isEditing}
-          />
+          <div className="field">
+            <label className="label">Отчество</label>
+            <input
+              className="input"
+              type="text"
+              value={userData.middleName}
+              onChange={(e) =>
+                setUserData({ ...userData, middleName: e.target.value })
+              }
+              disabled={!isEditing}
+            />
+          </div>
 
-          <label>Дата рождения:</label>
-          <input
-            type="date"
-            value={userData.birthDate}
-            onChange={(e) =>
-              setUserData({ ...userData, birthDate: e.target.value })
-            }
-            disabled={!isEditing}
-          />
+          <div className="field">
+            <label className="label">Дата рождения</label>
+            <input
+              className="input"
+              type="date"
+              value={userData.birthDate}
+              onChange={(e) =>
+                setUserData({ ...userData, birthDate: e.target.value })
+              }
+              disabled={!isEditing}
+            />
+          </div>
 
-          <label>Телефон:</label>
-          <input
-            type="tel"
-            value={userData.phone}
-            disabled
-          />
+          <div className="field">
+            <label className="label">Телефон</label>
+            <input className="input" type="tel" value={userData.phone} disabled />
+          </div>
         </div>
 
-        {/* Блок с кнопками "Редактировать / Сохранить" и "Выйти" */}
         <div className="profile-actions">
           {!isEditing ? (
-            <button onClick={() => setIsEditing(true)}>
+            <button className="btn btn-outline" onClick={() => setIsEditing(true)}>
               Редактировать
             </button>
           ) : (
-            <button onClick={handleSave}>
+            <button className="btn btn-outline" onClick={handleSave}>
               Сохранить
             </button>
           )}
-          <button onClick={handleLogout}>
+
+          {role === "admin" && (
+            <button
+              className="btn btn-outline"
+              onClick={() => navigate("/admin/inventory")}
+            >
+              Управление складом
+            </button>
+          )}
+
+          <button className="btn btn-primary" onClick={handleLogout}>
             Выйти
           </button>
-        </div>      
-</div>
+        </div>
+      </div>
 
-      <div className="profile-content">
-        <p>История заказов</p>
+      {/* Правая колонка — заказы */}
+      <div className="orders-card">
+        <h2 className="heading">История заказов</h2>
+
         {orders.length > 0 ? (
-          <table className="orders-table">
-            <thead>
-              <tr>
-                 {role === "admin" && <th>Пользователь</th>} {/* Показываем имя только админам */}
-                <th>Тип продукта</th>
-                <th>Дата заказа</th>
-                <th>Статус</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => (
-                <tr key={order.id}>
-                  {role === "admin" && <td>{order.phone || "Неизвестный"}</td>}
-                  <td>{order.productType}</td>
-                  <td>{new Date(order.orderDate).toLocaleDateString()}</td>
-                  <td>{order.status}</td>
+          <div className="table-wrap">
+            <table className="orders-table">
+              <thead>
+                <tr>
+                  {role === "admin" && <th>Пользователь</th>}
+                  <th>Тип продукта</th>
+                  <th>Дата заказа</th>
+                  <th>Статус</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {orders.map((order) => (
+                  <tr key={order.id}>
+                    {role === "admin" && <td>{order.phone || "Неизвестный"}</td>}
+                    <td>{order.productType}</td>
+                    <td>{new Date(order.orderDate).toLocaleDateString()}</td>
+                    <td>{order.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
-          <p>Ещё нет заказов</p>
+          <p className="muted">Ещё нет заказов</p>
         )}
       </div>
-    </div>
+    </section>
   );
 };
 

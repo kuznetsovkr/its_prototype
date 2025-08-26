@@ -21,11 +21,55 @@ const EmbroiderySelector = () => {
 
   const { selectedClothing, selectedSize, selectedColor } = location.state || {};
 
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files).slice(0, 10);
+  const MAX_MB = 5;
+  const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
-    setUploadedImage(files);
+  const handleFileChange = (e) => {
+    const incoming = Array.from(e.target.files);
+    const limit = selectedType === "petFace" ? 5 : 10;
+
+    setUploadedImage((prev) => {
+      const makeKey = (f) => `${f.name}_${f.size}_${f.lastModified}`;
+      const existingKeys = new Set(prev.map(makeKey));
+
+      const accepted = [];
+      const rejected = { dup: [], type: [], size: [] };
+
+      for (const f of incoming) {
+        const key = makeKey(f);
+        if (existingKeys.has(key)) {
+          rejected.dup.push(f.name);
+          continue;
+        }
+        if (!ALLOWED_TYPES.includes(f.type)) {
+          rejected.type.push(f.name);
+          continue;
+        }
+        if (f.size > MAX_MB * 1024 * 1024) {
+          rejected.size.push(f.name);
+          continue;
+        }
+        accepted.push(f);
+      }
+
+      const remaining = Math.max(0, limit - prev.length);
+      const toAdd = accepted.slice(0, remaining);
+      const next = [...prev, ...toAdd];
+
+      // Сообщения об ошибках/ограничениях
+      const msgs = [];
+      if (rejected.dup.length)  msgs.push(`дубликаты: ${rejected.dup.join(", ")}`);
+      if (rejected.type.length) msgs.push(`неподдерживаемый тип: ${rejected.type.join(", ")}`);
+      if (rejected.size.length) msgs.push(`слишком большие (> ${MAX_MB} МБ): ${rejected.size.join(", ")}`);
+      if (accepted.length > remaining) {
+        msgs.push(`превышен лимит (${limit}). Добавлено файлов: ${toAdd.length}`);
+      }
+      setError(msgs.join(" • "));
+
+      return next;
+    });
   };
+
 
   const handleRemoveImage = (index) => {
     setUploadedImage(uploadedImage.filter((_, i) => i !== index));
@@ -212,20 +256,27 @@ const EmbroiderySelector = () => {
                       className="hiddenFileInput"
                       type="file"
                       multiple
-                      accept="image/*"
+                      accept="image/png,image/jpeg,image/webp"
                       onChange={handleFileChange}
                     />
                   </label>
                 </div>
 
-                <div className="image-preview">
+                <ul className="file-list">
                   {uploadedImage.map((file, index) => (
-                    <div key={index} className="image-thumbnail">
-                      <img src={URL.createObjectURL(file)} alt={`Фото ${index + 1}`} width="80" />
-                      <button onClick={() => handleRemoveImage(index)}>Удалить</button>
-                    </div>
+                    <li key={file.name + index} className="file-item">
+                      <span className="file-name" title={file.name}>{file.name}</span>
+                      <button
+                        type="button"
+                        className="icon-btn close-btn"
+                        aria-label={`Удалить ${file.name}`}
+                        onClick={() => handleRemoveImage(index)}
+                      >
+                        &times;
+                      </button>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </>
             )}
 

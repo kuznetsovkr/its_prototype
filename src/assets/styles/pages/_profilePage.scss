@@ -1,25 +1,161 @@
+:root {
+  --brand: #440a18;
+  --text: #121319;
+}
+
 .profile-page {
+  display: grid;
+  gap: 32px;
+  padding: 24px 0;
+  background: transparent;
+}
+
+@media (min-width: 1024px) {
+  .profile-page {
+    grid-template-columns: 1fr 1.4fr;
+    align-items: start;
+    gap: 48px;
+  }
+}
+
+/* Карточки без фона и рамок */
+.user-card,
+.orders-card {
+  background: transparent;
+  border: none;
+  padding: 0;        /* оставил ноль, чтобы всё было «воздухом» без рамок */
+}
+
+/* Заголовки и лейблы — RightGrotesk */
+.heading,
+.label {
+  font-family: 'RightGrotesk', sans-serif;
+  font-weight: 500;
+  font-size: clamp(36px, 1vw, 54px);
+  color: var(--brand);
+  line-height: 1.15;
+  margin: 0 0 16px;
+}
+
+/* Сетка полей */
+.fields {
+  display: grid;
+  gap: 20px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+/* Инпуты и обычный текст — Raleway */
+.input,
+.muted,
+.orders-table,
+.btn {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 400;
+  font-size: clamp(20px, 1vw, 30px);
+  color: var(--text);
+}
+
+/* Инпуты */
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: 1px solid rgba(18, 19, 25, 0.25);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: var(--brand);
+}
+
+.input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Кнопки */
+.profile-actions {
+  margin-top: 24px;
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-.profile-sidebar {
-
-
-  .admin-button {
-
-  }
-
-  .user-info {
-
-  }
-
-  .profile-actions {
-
-  }
+.btn {
+  padding: 10px 18px;
+  border-radius: 12px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.06s ease, background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  background: transparent;
+  border: 1px solid transparent;
 }
 
-.profile-content {
-
+.btn:active {
+  transform: translateY(1px);
 }
 
+/* Белые с бордером */
+.btn-outline {
+  background: #fff;
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.btn-outline:hover {
+  background: rgba(68, 10, 24, 0.06);
+}
+
+/* «Выйти» — заливка брендовым цветом */
+.btn-primary {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+
+.btn-primary:hover {
+  filter: brightness(0.95);
+}
+
+/* Таблица заказов */
+.table-wrap {
+  overflow-x: auto;
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+}
+
+.orders-table th,
+.orders-table td {
+  text-align: left;
+  padding: 12px 8px;
+  background: transparent;
+  border: none; /* без рамок */
+}
+
+.orders-table thead th {
+  font-family: 'RightGrotesk', sans-serif;
+  font-weight: 500;
+  font-size: clamp(24px, 1vw, 36px);
+  color: var(--brand);
+  padding-bottom: 8px;
+}
+
+.orders-table tbody tr + tr td {
+  border-top: 1px solid rgba(18, 19, 25, 0.12); /* аккуратный разделитель строк */
+}
+
+/* Текст-пустышка */
+.muted {
+  opacity: 0.7;
+}

@@ -49,60 +49,60 @@ const HomePage = () => {
                                 <p className="titleOrder">ЗАКАЗ?</p>
                             </div>
                         </div>
-                        <section class="steps">
-                            <div class="step" id="step-1">
-                                <div class="firstRow">
-                                    <div class="number">1.</div>
-                                    <div class="text">
-                                        <p class="nameStep">ВАША ИДЕЯ</p>
-                                        <div class="descriptionStep">отправка фото или рисунка с вашей идеей</div>
+                        <section className="steps">
+                            <div className="step" id="step-1">
+                                <div className="firstRow">
+                                    <div className="number">1.</div>
+                                    <div className="text">
+                                        <p className="nameStep">ВАША ИДЕЯ</p>
+                                        <div className="descriptionStep">отправка фото или рисунка с вашей идеей</div>
                                     </div>
                                 </div>
-                                <div class="image-placeholder"></div>
+                                <div className="image-placeholder"></div>
                             </div>
 
-                            <div class="step" id="step-2">
-                                <div class="firstRow">
-                                    <div class="number">2.</div>
-                                    <div class="text">
-                                        <p class="nameStep">ЭСКИЗ</p>
-                                        <div class="descriptionStep">отрисовка эскиза по вашей идее</div>
+                            <div className="step" id="step-2">
+                                <div className="firstRow">
+                                    <div className="number">2.</div>
+                                    <div className="text">
+                                        <p className="nameStep">ЭСКИЗ</p>
+                                        <div className="descriptionStep">отрисовка эскиза по вашей идее</div>
                                     </div>
                                 </div>
-                                <div class="image-placeholder"></div>
+                                <div className="image-placeholder"></div>
                             </div>
                            
-                            <div class="step" id="step-3">
-                                <div class="firstRow">
-                                    <div class="number">3.</div>
-                                    <div class="text">
-                                        <p class="nameStep">ВЫШИВАЛЬНЫЙ ДИЗАЙН</p>
-                                        <div class="descriptionStep">подготовка макета по эскизу</div>
+                            <div className="step" id="step-3">
+                                <div className="firstRow">
+                                    <div className="number">3.</div>
+                                    <div className="text">
+                                        <p className="nameStep">ВЫШИВАЛЬНЫЙ ДИЗАЙН</p>
+                                        <div className="descriptionStep">подготовка макета по эскизу</div>
                                     </div>
                                 </div>
-                                <div class="image-placeholder"></div>
+                                <div className="image-placeholder"></div>
                             </div>
                       
-                            <div class="step" id="step-4">
-                                <div class="firstRow">
-                                    <div class="number">4.</div>
-                                    <div class="text">
-                                        <p class="nameStep">ГОТОВЫЙ ВАРИАНТ</p>
-                                        <div class="descriptionStep">оформление финального варианта</div>
+                            <div className="step" id="step-4">
+                                <div className="firstRow">
+                                    <div className="number">4.</div>
+                                    <div className="text">
+                                        <p className="nameStep">ГОТОВЫЙ ВАРИАНТ</p>
+                                        <div className="descriptionStep">оформление финального варианта</div>
                                     </div>
                                 </div>
-                                <div class="image-placeholder"></div>
+                                <div className="image-placeholder"></div>
                             </div>
                    
-                            <div class="step" id="step-5">
-                                <div class="firstRow">
-                                    <div class="number">5.</div>
-                                    <div class="text">
-                                        <p class="nameStep">ОТПРАВКА</p>
-                                        <div class="descriptionStep">отправка готового заказа</div>
+                            <div className="step" id="step-5">
+                                <div className="firstRow">
+                                    <div className="number">5.</div>
+                                    <div className="text">
+                                        <p className="nameStep">ОТПРАВКА</p>
+                                        <div className="descriptionStep">отправка готового заказа</div>
                                     </div>
                                 </div>
-                                <div class="image-placeholder"></div>
+                                <div className="image-placeholder"></div>
                             </div>
                         </section>
                     </div>

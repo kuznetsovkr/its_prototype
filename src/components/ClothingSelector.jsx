@@ -1,101 +1,225 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ReactComponent as CheckIcon } from '../images/Vector.svg'
+import { ReactComponent as CheckIcon } from "../images/Vector.svg";
 
+// helper: обводка для белого цвета
+const isWhite = (c = "") => {
+  const v = String(c).trim().toLowerCase();
+  return v === "#fff" || v === "#ffffff" || v === "white" || v === "rgb(255,255,255)";
+};
 
+// Нормализация подписи варианта начёса из БД
+const normalizeInner = (s) => {
+  if (!s) return null;
+  const x = String(s).trim().toLowerCase().replaceAll("ё", "е").replace(/\s+/g, " ");
+  if (x.includes("с начес")) return "с начёсом";
+  if (x.includes("без начес")) return "без начёса";
+  return null;
+};
+
+// "Худи (с начёсом)" -> { base: "Худи", inner: "с начёсом" }
+const parseTypeLabel = (raw) => {
+  const str = String(raw ?? "").trim();
+  const m = str.match(/^(.*?)(?:\s*\(([^)]+)\))?\s*$/);
+  const base = (m?.[1] ?? "").trim();
+  const inner = normalizeInner(m?.[2]);
+  return { base, inner };
+};
+
+// уникальность по ключу
+const uniqBy = (arr, keyFn) => {
+  const map = new Map();
+  for (const item of arr) {
+    const k = keyFn(item);
+    if (!map.has(k)) map.set(k, item);
+  }
+  return Array.from(map.values());
+};
+
+// порядок показа вариантов
+const INNER_ORDER = { "с начёсом": 1, "без начёса": 2 };
 
 const ClothingSelector = () => {
   const navigate = useNavigate();
 
-  const [inventory, setInventory] = useState([]); // Данные склада
-  const [selectedClothing, setSelectedClothing] = useState(""); // Выбранный тип
-  const [selectedColor, setSelectedColor] = useState(""); // Выбранный цвет
-  const [selectedSize, setSelectedSize] = useState(""); // Выбранный размер
-  const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-  const [selectedInnerType, setSelectedInnerType] = useState(""); // начёс или нет
+  const [inventory, setInventory] = useState([]);
+  const [selectedClothing, setSelectedClothing] = useState("");      // базовый тип
+  const [selectedInnerType, setSelectedInnerType] = useState("");     // вариант начёса
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
+  const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
   const [showSizeModal, setShowSizeModal] = useState(false);
-  const [gender, setGender] = useState("men"); // "men" или "women"
+  const [gender, setGender] = useState("men");
 
-  // Загружаем склад
+  // расширяем инвентарь полем parsed
+  const typedInventory = useMemo(
+    () => inventory.map((i) => ({ ...i, parsed: parseTypeLabel(i.productType) })),
+    [inventory]
+  );
+
+  // базовые типы (без приписок)
+  const availableBaseTypes = useMemo(() => {
+    const list = uniqBy(
+      typedInventory.map((i) => i.parsed.base).filter(Boolean),
+      (x) => x
+    );
+    return list;
+  }, [typedInventory]);
+
+  // какие варианты «начёса» доступны для выбранного базового типа
+  const presentInnerOptions = useMemo(() => {
+    const set = new Set(
+      typedInventory
+        .filter((i) => i.parsed.base === selectedClothing)
+        .map((i) => i.parsed.inner)
+        .filter(Boolean)
+    );
+    return Array.from(set).sort(
+      (a, b) => (INNER_ORDER[a] ?? 99) - (INNER_ORDER[b] ?? 99)
+    );
+  }, [typedInventory, selectedClothing]);
+
+  const needsInner = presentInnerOptions.length > 0;
+
+  // склад под текущие фильтры base + inner (если нужен)
+  const filteredByType = useMemo(() => {
+    return typedInventory.filter((i) => {
+      if (i.parsed.base !== selectedClothing) return false;
+      if (!needsInner) return true;
+      if (!selectedInnerType) return false;
+      return i.parsed.inner === selectedInnerType;
+    });
+  }, [typedInventory, selectedClothing, needsInner, selectedInnerType]);
+
+  // цвета (с кодом) под текущий выбор
+  const availableColorOptions = useMemo(() => {
+    const byName = new Map();
+    filteredByType.forEach((i) => {
+      if (!byName.has(i.color)) {
+        byName.set(i.color, {
+          label: i.color,
+          code: i.colorCode || i.color || "#CCCCCC",
+        });
+      }
+    });
+    return Array.from(byName.values());
+  }, [filteredByType]);
+
+  // размеры под текущий выбор
+  const availableSizes = useMemo(() => {
+    const list = filteredByType
+      .filter((i) => i.color === selectedColor)
+      .reduce((acc, i) => {
+        if (!acc.includes(i.size)) acc.push(i.size);
+        return acc;
+      }, []);
+    return list;
+  }, [filteredByType, selectedColor]);
+
+  // можно ли перейти далее
+  const canProceed = Boolean(
+    selectedClothing &&
+      selectedColor &&
+      selectedSize &&
+      (!needsInner || selectedInnerType)
+  );
+
+  // загрузка склада
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/inventory");
-        const data = response.data;
-        setInventory(data);
-  
-        // Выбираем первый доступный тип одежды
-        const firstType = [...new Set(data.map(item => item.productType))][0];
-        if (firstType) {
-          setSelectedClothing(firstType);
-        }
-  
+        const { data } = await axios.get("http://localhost:5000/api/inventory");
+
+        // берём только позиции с положительным остатком
+        const cleaned = (Array.isArray(data) ? data : []).filter((item) => {
+          const qty = Number(item?.quantity ?? 0);
+          return Number.isFinite(qty) && qty > 0;
+        });
+
+        setInventory(cleaned);
+
+        // дефолтный базовый тип — из ОЧИЩЕННОГО списка
+        const firstBase = parseTypeLabel(cleaned?.[0]?.productType)?.base || "";
+        if (firstBase) setSelectedClothing(firstBase);
       } catch (err) {
         console.error("Ошибка загрузки склада:", err);
       }
     };
     fetchInventory();
   }, []);
-  
-  //  Получаем уникальные типы одежды
-  const availableTypes = [...new Set(inventory.map(item => item.productType))];
 
-  //  Доступные цвета для выбранного типа
-  const availableColors = [...new Set(inventory
-    .filter(item => item.productType === selectedClothing)
-    .map(item => item.color)
-  )];
 
-  //  Доступные размеры для выбранного типа и цвета
-  const availableSizes = inventory
-    .filter(item => item.productType === selectedClothing && item.color === selectedColor)
-    .reduce((sizes, item) => {
-      if (!sizes.includes(item.size)) sizes.push(item.size);
-      return sizes;
-    }, []);
-
-  //  Обновляем выбранный цвет (по умолчанию первый доступный)
+  // АВТО-ВЫБОР варианта начёса при смене базового типа или составе вариантов
   useEffect(() => {
-    if (availableColors.length > 0) {
-      setSelectedColor(availableColors[0]);
+    if (!selectedClothing) return;
+
+    // сбрасываем цвет/размер при смене типа
+    setSelectedColor("");
+    setSelectedSize("");
+
+    if (presentInnerOptions.length > 0) {
+      // если текущий вариант невалиден — подставим первый доступный
+      if (!presentInnerOptions.includes(selectedInnerType)) {
+        setSelectedInnerType(presentInnerOptions[0]);
+      }
     } else {
-      setSelectedColor("");
+      // у типа нет вариантов — очищаем inner
+      if (selectedInnerType) setSelectedInnerType("");
     }
-  }, [selectedClothing]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedClothing, presentInnerOptions]);
 
-  //  Обновляем выбранный размер (по умолчанию первый доступный)
+  // Подстановка ПЕРВОГО ДОСТУПНОГО ЦВЕТА при смене варианта начёса (и вообще, когда список цветов обновился)
   useEffect(() => {
-    // Если доступных размеров нет, сбрасываем выбор
-    if (availableSizes.length === 0) {
+    // если нужен выбор варианта, но он ещё не выбран — ждём (но выше мы уже автосетим)
+    if (needsInner && !selectedInnerType) {
+      setSelectedColor("");
+      setSelectedSize("");
+      return;
+    }
+
+    if (availableColorOptions.length > 0) {
+      // если текущий цвет невалиден — подставим первый
+      if (!availableColorOptions.some((o) => o.label === selectedColor)) {
+        setSelectedColor(availableColorOptions[0].label);
+        setSelectedSize("");
+      }
+    } else {
+      if (selectedColor) setSelectedColor("");
+      if (selectedSize) setSelectedSize("");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedInnerType, needsInner, availableColorOptions]);
+
+  // если текущий размер пропал — сбрасываем
+  useEffect(() => {
+    if (selectedSize && !availableSizes.includes(selectedSize)) {
       setSelectedSize("");
     }
-  }, [selectedColor]);
-
-  useEffect(() => {
-    if (selectedClothing !== "Худи") {
-      setSelectedInnerType("");
-    }
-  }, [selectedClothing]);
+  }, [availableSizes, selectedSize]);
 
   const handleConfirm = () => {
-    if (selectedSize) {
-      navigate("/embroidery", {
-        state: { selectedClothing, selectedSize, selectedColor, selectedInnerType }
-      });
-    }
+    if (!canProceed) return;
+    navigate("/embroidery", {
+      state: { selectedClothing, selectedSize, selectedColor, selectedInnerType },
+    });
   };
 
+  // картинка превью
+  const previewItem = useMemo(() => {
+    return filteredByType.find((item) => item.color === selectedColor) || filteredByType[0];
+  }, [filteredByType, selectedColor]);
+
   return (
-     <>
-     
+    <>
       <div className="blockClothingSelector">
         {/* Левая часть: изображение товара */}
         <div className="clothing-block">
           <div className="image-wrapper">
-            {selectedClothing && selectedColor ? (
+            {previewItem ? (
               <img
-                src={`http://localhost:5000${inventory.find(item => item.productType === selectedClothing && item.color === selectedColor)?.imageUrl || "placeholder.png"}`}
+                src={`http://localhost:5000${previewItem.imageUrl || "placeholder.png"}`}
                 alt={selectedClothing}
                 className="clotheImage"
               />
@@ -105,91 +229,113 @@ const ClothingSelector = () => {
           </div>
         </div>
 
-
         {/* Правая часть */}
         <div className="blockSelection">
-
           <div className="selectorGroup">
             <p className="title">ТИП ИЗДЕЛИЯ:</p>
+
             <div className="selectorType">
-              {availableTypes.map(type => (
-                <label className="selectorType__item" key={type}>
-                  <input
-                    type="radio"
-                    name="clothing"
-                    value={type}
-                    checked={selectedClothing === type}
-                    onChange={(e) => setSelectedClothing(e.target.value)}
-                  />
-                  <span className="selectorType__custom">
+              {availableBaseTypes.length === 0 && (
+                <div className="muted">Нет доступных товаров</div>
+              )}
+              {availableBaseTypes.map((base) => (
+                <React.Fragment key={base}>
+                  <label className="selectorType__item">
+                    <input
+                      type="radio"
+                      name="clothing"
+                      value={base}
+                      checked={selectedClothing === base}
+                      onChange={(e) => setSelectedClothing(e.target.value)}
+                    />
+                    <span className="selectorType__custom">
                       <CheckIcon className="selectorType__check" />
-                  </span>
-                  {type}
-                </label>
+                    </span>
+                    {base}
+                  </label>
+
+                  {selectedClothing === base && needsInner && (
+                    <div className="selectorType selectorType--inner" key={`${base}-inner`}>
+                      {presentInnerOptions.map((inner) => (
+                        <label className="selectorType__item" key={inner}>
+                          <input
+                            type="radio"
+                            name="innerType"
+                            value={inner}
+                            checked={selectedInnerType === inner}
+                            onChange={(e) => setSelectedInnerType(e.target.value)}
+                          />
+                          <span className="selectorType__custom">
+                            <CheckIcon className="selectorType__check" />
+                          </span>
+                          {inner}
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </React.Fragment>
               ))}
             </div>
-            {selectedClothing === "Худи" && (
-                <div className="selectorType  selectorType--inner">
-                  {["с начёсом", "без начёса"].map(inner => (
-                    <label className="selectorType__item" key={inner}>
-                      <input
-                        type="radio"
-                        name="innerType"
-                        value={inner}
-                        checked={selectedInnerType === inner}
-                        onChange={(e) => setSelectedInnerType(e.target.value)}
-                      />
-                      <span className="selectorType__custom">
-                        <CheckIcon className="selectorType__check" />
-                      </span>
-                      {inner}
-                    </label>
-                  ))}
-                </div>
-            )}
           </div>
-          
+
           <div className="selectorGroup">
             <p className="title">ЦВЕТ:</p>
             <div className="colorSelector">
-              {availableColors.map(color => (
-                <div
-                  key={color}
-                  className={`colorSquare ${selectedColor === color ? "active" : ""}`}
-                  style={{ backgroundColor: color }}
-                  onClick={() => setSelectedColor(color)}
-                />
-              ))}
+              {!needsInner || selectedInnerType ? (
+                availableColorOptions.length > 0 ? (
+                  availableColorOptions.map((opt) => (
+                    <div
+                      key={opt.label}
+                      className={`colorSquare ${selectedColor === opt.label ? "active" : ""}`}
+                      style={{
+                        backgroundColor: opt.code,
+                        border: isWhite(opt.code) ? "1px solid currentColor" : undefined,
+                      }}
+                      title={opt.label}
+                      onClick={() => setSelectedColor(opt.label)}
+                    />
+                  ))
+                ) : (
+                  <div className="muted">Нет доступных цветов</div>
+                )
+              ) : (
+                <div className="muted">Сначала выберите вариант («с начёсом» / «без начёса»)</div>
+              )}
             </div>
           </div>
 
-          {/* Выбор размера */}
+          {/* Размер */}
           <div className="selectorGroup">
             <p className="title">РАЗМЕР:</p>
             <div className="sizeSelector">
-              {sizes.map(size => (
-                <label className="sizeSelector__item" key={size}>
-                  <input
-                    type="radio"
-                    name="size"
-                    value={size}
-                    checked={selectedSize === size}
-                    onChange={(e) => setSelectedSize(e.target.value)}
-                  />
-                  <span className="sizeSelector__box">{size}</span>
-                </label>
-              ))}
+              {sizes.map((size) => {
+                const isAvailable = availableSizes.includes(size);
+                return (
+                  <label
+                    className={`sizeSelector__item ${isAvailable ? "" : "is-disabled"}`}
+                    key={size}
+                    title={isAvailable ? "" : "Нет в наличии"}
+                  >
+                    <input
+                      type="radio"
+                      name="size"
+                      value={size}
+                      checked={selectedSize === size}
+                      onChange={(e) => setSelectedSize(e.target.value)}
+                      disabled={!isAvailable}
+                    />
+                    <span className="sizeSelector__box">{size}</span>
+                  </label>
+                );
+              })}
             </div>
+
             <div className="tableSize" onClick={() => setShowSizeModal(true)}>
               таблица размеров
             </div>
           </div>
 
-          <button
-            className="confirmButton"
-            onClick={handleConfirm}
-            disabled={!selectedSize}
-          >
+          <button className="confirmButton" onClick={handleConfirm} disabled={!canProceed}>
             ПЕРЕЙТИ К ВЫШИВКЕ
           </button>
         </div>
@@ -199,22 +345,15 @@ const ClothingSelector = () => {
         <div className="modalOverlay" onClick={() => setShowSizeModal(false)}>
           <div className="modalContent" onClick={(e) => e.stopPropagation()}>
             <div className="modalHeader">
-              <button
-                className={gender === "men" ? "active" : ""}
-                onClick={() => setGender("men")}
-              >
+              <button className={gender === "men" ? "active" : ""} onClick={() => setGender("men")}>
                 Мужчины
               </button>
-              <button
-                className={gender === "women" ? "active" : ""}
-                onClick={() => setGender("women")}
-              >
+              <button className={gender === "women" ? "active" : ""} onClick={() => setGender("women")}>
                 Женщины
               </button>
             </div>
 
             <div className="sizeTable">
-              {/* Пример таблицы. Заменишь на свои данные при необходимости */}
               {gender === "men" ? (
                 <table>
                   <thead>
@@ -242,7 +381,7 @@ const ClothingSelector = () => {
           </div>
         </div>
       )}
-     </>
+    </>
   );
 };
 
