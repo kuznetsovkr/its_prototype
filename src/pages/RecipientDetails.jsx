@@ -70,108 +70,131 @@ const RecipientDetails = () => {
   // Создание черновика заказа на бэке до оплаты
   async function createDraftOrder() {
     const token = localStorage.getItem("token");
+    const fd = new FormData();
 
-    // Важно: передаём ИД варианта/sku, либо productId+color+size
-    const payload = {
-      // user (если юзер не авторизован — бэк берёт эти поля из тела)
-      firstName: userData.firstName,
-      lastName:  userData.lastName,
-      middleName:userData.middleName,
-      phone:     userData.phone,
+    // Данные пользователя
+    fd.append("firstName", userData.firstName || "");
+    fd.append("lastName", userData.lastName || "");
+    fd.append("middleName", userData.middleName || "");
+    fd.append("phone", userData.phone || "");
 
-      // товар
-      productType: typeof productType === 'object'
+    // Товар
+    const productTypeName =
+      typeof productType === "object"
         ? (productType.name ?? productType.type ?? String(productType))
-        : productType,
-      color,
-      size,
+        : productType;
 
-      // кастомизация
-      embroideryType: selectedType,
-      customText,
-      comment,
+    fd.append("productType", productTypeName);
+    fd.append("color", color || "");
+    fd.append("size", size || "");
 
-      // доставка/суммы (ты уже их читаешь в /create)
-      totalPrice: totalPrice,
-      deliveryAddress: pickupPoint || (manualAddress && manualAddress.value) || '',
-    };
+    // Кастомизация
+    fd.append("embroideryType", selectedType || "");
+    fd.append("customText", customText || "");
+    fd.append("comment", comment || "");
 
-    const data = await postJSON(`${API}/orders/create`, payload, token);
-    // ожидаем { orderId, paymentUrl? }
+    // Доставка/сумма
+    fd.append("deliveryAddress", pickupPoint || (manualAddress && manualAddress.value) || "");
+    fd.append("totalPrice", String(totalPrice || 0));
+
+    // Фото
+    (uploadedImage || []).forEach((file, idx) => {
+      if (file) fd.append("images", file, file.name || `image_${idx}.jpg`);
+    });
+
+    const res = await fetch(`${API}/orders/create`, {
+      method: "POST",
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        // НЕ ставим Content-Type вручную — пусть браузер проставит boundary для FormData
+      },
+      body: fd,
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `Create failed ${res.status}`);
+    }
+    const data = await res.json(); // { orderId }
     setOrderId(data.orderId);
     return data;
   }
 
   // Открыть фейковую оплату
   async function handlePayment() {
-    if (isPaying) return; // защита от повторов
-    setError("");
-    setIsPaying(true);
+    if (isPaying) return;
+    setError(""); setIsPaying(true);
     try {
-      const { orderId: oid, paymentUrl } = await createDraftOrder();
-
-      // для удобства передаём orderId в фейковое окно
-      const url = paymentUrl || `/fake-payment?orderId=${encodeURIComponent(oid)}`;
-      const paymentWindow = window.open(url, "_blank", "width=500,height=600");
-      if (!paymentWindow) throw new Error('Не удалось открыть окно оплаты (popup blocker).');
+      const { orderId: oid } = await createDraftOrder();
+      const url = `/payment?orderId=${encodeURIComponent(oid)}`; // страница с PaymentPage
+      const w = window.open(url, "_blank", "width=520,height=640");
+      if (!w) throw new Error("Попап заблокирован");
     } catch (e) {
-      console.error(e);
-      setError(e.message || 'Ошибка при создании заказа');
+      setError(e.message || "Ошибка при создании заказа");
       setIsPaying(false);
     }
   }
 
   // Обработка сообщения об успешной оплате из фейкового окна
+  // Обработка сообщения об успешной оплате из фейкового окна
   useEffect(() => {
+    let confirming = false;
+
     const onMessage = async (event) => {
+      // Безопасность: принимаем только от своего origin
+      if (event.origin !== window.location.origin) return;
+
+      const ok =
+        event.data === "payment_success" ||
+        (event.data &&
+          event.data.type === "payment_status" &&
+          event.data.status === "success");
+
+      if (!ok) return;
+
+      console.log("[PAYMENT OK] event:", event.data, "orderId:", orderId);
+
+      if (!orderId) {
+        console.warn("[PAYMENT OK] но orderId ещё не создан");
+        setError("Не удалось определить номер заказа. Попробуйте ещё раз.");
+        setIsPaying(false);
+        return;
+      }
+
+      if (confirming) return; // защита от дубля
+      confirming = true;
+
       try {
-        // Безопасность: принимаем сообщения только с текущего origin
-        if (event.origin !== window.location.origin) return;
-
-        const ok = event.data === 'payment_success' ||
-                   (event.data && typeof event.data === 'object' && event.data.type === 'payment_status' && event.data.status === 'success');
-        if (!ok) return;
-
-        if (!orderId) {
-          console.warn('payment_success получен, но orderId ещё не создан');
-          return;
-        }
-
-        // Временный confirm до вебхука
-        try {
-          await postJSON(`${API}/orders/confirm/${orderId}`, {});
-        } catch (e) {
-          console.error('Ошибка confirm', e);
-          // При фейке можно всё равно пустить на страницу спасибо, но лучше показать ошибку
-        }
-
-        // Навигация на страницу "спасибо"
-        navigate('/payment', {
-          state: {
-            orderId,
-            userData,
-            selectedProduct: {
-              productType,
-              color,
-              size,
-              embroideryType: selectedType,
-              customText,
-              uploadedImage,
-              comment,
-            },
-            deliveryAddress: pickupPoint || manualAddress?.value,
-            totalPrice,
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API}/orders/confirm/${orderId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
-          replace: true,
+          body: JSON.stringify({}),
         });
+
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          console.error("Confirm failed:", res.status, body);
+          throw new Error(body.message || `Подтверждение оплаты не прошло (${res.status})`);
+        }
+
+        // ✅ всё ок — уходим на спасибо
+        navigate("/thank-you", { state: { orderNumber: orderId } });
+      } catch (e) {
+        console.error("Ошибка confirm:", e);
+        setError(String(e.message || e));
       } finally {
         setIsPaying(false);
       }
     };
 
-    window.addEventListener('message', onMessage);
-    return () => window.removeEventListener('message', onMessage);
-  }, [orderId, navigate, userData, selectedType, customText, uploadedImage, comment, productType, color, size, pickupPoint, manualAddress, totalPrice]);
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [orderId, navigate]);
+
 
   // Форма и валидации
   const handleInputChange = (e) => {
