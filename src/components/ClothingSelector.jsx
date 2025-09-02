@@ -220,7 +220,7 @@ const ClothingSelector = () => {
           <div className="image-wrapper">
             {previewItem ? (
               <img
-                src={buildImgSrc(previewItem?.imageUrl) || placeholder}
+                src={buildImgSrc(previewItem?.imageUrl)}
                 alt={selectedClothing}
                 className="clotheImage"
               />

@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import MyCdekWidget from "../components/MyCdekWidget";
 import { AddressSuggestions } from 'react-dadata';
-import api from '../api';
 
 /**
  * Ключевые изменения против вашей версии:
@@ -13,6 +12,7 @@ import api from '../api';
  * 5) Проверяем origin у postMessage, не даём двойных кликов
  */
 
+const API = "http://localhost:5000/api"; // вынесено в константу
 
 async function postJSON(url, body, token) {
   const res = await fetch(url, {
@@ -50,7 +50,7 @@ const RecipientDetails = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
       try {
-        const { data: response } = await api.get('/user/me');
+        const response = await fetch(`${API}/user/me`, { headers: { Authorization: `Bearer ${token}` } });
         if (response.ok) {
           const data = await response.json();
           setUserData({
@@ -103,14 +103,13 @@ const RecipientDetails = () => {
     });
 
     try {
-      const { data: res } = await api.post('/orders/create', fd);
+      const { data } = await api.post('/orders/create', fd); // FormData — заголовок проставится сам
+      setOrderId(data.orderId);
+      return data; // { orderId, ... }
     } catch (err) {
-      console.error('Ошибка создания заказа:', err.message);
+      // В интерсепторе мы уже формируем понятное сообщение
+      throw new Error(err.message || 'Create failed');
     }
-
-    const data = await res.json(); // { orderId }
-    setOrderId(data.orderId);
-    return data;
   }
 
   // Открыть фейковую оплату
@@ -158,14 +157,27 @@ const RecipientDetails = () => {
       confirming = true;
 
       try {
-        await api.post(`/orders/confirm/${encodeURIComponent(orderId)}`, {}); // тело {} как в исходнике
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API}/orders/confirm/${orderId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({}),
+        });
+
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          console.error("Confirm failed:", res.status, body);
+          throw new Error(body.message || `Подтверждение оплаты не прошло (${res.status})`);
+        }
+
         // ✅ всё ок — уходим на спасибо
-        navigate('/thank-you', { state: { orderNumber: orderId } });
-      } catch (err) {
-        const status = err.response?.status;
-        const body = err.response?.data;
-        console.error('Confirm failed:', status, body);
-        setError(body?.message || err.message || 'Подтверждение оплаты не прошло');
+        navigate("/thank-you", { state: { orderNumber: orderId } });
+      } catch (e) {
+        console.error("Ошибка confirm:", e);
+        setError(String(e.message || e));
       } finally {
         setIsPaying(false);
       }
