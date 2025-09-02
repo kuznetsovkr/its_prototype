@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from '../api';
 
 
 const ProfilePage = () => {
@@ -33,12 +34,9 @@ const ProfilePage = () => {
     if (!token) return;
 
     try {
-      const endpoint =
-        role === "admin"
-          ? "http://localhost:5000/api/orders/all"
-          : "http://localhost:5000/api/orders/user";
+      const path = role === 'admin' ? '/orders/all' : '/orders/user';
 
-      const response = await fetch(endpoint, {
+      const { response } = await api.get(path, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -59,7 +57,7 @@ const ProfilePage = () => {
       if (!token) return;
 
       try {
-        const response = await fetch("http://localhost:5000/api/user/me", {
+        const { data: response } = await api.get('/user/me', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (response.ok) {
@@ -89,16 +87,13 @@ const ProfilePage = () => {
     if (!token) return;
 
     try {
-      const response = await fetch("http://localhost:5000/api/user/update", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(userData),
+      const { data } = await api.put('/user/update', userData, {
+        headers: { Authorization: `Bearer ${token}` }, // можно убрать, если есть интерсептор
       });
-    } catch (error) {
-      console.error("Ошибка обновления данных:", error);
+      // data — ответ сервера
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || 'Неизвестная ошибка';
+      console.error('Ошибка обновления данных:', msg);
     }
   };
 

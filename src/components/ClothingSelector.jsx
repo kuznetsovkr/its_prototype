@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { ReactComponent as CheckIcon } from "../images/Vector.svg";
+import api from '../api'
+import { buildImgSrc } from '../utils/url';
 
 // helper: обводка для белого цвета
 const isWhite = (c = "") => {
@@ -129,7 +130,7 @@ const ClothingSelector = () => {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const { data } = await axios.get("http://localhost:5000/api/inventory");
+        const { data } = await api.get('/inventory');
 
         // берём только позиции с положительным остатком
         const cleaned = (Array.isArray(data) ? data : []).filter((item) => {
@@ -219,7 +220,7 @@ const ClothingSelector = () => {
           <div className="image-wrapper">
             {previewItem ? (
               <img
-                src={`http://localhost:5000${previewItem.imageUrl || "placeholder.png"}`}
+                src={buildImgSrc(previewItem?.imageUrl) || placeholder}
                 alt={selectedClothing}
                 className="clotheImage"
               />

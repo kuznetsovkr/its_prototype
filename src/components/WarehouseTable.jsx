@@ -1,6 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
 import ColorSelect from "./ColorSelect";
+import api from '../api'
+import { buildImgSrc } from '../utils/url';
 
 const popularTypes = ["Худи", "Футболка", "Кофта", "Свитшот", "Майка"];
 const popularSizes  = ["XS", "S", "M", "L", "XL", "XXL"];
@@ -43,7 +44,7 @@ const WarehouseTable = ({
     const formData = new FormData();
     formData.append("image", file);
     try {
-      const res = await axios.post("http://localhost:5000/api/upload", formData, {
+      const res = await api.post('/upload', formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setEditData((prev) => ({ ...prev, imageUrl: res.data.imageUrl }));
@@ -88,9 +89,7 @@ const WarehouseTable = ({
             ) : (
               inventory.map((row) => {
                 const isEditing = editingId === row.id;
-                const imgUrl = isEditing
-                  ? (editData?.imageUrl ? `http://localhost:5000${editData.imageUrl}` : (row.imageUrl ? `http://localhost:5000${row.imageUrl}` : ""))
-                  : (row.imageUrl ? `http://localhost:5000${row.imageUrl}` : "");
+                const imgUrl = buildImgSrc(isEditing ? (editData?.imageUrl || row.imageUrl) : row.imageUrl) || "";
 
                 const colorChipCode = isEditing
                   ? (editData?.colorCode || "")

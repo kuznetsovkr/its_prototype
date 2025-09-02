@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
-import axios from "axios";
 import WarehouseTable from "../components/WarehouseTable";
 import ColorSelect from "../components/ColorSelect";
+import api from '../api'
 
 const defaultColors = [
   { name: "Черный", code: "#000000" },
@@ -38,7 +38,7 @@ const AdminInventory = () => {
 
   const fetchInventory = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/inventory");
+      const res = await api.get('/inventory');
       setInventory(res.data || []);
     } catch (err) {
       console.error("Ошибка загрузки склада:", err);
@@ -47,7 +47,7 @@ const AdminInventory = () => {
 
   const fetchColors = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/colors");
+      const res = await api.get('/colors');
       if (Array.isArray(res.data) && res.data.length) {
         // ожидаем [{name, code}]
         setColorOptions(res.data);
@@ -60,7 +60,7 @@ const AdminInventory = () => {
   const addColor = async ({ name, code }) => {
     // пробуем на бэк, если нет — сохраняем локально
     try {
-      const res = await axios.post("http://localhost:5000/api/colors", { name, code });
+      const res = await api.post('/colors', { name, code });
       const saved = res.data?.name ? res.data : { name, code };
       setColorOptions((prev) => {
         const exists = prev.some((c) => c.name.toLowerCase() === saved.name.toLowerCase());
@@ -76,10 +76,9 @@ const AdminInventory = () => {
       return saved;
     }
   };
-
-  const updateQuantity = async (id, quantity) => {
+    const updateQuantity = async (id, quantity) => {
     try {
-      await axios.put(`http://localhost:5000/api/inventory/${id}`, { quantity });
+      await api.put(`/inventory/${id}`, { quantity });
       fetchInventory();
     } catch (err) {
       console.error("Ошибка обновления:", err);
@@ -88,7 +87,7 @@ const AdminInventory = () => {
 
   const updateItem = async (updated) => {
     try {
-      await axios.put(`http://localhost:5000/api/inventory/${updated.id}`, updated);
+      await api.put(`/inventory/${updated.id}`, updated);
       await fetchInventory();
     } catch (err) {
       console.error("Ошибка при обновлении товара:", err);
@@ -97,7 +96,7 @@ const AdminInventory = () => {
 
   const deleteItem = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/inventory/${id}`);
+      await api.delete(`/inventory/${id}`);
       fetchInventory();
     } catch (err) {
       console.error("Ошибка удаления:", err);
@@ -109,7 +108,7 @@ const AdminInventory = () => {
       return;
     }
     try {
-      await axios.post("http://localhost:5000/api/inventory", {
+      await api.post('/inventory', {
         ...newItem,
         quantity: Number(newItem.quantity),
       });
@@ -234,7 +233,7 @@ const AdminInventory = () => {
                   const formData = new FormData();
                   formData.append("image", file);
                   try {
-                    const res = await axios.post("http://localhost:5000/api/upload", formData, {
+                    const res = await api.post('/upload', formData, {
                       headers: { "Content-Type": "multipart/form-data" },
                     });
                     setNewItem((prev) => ({ ...prev, imageUrl: res.data.imageUrl }));

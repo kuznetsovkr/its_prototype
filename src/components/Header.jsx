@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import logo from "../images/logo_its.svg";
 import auth from "../images/auth.svg";
 import AuthModal from "../AuthModal";
+import api from '../api'
 
 // Иконка "три полоски"
 const BurgerIcon = () => (
@@ -45,7 +46,7 @@ const Header = () => {
     setOrderStatus(null);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/orders/status/${orderNumber}`);
+      const { response } = await api.get(`/orders/status/${encodeURIComponent(orderNumber)}`);
       if (response.ok) {
         const data = await response.json();
         setOrderStatus(`Статус заказа №${orderNumber}: ${data.status}`);

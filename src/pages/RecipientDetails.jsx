@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import MyCdekWidget from "../components/MyCdekWidget";
 import { AddressSuggestions } from 'react-dadata';
+import api from '../api';
 
 /**
  * Ключевые изменения против вашей версии:
@@ -12,7 +13,6 @@ import { AddressSuggestions } from 'react-dadata';
  * 5) Проверяем origin у postMessage, не даём двойных кликов
  */
 
-const API = "http://localhost:5000/api"; // вынесено в константу
 
 async function postJSON(url, body, token) {
   const res = await fetch(url, {
@@ -50,7 +50,7 @@ const RecipientDetails = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
       try {
-        const response = await fetch(`${API}/user/me`, { headers: { Authorization: `Bearer ${token}` } });
+        const { data: response } = await api.get('/user/me');
         if (response.ok) {
           const data = await response.json();
           setUserData({
@@ -102,19 +102,12 @@ const RecipientDetails = () => {
       if (file) fd.append("images", file, file.name || `image_${idx}.jpg`);
     });
 
-    const res = await fetch(`${API}/orders/create`, {
-      method: "POST",
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        // НЕ ставим Content-Type вручную — пусть браузер проставит boundary для FormData
-      },
-      body: fd,
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `Create failed ${res.status}`);
+    try {
+      const { data: res } = await api.post('/orders/create', fd);
+    } catch (err) {
+      console.error('Ошибка создания заказа:', err.message);
     }
+
     const data = await res.json(); // { orderId }
     setOrderId(data.orderId);
     return data;
@@ -165,27 +158,14 @@ const RecipientDetails = () => {
       confirming = true;
 
       try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`${API}/orders/confirm/${orderId}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify({}),
-        });
-
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          console.error("Confirm failed:", res.status, body);
-          throw new Error(body.message || `Подтверждение оплаты не прошло (${res.status})`);
-        }
-
+        await api.post(`/orders/confirm/${encodeURIComponent(orderId)}`, {}); // тело {} как в исходнике
         // ✅ всё ок — уходим на спасибо
-        navigate("/thank-you", { state: { orderNumber: orderId } });
-      } catch (e) {
-        console.error("Ошибка confirm:", e);
-        setError(String(e.message || e));
+        navigate('/thank-you', { state: { orderNumber: orderId } });
+      } catch (err) {
+        const status = err.response?.status;
+        const body = err.response?.data;
+        console.error('Confirm failed:', status, body);
+        setError(body?.message || err.message || 'Подтверждение оплаты не прошло');
       } finally {
         setIsPaying(false);
       }

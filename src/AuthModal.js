@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from './api'
 
 const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
     const [phone, setPhone] = useState("+7 "); // Начинаем с +7
@@ -62,7 +62,7 @@ const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
         console.log(`📞 Отправляем запрос на сервер с номером: ${cleanNumber}`);
 
         try {
-            const response = await axios.post("http://localhost:5000/api/auth/request-sms", { phone: cleanNumber });
+            const response = await api.post('/auth/request-sms', { phone: cleanNumber });
             console.log("✅ Ответ сервера:", response.data);
 
             if (response.data.message === "Введите пароль") {
@@ -88,7 +88,7 @@ const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
         }
 
         try {
-            const response = await axios.post("http://localhost:5000/api/auth/login", { phone, smsCode });
+            const response = await api.post('/auth/login', { phone, smsCode });
             localStorage.setItem("token", response.data.token);
             if (onLoginSuccess) onLoginSuccess();
         } catch (error) {
@@ -104,7 +104,7 @@ const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
         }
 
         try {
-            const response = await axios.post("http://localhost:5000/api/auth/admin-login", {
+            const response = await api.post('/auth/admin-login', {
                 phone: phone.replace(/\D/g, ""), // Очищаем номер
                 password,
             });
