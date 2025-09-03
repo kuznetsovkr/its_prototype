@@ -133,6 +133,7 @@ const Header = () => {
           <button
             type="button"
             className="burger-button mobile-only"
+            id="burger-menu"
             aria-label="Открыть меню"
             aria-expanded={isMenuOpen}
             aria-controls="mobile-menu"

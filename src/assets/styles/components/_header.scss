@@ -47,7 +47,7 @@
   }
 }
 
-.mobile-only {
+#burger-menu {
   display: none;
   @include respond-to(md) {
     display: block;
