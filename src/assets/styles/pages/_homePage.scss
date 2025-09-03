@@ -10,38 +10,74 @@
   bottom: 15%;
   left: 50%;
   transform: translateX(-50%);
-  width: clamp(316px, 27.43vw, 474px);
-  height: clamp(69px, 5.97vw, 103.5px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  // ширина и высота — адаптивные
+  width: clamp(220px, 80vw, 474px);
+  min-height: clamp(48px, 12vw, 103.5px);
+  height: auto;
+
+  // гибкие отступы
+  padding: clamp(12px, 3vw, 20px) clamp(16px, 6vw, 60px);
+
   border: 2px solid #440a18;
   border-radius: 20px;
-  padding: 20px 60px;
+  box-sizing: border-box;
   cursor: pointer;
+
   font-family: 'RightGrotesk', sans-serif;
   font-weight: 500;
-  font-size: clamp(24px, 2.08vw, 36px);
+  font-size: clamp(18px, 5vw, 36px);
+  line-height: 1.15;
+  text-transform: uppercase;
+  text-align: center;
   color: #440a18;
   background: transparent;
 
+  // на случай глобальных стилей
+  white-space: normal;
+  overflow-wrap: anywhere;
 
-
-  @include respond-to(lg) {
-    font-size: 36px;
-    width: 40%;
-  }
-
-  @include respond-to(md) {
-    font-size: 32px;
-    width: 50%;
-  }
-
+  // при желании можно вообще не трогать font-size через брейкпоинты —
+  // clamp всё покроет. Но оставлю примеры полезных мобильных правок:
   @include respond-to(sm) {
-    font-size: 28px;
-    width: 60%;
+    width: clamp(240px, 86vw, 474px);
+    bottom: 10%;
   }
 
   @include respond-to(xs) {
-    font-size: 24px;
-    width: 70%;
+    // на совсем маленьких — убираем absolute, чтобы не перекрывать контент
+    position: static;
+    transform: none;
+    margin: 16px auto 0;
+    width: min(92vw, 474px);
+    bottom: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .main_block_order_button {
+    position: fixed;            // фиксируем к вьюпорту
+    left: 50%;
+    bottom: 50px;               // ровно как просил(а)
+    transform: translateX(-50%);
+    width: min(92vw, 474px);
+    min-height: 56px;
+    height: auto;
+    padding: 14px 20px;
+    z-index: 1000;              // поверх контента, но ниже мобильного меню (у него 9999)
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+
+  /* iOS safe area (полезно для айфонов с «чёлкой/домом») */
+  @supports (bottom: calc(50px + env(safe-area-inset-bottom))) {
+    .main_block_order_button {
+      bottom: calc(50px + env(safe-area-inset-bottom));
+    }
   }
 }
 
@@ -160,5 +196,101 @@
   &.visible {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  /* 1) Блок-герой учитывает мобильный хедер 70px */
+  #main_block {
+    height: calc(100vh - 70px);
+    position: relative; // на всякий случай
+  }
+
+  /* 2) Чтобы абсолют кнопки был относительно #main_block, а не wrapper */
+  #main_block > .wrapper {
+    position: static; // перебьёт возможный relative у wrapper
+  }
+
+  /* 3) Кнопка — к нижней границе блока на 50px */
+  .main_block_order_button {
+    position: absolute !important;  /* перекрываем прежний static/fixed */
+    left: 50%;
+    bottom: 50px;
+    transform: translateX(-50%);
+    margin: 0;
+
+    width: min(92vw, 474px);
+    min-height: 56px;
+    height: auto;
+    padding: 14px 20px;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    z-index: 1; /* достаточно, т.к. внутри блока */
+  }
+}
+
+/* Tablet + Mobile: шаги в одну колонку, по центру */
+@media (max-width: 1024px) {
+  .roadmap {
+    .steps {
+      display: flex;
+      flex-direction: column;
+      align-items: center;   /* всё по центру */
+      gap: 28px;
+      padding: 0 10px;             /* расстояние между карточками */
+      /* Снимаем все «зиг-заги» и перекрытия с десктопа */
+      #step-1, #step-2, #step-3, #step-4, #step-5 {
+        align-self: center;
+        margin-top: 0 !important;
+      }
+
+      .step {
+        width: 100%;
+        max-width: 360px;      /* чтобы влезла картинка 320 + немного текста */
+        height: auto;
+        align-self: center;    /* на всякий случай */
+      }
+
+      .step .firstRow {
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      /* Блок изображения: 320x177 с адаптивным сохранением пропорций */
+      .step .image-placeholder{
+        width: min(320px, 100%);     /* если экран уже, не вылезаем */
+        aspect-ratio: 320 / 177;     /* держим пропорции 320x177 */
+        height: auto;
+        border-radius: 20px;
+        background: #d9d9d9;
+        margin: 12px auto 0;         /* по центру */
+      }
+    }
+    /* Стрелки на мобилке не нужны */
+    .arrow { display: none !important; }
+  }
+}
+
+/* Доп. подстройка шрифтов для телефонов, чтобы ничего не ломало верстку */
+@media (max-width: 768px) {
+  .roadmap .titleRoadmap { margin: 56px 0 24px; gap: 12px; }
+
+  .roadmap .titleRoadmap .titleFirstColumn {
+    font-size: clamp(64px, 18vw, 96px);
+  }
+
+  .roadmap .titleRoadmap .titleSecondColumn{
+    font-size: clamp(24px, 5vw, 36px);
+  }
+
+  .roadmap .steps .step .firstRow .number {
+    font-size: clamp(96px, 18vw, 132px);
+  }
+  .roadmap .steps .step .text .nameStep {
+    font-size: clamp(26px, 5vw, 36px);
+  }
+  .roadmap .steps .step .text .descriptionStep {
+    font-size: clamp(16px, 4vw, 18px);
   }
 }

@@ -4,15 +4,7 @@ import logo from "../images/logo_its.svg";
 import auth from "../images/auth.svg";
 import AuthModal from "../AuthModal";
 import api from '../api'
-
-// Иконка "три полоски"
-const BurgerIcon = () => (
-  <div className="burger-icon">
-    <span />
-    <span />
-    <span />
-  </div>
-);
+import { ReactComponent as BurgerSvg } from "../images/burger.svg";
 
 const Header = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -136,22 +128,29 @@ const Header = () => {
           <img src={auth} alt="auth" />
         </div>
 
-        {/* Бургер (мобильная/планшетная версия). Скрываем его при открытом меню */}
+        {/* Бургер (моб/планшет). Скрываем его при открытом меню */}
         {!isMenuOpen && (
-          <div className="mobile-only" onClick={toggleMenu}>
-            <BurgerIcon />
-          </div>
+          <button
+            type="button"
+            className="burger-button mobile-only"
+            aria-label="Открыть меню"
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
+            onClick={toggleMenu}
+          >
+            <BurgerSvg aria-hidden="true" />
+          </button>
         )}
       </header>
 
       {/* Мобильное бургер-меню (выезжающее) */}
-      <div className={`mobile-menu ${isMenuOpen ? "open" : ""}`}>
+      <div id="mobile-menu" className={`mobile-menu ${isMenuOpen ? "open" : ""}`}>
         <div className="mobile-menu-content">
           <button className="close-button" onClick={toggleMenu}>×</button>
           <nav className="mobile-nav">
-            <Link to="/works" onClick={toggleMenu}>Примеры работ</Link>
-            <Link to="/about" onClick={toggleMenu}>О нас</Link>
-            <Link to="/faq" onClick={toggleMenu}>Ответы на частые вопросы</Link>
+            <Link to="/works" onClick={toggleMenu}>примеры работ</Link>
+            <Link to="/about" onClick={toggleMenu}>о нас</Link>
+            <Link to="/faq" onClick={toggleMenu}>ответы на самые частые вопросы</Link>
 
             {/*
             <button
@@ -173,7 +172,7 @@ const Header = () => {
                 toggleMenu();
               }}
             >
-              Личный кабинет
+              личный кабинет
             </button>
           </nav>
         </div>

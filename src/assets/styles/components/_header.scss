@@ -54,33 +54,6 @@
   }
 }
 
-
-.burger-icon {
-  width: 30px;
-  height: 22px;
-  position: relative;
-  cursor: pointer;
-  span {
-    display: block;
-    width: 100%;
-    height: 4px;
-    background-color: #333;
-    border-radius: 2px;
-    position: absolute;
-    left: 0;
-    transition: 0.3s;
-  }
-  span:nth-of-type(1) {
-    top: 0;
-  }
-  span:nth-of-type(2) {
-    top: 9px;
-  }
-  span:nth-of-type(3) {
-    top: 18px;
-  }
-}
-
 .mobile-menu {
   position: fixed;
   top: 0;
@@ -91,6 +64,9 @@
   transform: translateX(100%);
   transition: transform 0.3s ease;
   z-index: 9999;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 400; 
+  font-size: 20px;
 
   &.open {
     transform: translateX(0);
@@ -124,10 +100,13 @@
             font-size: 24px;
             background: none;
             border: none;
-            text-align: left;
+            text-align: center;
             cursor: pointer;
             color: #333;
             text-decoration: none;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 400; 
+            font-size: 20px;
         }
     }
 
@@ -142,11 +121,41 @@
 }
 
 @media (max-width: 768px) {
-  .header{
-    .logo {
-      img {
-        height: 50px;
-      }
-    }
+  .header {
+    height: 70px;           // новая высота
+    padding: 8px 16px;      // можно чуть компактнее, чтобы контент влезал
   }
+
+  .header .logo img {
+    height: 44px;           // чтобы уместилось по вертикали внутри 70px
+  }
+
+  .auth-button {
+    height: 32px;
+    img { height: 32px; }
+  }
+}
+
+.burger-button {
+  background: transparent;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  line-height: 0; // без лишнего кликабельного текста
+  color: #121319; // базовый цвет иконки
+
+  svg {
+    width: 24px;
+    height: 16px;
+    display: block;
+  }
+
+  &:active { transform: scale(.96); }
+}
+
+// можно подсветить при открытом меню
+.burger-button[aria-expanded="true"] {
+  color: #440a18; // твой brand
 }
