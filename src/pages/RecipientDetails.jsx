@@ -112,17 +112,24 @@ const RecipientDetails = () => {
   // Открыть фейковую оплату
   async function handlePayment() {
     if (isPaying) return;
-    setError(""); setIsPaying(true);
+    setError(''); setIsPaying(true);
     try {
       const { orderId: oid } = await createDraftOrder();
-      const url = `/payment?orderId=${encodeURIComponent(oid)}`; // страница с PaymentPage
-      const w = window.open(url, "_blank", "width=520,height=640");
-      if (!w) throw new Error("Попап заблокирован");
+
+      // запрашиваем ссылку на оплату у бэка
+      const { data } = await api.post('/payments/paykeeper/link', { orderId: oid });
+
+      // сохраним orderId чтобы после редиректа знать, кого ждать
+      sessionStorage.setItem('pay_order_id', String(oid));
+
+      // редиректим на платёжную страницу PayKeeper
+      window.location.href = data.pay_url; // можно window.open(data.pay_url, '_blank')
     } catch (e) {
-      setError(e.message || "Ошибка при создании заказа");
+      setError(e.message || 'Ошибка при создании ссылки на оплату');
       setIsPaying(false);
     }
   }
+
 
   // Обработка сообщения об успешной оплате из фейкового окна
   // Обработка сообщения об успешной оплате из фейкового окна

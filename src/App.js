@@ -16,6 +16,8 @@ import PaymentPage from './pages/PaymentPage';
 import AdminInventory from "./admin/AdminInventory";
 import PageLayout from './components/PageLayout';
 import FakePayment from './pages/FakePayment';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentFail from './pages/PaymentFail';
 
 
 
@@ -38,6 +40,8 @@ const App = () => {
                             <Route path="/size-guide" element={<PageLayout><SizeGuidePage /></PageLayout>} />
                             <Route path="/payment" element={<PageLayout><PaymentPage /></PageLayout>} />
                             <Route path="/fake-payment" element={<FakePayment />} />
+                            <Route path="/payment-success" element={<PageLayout><PaymentSuccess /></PageLayout>} />
+                            <Route path="/payment-fail" element={<PageLayout><PaymentFail /></PageLayout>} />
 
                             {/* Админку можно оставить без layout-а, если она отдельная */}
                             <Route path="/admin/inventory" element={<PageLayout><AdminInventory /></PageLayout>} />
