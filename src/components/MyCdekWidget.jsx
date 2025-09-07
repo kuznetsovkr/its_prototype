@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import CDEKWidget from '@cdek-it/widget';
 
 const MyCdekWidget = ({ onAddressSelect, onRateSelect }) => {
+  const servicePath = process.env.REACT_APP_CDEK_SERVICE_URL || '/service.php';
+
   useEffect(() => {
     const instance = new CDEKWidget({
       root: 'cdek-map',
@@ -10,11 +12,11 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect }) => {
         city: 'Красноярск',
         postal_code: 660135,
         code: 278,
-        address: "ул. 78-й Добровольческой Бригады, 1",
+        address: 'ул. 78-й Добровольческой Бригады, 1',
       },
       apiKey: '310f9193-b426-4cdd-8e65-b03ac33526fa',
       canChoose: true,
-      servicePath: 'http://localhost:8080/service.php',
+      servicePath, // ← больше не localhost
       hideFilters: { have_cashless: false, have_cash: false, is_dressing_room: false, type: false },
       hideDeliveryOptions: { office: false, door: false },
       debug: false,
@@ -34,9 +36,10 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect }) => {
       const el = document.getElementById('cdek-map');
       if (el) el.innerHTML = '';
     };
-  }, [onAddressSelect, onRateSelect]);
+  }, [onAddressSelect, onRateSelect, servicePath]);
 
-  return null; // ничего не рендерим
+  // важное: даём корневой контейнер для виджета
+  return <div id="cdek-map" style={{ minHeight: 420 }} />;
 };
 
 export default MyCdekWidget;
