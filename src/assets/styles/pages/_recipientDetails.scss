@@ -22,6 +22,7 @@
       .data{
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
         gap: clamp(20px, 1vw, 30px);
 
         input {
