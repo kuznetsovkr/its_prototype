@@ -1,180 +1,197 @@
 .containerDetails{
+  display: flex;
+  flex-direction: row;
+  gap: clamp(20px, 1vw, 30px);
+  min-height: min(calc(100vh - 200px), 1008px);
+  margin-top: 10px;
+
+  .firstColumn{
     display: flex;
-    flex-direction: row;
-    gap: clamp(20px, 1vw, 30px);
-    min-height: min(calc(100vh - 200px), 1008px);
-    margin-top: 10px;
+    flex-direction: column;
+    gap: clamp(40px, 2vw, 60px);
 
-    .firstColumn{
-        display: flex;
-    
-        flex-direction: column;
-        gap: clamp(40px, 2vw, 60px);
-        .recipientInfo{
-            .title{
-                font-family: 'RightGrotesk', sans-serif;
-                font-weight: 500;
-                font-size: clamp(36px, 2vw, 54px);
-                color: #440a18;
-                margin-bottom: 30px;
-            }
-            .data{
-                display: flex;
-                flex-direction: row;
-                gap: clamp(20px, 1vw, 30px);
-                input {
-                    box-sizing: border-box;
-                    width: 433px;
-                    height: 43px;
-                    padding: 10px 10px 10px 20px;
-                    border: 1px solid #121319;
-                    border-radius: 10px;
-                    font-weight: 400;
-                    font-size: clamp(20px, 1vw, 30px);
-                    font-family: 'Raleway', sans-serif;
-                    transition: border 0.2s ease-in-out;
-
-                    &::placeholder {
-                        color: rgba(18, 19, 25, 0.5);
-                    }
-
-                    &:focus {
-                        outline: none;
-                        border-color: #440a18;
-                    }
-
-                    &:disabled {
-                        background-color: #fff;
-                    }
-                }
-            }
-            .FIO{
-                display: flex;
-                flex-direction: column;
-                gap: clamp(10px, 0.5vw, 15px);
-            }
-        }
-
-        .deliveryInfo{
-            display: flex;
-            flex-direction: column;
-            .title{
-                font-family: 'RightGrotesk', sans-serif;
-                font-weight: 500;
-                font-size: clamp(36px, 2vw, 54px);
-                color: #440a18;
-                margin-bottom: 30px;
-            }
-            .blockCDEK{
-                #cdek-map{
-                    border-radius: 20px;
-                    width: 887px;
-                    height: 430px;
-                    border: 2px solid #440a18;
-                }
-                label {
-                    font-family: 'Raleway', sans-serif;
-                    font-weight: 400;
-                    font-size: 20px;
-                    color: #121319;
-                    margin-top: 20px;
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-
-                    input[type="checkbox"] {
-                        width: 18px;
-                        height: 18px;
-                        cursor: pointer;
-                    }
-                }
-            }
-        }
-    }
-
-    .secondColumn{
-        width: 100%;
-        .deliveryCost{
-            display: flex;
-            flex-direction: column;
-            .title{
-                font-family: 'RightGrotesk', sans-serif;
-                font-weight: 500;
-                font-size: clamp(36px, 2vw, 54px);
-                color: #440a18;
-                margin-bottom: 30px;
-            }
-            .aboutPrice{
-                font-family: 'Raleway', sans-serif;
-                font-weight: 400;
-                font-size: clamp(24px, 1vw, 36px);
-                color: #121319;
-                &_calculate{
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: space-between;
-                }
-                .summaryCost{
-                    font-family: 'RightGrotesk', sans-serif;
-                    margin-top: 30px;
-                    font-weight: 500;
-                    font-size: clamp(24px, 1vw, 36px);
-                    color: #440a18;
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: space-between;
-                }
-            }
-        }
-    }
-}
-
-.tooltip-container {
-    margin-top: 40px;
-    position: relative;
-    display: inline-block;
-    .confirmButton{
-        border-radius: 20px;
-        height: clamp(68px, 3vw, 102px);
-        background: #440a18;
-        font-family: 'Raleway', sans-serif;
+    .recipientInfo{
+      .title{
+        font-family: 'RightGrotesk', sans-serif;
         font-weight: 500;
-        font-size: clamp(24px, 1vw, 36px);
-        color: #fff;
-        border: none;
-        cursor: pointer;
-        width: 100%;
-    }
-}
-  
-  .tooltip-text {
-    font-family: 'Raleway', sans-serif;
-    font-weight: 400;
-    font-size: clamp(14px, 1vw, 21px);
-    visibility: hidden;
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    border-radius: 5px;
-    padding: 6px 8px;
-    position: absolute;
-    z-index: 1;
-    bottom: 130%; 
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
-  }
-  
-  .tooltip-container:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-  }
-  
+        font-size: clamp(36px, 2vw, 54px);
+        color: #440a18;
+        margin-bottom: 30px;
+      }
 
-  .react-dadata__container {
+      .data{
+        display: flex;
+        flex-direction: row;
+        gap: clamp(20px, 1vw, 30px);
+
+        input {
+          box-sizing: border-box;
+          width: 433px; // на десктопе прежняя логика
+          height: 43px;
+          padding: 10px 10px 10px 20px;
+          border: 1px solid #121319;
+          border-radius: 10px;
+          font-weight: 400;
+          font-size: clamp(20px, 1vw, 30px);
+          font-family: 'Raleway', sans-serif;
+          transition: border 0.2s ease-in-out;
+
+          &::placeholder { color: rgba(18, 19, 25, 0.5); }
+          &:focus { outline: none; border-color: #440a18; }
+          &:disabled { background-color: #fff; }
+        }
+      }
+
+      .FIO{
+        display: flex;
+        flex-direction: column;
+        gap: clamp(10px, 0.5vw, 15px);
+      }
+    }
+
+    .deliveryInfo{
+      display: flex;
+      flex-direction: column;
+
+      .title{
+        font-family: 'RightGrotesk', sans-serif;
+        font-weight: 500;
+        font-size: clamp(36px, 2vw, 54px);
+        color: #440a18;
+        margin-bottom: 30px;
+      }
+
+      .blockCDEK{
+        // адаптивная обёртка карты
+        #cdek-map{
+          width: 100%;
+          aspect-ratio: 16 / 9; // базовое соотношение
+          border-radius: 20px;
+          border: 2px solid #440a18;
+          overflow: hidden;
+
+          // на случай, если виджет внутри требует растяжения
+          & > * {
+            width: 100%;
+            height: 100%;
+          }
+        }
+
+        label {
+          font-family: 'Raleway', sans-serif;
+          font-weight: 400;
+          font-size: 20px;
+          color: #121319;
+          margin-top: 20px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
+
+  .secondColumn{
+    width: 100%;
+    .deliveryCost{
+      display: flex;
+      flex-direction: column;
+
+      .title{
+        font-family: 'RightGrotesk', sans-serif;
+        font-weight: 500;
+        font-size: clamp(36px, 2vw, 54px);
+        color: #440a18;
+        margin-bottom: 30px;
+      }
+
+      .aboutPrice{
+        font-family: 'Raleway', sans-serif;
+        font-weight: 400;
+        font-size: clamp(24px, 1vw, 36px);
+        color: #121319;
+
+        &_calculate{
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+        }
+
+        .summaryCost{
+          font-family: 'RightGrotesk', sans-serif;
+          margin-top: 30px;
+          font-weight: 500;
+          font-size: clamp(24px, 1vw, 36px);
+          color: #440a18;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+        }
+      }
+    }
+  }
+}
+
+// Кнопка и тултип
+.tooltip-container {
+  margin-top: 40px;
+  position: relative;
+  display: inline-block;
+  width: 100%;
+
+  .confirmButton{
+    border-radius: 20px;
+    height: clamp(68px, 3vw, 102px);
+    background: #440a18;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 500;
+    font-size: clamp(24px, 1vw, 36px);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    transition: opacity .2s;
+
+    &:disabled { opacity: .6; cursor: not-allowed; }
+  }
+}
+
+.tooltip-text {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 400;
+  font-size: clamp(14px, 1vw, 21px);
+  visibility: hidden;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 6px 8px;
+  position: absolute;
+  z-index: 1;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  max-width: min(90vw, 360px);
+  white-space: normal;         // переносим строки
+  word-wrap: break-word;       // на всякий случай
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+// react-dadata
+.react-dadata__container {
   font-family: 'Raleway', sans-serif;
   font-weight: 400;
   font-size: 20px;
@@ -189,15 +206,10 @@
     font-size: 20px;
     font-family: 'Raleway', sans-serif;
 
-    &::placeholder {
-      color: rgba(18, 19, 25, 0.5);
-    }
-
-    &:focus {
-      outline: none;
-      border-color: #440a18;
-    }
+    &::placeholder { color: rgba(18, 19, 25, 0.5); }
+    &:focus { outline: none; border-color: #440a18; }
   }
+
   .react-dadata__input {
     width: 100%;
     height: 43px;
@@ -207,49 +219,108 @@
     font-family: 'Raleway', sans-serif;
     font-size: 20px;
 
-    &::placeholder {
-        color: rgba(18, 19, 25, 0.5);
-    }
+    &::placeholder { color: rgba(18, 19, 25, 0.5); }
+    &:focus { border-color: #440a18; outline: none; }
+  }
 
-    &:focus {
-        border-color: #440a18;
-        outline: none;
-    }
-    }
-
-
-    .react-dadata__suggestions {
+  .react-dadata__suggestions {
     border: 1px solid #ccc;
     border-top: none;
     border-radius: 0 0 10px 10px;
     background-color: #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     font-family: 'Raleway', sans-serif;
     font-weight: 400;
     font-size: 18px;
     color: #121319;
     max-height: 250px;
     overflow-y: auto;
+    max-width: 100%;
+    box-sizing: border-box;
 
     .react-dadata__suggestion {
-        padding: 10px 16px;
-        cursor: default;
-        border-top: 1px solid #eee;
+      padding: 10px 16px;
+      cursor: default;
+      border-top: 1px solid #eee;
 
-        &:hover {
-        background-color: #f9f9f9;
-        }
+      &:hover { background-color: #f9f9f9; }
+      &--current { background-color: #f0f0f0; }
 
-        &--current {
-        background-color: #f0f0f0;
-        }
-
-        mark {
+      mark {
         background: none;
         font-weight: 600;
         color: #440a18;
-        }
+      }
     }
-    }
+  }
+}
 
+/* ===== МЕДИА: мобильная версия ≤ 768 ===== */
+@media (max-width: 768px) {
+  .containerDetails{
+    flex-direction: column;
+    gap: 24px;
+    min-height: auto;             // не тянем страницу на всю высоту
+  }
+
+  .firstColumn, .secondColumn{
+    width: 100%;
+  }
+
+  .containerDetails .firstColumn .recipientInfo .data{
+    flex-direction: column;       // ФИО + телефон в столбик
+    gap: 12px;
+
+    input{
+      width: 100%;                // инпуты занимают всю ширину
+    }
+  }
+
+  .deliveryInfo .blockCDEK {
+    #cdek-map{
+      aspect-ratio: 4 / 3;        // повыше на мобилке
+      min-height: 260px;          // страховка, если браузер чудит с ratio
+    }
+  }
+
+  .secondColumn .deliveryCost .aboutPrice{
+    font-size: clamp(18px, 4vw, 22px);
+  }
+
+  .tooltip-container{
+    width: 100%;
+  }
+}
+
+/* (Опционально) Для очень широких экранов можно чуть "сплющить" карту */
+@media (min-width: 1280px){
+  .deliveryInfo .blockCDEK #cdek-map{
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.containerDetails{
+  /* страховка от любых мелких утечек */
+  overflow-x: clip;
+
+  /* ...остальное... */
+
+  .firstColumn, .secondColumn{
+    /* ключ! даём flex-элементам право ужиматься */
+    min-width: 0;
+  }
+
+  .firstColumn{
+    flex: 1 1 60%;
+  }
+  .secondColumn{
+    /* убираем width:100% на десктопе */
+    flex: 1 1 40%;
+    width: auto;
+  }
+}
+
+/* На мобилке оставляем 100% ширины */
+@media (max-width: 768px){
+  .firstColumn, .secondColumn{ width: 100%; }
 }

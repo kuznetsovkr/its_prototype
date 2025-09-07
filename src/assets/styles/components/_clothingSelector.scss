@@ -10,7 +10,6 @@
   display: flex;
   flex-direction: row;
   justify-content: center;
-  height: min(calc(100vh - 200px), 1008px);
   gap: clamp(50px, 4.31vw, 75px);
   width: 100%;
 
@@ -19,6 +18,11 @@
     width: clamp(530px, 20vw, 765px);
     border: 0.25px solid #121319;
     border-radius: 20px;
+
+    
+    @media (max-width: 768px) {
+      border: none;
+    }
 
     .image-wrapper {
       display: flex;
@@ -298,6 +302,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  
 }
 
 .colorSquare {
@@ -334,3 +339,24 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+.blockClothingSelector {
+  /* было: height: min(calc(100vh - 200px), 1008px); */
+  height: auto;
+  min-height: clamp(600px, calc(100dvh - var(--header-h) - var(--footer-h)), 1008px);
+}
+
+@media (max-width: 768px) {
+  .blockClothingSelector {
+    /* на мобиле вообще убираем требование по высоте — пусть контент течёт */
+    min-height: unset;
+    height: auto;
+  }
+}
+
+.clothing-block .image-wrapper .clotheImage {
+  max-width: 100%;
+  height: auto;
+}
+
+.modalOverlay { z-index: 2000; }

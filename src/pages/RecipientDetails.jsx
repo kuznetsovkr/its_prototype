@@ -50,16 +50,13 @@ const RecipientDetails = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
       try {
-        const { data: response } = await api.get('/user/me');
-        if (response.ok) {
-          const data = await response.json();
-          setUserData({
-            firstName: data.firstName || "",
-            lastName: data.lastName || "",
-            middleName: data.middleName || "",
-            phone: data.phone || "",
-          });
-        }
+        const { data } = await api.get('/user/me'); // axios
+        setUserData({
+          firstName: data?.firstName ?? "",
+          lastName: data?.lastName ?? "",
+          middleName: data?.middleName ?? "",
+          phone: data?.phone ?? "",
+        });
       } catch (e) {
         console.error("Ошибка получения данных пользователя:", e);
       }
@@ -221,12 +218,8 @@ const RecipientDetails = () => {
         <div className="deliveryInfo">
           <p className="title">Выбор пункта выдачи (СДЭК)</p>
           <div className="blockCDEK">
-            <div id="cdek-map">
-                            <MyCdekWidget 
-                                onAddressSelect={setPickupPoint}
-                                onRateSelect={setDeliveryPrice}
-                            />            
-                            </div>
+            <div id="cdek-map" />   {/* пустой контейнер под карту */}
+            <MyCdekWidget onAddressSelect={setPickupPoint} onRateSelect={setDeliveryPrice} />
             <label>
               <input type="checkbox" checked={isNoCdek} onChange={() => setIsNoCdek((p) => !p)} />
               В моём городе нет СДЭКа
