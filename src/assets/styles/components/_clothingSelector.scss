@@ -360,3 +360,30 @@
 }
 
 .modalOverlay { z-index: 2000; }
+
+.clothing-block {
+  width: clamp(280px, 40vw, 765px);
+  /* бордер убираем отсюда, перенесён на .image-frame */
+  border: none;
+  border-radius: 0;
+}
+
+.image-frame {
+  width: 100%;
+  aspect-ratio: 1 / 1;          /* квадрат держится на любом экране */
+  border-radius: 20px;
+  overflow: hidden;              /* чтобы картинка повторяла скругления */
+}
+
+/* картинка заполняет квадрат без искажений */
+.clotheImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* квадратная картинка в квадрате не обрежется, но можно заменить на contain */
+  display: block;
+}
+
+/* Мобилка: просто наследуем — квадрат сохранится сам */
+@media (max-width: 768px) {
+  .clothing-block { width: 100%; }
+}

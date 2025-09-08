@@ -218,15 +218,18 @@ const ClothingSelector = () => {
         {/* Левая часть: изображение товара */}
         <div className="clothing-block">
           <div className="image-wrapper">
-            {previewItem ? (
-              <img
-                src={buildImgSrc(previewItem?.imageUrl)}
-                alt={selectedClothing}
-                className="clotheImage"
-              />
-            ) : (
-              <img src="placeholder.png" alt="Выберите одежду" className="clotheImage" />
-            )}
+            <div className="image-frame">
+              {previewItem ? (
+                <img
+                  src={buildImgSrc(previewItem?.imageUrl)}
+                  alt={selectedClothing}
+                  className="clotheImage"
+                  loading="lazy"
+                />
+              ) : (
+                <img src="placeholder.png" alt="Выберите одежду" className="clotheImage" />
+              )}
+            </div>
           </div>
         </div>
 
