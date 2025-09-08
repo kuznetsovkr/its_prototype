@@ -1,4 +1,3 @@
-// src/pages/PaymentSuccess.jsx
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
@@ -55,7 +54,16 @@ export default function PaymentSuccess() {
       try {
         const { data } = await api.get(`/orders/${orderId}`);
         if (data.paymentStatus === 'paid') {
-          // Поведение оставляем прежним: сразу уходим на Thank You
+          // Если оплата подтверждена, но финализации (status !== "Оплачено") ещё нет — дергаем /confirm как фолбэк
+          if (data.status !== 'Оплачено') {
+            try {
+              await api.post(`/orders/confirm/${orderId}`, { provider: 'fallback' });
+            } catch (_) {
+              /* проглотим — ещё попробуем в следующий тик */
+            }
+            return; // дождёмся следующего тика и снова проверим
+          }
+          // Финализировано — уходим на Thank You
           navigate('/thank-you', { state: { orderNumber: orderId } });
           return;
         } else if (!finalizedRef.current && tries % 5 === 0) {
