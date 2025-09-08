@@ -1,0 +1,124 @@
+.thx {
+  /* цвета/шрифты проекта */
+  --brand: #440a18;
+  --text: #121319;
+  --muted: #6b6b6b;
+  --border: #ececec;
+
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: #fff;
+}
+
+.thx__card {
+  width: 100%;
+  max-width: 720px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+  animation: thx-fade-in .6s ease both;
+
+  @media (min-width: 768px) {
+    padding: 48px 56px;
+    border-radius: 20px;
+  }
+}
+
+/* Иконка-галочка */
+.thx__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  color: var(--brand);
+}
+.thx__icon-svg {
+  width: 72px;
+  height: 72px;
+
+  /* фон-кружок и галочка */
+  & path:first-child { fill: currentColor; opacity: .08; }
+  & path:last-child  { stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+
+  @media (min-width: 768px) {
+    width: 88px;
+    height: 88px;
+  }
+}
+
+/* Заголовок */
+.thx__title {
+  font-family: 'RightGrotesk', sans-serif;
+  font-weight: 500;
+  color: var(--brand);
+  font-size: clamp(28px, 5vw, 42px);
+  line-height: 1.1;
+  margin: 8px 0 10px;
+}
+
+/* Обычный текст */
+.thx__text,
+.thx__hint {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 400;
+  color: var(--text);
+  font-size: clamp(16px, 2.6vw, 20px);
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+
+/* Номер заказа */
+.thx__order {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 400;
+  color: var(--text);
+  font-size: clamp(16px, 2.6vw, 20px);
+  line-height: 1.5;
+
+  display: inline-flex;
+  gap: 8px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+}
+.thx__order-label { color: var(--muted); }
+.thx__order-number { font-weight: 600; letter-spacing: .3px; }
+
+/* Кнопка-ссылка */
+.thx__actions { margin-top: 8px; }
+
+.thx__link {
+  display: inline-block;
+  padding: 12px 20px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+
+  background: var(--brand);
+  color: #fff;
+  border: 1px solid var(--brand);
+  transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
+
+  &:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(68,10,24,.2); }
+  &:active { transform: translateY(0); box-shadow: none; }
+  &:focus-visible { outline: 3px solid rgba(68,10,24,.35); outline-offset: 2px; }
+}
+
+/* Анимация */
+@keyframes thx-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Уважение к reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .thx__card { animation: none; }
+}

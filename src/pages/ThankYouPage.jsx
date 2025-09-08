@@ -1,20 +1,38 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
+import '../assets/styles/pages/_thx.scss';
 
 const ThankYouPage = () => {
-    const location = useLocation();
-    const { orderNumber } = location.state || {};
+  const location = useLocation();
+  const { orderNumber } = location.state || {};
 
-    return (
-        <div style={{ textAlign: 'center', marginTop: '50px' }}>
-            <h1>Спасибо за заказ!</h1>
-            <p>Данные вашего заказа:</p>
-            <p><strong>Номер заказа:</strong> {orderNumber}</p>
-            <Link to="/profile" style={{ color: '#007bff', textDecoration: 'none' }}>
-                Отследить в личном кабинете
-            </Link>
+  return (
+    <main className="thx" role="main">
+      <section className="thx__card" aria-labelledby="thx-title">
+        <div className="thx__icon" aria-hidden="true">
+          <svg className="thx__icon-svg" viewBox="0 0 24 24">
+            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+            <path d="M16.5 8.5l-5.5 7-3-3" />
+          </svg>
         </div>
-    );
+
+        <h1 id="thx-title" className="thx__title">Спасибо за заказ!</h1>
+
+        <p className="thx__text">Данные вашего заказа:</p>
+
+        {orderNumber ? (
+          <p className="thx__order">
+            <span className="thx__order-label">Номер заказа:</span>
+            <span className="thx__order-number">{orderNumber}</span>
+          </p>
+        ) : (
+          <p className="thx__hint">Номер заказа появится в личном кабинете.</p>
+        )}
+
+
+      </section>
+    </main>
+  );
 };
 
 export default ThankYouPage;
