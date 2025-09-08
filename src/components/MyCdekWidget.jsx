@@ -29,7 +29,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect }) => {
         goods: [{ width:10, height:10, length:10, weight:10 }],
         // можно строкой: defaultLocation: 'Красноярск',
         defaultLocation: DEFAULT_CENTER, // ВАЖНО: [lng, lat]
-        fixBounds: 'locality',           // держим в рамках города
+        fixBounds: 'country',           // держим в рамках страны, простите казахи
         lang: 'rus',
         currency: 'RUB',
         tariffs: { office:[234,136,138], door:[233,137,139] },
