@@ -29,49 +29,53 @@ const ProfilePage = () => {
     !!localStorage.getItem("token")
   );
 
+  // === Загрузка заказов (axios) ===
   const fetchOrders = async () => {
     const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!token) { setOrders([]); return; }
 
     try {
       const path = role === 'admin' ? '/orders/all' : '/orders/user';
 
-      const { response } = await api.get(path, {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await api.get(path, {
+        headers: { Authorization: `Bearer ${token}` }, // убери, если есть интерсептор
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setOrders(data || []);
-      }
+      // Сервер может вернуть либо массив, либо объект { orders: [...] }
+      const payload = res.data;
+      const list = Array.isArray(payload) ? payload : (payload?.orders ?? []);
+      setOrders(list);
     } catch (error) {
-      console.error("Ошибка получения заказов:", error);
+      const msg = error.response?.data?.message || error.message;
+      console.error("Ошибка получения заказов:", msg);
+      setOrders([]); // безопасно обнулим, чтобы не падал рендер
     }
   };
 
   useEffect(() => {
     setRole(localStorage.getItem("role") || "user");
 
+    // === Загрузка данных пользователя (axios) ===
     const fetchUserData = async () => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
       try {
-        const { data: response } = await api.get('/user/me', {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await api.get('/user/me', {
+          headers: { Authorization: `Bearer ${token}` }, // убери, если есть интерсептор
         });
-        if (response.ok) {
-          const data = await response.json();
-          setUserData({
-            firstName: data.firstName || "",
-            lastName: data.lastName || "",
-            middleName: data.middleName || "",
-            birthDate: data.birthDate || "",
-            phone: data.phone || "",
-          });
-        }
+
+        const u = res.data || {};
+        setUserData({
+          firstName: u.firstName || "",
+          lastName:  u.lastName  || "",
+          middleName:u.middleName|| "",
+          birthDate: u.birthDate || "",
+          phone:     u.phone     || "",
+        });
       } catch (error) {
-        console.error("Ошибка получения данных пользователя:", error);
+        const msg = error.response?.data?.message || error.message;
+        console.error("Ошибка получения данных пользователя:", msg);
       }
     };
 
