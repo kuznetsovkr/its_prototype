@@ -64,6 +64,10 @@ const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
         try {
             const response = await api.post('/auth/request-sms', { phone: cleanNumber });
             console.log("✅ Ответ сервера:", response.data);
+            const debugCode = response.data?.debugCode;
+            if (debugCode) {
+                alert(`Тестовый СМС-код: ${debugCode}`);
+            }
 
             if (response.data.message === "Введите пароль") {
                 // ✅ Это админ, запрашиваем пароль вместо кода

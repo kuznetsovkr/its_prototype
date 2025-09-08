@@ -4,28 +4,22 @@ import MyCdekWidget from "../components/MyCdekWidget";
 import { AddressSuggestions } from 'react-dadata';
 import api from '../api';
 
-/**
- * Ключевые изменения против вашей версии:
- * 1) Перед оплатой создаём заказ на бэке (status=pending) -> получаем orderId
- * 2) Окно оплаты (пока фейк) открываем после успешного создания заказа
- * 3) На сообщение об успешной оплате временно дергаем POST /orders/:id/confirm
- * 4) Переходим на страницу "спасибо" только после confirm (или параллельно, но confirm всё равно уедет на бэк)
- * 5) Проверяем origin у postMessage, не даём двойных кликов
- */
+// ====== ХЕЛПЕРЫ ДЛЯ ТЕЛЕФОНА ======
+const cleanPhone = (v) => (v || '').replace(/\D/g, ''); // только цифры
+const isRu11 = (digits) => digits.length === 11 && digits.startsWith('7');
 
-
-async function postJSON(url, body, token) {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
-    },
-    body: JSON.stringify(body)
-  });
-  if (!res.ok) throw new Error(`Request failed ${res.status}`);
-  return res.json();
-}
+// Маска +7 (___) ___-__-__
+const formatPhoneNumber = (value) => {
+  let numbers = cleanPhone(value);
+  if (!numbers.startsWith('7')) numbers = '7' + numbers; // принудительно 7 в начале
+  return (
+    '+7 ' +
+    (numbers[1] ? `(${numbers.slice(1, 4)}` : '') +
+    (numbers[4] ? `) ${numbers.slice(4, 7)}` : '') +
+    (numbers[7] ? `-${numbers.slice(7, 9)}` : '') +
+    (numbers[9] ? `-${numbers.slice(9, 11)}` : '')
+  );
+};
 
 const RecipientDetails = () => {
   const location = useLocation();
@@ -33,40 +27,223 @@ const RecipientDetails = () => {
   const { selectedType, customText, uploadedImage, comment, productType, color, size } = location.state || {};
 
   const [userData, setUserData] = useState({ firstName: "", lastName: "", middleName: "", phone: "" });
+
+  // Телефон/аутентификация
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState(!!localStorage.getItem("token"));
+  const [phoneFromProfile, setPhoneFromProfile] = useState(false);   // телефон подтянулся из профиля
+  const [phoneLocked, setPhoneLocked] = useState(false);             // поле зафиксировано (нельзя редачить)
+  const [phoneVerified, setPhoneVerified] = useState(false);         // подтверждён (✓) или считается валидным, если из профиля и не редактируется
+  const [phoneEditedSinceProfile, setPhoneEditedSinceProfile] = useState(false); // меняли после «изменить»
+
+  // Шаги подтверждения
+  const [smsRequested, setSmsRequested] = useState(false);
+  const [smsStep, setSmsStep] = useState(0); // 0 - ничего, 1 - ввод кода, 2 - ввод пароля админа
+  const [smsCode, setSmsCode] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
+  const [resendTimer, setResendTimer] = useState(0); // сек до повторной отправки
+  const [authError, setAuthError] = useState("");
+
+  // Оплата / заказы
   const [pickupPoint, setPickupPoint] = useState(""); // address.name
   const [deliveryPrice, setDeliveryPrice] = useState(null); // rate.delivery_sum
   const [manualAddress, setManualAddress] = useState(null);
-
-  const mockEmbroideryPrice = 1200;
-  const totalPrice = useMemo(() => mockEmbroideryPrice + (deliveryPrice || 0), [deliveryPrice]);
-
-  const [isUserAuthenticated, setIsUserAuthenticated] = useState(!!localStorage.getItem("token"));
   const [isPaying, setIsPaying] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const [error, setError] = useState("");
 
+  // Цены
+  const mockEmbroideryPrice = 1200;
+  const totalPrice = useMemo(() => mockEmbroideryPrice + (deliveryPrice || 0), [deliveryPrice]);
+
+  // Dadata
+  const [isNoCdek, setIsNoCdek] = useState(false);
+  const dadataToken = "0821b30c8abbf80ea31555ae120fed168b30b8dc"; // ваш токен
+
+  // Подтягиваем профиль
   useEffect(() => {
     const fetchUserData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+      if (!isUserAuthenticated) return;
       try {
-        const { data } = await api.get('/user/me'); // axios
+        const { data } = await api.get('/user/me');
+        const maskedPhone = data?.phone ? formatPhoneNumber(String(data.phone)) : "";
         setUserData({
           firstName: data?.firstName ?? "",
           lastName: data?.lastName ?? "",
           middleName: data?.middleName ?? "",
-          phone: data?.phone ?? "",
+          phone: maskedPhone,
         });
+
+        const hasProfilePhone = Boolean(data?.phone);
+        setPhoneFromProfile(hasProfilePhone);
+        setPhoneLocked(hasProfilePhone);
+        setPhoneVerified(hasProfilePhone); // авторизован и телефон пришёл — считаем ок, пока не изменён
+        setPhoneEditedSinceProfile(false);
       } catch (e) {
         console.error("Ошибка получения данных пользователя:", e);
       }
     };
-    if (isUserAuthenticated) fetchUserData();
+    fetchUserData();
   }, [isUserAuthenticated]);
 
-  // Создание черновика заказа на бэке до оплаты
+  // Маска/валидация для полей
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    // Маска только для телефона
+    if (name === 'phone') {
+      const masked = formatPhoneNumber(value);
+      setUserData((prev) => ({ ...prev, phone: masked }));
+      setAuthError("");
+      if (phoneFromProfile) {
+        setPhoneEditedSinceProfile(true);
+        setPhoneVerified(false); // при редактировании подтверждение слетает
+      }
+      return;
+    }
+
+    setUserData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const isUserDataFilled =
+    userData.lastName.trim() !== "" &&
+    userData.firstName.trim() !== "" &&
+    userData.middleName.trim() !== "" &&
+    userData.phone.trim() !== "";
+
+  const isDeliveryAddressFilled = !!pickupPoint || !!manualAddress?.value;
+
+  // Телефон ок для оплаты, если подтверждён ИЛИ (пришёл из профиля, поле заблокировано и не редактировалось)
+  const isPhoneOk = phoneVerified || (phoneFromProfile && phoneLocked && !phoneEditedSinceProfile);
+  const isFormValid = isUserDataFilled && isDeliveryAddressFilled && isPhoneOk;
+
+  const getMissingFieldsMessage = () => {
+    const missing = [];
+    if (!userData.lastName.trim()) missing.push("фамилию");
+    if (!userData.firstName.trim()) missing.push("имя");
+    if (!userData.middleName.trim()) missing.push("отчество");
+    if (!userData.phone.trim()) missing.push("телефон");
+    if (!pickupPoint && !manualAddress?.value) missing.push("адрес");
+    if (!isPhoneOk) missing.push("подтвердите телефон");
+    if (missing.length === 0) return "";
+    const last = missing.pop();
+    const list = missing.length ? `${missing.join(', ')} и ${last}` : last;
+    return `Пожалуйста, заполните ${list}`;
+  };
+
+  // ====== SMS: запрос/повтор/подтверждение ======
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+    const id = setTimeout(() => setResendTimer((s) => s - 1), 1000);
+    return () => clearTimeout(id);
+  }, [resendTimer]);
+
+  const validatePhoneMasked = () => {
+    const digits = cleanPhone(userData.phone);
+    if (!isRu11(digits)) {
+      setAuthError("Введите корректный номер телефона.");
+      return null;
+    }
+    return digits;
+  };
+
+  const requestSms = async () => {
+    setAuthError("");
+    const digits = validatePhoneMasked();
+    if (!digits) return;
+
+    try {
+      const response = await api.post('/auth/request-sms', { phone: digits });
+      // Если бэкенд просит пароль — это админ
+      if (response.data?.message === "Введите пароль") {
+        setSmsStep(2);
+      } else {
+        setSmsStep(1);
+      }
+      setSmsRequested(true);
+      setResendTimer(60);
+      const debugCode = response.data?.debugCode;
+      if (debugCode) {
+        alert(`Тестовый СМС-код: ${debugCode}`);
+      }
+    } catch (err) {
+      console.error("Ошибка при запросе SMS:", err);
+      setAuthError("Ошибка при отправке SMS, попробуйте снова.");
+    }
+  };
+
+  const resendSms = async () => {
+    if (resendTimer > 0) return;
+    await requestSms();
+  };
+
+  const confirmSmsCode = async () => {
+    setAuthError("");
+    const digits = validatePhoneMasked();
+    if (!digits) return;
+    if (!smsCode || smsCode.length < 4) {
+      setAuthError("Введите корректный код из SMS.");
+      return;
+    }
+    try {
+      const response = await api.post('/auth/login', { phone: digits, smsCode });
+      const token = response.data?.token;
+      if (token) {
+        localStorage.setItem("token", token);
+        setIsUserAuthenticated(true);
+      }
+      setPhoneVerified(true);
+      setPhoneLocked(true);
+      setSmsRequested(false);
+      setSmsStep(0);
+      setSmsCode("");
+      setAdminPassword("");
+      setPhoneEditedSinceProfile(false);
+    } catch (err) {
+      console.error("Ошибка при авторизации:", err);
+      setAuthError("Неверный код, попробуйте снова.");
+    }
+  };
+
+  const confirmAdminPassword = async () => {
+    setAuthError("");
+    const digits = validatePhoneMasked();
+    if (!digits) return;
+    if (!adminPassword) {
+      setAuthError("Введите пароль.");
+      return;
+    }
+    try {
+      const response = await api.post('/auth/admin-login', { phone: digits, password: adminPassword });
+      const token = response.data?.token;
+      if (token) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("role", "admin");
+        setIsUserAuthenticated(true);
+      }
+      setPhoneVerified(true);
+      setPhoneLocked(true);
+      setSmsRequested(false);
+      setSmsStep(0);
+      setSmsCode("");
+      setAdminPassword("");
+      setPhoneEditedSinceProfile(false);
+    } catch (err) {
+      console.error("Ошибка при входе админа:", err);
+      setAuthError("Неверный пароль.");
+    }
+  };
+
+  const onClickEditPhone = () => {
+    setPhoneLocked(false);
+    setPhoneVerified(false);
+    setPhoneEditedSinceProfile(true);
+    setSmsRequested(false);
+    setSmsStep(0);
+    setAuthError("");
+  };
+
+  // ====== Создание черновика заказа и оплата ======
   async function createDraftOrder() {
-    const token = localStorage.getItem("token");
     const fd = new FormData();
 
     // Данные пользователя
@@ -100,69 +277,51 @@ const RecipientDetails = () => {
     });
 
     try {
-      const { data } = await api.post('/orders/create', fd); // FormData — заголовок проставится сам
+      const { data } = await api.post('/orders/create', fd);
       setOrderId(data.orderId);
       return data; // { orderId, ... }
     } catch (err) {
-      // В интерсепторе мы уже формируем понятное сообщение
       throw new Error(err.message || 'Create failed');
     }
   }
 
-  // Открыть фейковую оплату
+  // Открыть оплату
   async function handlePayment() {
     if (isPaying) return;
     setError(''); setIsPaying(true);
     try {
       const { orderId: oid } = await createDraftOrder();
-
-      // запрашиваем ссылку на оплату у бэка
       const { data } = await api.post('/payments/paykeeper/link', { orderId: oid });
-
-      // сохраним orderId чтобы после редиректа знать, кого ждать
       sessionStorage.setItem('pay_order_id', String(oid));
-
-      // редиректим на платёжную страницу PayKeeper
-      window.location.href = data.pay_url; // можно window.open(data.pay_url, '_blank')
+      window.location.href = data.pay_url;
     } catch (e) {
       setError(e.message || 'Ошибка при создании ссылки на оплату');
       setIsPaying(false);
     }
   }
 
-
-  // Обработка сообщения об успешной оплате из фейкового окна
-  // Обработка сообщения об успешной оплате из фейкового окна
+  // Сообщение об успешной оплате
   useEffect(() => {
     let confirming = false;
-
     const onMessage = async (event) => {
-      // Безопасность: принимаем только от своего origin
       if (event.origin !== window.location.origin) return;
 
       const ok =
         event.data === "payment_success" ||
-        (event.data &&
-          event.data.type === "payment_status" &&
-          event.data.status === "success");
-
+        (event.data && event.data.type === "payment_status" && event.data.status === "success");
       if (!ok) return;
 
-      console.log("[PAYMENT OK] event:", event.data, "orderId:", orderId);
-
       if (!orderId) {
-        console.warn("[PAYMENT OK] но orderId ещё не создан");
         setError("Не удалось определить номер заказа. Попробуйте ещё раз.");
         setIsPaying(false);
         return;
       }
 
-      if (confirming) return; // защита от дубля
+      if (confirming) return;
       confirming = true;
 
       try {
-        await api.post(`/orders/confirm/${encodeURIComponent(orderId)}`, {}); // тело {} как в исходнике
-        // ✅ всё ок — уходим на спасибо
+        await api.post(`/orders/confirm/${encodeURIComponent(orderId)}`, {});
         navigate('/thank-you', { state: { orderNumber: orderId } });
       } catch (err) {
         const status = err.response?.status;
@@ -173,37 +332,9 @@ const RecipientDetails = () => {
         setIsPaying(false);
       }
     };
-
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
   }, [orderId, navigate]);
-
-
-  // Форма и валидации
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUserData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const [isNoCdek, setIsNoCdek] = useState(false);
-  const dadataToken = "0821b30c8abbf80ea31555ae120fed168b30b8dc"; // замените на свой
-
-  const isUserDataFilled = Object.values(userData).every((val) => String(val).trim() !== "");
-  const isDeliveryAddressFilled = !!pickupPoint || !!manualAddress?.value;
-  const isFormValid = isUserDataFilled && isDeliveryAddressFilled;
-
-  const getMissingFieldsMessage = () => {
-    const missing = [];
-    if (!userData.lastName.trim()) missing.push("фамилию");
-    if (!userData.firstName.trim()) missing.push("имя");
-    if (!userData.middleName.trim()) missing.push("отчество");
-    if (!userData.phone.trim()) missing.push("телефон");
-    if (!pickupPoint && !manualAddress?.value) missing.push("адрес");
-    if (missing.length === 0) return "";
-    const last = missing.pop();
-    const list = missing.length ? `${missing.join(', ')} и ${last}` : last;
-    return `Пожалуйста, заполните ${list}`;
-  };
 
   return (
     <div className="containerDetails">
@@ -216,8 +347,86 @@ const RecipientDetails = () => {
               <input type="text" name="firstName" placeholder="Имя" value={userData.firstName} onChange={handleInputChange} />
               <input type="text" name="middleName" placeholder="Отчество" value={userData.middleName} onChange={handleInputChange} />
             </div>
-            <div>
-              <input type="tel" name="phone" placeholder="Номер телефона" value={userData.phone} onChange={handleInputChange} />
+            <div className="PhoneContainer">
+              <div className="PhoneBlock">
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="+7 (___) ___-__-__"
+                  value={userData.phone}
+                  onChange={handleInputChange}
+                  disabled={phoneLocked || isPaying}
+                  maxLength={18}
+                />
+
+                {phoneFromProfile && phoneLocked && (
+                  <button
+                    type="button"
+                    className="link-like"
+                    onClick={onClickEditPhone}
+                  >
+                    изменить
+                  </button>
+                )}
+              </div>
+
+              {(!phoneLocked || !phoneFromProfile) && (
+                <div>
+                  {!smsRequested ? (
+                    <button
+                      type="button"
+                      className="link-like"
+                      onClick={requestSms}
+                    >
+                      подтвердить номер телефона
+                    </button>
+                  ) : (
+                    <>
+                      {smsStep === 1 && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="Код из SMS"
+                            value={smsCode}
+                            onChange={(e) => setSmsCode(e.target.value)}
+                            maxLength={6}
+                            style={{ width: 140 }}
+                          />
+                          <button type="button" onClick={confirmSmsCode} className="btn-confirm">подтвердить</button>
+                          <button
+                            type="button"
+                            onClick={resendSms}
+                            disabled={resendTimer > 0}
+                            className="link-like"
+                            style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: resendTimer > 0 ? 'not-allowed' : 'pointer' }}
+                          >
+                            {resendTimer > 0 ? `повторно отправить (${resendTimer}с)` : 'повторно отправить код'}
+                          </button>
+                        </div>
+                      )}
+
+                      {smsStep === 2 && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
+                          <input
+                            type="password"
+                            placeholder="Пароль администратора"
+                            value={adminPassword}
+                            onChange={(e) => setAdminPassword(e.target.value)}
+                            style={{ width: 200 }}
+                          />
+                          <button type="button" onClick={confirmAdminPassword} className="btn-confirm">подтвердить</button>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {!!authError && (
+                    <div style={{ color: 'crimson', marginTop: 6, fontSize: 13 }}>{authError}</div>
+                  )}
+                </div>
+              )}
+
             </div>
           </div>
         </div>
