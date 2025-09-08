@@ -1,47 +1,112 @@
-.works {
-  --gap: 0;         /* убираем зазоры между колонками */
-  --radius: 16px;
+$xs: 480px;
+$sm: 640px;
+$md: 768px;
+$lg: 1024px;
+$xl: 1280px;
 
-  &__grid {
-    column-count: 4;
-    column-gap: var(--gap);
+$border: #fff;
 
-    @media (max-width: 1280px) { column-count: 3; }
-    @media (max-width: 920px)  { column-count: 2; }
-    @media (max-width: 560px)  { column-count: 1; }
-  }
+.works-gallery {
+  padding: 16px 0;
+  background: transparent; // общий фон “прозрачный, белый” → оставляем прозрачным
+  // при необходимости можно поставить #fff
 
-  &__item {
-    display: inline-block;
-    width: 100%;
-    margin: 0;                     /* убрали нижний отступ */
-    border: 1px solid #fff;        /* только бордеры */
-    border-radius: var(--radius);
-    background: #e9eaee;
-    background-clip: padding-box;  /* чтобы фон не “залезал” под бордер */
-    position: relative;
-    overflow: hidden;
-    break-inside: avoid;
-    aspect-ratio: var(--ar, 4/3);
-
-    &::after {
-      content: "";
-      position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(255,255,255,0.4), rgba(0,0,0,0.04));
-      pointer-events: none;
+  .wg-controls {
+    margin: 0 16px 12px;
+    .wg-select {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      span { color: #111; font-size: 14px; }
+      select {
+        appearance: none;
+        background: #fff;
+        color: #111;
+        border: 1px solid #e5e5e5;
+        border-radius: 10px;
+        padding: 8px 12px;
+      }
     }
   }
-}
-.works--hairline {
-  & .works__grid {
-    column-gap: 1px;    /* горизонтальные 1px */
-    background: #fff;   /* цвет разделителей */
+
+  // базовая плитка
+  .wg-item {
+    background: #d9d9d9;          // серые заглушки
+    border: 1px solid $border;     // белые линии 1px
+    border-radius: 20px;           // радиус 20px
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .ph {
+      font: 600 14px/1 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: rgba(0,0,0,.5);
+      user-select: none;
+    }
+
+    // для реальных изображений:
+    // img { width: 100%; height: 100%; object-fit: cover; display: block; }
   }
-  & .works__item {
-    margin: 0 0 1px;    /* вертикальные 1px */
-    border: 0;          /* бордеры не нужны, линии рисует фон контейнера */
-    border-radius: 16px;
-    background: #e9eaee;
-    background-clip: padding-box;
+
+  // ===== 1) Квадратная сетка ≈ 20% ширины (5 колонок), без зазоров =====
+  .grid-basic {
+    --cols: 5;                    // JS выставляет фактическое число колонок
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    gap: 0;                       // расстояние отсутствует
+
+    .square { aspect-ratio: 1 / 1; }
+  }
+
+  // ===== 2) Ряды квадратов / крупные 2×2 =====
+  .grid-rowspan {
+    --cols: 5;
+    --cell: 160px;                // JS перезапишет точным значением
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    grid-auto-rows: var(--cell);  // высота строки = ширине колонки (из JS)
+    grid-auto-flow: dense;
+    gap: 0;
+
+    .wg-item { height: var(--cell); } // квадрат 1×1
+    .big {
+      grid-column: span 2;
+      grid-row: span 2;           // крупная 2×2
+      height: calc(var(--cell) * 2);
+    }
+  }
+
+  // ===== 3) Masonry (Pinterest) — крупнее колонки, разные высоты =====
+  .wg-masonry {
+    --cols: 4;                    // JS перезапишет
+    column-count: var(--cols);
+    column-gap: 0;                // без расстояния
+
+    .wg-masonry-item {
+      break-inside: avoid;
+      margin: 0 0 0;              // без нижнего промежутка
+      .wg-item {
+        width: 100%;
+        // высоту задаём инлайном из JSX (220–500px)
+        border-radius: 20px;
+      }
+    }
+  }
+
+  // ===== 4) Метро-мозаика — крупнее клетки =====
+  .grid-metro {
+    --cols: 4;
+    --cell: 180px;                // JS перезапишет, без зазоров крупно
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    grid-auto-rows: var(--cell);
+    grid-auto-flow: dense;
+    gap: 0;
+
+    .w2 { grid-column: span 2; }
+    .h2 { grid-row: span 2; }
+
+    .w2.h2 { /* крупный квад на 2×2 */ }
   }
 }
