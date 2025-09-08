@@ -330,9 +330,9 @@
   .mapBox {
     position: relative;
     width: 100%;
-    border: 2px solid #440a18;
     border-radius: 20px;
     overflow: hidden;
+    min-height: 420px;
 
     // Соотношение сторон по умолчанию (16:9)
     &::before {
