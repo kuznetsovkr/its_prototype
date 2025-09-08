@@ -15,12 +15,13 @@
 .modal-content {
   display: flex;
   flex-direction: column;
+  gap:10px;
   justify-content: space-between;
   background: #fff;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
-  height: 200px;
+  min-height: 200px;
   width: 90%;
   max-width: 500px;
   text-align: center;
