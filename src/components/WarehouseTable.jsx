@@ -22,8 +22,6 @@ const WarehouseTable = ({
   const arrow = sortDir === "asc" ? "▲" : "▼";
   const typeNameById = (id) =>
     clothingTypes?.find((t) => String(t.id) === String(id))?.name || "";
-  const priceByTypeId = (id) =>
-    clothingTypes?.find((t) => String(t.id) === String(id))?.price;
 
   const startEditing = (row) => {
     const resolvedTypeId =
@@ -84,7 +82,6 @@ const WarehouseTable = ({
               <th>ID</th>
               <th>Фото</th>
               <th>Тип</th>
-              <th>Цена</th>
               <th>Цвет</th>
               <th>Размер</th>
               <th className="th-sort" onClick={onToggleSortQuantity} role="button" tabIndex={0}>
@@ -97,7 +94,7 @@ const WarehouseTable = ({
           <tbody>
             {inventory.length === 0 ? (
               <tr>
-                <td colSpan={8} className="muted">Ничего не найдено по текущим фильтрам</td>
+                <td colSpan={7} className="muted">Ничего не найдено по текущим фильтрам</td>
               </tr>
             ) : (
               inventory.map((row) => {
@@ -108,8 +105,6 @@ const WarehouseTable = ({
                   ? (editData?.colorCode || "")
                   : (row.colorCode || codeByName(row.color) || "");
                 const resolvedTypeName = typeNameById(row.clothingTypeId) || row.clothingTypeName || row.productType;
-                const resolvedPrice = row.price ?? priceByTypeId(row.clothingTypeId);
-                const editingPrice = editData?.clothingTypeId ? priceByTypeId(editData.clothingTypeId) : resolvedPrice;
 
                 return (
                   <tr key={row.id}>
@@ -150,14 +145,6 @@ const WarehouseTable = ({
                         </select>
                       ) : (
                         resolvedTypeName
-                      )}
-                    </td>
-
-                    <td>
-                      {isEditing ? (
-                        editingPrice ?? "-"
-                      ) : (
-                        resolvedPrice ?? "-"
                       )}
                     </td>
                     {/* Цвет */}
