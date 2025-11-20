@@ -466,7 +466,11 @@ const RecipientDetails = () => {
             <div className="mapBox">
               <div id="cdek-map" />
             </div>
-            <MyCdekWidget onAddressSelect={setPickupPoint} onRateSelect={setDeliveryPrice} />
+            <MyCdekWidget
+              productType={productType}
+              onAddressSelect={setPickupPoint}
+              onRateSelect={setDeliveryPrice}
+            />
             <label>
               <input type="checkbox" checked={isNoCdek} onChange={() => setIsNoCdek((p) => !p)} />
               В моём городе нет СДЭКа
