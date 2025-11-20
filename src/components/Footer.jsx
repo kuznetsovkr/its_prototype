@@ -10,7 +10,7 @@ const Footer = () => {
                     <a href="https://vk.com/its.custom" target="_blank" rel="noopener noreferrer">
                         <img src={vkIcon} alt="VK" className="social-icon" />
                     </a>
-                    <a href="https://t.me/alexchudaev123" target="_blank" rel="noopener noreferrer">
+                    <a href="https://t.me/itscstm" target="_blank" rel="noopener noreferrer">
                         <img src={telegramIcon} alt="Telegram" className="social-icon" />
                     </a>
                     <a href="https://www.instagram.com/i.tak_soydet" target="_blank" rel="noopener noreferrer">
