@@ -4,6 +4,7 @@ import MyCdekWidget from "../components/MyCdekWidget";
 import { AddressSuggestions } from 'react-dadata';
 import 'react-dadata/dist/react-dadata.css';
 import api from '../api';
+import { useOrder } from "../context/OrderContext";
 
 // ====== ХЕЛПЕРЫ ДЛЯ ТЕЛЕФОНА ======
 const cleanPhone = (v) => (v || '').replace(/\D/g, ''); // только цифры
@@ -25,9 +26,22 @@ const formatPhoneNumber = (value) => {
 const RecipientDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { selectedType, customText, uploadedImage, comment, productType, color, size } = location.state || {};
+  const { order, setRecipient } = useOrder();
+  const { clothing, embroidery, recipient: recipientState } = order;
+  const locationState = location.state || {};
 
-  const [userData, setUserData] = useState({ firstName: "", lastName: "", middleName: "", phone: "" });
+  const productType = clothing.type || locationState.productType;
+  const color = clothing.color || locationState.color;
+  const size = clothing.size || locationState.size;
+
+  const selectedType = embroidery.type || locationState.selectedType;
+  const customText = embroidery.customText || locationState.customText;
+  const uploadedImage = embroidery.uploadedImage || locationState.uploadedImage || [];
+  const comment = embroidery.comment || locationState.comment;
+
+  const [userData, setUserData] = useState(
+    recipientState.userData || { firstName: "", lastName: "", middleName: "", phone: "" }
+  );
 
   // Телефон/аутентификация
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(!!localStorage.getItem("token"));
@@ -45,9 +59,11 @@ const RecipientDetails = () => {
   const [authError, setAuthError] = useState("");
 
   // Оплата / заказы
-  const [pickupPoint, setPickupPoint] = useState(""); // address.name
-  const [deliveryPrice, setDeliveryPrice] = useState(null); // rate.delivery_sum
-  const [manualAddress, setManualAddress] = useState(null);
+  const [pickupPoint, setPickupPoint] = useState(recipientState.pickupPoint || ""); // address.name
+  const [deliveryPrice, setDeliveryPrice] = useState(
+    recipientState.deliveryPrice ?? null
+  ); // rate.delivery_sum
+  const [manualAddress, setManualAddress] = useState(recipientState.manualAddress || null);
   const [isPaying, setIsPaying] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const [error, setError] = useState("");
@@ -57,15 +73,124 @@ const RecipientDetails = () => {
   const totalPrice = useMemo(() => mockEmbroideryPrice + (deliveryPrice || 0), [deliveryPrice]);
   
   // Dadata
-  const [isNoCdek, setIsNoCdek] = useState(false);
+  const [isNoCdek, setIsNoCdek] = useState(Boolean(recipientState.isNoCdek));
   const dadataToken = "0821b30c8abbf80ea31555ae120fed168b30b8dc"; // ваш токен
 
   const isManualAddressFull = useMemo(() => {
-  if (!manualAddress || !manualAddress.data) return false;
-  const { house, block, flat } = manualAddress.data || {};
-  // считаем, что адрес "до дома", если есть хотя бы дом/корпус/квартира
-  return Boolean(house || block || flat);
-}, [manualAddress]);
+    if (!manualAddress || !manualAddress.data) return false;
+    const { house, block, flat } = manualAddress.data || {};
+    // ???????, ??? ????? "?? ????", ???? ???? ???? ?? ???/??????/????????
+    return Boolean(house || block || flat);
+  }, [manualAddress]);
+
+  const isRecipientSame = useMemo(() => {
+    const stored = {
+      userData: recipientState.userData,
+      pickupPoint: recipientState.pickupPoint,
+      deliveryPrice: recipientState.deliveryPrice ?? null,
+      manualAddressValue: recipientState.manualAddress?.value || "",
+      manualHouse: recipientState.manualAddress?.data?.house || "",
+      manualBlock: recipientState.manualAddress?.data?.block || "",
+      manualFlat: recipientState.manualAddress?.data?.flat || "",
+      isNoCdek: Boolean(recipientState.isNoCdek),
+    };
+    const local = {
+      userData,
+      pickupPoint,
+      deliveryPrice: deliveryPrice ?? null,
+      manualAddressValue: manualAddress?.value || "",
+      manualHouse: manualAddress?.data?.house || "",
+      manualBlock: manualAddress?.data?.block || "",
+      manualFlat: manualAddress?.data?.flat || "",
+      isNoCdek: Boolean(isNoCdek),
+    };
+    const sameUser =
+      (local.userData.firstName || "") === (stored.userData?.firstName || "") &&
+      (local.userData.lastName || "") === (stored.userData?.lastName || "") &&
+      (local.userData.middleName || "") === (stored.userData?.middleName || "") &&
+      (local.userData.phone || "") === (stored.userData?.phone || "");
+    return (
+      sameUser &&
+      local.pickupPoint === stored.pickupPoint &&
+      local.deliveryPrice === stored.deliveryPrice &&
+      local.manualAddressValue === stored.manualAddressValue &&
+      local.manualHouse === stored.manualHouse &&
+      local.manualBlock === stored.manualBlock &&
+      local.manualFlat === stored.manualFlat &&
+      local.isNoCdek === stored.isNoCdek
+    );
+  }, [
+    userData,
+    pickupPoint,
+    deliveryPrice,
+    manualAddress?.value,
+    manualAddress?.data?.house,
+    manualAddress?.data?.block,
+    manualAddress?.data?.flat,
+    isNoCdek,
+    recipientState,
+  ]);
+
+  // persist current form values to shared order state so browser Back keeps them
+  useEffect(() => {
+    if (isRecipientSame) return;
+    setRecipient({
+      userData,
+      pickupPoint,
+      deliveryPrice,
+      manualAddress: manualAddress
+        ? {
+            value: manualAddress.value || "",
+            data: manualAddress.data || {},
+          }
+        : manualAddress,
+      isNoCdek,
+    });
+  }, [
+    userData,
+    pickupPoint,
+    deliveryPrice,
+    manualAddress?.value,
+    manualAddress?.data?.house,
+    manualAddress?.data?.block,
+    manualAddress?.data?.flat,
+    isNoCdek,
+    setRecipient,
+    isRecipientSame,
+  ]);
+
+  useEffect(() => {
+    const hasClothing = Boolean(productType && color && size);
+    const hasEmbroidery = Boolean(selectedType && (uploadedImage?.length || 0) > 0);
+    if (!hasClothing) {
+      navigate("/order", { replace: true });
+    } else if (!hasEmbroidery) {
+      navigate("/embroidery", { replace: true });
+    }
+  }, [productType, color, size, selectedType, uploadedImage?.length, navigate]);
+
+  // reset local inputs only when shared order data changes externally (например, сброс корзины)
+  useEffect(() => {
+    setUserData((prev) => ({
+      ...prev,
+      ...recipientState.userData,
+    }));
+    setPickupPoint(recipientState.pickupPoint || "");
+    setDeliveryPrice(recipientState.deliveryPrice ?? null);
+    setManualAddress(recipientState.manualAddress || null);
+    setIsNoCdek(Boolean(recipientState.isNoCdek));
+  }, [
+    recipientState.userData?.firstName,
+    recipientState.userData?.lastName,
+    recipientState.userData?.middleName,
+    recipientState.userData?.phone,
+    recipientState.pickupPoint,
+    recipientState.deliveryPrice,
+    recipientState.manualAddress?.value,
+    recipientState.isNoCdek,
+  ]);
+
+
 
 
   // Подтягиваем профиль

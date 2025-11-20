@@ -6,6 +6,7 @@ import { buildImgSrc } from '../utils/url';
 import hoodieImg from '../images/hoodie.jpg';
 import switshotImg from '../images/switshot.jpg';
 import tshirtImg from '../images/tshirt.jpg';
+import { useOrder } from "../context/OrderContext";
 
 // helper: обводка для белого цвета
 const isWhite = (c = "") => {
@@ -120,15 +121,17 @@ const detectChartKey = (base) => {
 
 const ClothingSelector = () => {
   const navigate = useNavigate();
+  const { order, setClothing } = useOrder();
+  const { clothing } = order;
 
   const [inventory, setInventory] = useState([]);
-  const [selectedClothing, setSelectedClothing] = useState("");
-  const [selectedInnerType, setSelectedInnerType] = useState("");
-  const [selectedColor, setSelectedColor] = useState("");
-  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedClothing, setSelectedClothing] = useState(clothing.type || "");
+  const [selectedInnerType, setSelectedInnerType] = useState(clothing.innerType || "");
+  const [selectedColor, setSelectedColor] = useState(clothing.color || "");
+  const [selectedSize, setSelectedSize] = useState(clothing.size || "");
   const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
   const [showSizeModal, setShowSizeModal] = useState(false);
-  const [chartKey, setChartKey] = useState(() => detectChartKey(selectedClothing));
+  const [chartKey, setChartKey] = useState(() => detectChartKey(clothing.type));
 
   const activeChart = sizeCharts[chartKey] || sizeCharts[detectChartKey(selectedClothing)] || sizeCharts.default;
 
@@ -208,13 +211,13 @@ const ClothingSelector = () => {
         });
         setInventory(cleaned);
         const firstBase = parseTypeLabel(cleaned?.[0]?.productType)?.base || "";
-        if (firstBase) setSelectedClothing(firstBase);
+        if (!clothing.type && firstBase) setSelectedClothing(firstBase);
       } catch (err) {
         console.error("Error loading inventory:", err);
       }
     };
     fetchInventory();
-  }, []);
+  }, [clothing.type]);
 
   useEffect(() => {
     setChartKey(detectChartKey(selectedClothing));
@@ -243,7 +246,8 @@ const ClothingSelector = () => {
     }
 
     if (availableColorOptions.length > 0) {
-      if (!availableColorOptions.some((o) => o.label === selectedColor)) {
+      const hasSelected = availableColorOptions.some((o) => o.label === selectedColor);
+      if (!hasSelected) {
         setSelectedColor(availableColorOptions[0].label);
         setSelectedSize("");
       }
@@ -251,8 +255,7 @@ const ClothingSelector = () => {
       if (selectedColor) setSelectedColor("");
       if (selectedSize) setSelectedSize("");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedInnerType, needsInner, availableColorOptions]);
+  }, [selectedInnerType, needsInner, availableColorOptions, selectedColor, selectedSize]);
 
   useEffect(() => {
     if (selectedSize && !availableSizes.includes(selectedSize)) {
@@ -260,11 +263,35 @@ const ClothingSelector = () => {
     }
   }, [availableSizes, selectedSize]);
 
+  useEffect(() => {
+    // keep shared order state in sync to survive route changes/back navigation
+    const isSame =
+      (clothing.type || "") === (selectedClothing || "") &&
+      (clothing.innerType || "") === (selectedInnerType || "") &&
+      (clothing.color || "") === (selectedColor || "") &&
+      (clothing.size || "") === (selectedSize || "");
+    if (isSame) return;
+    setClothing({
+      type: selectedClothing,
+      innerType: selectedInnerType,
+      color: selectedColor,
+      size: selectedSize,
+    });
+  }, [
+    selectedClothing,
+    selectedInnerType,
+    selectedColor,
+    selectedSize,
+    setClothing,
+    clothing.type,
+    clothing.innerType,
+    clothing.color,
+    clothing.size,
+  ]);
+
   const handleConfirm = () => {
     if (!canProceed) return;
-    navigate("/embroidery", {
-      state: { selectedClothing, selectedSize, selectedColor, selectedInnerType },
-    });
+    navigate("/embroidery");
   };
 
   const previewItem = useMemo(() => {

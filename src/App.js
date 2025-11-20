@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
@@ -18,6 +18,31 @@ import PageLayout from './components/PageLayout';
 import FakePayment from './pages/FakePayment';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFail from './pages/PaymentFail';
+import { useOrder } from "./context/OrderContext";
+
+const OrderFlowReset = () => {
+    const location = useLocation();
+    const { resetOrder } = useOrder();
+
+    useEffect(() => {
+        const allowed = [
+            "/order",
+            "/embroidery",
+            "/recipient",
+            "/payment",
+            "/fake-payment",
+            "/payment-success",
+            "/payment-fail",
+            "/thank-you"
+        ];
+        const isOrderPath = allowed.some((p) => location.pathname.startsWith(p));
+        if (!isOrderPath) {
+            resetOrder();
+        }
+    }, [location.pathname, resetOrder]);
+
+    return null;
+};
 
 
 
@@ -26,6 +51,7 @@ const App = () => {
         <Router>
             <div className="App">
                 <Header />
+                <OrderFlowReset />
                     <main>
                         <Routes>
                             <Route path="/" element={<HomePage />} />

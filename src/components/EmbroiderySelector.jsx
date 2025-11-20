@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ReactComponent as CheckIcon } from "../images/Vector.svg";
+import { useOrder } from "../context/OrderContext";
 
 // Detect clothing type by name (ru/en)
 const detectClothingKey = (base) => {
@@ -26,19 +27,21 @@ const priceMatrix = {
 const EmbroiderySelector = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { order, setEmbroidery } = useOrder();
+  const { clothing, embroidery } = order;
 
-  const [selectedType, setSelectedType] = useState("Patronus");
-  const [customText, setCustomText] = useState("");
-  const [uploadedImage, setUploadedImage] = useState([]);
-  const [comment, setComment] = useState("");
+  const [selectedType, setSelectedType] = useState(embroidery.type || "Patronus");
+  const [customText, setCustomText] = useState(embroidery.customText || "");
+  const [uploadedImage, setUploadedImage] = useState(embroidery.uploadedImage || []);
+  const [comment, setComment] = useState(embroidery.comment || "");
   const [error, setError] = useState("");
-  const [patronusCount, setPatronusCount] = useState(1);
-  const [petFaceCount, setPetFaceCount] = useState(1);
-  const [customOption, setCustomOption] = useState({ image: false, text: false });
-  const [customTextFont, setCustomTextFont] = useState("Arial");
+  const [patronusCount, setPatronusCount] = useState(embroidery.patronusCount || 1);
+  const [petFaceCount, setPetFaceCount] = useState(embroidery.petFaceCount || 1);
+  const [customOption, setCustomOption] = useState(embroidery.customOption || { image: false, text: false });
+  const [customTextFont, setCustomTextFont] = useState(embroidery.customTextFont || "Arial");
 
-  const { selectedClothing, selectedSize, selectedColor } = location.state || {};
-  const clothingKey = detectClothingKey(selectedClothing);
+  const { selectedClothing } = location.state || {};
+  const clothingKey = detectClothingKey(clothing.type || selectedClothing);
 
   const calcPrice = (type) => {
     const base = priceMatrix[type]?.[clothingKey] ?? 0;
@@ -106,19 +109,7 @@ const EmbroiderySelector = () => {
 
   const handleNext = () => {
     if (!canProceed) return;
-    navigate("/recipient", {
-      state: {
-        selectedType,
-        customText,
-        uploadedImage,
-        comment,
-        productType: selectedClothing,
-        size: selectedSize,
-        color: selectedColor,
-        patronusCount,
-        petFaceCount,
-      },
-    });
+    navigate("/recipient");
   };
 
   const textareaRef = useRef(null);
@@ -130,6 +121,49 @@ const EmbroiderySelector = () => {
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
   }, [comment]);
+
+  useEffect(() => {
+    setEmbroidery({
+      type: selectedType,
+      customText,
+      customTextFont,
+      comment,
+      uploadedImage,
+      patronusCount,
+      petFaceCount,
+      customOption,
+    });
+  }, [
+    selectedType,
+    customText,
+    customTextFont,
+    comment,
+    uploadedImage,
+    patronusCount,
+    petFaceCount,
+    customOption,
+    setEmbroidery,
+  ]);
+
+  useEffect(() => {
+    setSelectedType(embroidery.type || "Patronus");
+    setCustomText(embroidery.customText || "");
+    setUploadedImage(embroidery.uploadedImage || []);
+    setComment(embroidery.comment || "");
+    setPatronusCount(embroidery.patronusCount || 1);
+    setPetFaceCount(embroidery.petFaceCount || 1);
+    setCustomOption(embroidery.customOption || { image: false, text: false });
+    setCustomTextFont(embroidery.customTextFont || "Arial");
+  }, [
+    embroidery.type,
+    embroidery.customText,
+    embroidery.uploadedImage,
+    embroidery.comment,
+    embroidery.patronusCount,
+    embroidery.petFaceCount,
+    embroidery.customOption,
+    embroidery.customTextFont,
+  ]);
 
   useEffect(() => {
     // reset counters when switching type to avoid stale extra price
