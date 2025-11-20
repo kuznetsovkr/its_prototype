@@ -31,6 +31,7 @@ const initialState = {
     uploadedImage: [],
     patronusCount: 1,
     petFaceCount: 1,
+    price: 0,
     customOption: {
       image: false,
       text: false,

@@ -38,6 +38,7 @@ const RecipientDetails = () => {
   const customText = embroidery.customText || locationState.customText;
   const uploadedImage = embroidery.uploadedImage || locationState.uploadedImage || [];
   const comment = embroidery.comment || locationState.comment;
+  const embroideryPrice = embroidery.price ?? locationState.embroideryPrice ?? 0;
 
   const [userData, setUserData] = useState(
     recipientState.userData || { firstName: "", lastName: "", middleName: "", phone: "" }
@@ -68,9 +69,10 @@ const RecipientDetails = () => {
   const [orderId, setOrderId] = useState(null);
   const [error, setError] = useState("");
 
-  // Цены
-  const mockEmbroideryPrice = 1200;
-  const totalPrice = useMemo(() => mockEmbroideryPrice + (deliveryPrice || 0), [deliveryPrice]);
+  const totalPrice = useMemo(
+    () => (embroideryPrice || 0) + (deliveryPrice || 0),
+    [embroideryPrice, deliveryPrice]
+  );
   
   // Dadata
   const [isNoCdek, setIsNoCdek] = useState(Boolean(recipientState.isNoCdek));
@@ -630,7 +632,7 @@ const RecipientDetails = () => {
         <div className="deliveryCost">
           <p className="title">РАСЧЁТ СТОИМОСТИ</p>
           <div className="aboutPrice">
-            <div className="aboutPrice_calculate"><p>Вышивка:</p> {`${mockEmbroideryPrice} ₽`}</div>
+            <div className="aboutPrice_calculate"><p>Вышивка:</p> {`${embroideryPrice || 0} ₽`}</div>
             <div className="aboutPrice_calculate"><p>Доставка:</p> {`${deliveryPrice || 0} ₽`}</div>
             <div className="summaryCost"><p>ИТОГО:</p> {`${totalPrice} ₽`}</div>
           </div>

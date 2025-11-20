@@ -29,6 +29,7 @@ const EmbroiderySelector = () => {
   const location = useLocation();
   const { order, setEmbroidery } = useOrder();
   const { clothing, embroidery } = order;
+  const prevTypeRef = useRef(null);
 
   const [selectedType, setSelectedType] = useState(embroidery.type || "Patronus");
   const [customText, setCustomText] = useState(embroidery.customText || "");
@@ -109,7 +110,7 @@ const EmbroiderySelector = () => {
 
   const handleNext = () => {
     if (!canProceed) return;
-    navigate("/recipient");
+    navigate("/recipient", { state: { embroideryPrice: calcPrice(selectedType) } });
   };
 
   const textareaRef = useRef(null);
@@ -123,6 +124,7 @@ const EmbroiderySelector = () => {
   }, [comment]);
 
   useEffect(() => {
+    const price = calcPrice(selectedType);
     setEmbroidery({
       type: selectedType,
       customText,
@@ -132,6 +134,7 @@ const EmbroiderySelector = () => {
       patronusCount,
       petFaceCount,
       customOption,
+      price,
     });
   }, [
     selectedType,
@@ -142,6 +145,7 @@ const EmbroiderySelector = () => {
     patronusCount,
     petFaceCount,
     customOption,
+    clothingKey,
     setEmbroidery,
   ]);
 
@@ -166,14 +170,17 @@ const EmbroiderySelector = () => {
   ]);
 
   useEffect(() => {
-    // reset counters when switching type to avoid stale extra price
-    setPatronusCount(1);
-    setPetFaceCount(1);
-    if (selectedType !== "custom") {
-      setCustomOption({ image: false, text: false });
-      setCustomText("");
-      setCustomTextFont("Arial");
+    // reset counters only after the initial render when user actually switches type
+    if (prevTypeRef.current && prevTypeRef.current !== selectedType) {
+      setPatronusCount(1);
+      setPetFaceCount(1);
+      if (selectedType !== "custom") {
+        setCustomOption({ image: false, text: false });
+        setCustomText("");
+        setCustomTextFont("Arial");
+      }
     }
+    prevTypeRef.current = selectedType;
   }, [selectedType]);
 
   const handleSelectType = (type) => {
