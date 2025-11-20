@@ -6,6 +6,13 @@ import 'react-dadata/dist/react-dadata.css';
 import api from '../api';
 import { useOrder } from "../context/OrderContext";
 
+const EMBROIDERY_TYPE_RU = {
+  Patronus: "Патронус",
+  Car: "Автомобиль",
+  petFace: "Мордочка питомца",
+  custom: "Своя вышивка",
+};
+
 // ====== ХЕЛПЕРЫ ДЛЯ ТЕЛЕФОНА ======
 const cleanPhone = (v) => (v || '').replace(/\D/g, ''); // только цифры
 const isRu11 = (digits) => digits.length === 11 && digits.startsWith('7');
@@ -39,6 +46,9 @@ const RecipientDetails = () => {
   const uploadedImage = embroidery.uploadedImage || locationState.uploadedImage || [];
   const comment = embroidery.comment || locationState.comment;
   const embroideryPrice = embroidery.price ?? locationState.embroideryPrice ?? 0;
+  const patronusCount = embroidery.patronusCount || 0;
+  const petFaceCount = embroidery.petFaceCount || 0;
+  const embroideryTypeRu = EMBROIDERY_TYPE_RU[selectedType] || selectedType || "";
 
   const [userData, setUserData] = useState(
     recipientState.userData || { firstName: "", lastName: "", middleName: "", phone: "" }
@@ -412,6 +422,9 @@ const RecipientDetails = () => {
 
     // Кастомизация
     fd.append("embroideryType", selectedType || "");
+    fd.append("embroideryTypeRu", embroideryTypeRu);
+    fd.append("patronusCount", String(patronusCount || 0));
+    fd.append("petFaceCount", String(petFaceCount || 0));
     fd.append("customText", customText || "");
     fd.append("comment", comment || "");
 
