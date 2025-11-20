@@ -1,4 +1,4 @@
-.orderBlock{
+.orderBlock {
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -13,13 +13,12 @@
   gap: clamp(50px, 4.31vw, 75px);
   width: 100%;
 
-  /* Левая часть — блок с изображением */
+  /* left column: product image */
   .clothing-block {
     width: clamp(530px, 20vw, 765px);
     border: 0.25px solid #121319;
     border-radius: 20px;
 
-    
     @media (max-width: 768px) {
       border: none;
     }
@@ -31,14 +30,14 @@
       width: 100%;
       height: 100%;
       box-sizing: border-box;
+
       .clotheImage {
         height: 100%;
       }
     }
-    
   }
 
-  /* Правая часть — блок с формой выбора */
+  /* right column: selectors */
   .blockSelection {
     display: flex;
     flex-direction: column;
@@ -52,13 +51,12 @@
       margin-bottom: 20px;
     }
 
-
-
     .selectorGroup {
       .selectorType {
         display: flex;
         flex-direction: column;
         gap: clamp(10px, 0.5vw, 15px);
+
         .selectorType__item {
           display: flex;
           align-items: center;
@@ -137,7 +135,8 @@
           }
         }
       }
-      .tableSize{
+
+      .tableSize {
         cursor: pointer;
         margin-top: 20px;
         font-family: 'Raleway', sans-serif;
@@ -148,16 +147,13 @@
         text-decoration-skip-ink: none;
         color: rgba(18, 19, 25, 0.8);
       }
-      
     }
-
-
   }
 }
 
 .sizeSelector__item.is-disabled {
   opacity: 0.45;
-  pointer-events: none; /* чтобы не кликалось */
+  pointer-events: none; /* disable click */
 }
 .sizeSelector__item.is-disabled .sizeSelector__box {
   cursor: not-allowed;
@@ -167,7 +163,7 @@
   cursor: not-allowed;
 }
 
-.confirmButton{
+.confirmButton {
   border-radius: 20px;
   width: clamp(350px, 20vw, 525px);
   height: clamp(68px, 3vw, 102px);
@@ -184,19 +180,23 @@
   .blockClothingSelector {
     flex-direction: column;
     align-items: center;
-    gap:10px;
+    gap: 10px;
+
     .clothing-block {
       width: auto;
+
       .image-wrapper {
         align-items: center;
         justify-content: center;
-        .clotheImage {    
+
+        .clotheImage {
           max-height: 100%;
-          width: auto;       
+          width: auto;
         }
       }
     }
-    .blockSelection{
+
+    .blockSelection {
       width: auto;
       flex-direction: row;
       flex-wrap: wrap;
@@ -213,9 +213,10 @@
         align-items: center;
         justify-content: center;
         height: auto;
-        .clotheImage {    
-          max-width: 100%;    
-          height: auto;         
+
+        .clotheImage {
+          max-width: 100%;
+          height: auto;
         }
       }
     }
@@ -243,7 +244,7 @@
   background: white;
   border-radius: 20px;
   padding: 30px;
-  max-width: 600px;
+  max-width: 720px;
   width: 90%;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
@@ -251,19 +252,20 @@
 .modalHeader {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 16px;
   margin-bottom: 20px;
 
   button {
-    padding: 10px 20px;
+    padding: 10px 18px;
     background: transparent;
     border: 2px solid #440a18;
     border-radius: 10px;
     cursor: pointer;
     font-family: 'Raleway', sans-serif;
-    font-size: 18px;
+    font-size: 16px;
     color: #440a18;
     transition: all 0.3s;
+    text-transform: lowercase;
 
     &.active {
       background: #440a18;
@@ -279,7 +281,8 @@
     font-family: 'Raleway', sans-serif;
     font-size: 16px;
 
-    th, td {
+    th,
+    td {
       padding: 10px;
       border: 1px solid #ddd;
       text-align: center;
@@ -292,7 +295,6 @@
   }
 }
 
-
 :root {
   --brand: #440a18;
   --text: #121319;
@@ -302,25 +304,24 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  
 }
 
 .colorSquare {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  border: 1px solid rgba(18,19,25,0.15);
+  border: 1px solid rgba(18, 19, 25, 0.15);
   display: grid;
   place-items: center;
   cursor: pointer;
   position: relative;
-  transition: transform .06s ease, box-shadow .15s ease, border-color .15s ease;
+  transition: transform 0.06s ease, box-shadow 0.15s ease, border-color 0.15s ease;
   background-clip: padding-box;
 }
 
 .colorSquare:hover {
-  box-shadow: 0 3px 10px rgba(0,0,0,.08);
-  border-color: rgba(18,19,25,0.3);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  border-color: rgba(18, 19, 25, 0.3);
 }
 
 .colorSquare.active {
@@ -331,24 +332,23 @@
 .colorSquare__check {
   width: 24px;
   height: 24px;
-  /* важное переопределение цвета штриха SVG */
+  /* important: override stroke color of SVG */
 }
+
 .colorSquare__check path {
-  stroke: currentColor; /* перекрашиваем чек-иконку цветом 'color' */
+  stroke: currentColor; /* recolor check icon with current text color */
   stroke-width: 2.25;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .blockClothingSelector {
-  /* было: height: min(calc(100vh - 200px), 1008px); */
   height: auto;
   min-height: clamp(600px, calc(100dvh - var(--header-h) - var(--footer-h)), 1008px);
 }
 
 @media (max-width: 768px) {
   .blockClothingSelector {
-    /* на мобиле вообще убираем требование по высоте — пусть контент течёт */
     min-height: unset;
     height: auto;
   }
@@ -359,5 +359,57 @@
   height: auto;
 }
 
-.modalOverlay { z-index: 2000; }
+.modalOverlay {
+  z-index: 2000;
+}
 
+.sizeTableGrid {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.sizeTable__table {
+  flex: 1 1 260px;
+  min-width: 260px;
+}
+
+.sizeTable__illustration {
+  flex: 0 0 220px;
+  min-height: 220px;
+  display: flex;
+}
+
+.sizeTable__placeholder {
+  background: none;
+  border-radius: 12px;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 0;
+}
+
+.sizeTable__img {
+  max-width: 280px;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .sizeTableGrid {
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+
+  .sizeTable__illustration {
+    width: 100%;
+    flex: 1 1 auto;
+  }
+}

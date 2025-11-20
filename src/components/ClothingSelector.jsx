@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ReactComponent as CheckIcon } from "../images/Vector.svg";
-import api from '../api'
+import api from '../api';
 import { buildImgSrc } from '../utils/url';
+import hoodieImg from '../images/hoodie.jpg';
+import switshotImg from '../images/switshot.jpg';
+import tshirtImg from '../images/tshirt.jpg';
 
 // helper: обводка для белого цвета
 const isWhite = (c = "") => {
@@ -38,28 +41,102 @@ const uniqBy = (arr, keyFn) => {
   return Array.from(map.values());
 };
 
-// порядок показа вариантов
 const INNER_ORDER = { "с начёсом": 1, "без начёса": 2 };
+
+const sizeColumns = [
+  "Размер",
+  "Ширина под проймой",
+  "Длина по переду",
+  "Длина плеча",
+  "Длина рукава",
+];
+
+const sizeCharts = {
+  hoodie: {
+    title: "худи",
+    image: hoodieImg,
+    rows: [
+      ["XS", "63", "73", "20,5", "58,5"],
+      ["S", "65", "75", "21", "59,5"],
+      ["M", "67", "77", "21,5", "60"],
+      ["L", "69", "78", "22", "60,5"],
+      ["XL", "71", "79", "22,5", "61"],
+      ["XXL", "73", "80", "23", "61,5"],
+    ],
+  },
+  svitshot: {
+    title: "свитшот",
+    image: switshotImg,
+    rows: [
+      ["XS", "63", "71", "22", "58,5"],
+      ["S", "65", "73", "22,5", "59,5"],
+      ["M", "67", "75", "23", "60"],
+      ["L", "69", "77", "23,5", "60,5"],
+      ["XL", "71", "78", "24", "61"],
+      ["XXL", "73", "79", "24,5", "61,5"],
+    ],
+  },
+  tshirt: {
+    title: "футболка",
+    image: tshirtImg,
+    rows: [
+      ["XS", "54", "67", "17", "24"],
+      ["S", "56", "69", "17,5", "24,5"],
+      ["M", "58", "73", "18", "25"],
+      ["L", "60", "75", "18,5", "25,5"],
+      ["XL", "62", "77", "19", "26"],
+      ["XXL", "64", "79", "19,5", "26,5"],
+    ],
+  },
+  default: {
+    title: "izdelie",
+    image: tshirtImg,
+    rows: [
+      ["XS", "54", "67", "17", "24"],
+      ["S", "56", "69", "17,5", "24,5"],
+      ["M", "58", "73", "18", "25"],
+      ["L", "60", "75", "18,5", "25,5"],
+      ["XL", "62", "77", "19", "26"],
+      ["XXL", "64", "79", "19,5", "26,5"],
+    ],
+  },
+};
+
+const detectChartKey = (base) => {
+  const raw = String(base || "").toLowerCase();
+  const translit = raw
+    .replace(/х/g, "h")
+    .replace(/уди/g, "udi")
+    .replace(/худи/g, "hudi")
+    .replace(/свитшот/g, "svitshot")
+    .replace(/свит/g, "svit")
+    .replace(/футбол/g, "futbol");
+  const name = `${raw} ${translit}`;
+  if (name.includes("hudi") || name.includes("hoodie")) return "hoodie";
+  if (name.includes("svitshot") || name.includes("sweatshirt")) return "svitshot";
+  if (name.includes("t-shirt") || name.includes("tshirt") || name.includes("tee") || name.includes("futbol")) return "tshirt";
+  return "default";
+};
 
 const ClothingSelector = () => {
   const navigate = useNavigate();
 
   const [inventory, setInventory] = useState([]);
-  const [selectedClothing, setSelectedClothing] = useState("");      // базовый тип
-  const [selectedInnerType, setSelectedInnerType] = useState("");     // вариант начёса
+  const [selectedClothing, setSelectedClothing] = useState("");
+  const [selectedInnerType, setSelectedInnerType] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
   const [showSizeModal, setShowSizeModal] = useState(false);
-  const [gender, setGender] = useState("men");
+  const [chartKey, setChartKey] = useState(() => detectChartKey(selectedClothing));
 
-  // расширяем инвентарь полем parsed
+  const activeChart = sizeCharts[chartKey] || sizeCharts[detectChartKey(selectedClothing)] || sizeCharts.default;
+
   const typedInventory = useMemo(
     () => inventory.map((i) => ({ ...i, parsed: parseTypeLabel(i.productType) })),
     [inventory]
   );
 
-  // базовые типы (без приписок)
   const availableBaseTypes = useMemo(() => {
     const list = uniqBy(
       typedInventory.map((i) => i.parsed.base).filter(Boolean),
@@ -68,7 +145,6 @@ const ClothingSelector = () => {
     return list;
   }, [typedInventory]);
 
-  // какие варианты «начёса» доступны для выбранного базового типа
   const presentInnerOptions = useMemo(() => {
     const set = new Set(
       typedInventory
@@ -83,7 +159,6 @@ const ClothingSelector = () => {
 
   const needsInner = presentInnerOptions.length > 0;
 
-  // склад под текущие фильтры base + inner (если нужен)
   const filteredByType = useMemo(() => {
     return typedInventory.filter((i) => {
       if (i.parsed.base !== selectedClothing) return false;
@@ -93,7 +168,6 @@ const ClothingSelector = () => {
     });
   }, [typedInventory, selectedClothing, needsInner, selectedInnerType]);
 
-  // цвета (с кодом) под текущий выбор
   const availableColorOptions = useMemo(() => {
     const byName = new Map();
     filteredByType.forEach((i) => {
@@ -107,7 +181,6 @@ const ClothingSelector = () => {
     return Array.from(byName.values());
   }, [filteredByType]);
 
-  // размеры под текущий выбор
   const availableSizes = useMemo(() => {
     const list = filteredByType
       .filter((i) => i.color === selectedColor)
@@ -118,7 +191,6 @@ const ClothingSelector = () => {
     return list;
   }, [filteredByType, selectedColor]);
 
-  // можно ли перейти далее
   const canProceed = Boolean(
     selectedClothing &&
       selectedColor &&
@@ -126,54 +198,44 @@ const ClothingSelector = () => {
       (!needsInner || selectedInnerType)
   );
 
-  // загрузка склада
   useEffect(() => {
     const fetchInventory = async () => {
       try {
         const { data } = await api.get('/inventory');
-
-        // берём только позиции с положительным остатком
         const cleaned = (Array.isArray(data) ? data : []).filter((item) => {
           const qty = Number(item?.quantity ?? 0);
           return Number.isFinite(qty) && qty > 0;
         });
-
         setInventory(cleaned);
-
-        // дефолтный базовый тип — из ОЧИЩЕННОГО списка
         const firstBase = parseTypeLabel(cleaned?.[0]?.productType)?.base || "";
         if (firstBase) setSelectedClothing(firstBase);
       } catch (err) {
-        console.error("Ошибка загрузки склада:", err);
+        console.error("Error loading inventory:", err);
       }
     };
     fetchInventory();
   }, []);
 
+  useEffect(() => {
+    setChartKey(detectChartKey(selectedClothing));
+  }, [selectedClothing]);
 
-  // АВТО-ВЫБОР варианта начёса при смене базового типа или составе вариантов
   useEffect(() => {
     if (!selectedClothing) return;
-
-    // сбрасываем цвет/размер при смене типа
     setSelectedColor("");
     setSelectedSize("");
 
     if (presentInnerOptions.length > 0) {
-      // если текущий вариант невалиден — подставим первый доступный
       if (!presentInnerOptions.includes(selectedInnerType)) {
         setSelectedInnerType(presentInnerOptions[0]);
       }
     } else {
-      // у типа нет вариантов — очищаем inner
       if (selectedInnerType) setSelectedInnerType("");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClothing, presentInnerOptions]);
 
-  // Подстановка ПЕРВОГО ДОСТУПНОГО ЦВЕТА при смене варианта начёса (и вообще, когда список цветов обновился)
   useEffect(() => {
-    // если нужен выбор варианта, но он ещё не выбран — ждём (но выше мы уже автосетим)
     if (needsInner && !selectedInnerType) {
       setSelectedColor("");
       setSelectedSize("");
@@ -181,7 +243,6 @@ const ClothingSelector = () => {
     }
 
     if (availableColorOptions.length > 0) {
-      // если текущий цвет невалиден — подставим первый
       if (!availableColorOptions.some((o) => o.label === selectedColor)) {
         setSelectedColor(availableColorOptions[0].label);
         setSelectedSize("");
@@ -193,7 +254,6 @@ const ClothingSelector = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedInnerType, needsInner, availableColorOptions]);
 
-  // если текущий размер пропал — сбрасываем
   useEffect(() => {
     if (selectedSize && !availableSizes.includes(selectedSize)) {
       setSelectedSize("");
@@ -207,7 +267,6 @@ const ClothingSelector = () => {
     });
   };
 
-  // картинка превью
   const previewItem = useMemo(() => {
     return filteredByType.find((item) => item.color === selectedColor) || filteredByType[0];
   }, [filteredByType, selectedColor]);
@@ -215,7 +274,6 @@ const ClothingSelector = () => {
   return (
     <>
       <div className="blockClothingSelector">
-        {/* Левая часть: изображение товара */}
         <div className="clothing-block">
           <div className="image-wrapper">
             <div className="image-frame">
@@ -233,7 +291,6 @@ const ClothingSelector = () => {
           </div>
         </div>
 
-        {/* Правая часть */}
         <div className="blockSelection">
           <div className="selectorGroup">
             <p className="title">ТИП ИЗДЕЛИЯ:</p>
@@ -308,7 +365,6 @@ const ClothingSelector = () => {
             </div>
           </div>
 
-          {/* Размер */}
           <div className="selectorGroup">
             <p className="title">РАЗМЕР:</p>
             <div className="sizeSelector">
@@ -334,7 +390,13 @@ const ClothingSelector = () => {
               })}
             </div>
 
-            <div className="tableSize" onClick={() => setShowSizeModal(true)}>
+            <div
+              className="tableSize"
+              onClick={() => {
+                setChartKey(detectChartKey(selectedClothing));
+                setShowSizeModal(true);
+              }}
+            >
               таблица размеров
             </div>
           </div>
@@ -349,38 +411,34 @@ const ClothingSelector = () => {
         <div className="modalOverlay" onClick={() => setShowSizeModal(false)}>
           <div className="modalContent" onClick={(e) => e.stopPropagation()}>
             <div className="modalHeader">
-              <button className={gender === "men" ? "active" : ""} onClick={() => setGender("men")}>
-                Мужчины
-              </button>
-              <button className={gender === "women" ? "active" : ""} onClick={() => setGender("women")}>
-                Женщины
-              </button>
+              <button className={chartKey === "svitshot" ? "active" : ""} onClick={() => setChartKey("svitshot")}>свитшот</button>
+              <button className={chartKey === "hoodie" ? "active" : ""} onClick={() => setChartKey("hoodie")}>худи</button>
+              <button className={chartKey === "tshirt" ? "active" : ""} onClick={() => setChartKey("tshirt")}>футболка</button>
             </div>
 
-            <div className="sizeTable">
-              {gender === "men" ? (
+            <div className="sizeTable sizeTableGrid">
+              <div className="sizeTable__table">
                 <table>
                   <thead>
-                    <tr><th>Размер</th><th>Грудь</th><th>Талия</th></tr>
+                    <tr>
+                      {sizeColumns.map((col) => <th key={col}>{col}</th>)}
+                    </tr>
                   </thead>
                   <tbody>
-                    <tr><td>S</td><td>88–92</td><td>76–80</td></tr>
-                    <tr><td>M</td><td>92–96</td><td>80–84</td></tr>
-                    <tr><td>L</td><td>96–100</td><td>84–88</td></tr>
+                    {(activeChart.rows || []).map((row) => (
+                      <tr key={row[0]}>
+                        {row.map((cell, idx) => <td key={`${row[0]}-${idx}`}>{cell}</td>)}
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
-              ) : (
-                <table>
-                  <thead>
-                    <tr><th>Размер</th><th>Грудь</th><th>Талия</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr><td>S</td><td>84–88</td><td>64–68</td></tr>
-                    <tr><td>M</td><td>88–92</td><td>68–72</td></tr>
-                    <tr><td>L</td><td>92–96</td><td>72–76</td></tr>
-                  </tbody>
-                </table>
-              )}
+              </div>
+
+              <div className="sizeTable__illustration">
+                <div className="sizeTable__placeholder">
+                  <img className="sizeTable__img" src={activeChart.image} alt={activeChart.title} />
+                </div>
+              </div>
             </div>
           </div>
         </div>
