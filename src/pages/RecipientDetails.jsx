@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import MyCdekWidget from "../components/MyCdekWidget";
 import { AddressSuggestions } from 'react-dadata';
+import 'react-dadata/dist/react-dadata.css';
 import api from '../api';
 
 // ====== ХЕЛПЕРЫ ДЛЯ ТЕЛЕФОНА ======
@@ -54,10 +55,18 @@ const RecipientDetails = () => {
   // Цены
   const mockEmbroideryPrice = 1200;
   const totalPrice = useMemo(() => mockEmbroideryPrice + (deliveryPrice || 0), [deliveryPrice]);
-
+  
   // Dadata
   const [isNoCdek, setIsNoCdek] = useState(false);
   const dadataToken = "0821b30c8abbf80ea31555ae120fed168b30b8dc"; // ваш токен
+
+  const isManualAddressFull = useMemo(() => {
+  if (!manualAddress || !manualAddress.data) return false;
+  const { house, block, flat } = manualAddress.data || {};
+  // считаем, что адрес "до дома", если есть хотя бы дом/корпус/квартира
+  return Boolean(house || block || flat);
+}, [manualAddress]);
+
 
   // Подтягиваем профиль
   useEffect(() => {
@@ -110,7 +119,9 @@ const RecipientDetails = () => {
     userData.middleName.trim() !== "" &&
     userData.phone.trim() !== "";
 
-  const isDeliveryAddressFilled = !!pickupPoint || !!manualAddress?.value;
+  const isDeliveryAddressFilled = isNoCdek
+    ? Boolean(manualAddress?.value && isManualAddressFull) // только полный адрес до дома
+    : Boolean(pickupPoint);      
 
   // Телефон ок для оплаты, если подтверждён ИЛИ (пришёл из профиля, поле заблокировано и не редактировалось)
   const isPhoneOk = phoneVerified || (phoneFromProfile && phoneLocked && !phoneEditedSinceProfile);
@@ -122,13 +133,23 @@ const RecipientDetails = () => {
     if (!userData.firstName.trim()) missing.push("имя");
     if (!userData.middleName.trim()) missing.push("отчество");
     if (!userData.phone.trim()) missing.push("телефон");
-    if (!pickupPoint && !manualAddress?.value) missing.push("адрес");
+
+    if (isNoCdek) {
+      if (!manualAddress?.value || !isManualAddressFull) {
+        missing.push("полный адрес до дома");
+      }
+    } else {
+      if (!pickupPoint) missing.push("пункт выдачи СДЭК");
+    }
+
     if (!isPhoneOk) missing.push("подтвердите телефон");
+
     if (missing.length === 0) return "";
     const last = missing.pop();
     const list = missing.length ? `${missing.join(', ')} и ${last}` : last;
     return `Пожалуйста, заполните ${list}`;
   };
+
 
   // ====== SMS: запрос/повтор/подтверждение ======
   useEffect(() => {
@@ -336,6 +357,14 @@ const RecipientDetails = () => {
     return () => window.removeEventListener("message", onMessage);
   }, [orderId, navigate]);
 
+  useEffect(() => {
+  // если галочку сняли — чистим ручной адрес
+  if (!isNoCdek) {
+    setManualAddress(null);
+  }
+}, [isNoCdek]);
+
+
   return (
     <div className="containerDetails">
       <div className="firstColumn">
@@ -443,14 +472,25 @@ const RecipientDetails = () => {
               В моём городе нет СДЭКа
             </label>
             {isNoCdek && (
-              <div style={{ marginTop: '12px', maxWidth: '400px' }}>
+              <div className="manualAddress">
                 <AddressSuggestions
                   token={dadataToken}
-                  placeholder="Начните вводить адрес..."
-                  query={manualAddress?.value}
-                  onChange={(suggestion) => setManualAddress(suggestion)}
+                  value={manualAddress}
+                  onChange={setManualAddress}
+                  inputProps={{
+                    placeholder: "Введите свой адрес",
+                  }}
                 />
-                {manualAddress && <p style={{ marginTop: '8px' }}>Вы выбрали: {manualAddress.value}</p>}
+                {manualAddress && !isManualAddressFull && (
+                  <p className="manualAddress__hint">
+                    Пожалуйста, выберите подсказку с указанием дома.
+                  </p>
+                )}
+                {manualAddress?.value && (
+                  <p className="manualAddress__selected">
+                    Вы выбрали: {manualAddress.value}
+                  </p>
+                )}
               </div>
             )}
           </div>

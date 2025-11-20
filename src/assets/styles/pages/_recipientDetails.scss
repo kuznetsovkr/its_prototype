@@ -191,70 +191,6 @@
   opacity: 1;
 }
 
-// react-dadata
-.react-dadata__container {
-  font-family: 'Raleway', sans-serif;
-  font-weight: 400;
-  font-size: 20px;
-  color: #121319;
-  width: 100%;
-
-  input.react-dadata__input {
-    width: 100%;
-    height: 43px;
-    border: 1px solid #121319;
-    border-radius: 10px;
-    font-size: 20px;
-    font-family: 'Raleway', sans-serif;
-
-    &::placeholder { color: rgba(18, 19, 25, 0.5); }
-    &:focus { outline: none; border-color: #440a18; }
-  }
-
-  .react-dadata__input {
-    width: 100%;
-    height: 43px;
-    padding: 10px 20px;
-    border: 1px solid #121319;
-    border-radius: 10px;
-    font-family: 'Raleway', sans-serif;
-    font-size: 20px;
-
-    &::placeholder { color: rgba(18, 19, 25, 0.5); }
-    &:focus { border-color: #440a18; outline: none; }
-  }
-
-  .react-dadata__suggestions {
-    border: 1px solid #ccc;
-    border-top: none;
-    border-radius: 0 0 10px 10px;
-    background-color: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    font-family: 'Raleway', sans-serif;
-    font-weight: 400;
-    font-size: 18px;
-    color: #121319;
-    max-height: 250px;
-    overflow-y: auto;
-    max-width: 100%;
-    box-sizing: border-box;
-
-    .react-dadata__suggestion {
-      padding: 10px 16px;
-      cursor: default;
-      border-top: 1px solid #eee;
-
-      &:hover { background-color: #f9f9f9; }
-      &--current { background-color: #f0f0f0; }
-
-      mark {
-        background: none;
-        font-weight: 600;
-        color: #440a18;
-      }
-    }
-  }
-}
 
 /* ===== МЕДИА: мобильная версия ≤ 768 ===== */
 @media (max-width: 768px) {
@@ -410,5 +346,98 @@
     font-family: 'Raleway', sans-serif;
     font-weight: 400;
     color: #121319;
+  }
+}
+
+// ====== АДРЕС БЕЗ СДЭКа (DaData) ======
+.manualAddress {
+  margin-top: 12px;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  color: #121319;
+
+  &__selected {
+    margin-top: 8px;
+    font-size: 16px;
+    color: rgba(18, 19, 25, 0.8);
+  }
+
+  .react-dadata__container {
+    width: 100%;
+  }
+
+  // Сам инпут — максимально как твои поля ФИО
+  .react-dadata__input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 43px;
+    padding: 10px 20px;
+    border: 1px solid #121319;
+    border-radius: 10px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 20px;
+    transition: border-color 0.2s ease-in-out;
+    background: #fff;
+
+    &::placeholder {
+      color: rgba(18, 19, 25, 0.5);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: #440a18;
+    }
+  }
+
+  // Контейнер подсказок
+  .react-dadata__suggestions {
+    margin-top: 4px;
+    border: 1px solid #121319;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    max-height: 260px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 4px 0;
+    z-index: 10; // чтобы не залезало под карту
+  }
+
+  .react-dadata__suggestion {
+    padding: 8px 16px;
+    cursor: pointer;
+    border-top: 1px solid rgba(18, 19, 25, 0.06);
+
+    &:first-child {
+      border-top: none;
+    }
+
+    &:hover,
+    &--current {
+      background-color: #f9f4f6;
+    }
+
+    // Основная строка (обычно она первая)
+    .react-dadata__suggestion-label {
+      display: block;
+      font-size: 16px;
+      color: #121319;
+    }
+
+    // Доп. текст (регион/город) — более лёгкий
+    .react-dadata__suggestion-subtitle {
+      display: block;
+      margin-top: 2px;
+      font-size: 14px;
+      color: rgba(18, 19, 25, 0.6);
+    }
+
+    // Подсветка совпадений
+    mark {
+      background: none;
+      font-weight: 600;
+      color: #440a18;
+    }
   }
 }
