@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import WarehouseTable from "../components/WarehouseTable";
 import ColorSelect from "../components/ColorSelect";
 import api from '../api'
-
 const defaultColors = [
   { name: "Черный", code: "#000000" },
   { name: "Белый",  code: "#FFFFFF" },
@@ -10,15 +9,14 @@ const defaultColors = [
   { name: "Красный",code: "#FF0000" },
   { name: "Синий",  code: "#0057FF" },
 ];
-
-const popularTypes = ["Худи", "Футболка", "Кофта", "Свитшот", "Майка"];
 const popularSizes = ["XS", "S", "M", "L", "XL", "XXL"];
-
+const ALL_VALUE = "Все";
 const AdminInventory = () => {
   const [inventory, setInventory] = useState([]);
   const [colorOptions, setColorOptions] = useState(defaultColors);
-
+  const [clothingTypes, setClothingTypes] = useState([]);
   const [newItem, setNewItem] = useState({
+    clothingTypeId: "",
     productType: "",
     color: "",
     colorCode: "",
@@ -26,16 +24,14 @@ const AdminInventory = () => {
     quantity: 0,
     imageUrl: "",
   });
-
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [filters, setFilters] = useState({ type: "Все", color: "Все", size: "Все" });
+  const [filters, setFilters] = useState({ type: ALL_VALUE, color: ALL_VALUE, size: ALL_VALUE });
   const [sort, setSort] = useState({ key: "quantity", dir: "desc" });
-
   useEffect(() => {
     fetchInventory();
     fetchColors();
+    fetchClothingTypes();
   }, []);
-
   const fetchInventory = async () => {
     try {
       const res = await api.get('/inventory');
@@ -44,7 +40,16 @@ const AdminInventory = () => {
       console.error("Ошибка загрузки склада:", err);
     }
   };
-
+  const fetchClothingTypes = async () => {
+    try {
+      const res = await api.get('/clothing-types');
+      if (Array.isArray(res.data)) {
+        setClothingTypes(res.data);
+      }
+    } catch (err) {
+      console.error("ошибка новая", err);
+    }
+  };
   const fetchColors = async () => {
     try {
       const res = await api.get('/colors');
@@ -56,7 +61,6 @@ const AdminInventory = () => {
       // fallback на дефолтные
     }
   };
-
   const addColor = async ({ name, code }) => {
     // пробуем на бэк, если нет — сохраняем локально
     try {
@@ -84,16 +88,23 @@ const AdminInventory = () => {
       console.error("Ошибка обновления:", err);
     }
   };
-
   const updateItem = async (updated) => {
     try {
-      await api.put(`/inventory/${updated.id}`, updated);
+      const payload = {
+        productType: updated.productType,
+        clothingTypeId: updated.clothingTypeId ? Number(updated.clothingTypeId) : undefined,
+        color: updated.color,
+        colorCode: updated.colorCode,
+        size: updated.size,
+        quantity: Number(updated.quantity),
+        imageUrl: updated.imageUrl,
+      };
+      await api.put(`/inventory/${updated.id}`, payload);
       await fetchInventory();
     } catch (err) {
-      console.error("Ошибка при обновлении товара:", err);
+      console.error("Failed to update inventory:", err);
     }
   };
-
   const deleteItem = async (id) => {
     try {
       await api.delete(`/inventory/${id}`);
@@ -102,37 +113,43 @@ const AdminInventory = () => {
       console.error("Ошибка удаления:", err);
     }
   };
-
   const addItem = async () => {
-    if (!newItem.productType || !newItem.color || !newItem.colorCode || !newItem.size || Number(newItem.quantity) <= 0) {
+    if (!newItem.clothingTypeId || !newItem.productType || !newItem.color || !newItem.colorCode || !newItem.size || Number(newItem.quantity) <= 0) {
       return;
     }
     try {
       await api.post('/inventory', {
         ...newItem,
+        clothingTypeId: Number(newItem.clothingTypeId),
         quantity: Number(newItem.quantity),
       });
-      setNewItem({ productType: "", color: "", colorCode: "", size: "", quantity: 0, imageUrl: "" });
+      setNewItem({ clothingTypeId: "", productType: "", color: "", colorCode: "", size: "", quantity: 0, imageUrl: "" });
       fetchInventory();
     } catch (err) {
       console.error("Ошибка добавления:", err);
     }
   };
-
+  const typeLabel = (item) => item?.clothingTypeName || item?.productType || "";
+  const typeOptions = useMemo(
+    () =>
+      Array.from(new Set(inventory.map((i) => typeLabel(i)).filter(Boolean))).sort((a, b) =>
+        String(a).localeCompare(String(b), "ru")
+      ),
+    [inventory]
+  );
   const unique = (key) =>
     Array.from(new Set(inventory.map((i) => i[key]).filter(Boolean))).sort((a, b) =>
       String(a).localeCompare(String(b), "ru")
     );
-
   const filtered = useMemo(() => {
     return inventory.filter((i) => {
-      const byType = filters.type === "Все" || i.productType === filters.type;
-      const byColor = filters.color === "Все" || i.color === filters.color;
-      const bySize  = filters.size  === "Все" || i.size  === filters.size;
+      const typeName = typeLabel(i);
+      const byType = filters.type === ALL_VALUE || typeName === filters.type;
+      const byColor = filters.color === ALL_VALUE || i.color === filters.color;
+      const bySize  = filters.size  === ALL_VALUE || i.size  === filters.size;
       return byType && byColor && bySize;
     });
   }, [inventory, filters]);
-
   const sorted = useMemo(() => {
     const arr = [...filtered];
     if (sort.key === "quantity") {
@@ -142,16 +159,12 @@ const AdminInventory = () => {
     }
     return arr;
   }, [filtered, sort]);
-
   const toggleSortQuantity = () =>
     setSort((s) => ({ key: "quantity", dir: s.dir === "asc" ? "desc" : "asc" }));
-
-  const resetFilters = () => setFilters({ type: "Все", color: "Все", size: "Все" });
-
+  const resetFilters = () => setFilters({ type: ALL_VALUE, color: ALL_VALUE, size: ALL_VALUE });
   // найти код по имени (на случай, если строки старые без colorCode)
   const codeByName = (name) =>
     colorOptions.find(c => c.name.toLowerCase() === String(name || "").toLowerCase())?.code || "";
-
   return (
     <section className="admin-wrap">
       <div className="admin-header">
@@ -166,26 +179,29 @@ const AdminInventory = () => {
           {isAddOpen ? "−" : "+"}
         </button>
       </div>
-
       {/* Форма добавления — ЦВЕТ ТОЛЬКО ИЗ СПРАВОЧНИКА */}
       <div id="addForm" className={`collapsible ${isAddOpen ? "is-open" : ""}`}>
         <div className="card form-card">
           <div className="form-grid">
             <div className="field">
               <label className="label">Тип одежды</label>
-              <input
-                className="input"
-                list="types"
-                type="text"
-                placeholder="Выберите или введите свой тип"
-                value={newItem.productType}
-                onChange={(e) => setNewItem({ ...newItem, productType: e.target.value })}
-              />
-              <datalist id="types">
-                {[...new Set(popularTypes)].map((t) => (<option key={t} value={t} />))}
-              </datalist>
+              <select
+                className="select"
+                value={newItem.clothingTypeId}
+                onChange={(e) => {
+                  const selected = clothingTypes.find((t) => String(t.id) === e.target.value);
+                  setNewItem((prev) => ({
+                    ...prev,
+                    clothingTypeId: e.target.value,
+                    productType: selected?.name || "",
+                  }));
+                }}>
+                          <option value="">Выберите тип</option>
+                {clothingTypes.map((t) => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </select>
             </div>
-
             <div className="field">
               <label className="label">Цвет</label>
               <ColorSelect
@@ -196,7 +212,6 @@ const AdminInventory = () => {
                 onAddColor={addColor}
               />
             </div>
-
             <div className="field">
               <label className="label">Размер</label>
               <input
@@ -211,7 +226,6 @@ const AdminInventory = () => {
                 {popularSizes.map((s) => (<option key={s} value={s} />))}
               </datalist>
             </div>
-
             <div className="field">
               <label className="label">Количество</label>
               <input
@@ -223,7 +237,6 @@ const AdminInventory = () => {
                 onChange={(e) => setNewItem({ ...newItem, quantity: e.target.value.replace(/[^\d]/g, "") })}
               />
             </div>
-
             <div className="field">
               <label className="label">Изображение</label>
               <div className="file-row">
@@ -246,32 +259,30 @@ const AdminInventory = () => {
               </div>
             </div>
           </div>
-
           <div className="actions">
             <button className="btn btn-primary" onClick={addItem}>Добавить</button>
           </div>
         </div>
       </div>
-
       {/* Фильтры */}
       <div className="card filters-card">
         <div className="filters-grid">
           <div className="field">
             <label className="label">Тип</label>
             <select className="select" value={filters.type} onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value }))}>
-              {["Все", ...unique("productType")].map((t) => (<option key={t} value={t}>{t}</option>))}
+              {[ALL_VALUE, ...typeOptions].map((t) => (<option key={t} value={t}>{t}</option>))}
             </select>
           </div>
           <div className="field">
             <label className="label">Цвет</label>
             <select className="select" value={filters.color} onChange={(e) => setFilters((f) => ({ ...f, color: e.target.value }))}>
-              {["Все", ...unique("color")].map((c) => (<option key={c} value={c}>{c}</option>))}
+              {[ALL_VALUE, ...unique("color")].map((c) => (<option key={c} value={c}>{c}</option>))}
             </select>
           </div>
           <div className="field">
             <label className="label">Размер</label>
             <select className="select" value={filters.size} onChange={(e) => setFilters((f) => ({ ...f, size: e.target.value }))}>
-              {["Все", ...unique("size")].map((s) => (<option key={s} value={s}>{s}</option>))}
+              {[ALL_VALUE, ...unique("size")].map((s) => (<option key={s} value={s}>{s}</option>))}
             </select>
           </div>
           <div className="filters-actions">
@@ -279,7 +290,6 @@ const AdminInventory = () => {
           </div>
         </div>
       </div>
-
       {/* Таблица */}
       <WarehouseTable
         inventory={sorted}
@@ -290,9 +300,9 @@ const AdminInventory = () => {
         colorOptions={colorOptions}
         codeByName={codeByName}
         onAddColor={addColor}
+        clothingTypes={clothingTypes}
       />
     </section>
   );
 };
-
 export default AdminInventory;

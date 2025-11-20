@@ -3,7 +3,6 @@ import ColorSelect from "./ColorSelect";
 import api from '../api'
 import { buildImgSrc } from '../utils/url';
 
-const popularTypes = ["Худи", "Футболка", "Кофта", "Свитшот", "Майка"];
 const popularSizes  = ["XS", "S", "M", "L", "XL", "XXL"];
 
 const WarehouseTable = ({
@@ -15,16 +14,28 @@ const WarehouseTable = ({
   colorOptions,
   codeByName,
   onAddColor,
+  clothingTypes,
 }) => {
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData]   = useState(null);
 
   const arrow = sortDir === "asc" ? "▲" : "▼";
+  const typeNameById = (id) =>
+    clothingTypes?.find((t) => String(t.id) === String(id))?.name || "";
+  const priceByTypeId = (id) =>
+    clothingTypes?.find((t) => String(t.id) === String(id))?.price;
 
   const startEditing = (row) => {
+    const resolvedTypeId =
+      row.clothingTypeId ||
+      row.clothingType?.id ||
+      clothingTypes?.find((t) => t.name === (row.clothingTypeName || row.productType))?.id ||
+      "";
     setEditingId(row.id);
     setEditData({
       ...row,
+      clothingTypeId: resolvedTypeId,
+      productType: row.clothingTypeName || row.productType || typeNameById(resolvedTypeId),
       colorCode: row.colorCode || codeByName(row.color) || "",
     });
   };
@@ -57,6 +68,7 @@ const WarehouseTable = ({
     if (!editData) return;
     await updateItem({
       ...editData,
+      clothingTypeId: editData.clothingTypeId ? Number(editData.clothingTypeId) : null,
       quantity: Number(editData.quantity) || 0,
     });
     setEditingId(null);
@@ -72,6 +84,7 @@ const WarehouseTable = ({
               <th>ID</th>
               <th>Фото</th>
               <th>Тип</th>
+              <th>Цена</th>
               <th>Цвет</th>
               <th>Размер</th>
               <th className="th-sort" onClick={onToggleSortQuantity} role="button" tabIndex={0}>
@@ -84,7 +97,7 @@ const WarehouseTable = ({
           <tbody>
             {inventory.length === 0 ? (
               <tr>
-                <td colSpan={7} className="muted">Ничего не найдено по текущим фильтрам</td>
+                <td colSpan={8} className="muted">Ничего не найдено по текущим фильтрам</td>
               </tr>
             ) : (
               inventory.map((row) => {
@@ -94,6 +107,9 @@ const WarehouseTable = ({
                 const colorChipCode = isEditing
                   ? (editData?.colorCode || "")
                   : (row.colorCode || codeByName(row.color) || "");
+                const resolvedTypeName = typeNameById(row.clothingTypeId) || row.clothingTypeName || row.productType;
+                const resolvedPrice = row.price ?? priceByTypeId(row.clothingTypeId);
+                const editingPrice = editData?.clothingTypeId ? priceByTypeId(editData.clothingTypeId) : resolvedPrice;
 
                 return (
                   <tr key={row.id}>
@@ -116,23 +132,34 @@ const WarehouseTable = ({
                     {/* Тип */}
                     <td>
                       {isEditing ? (
-                        <>
-                          <input
-                            className="input"
-                            list={`types-${row.id}`}
-                            type="text"
-                            value={editData?.productType ?? ""}
-                            onChange={(e) => handleChange("productType", e.target.value)}
-                          />
-                          <datalist id={`types-${row.id}`}>
-                            {popularTypes.map((t) => (<option key={t} value={t} />))}
-                          </datalist>
-                        </>
+                        <select
+                          className="select"
+                          value={editData?.clothingTypeId ?? ""}
+                          onChange={(e) => {
+                            const selected = clothingTypes?.find((t) => String(t.id) === e.target.value);
+                            handleChange("clothingTypeId", e.target.value);
+                            handleChange("productType", selected?.name || "");
+                            handleChange("clothingTypeName", selected?.name || "");
+                            handleChange("price", selected?.price);
+                          }}
+                        >
+                          <option value="">Выберите тип</option>
+                          {clothingTypes?.map((t) => (
+                            <option key={t.id} value={t.id}>{t.name}</option>
+                          ))}
+                        </select>
                       ) : (
-                        row.productType
+                        resolvedTypeName
                       )}
                     </td>
 
+                    <td>
+                      {isEditing ? (
+                        editingPrice ?? "-"
+                      ) : (
+                        resolvedPrice ?? "-"
+                      )}
+                    </td>
                     {/* Цвет */}
                     <td>
                       {isEditing ? (
