@@ -155,12 +155,8 @@
   opacity: 0.45;
   pointer-events: none; /* disable click */
 }
-.sizeSelector__item.is-disabled .sizeSelector__box {
-  cursor: not-allowed;
-}
 .confirmButton:disabled {
   opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .confirmButton {

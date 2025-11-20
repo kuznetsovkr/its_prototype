@@ -48,6 +48,9 @@ const EmbroiderySelector = () => {
   };
 
   const priceLabel = (type) => `${calcPrice(type)} ₽`;
+  const hasFiles = uploadedImage.length > 0;
+  const canProceed = Boolean(selectedType && hasFiles);
+  const disabledHint = !hasFiles ? "Загрузите хотя бы одно изображение" : "";
 
   const MAX_MB = 5;
   const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
@@ -102,6 +105,7 @@ const EmbroiderySelector = () => {
   };
 
   const handleNext = () => {
+    if (!canProceed) return;
     navigate("/recipient", {
       state: {
         selectedType,
@@ -363,8 +367,13 @@ const EmbroiderySelector = () => {
         </div>
 
         <div className="navigationButtons">
-          <button className="confirmButton" onClick={handleNext} disabled={!selectedType}>
-                          ПЕРЕЙТИ К ОФОРМЛЕНИЮ
+          <button
+            className="confirmButton"
+            onClick={handleNext}
+            disabled={!canProceed}
+            title={!canProceed ? "Загрузите хотя бы одно изображение" : undefined}
+          >
+            ПЕРЕЙТИ К ОФОРМЛЕНИЮ
           </button>
 
           <button className="backButton" onClick={() => navigate(-1)}>
