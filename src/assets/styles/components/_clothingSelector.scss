@@ -31,8 +31,20 @@
       height: 100%;
       box-sizing: border-box;
 
+      .image-frame {
+        width: 100%;
+        min-height: clamp(320px, 52vw, 640px);
+        max-height: clamp(420px, 70vh, 780px);
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+      }
+
       .clotheImage {
+        width: 100%;
         height: 100%;
+        object-fit: contain;
+        display: block;
       }
     }
   }
@@ -179,11 +191,16 @@
     gap: 10px;
 
     .clothing-block {
-      width: auto;
+      width: 100%;
 
       .image-wrapper {
         align-items: center;
         justify-content: center;
+
+        .image-frame {
+          min-height: clamp(280px, 90vw, 520px);
+          max-height: none;
+        }
 
         .clotheImage {
           max-height: 100%;
@@ -352,7 +369,8 @@
 
 .clothing-block .image-wrapper .clotheImage {
   max-width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: contain;
 }
 
 .modalOverlay {
