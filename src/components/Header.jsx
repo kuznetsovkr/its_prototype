@@ -147,7 +147,28 @@ const Header = () => {
       {/* Мобильное бургер-меню (выезжающее) */}
       <div id="mobile-menu" className={`mobile-menu ${isMenuOpen ? "open" : ""}`}>
         <div className="mobile-menu-content">
-          <button className="close-button" onClick={toggleMenu}>×</button>
+          <button
+              type="button"
+              className="modalClose"
+              aria-label="Закрыть таблицу размеров"
+              onClick={toggleMenu}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="17"
+                height="17"
+                viewBox="0 0 17 17"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M16.5 0.5L0.5 16.5M16.5 16.5L0.5 0.5"
+                  stroke="#433F3C"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
           <nav className="mobile-nav">
             <Link to="/works" onClick={toggleMenu}>примеры работ</Link>
             <Link to="/about" onClick={toggleMenu}>о нас</Link>
