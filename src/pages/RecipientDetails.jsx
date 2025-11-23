@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useLayoutEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import MyCdekWidget from "../components/MyCdekWidget";
 import { AddressSuggestions } from 'react-dadata';
@@ -83,6 +83,11 @@ const RecipientDetails = () => {
     () => (embroideryPrice || 0) + (deliveryPrice || 0),
     [embroideryPrice, deliveryPrice]
   );
+
+  useLayoutEffect(() => {
+    // при переходе на шаг получателя всегда показываем верх страницы
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, []);
   
   // Dadata
   const [isNoCdek, setIsNoCdek] = useState(Boolean(recipientState.isNoCdek));
