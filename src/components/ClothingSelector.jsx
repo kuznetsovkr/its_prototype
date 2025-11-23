@@ -437,6 +437,28 @@ const ClothingSelector = () => {
       {showSizeModal && (
         <div className="modalOverlay" onClick={() => setShowSizeModal(false)}>
           <div className="modalContent" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="modalClose"
+              aria-label="Закрыть таблицу размеров"
+              onClick={() => setShowSizeModal(false)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="17"
+                height="17"
+                viewBox="0 0 17 17"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M16.5 0.5L0.5 16.5M16.5 16.5L0.5 0.5"
+                  stroke="#433F3C"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
             <div className="modalHeader">
               <button className={chartKey === "svitshot" ? "active" : ""} onClick={() => setChartKey("svitshot")}>свитшот</button>
               <button className={chartKey === "hoodie" ? "active" : ""} onClick={() => setChartKey("hoodie")}>худи</button>

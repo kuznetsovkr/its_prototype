@@ -260,16 +260,30 @@
   max-width: 720px;
   width: 90%;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  max-height: 85vh;
+  overflow: auto;
+  overscroll-behavior: contain;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  scrollbar-width: none;
+
   @media (max-width: 570px) {
-    padding: 30px 10px;
+    padding: 10px 10px 30px;
   }
+}
+
+.modalContent::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .modalHeader {
   display: flex;
   justify-content: center;
   gap: 16px;
-  margin-bottom: 20px;
+  padding-top: 40px;
 
   button {
     padding: 10px 18px;
@@ -288,6 +302,26 @@
       color: white;
     }
   }
+}
+
+.modalClose {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modalClose:hover {
+  background: rgba(18, 19, 25, 0.06);
 }
 
 .sizeTable {
