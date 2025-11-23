@@ -260,6 +260,9 @@
   max-width: 720px;
   width: 90%;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  @media (max-width: 570px) {
+    padding: 30px 10px;
+  }
 }
 
 .modalHeader {
@@ -299,6 +302,9 @@
       padding: 10px;
       border: 1px solid #ddd;
       text-align: center;
+      @media (max-width: 570px) {
+        padding: 10px 5px;
+      }
     }
 
     th {
