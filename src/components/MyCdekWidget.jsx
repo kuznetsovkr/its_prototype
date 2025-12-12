@@ -54,6 +54,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
   const DEFAULT_ZOOM = 10;
 
   useEffect(() => {
+    let instance;
     const t = setTimeout(() => {
       const typeName = resolveProductName(productType);
       const goodsKey = detectClothingKey(typeName);
@@ -63,7 +64,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         weight_grams: Math.round((goods.weight || 0) * 1000),
       };
 
-      const instance = new CDEKWidget({
+      instance = new CDEKWidget({
         root: 'cdek-map',
         from: FROM_LOCATION,
         apiKey: ymapsKey,
@@ -108,10 +109,12 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
       instance.updateLocation(DEFAULT_CENTER, DEFAULT_ZOOM).catch(() => {});
       requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
 
-      return () => { try { instance?.destroy?.(); } catch {} };
     }, 0);
 
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      try { instance?.destroy?.(); } catch {}
+    };
   }, [onAddressSelect, onRateSelect, onCdekSelect, servicePath, ymapsKey, productType]);
 
   return null; // renders into #cdek-map via widget internals
