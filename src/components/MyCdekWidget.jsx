@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 import CDEKWidget from '@cdek-it/widget';
 
-// Detect product type to pick dimensions/weight preset for delivery calc
+// Подбираем тип изделия и габариты/вес для расчета доставки
 const detectClothingKey = (base) => {
   const raw = String(base || '').toLowerCase();
-  if (raw.includes('hoodie') || raw.includes('hudi')) return 'hoodie';
-  if (raw.includes('sweatshirt') || raw.includes('svitshot')) return 'svitshot';
-  if (raw.includes('t-shirt') || raw.includes('tshirt') || raw.includes('tee')) return 'tshirt';
-  return 'hoodie';
+  if (raw.includes('худи') || raw.includes('hoodie') || raw.includes('hudi')) return 'hoodie';
+  if (raw.includes('свитшот') || raw.includes('свит') || raw.includes('sweatshirt') || raw.includes('svitshot')) return 'svitshot';
+  if (raw.includes('футбол') || raw.includes('t-shirt') || raw.includes('tshirt') || raw.includes('tee')) return 'tshirt';
+  return 'hoodie'; // чуть завышаем по умолчанию, чтобы не занизить доставку
 };
 
 const resolveProductName = (productType) => {
@@ -28,10 +28,10 @@ const GOODS_PRESETS = {
 
 const FROM_LOCATION = {
   country_code: 'RU',
-  city: 'Krasnoyarsk',
+  city: 'Красноярск',
   postal_code: 660135,
   code: 278,
-  address: 'ul. 78 Dobrovolcheskoy Brigady, 1',
+  address: 'ул. 78-й Добровольческой бригады, 1',
 };
 
 const formatAddressLabel = (address) => {
