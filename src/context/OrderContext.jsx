@@ -43,6 +43,7 @@ const initialState = {
     deliveryPrice: null,
     manualAddress: null,
     isNoCdek: false,
+    cdek: null,
   },
 };
 
@@ -85,6 +86,7 @@ export const OrderProvider = ({ children }) => {
           payload?.manualAddress,
           prev.recipient.manualAddress
         ),
+        cdek: payload?.cdek !== undefined ? payload.cdek : prev.recipient.cdek,
       };
       if (isEqual(next, prev.recipient)) return prev;
       return { ...prev, recipient: next };

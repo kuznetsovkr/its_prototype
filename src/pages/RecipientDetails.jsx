@@ -75,6 +75,7 @@ const RecipientDetails = () => {
     recipientState.deliveryPrice ?? null
   ); // rate.delivery_sum
   const [manualAddress, setManualAddress] = useState(recipientState.manualAddress || null);
+  const [cdekData, setCdekData] = useState(recipientState.cdek || null);
   const [isPaying, setIsPaying] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const [error, setError] = useState("");
@@ -110,6 +111,7 @@ const RecipientDetails = () => {
       manualBlock: recipientState.manualAddress?.data?.block || "",
       manualFlat: recipientState.manualAddress?.data?.flat || "",
       isNoCdek: Boolean(recipientState.isNoCdek),
+      cdek: recipientState.cdek,
     };
     const local = {
       userData,
@@ -120,6 +122,7 @@ const RecipientDetails = () => {
       manualBlock: manualAddress?.data?.block || "",
       manualFlat: manualAddress?.data?.flat || "",
       isNoCdek: Boolean(isNoCdek),
+      cdek: cdekData,
     };
     const sameUser =
       (local.userData.firstName || "") === (stored.userData?.firstName || "") &&
@@ -134,7 +137,8 @@ const RecipientDetails = () => {
       local.manualHouse === stored.manualHouse &&
       local.manualBlock === stored.manualBlock &&
       local.manualFlat === stored.manualFlat &&
-      local.isNoCdek === stored.isNoCdek
+      local.isNoCdek === stored.isNoCdek &&
+      JSON.stringify(local.cdek ?? null) === JSON.stringify(stored.cdek ?? null)
     );
   }, [
     userData,
@@ -145,6 +149,7 @@ const RecipientDetails = () => {
     manualAddress?.data?.block,
     manualAddress?.data?.flat,
     isNoCdek,
+    cdekData,
     recipientState,
   ]);
 
@@ -162,6 +167,7 @@ const RecipientDetails = () => {
           }
         : manualAddress,
       isNoCdek,
+      cdek: cdekData,
     });
   }, [
     userData,
@@ -172,6 +178,7 @@ const RecipientDetails = () => {
     manualAddress?.data?.block,
     manualAddress?.data?.flat,
     isNoCdek,
+    cdekData,
     setRecipient,
     isRecipientSame,
   ]);
@@ -196,6 +203,7 @@ const RecipientDetails = () => {
     setDeliveryPrice(recipientState.deliveryPrice ?? null);
     setManualAddress(recipientState.manualAddress || null);
     setIsNoCdek(Boolean(recipientState.isNoCdek));
+    setCdekData(recipientState.cdek || null);
   }, [
     recipientState.userData?.firstName,
     recipientState.userData?.lastName,
@@ -205,6 +213,7 @@ const RecipientDetails = () => {
     recipientState.deliveryPrice,
     recipientState.manualAddress?.value,
     recipientState.isNoCdek,
+    recipientState.cdek,
   ]);
 
 
@@ -405,6 +414,50 @@ const RecipientDetails = () => {
     setAuthError("");
   };
 
+  const handleCdekSelect = (payload) => {
+    const label =
+      payload?.addressLabel ||
+      payload?.address?.address ||
+      payload?.address?.formatted ||
+      payload?.address?.name ||
+      "";
+    setPickupPoint(label);
+    setDeliveryPrice(payload?.tariff?.delivery_sum ?? payload?.tariff?.total_sum ?? null);
+    setCdekData(payload || null);
+    setIsNoCdek(false);
+    setManualAddress(null);
+  };
+
+  const normalizePhoneDigits = (value) => {
+    const digits = cleanPhone(value);
+    if (!digits) return '';
+    if (digits.length === 10) return `7${digits}`;
+    if (digits.length === 11 && digits.startsWith('8')) return `7${digits.slice(1)}`;
+    return digits;
+  };
+
+  const deriveGoodsPreset = () => {
+    const name = String(
+      typeof productType === "object"
+        ? productType?.name || productType?.type || ""
+        : productType || ""
+    ).toLowerCase();
+    const presets = {
+      hoodie:   { width: 35, height: 35, length: 7, weight: 0.8 },
+      svitshot: { width: 35, height: 35, length: 7, weight: 0.8 },
+      tshirt:   { width: 30, height: 20, length: 3, weight: 0.3 },
+      default:  { width: 35, height: 35, length: 7, weight: 0.8 },
+    };
+    const pick = () => {
+      if (name.includes('hoodie') || name.includes('hudi')) return presets.hoodie;
+      if (name.includes('sweatshirt') || name.includes('svitshot')) return presets.svitshot;
+      if (name.includes('t-shirt') || name.includes('tshirt') || name.includes('tee')) return presets.tshirt;
+      return presets.default;
+    };
+    const base = pick();
+    return { ...base, weight_grams: Math.round((base.weight || 0) * 1000) };
+  };
+
   // ====== Создание черновика заказа и оплата ======
   async function createDraftOrder() {
     const fd = new FormData();
@@ -414,6 +467,8 @@ const RecipientDetails = () => {
     fd.append("lastName", userData.lastName || "");
     fd.append("middleName", userData.middleName || "");
     fd.append("phone", userData.phone || "");
+    fd.append("recipientPhoneDigits", normalizePhoneDigits(userData.phone) || "");
+    fd.append("recipientFullName", `${userData.lastName || ""} ${userData.firstName || ""} ${userData.middleName || ""}`.trim());
 
     // Товар
     const productTypeName =
@@ -436,6 +491,20 @@ const RecipientDetails = () => {
     // Доставка/сумма
     fd.append("deliveryAddress", pickupPoint || (manualAddress && manualAddress.value) || "");
     fd.append("totalPrice", String(totalPrice || 0));
+
+    // Детали CDEK (PVZ/дверь + тариф + посылка)
+    const deliveryPayment = { payer: "sender", paidByUserOnSite: true };
+    if (!isNoCdek && cdekData) {
+      const goods = (cdekData.goods && cdekData.goods.length) ? cdekData.goods : [deriveGoodsPreset()];
+      fd.append("cdekMode", cdekData.mode || "");
+      fd.append("cdekTariffCode", cdekData.tariff?.tariff_code || "");
+      fd.append("cdekTariff", JSON.stringify(cdekData.tariff || {}));
+      fd.append("cdekAddress", JSON.stringify(cdekData.address || {}));
+      fd.append("cdekAddressLabel", cdekData.addressLabel || "");
+      fd.append("cdekGoods", JSON.stringify(goods));
+      fd.append("cdekFrom", JSON.stringify(cdekData.from || {}));
+      fd.append("deliveryPayment", JSON.stringify(deliveryPayment));
+    }
 
     // Фото
     (uploadedImage || []).forEach((file, idx) => {
@@ -503,11 +572,16 @@ const RecipientDetails = () => {
   }, [orderId, navigate]);
 
   useEffect(() => {
-  // если галочку сняли — чистим ручной адрес
-  if (!isNoCdek) {
-    setManualAddress(null);
-  }
-}, [isNoCdek]);
+    // если галочку сняли — чистим ручной адрес
+    if (!isNoCdek) {
+      setManualAddress(null);
+      return;
+    }
+    // если выбрали “нет СДЭКа” — сбрасываем выбранный ПВЗ/тариф
+    setCdekData(null);
+    setPickupPoint("");
+    setDeliveryPrice(null);
+  }, [isNoCdek]);
 
 
   return (
@@ -615,6 +689,7 @@ const RecipientDetails = () => {
               productType={productType}
               onAddressSelect={setPickupPoint}
               onRateSelect={setDeliveryPrice}
+              onCdekSelect={handleCdekSelect}
             />
             <label>
               <input type="checkbox" checked={isNoCdek} onChange={() => setIsNoCdek((p) => !p)} />
