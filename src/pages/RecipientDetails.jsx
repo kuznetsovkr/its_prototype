@@ -77,6 +77,7 @@ const RecipientDetails = () => {
   ); // rate.delivery_sum
   const [manualAddress, setManualAddress] = useState(recipientState.manualAddress || null);
   const [cdekData, setCdekData] = useState(recipientState.cdek || null);
+  const [cdekNumber, setCdekNumber] = useState(null);
   const [isPaying, setIsPaying] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const [error, setError] = useState("");
@@ -504,7 +505,11 @@ const RecipientDetails = () => {
     try {
       const { data } = await api.post('/orders/create', fd);
       setOrderId(data.orderId);
-      return data; // { orderId, ... }
+      if (data?.cdekNumber) {
+        setCdekNumber(data.cdekNumber);
+        sessionStorage.setItem("pay_cdek_number", String(data.cdekNumber));
+      }
+      return data; // { orderId, cdekNumber, ... }
     } catch (err) {
       throw new Error(err.message || 'Create failed');
     }
@@ -515,7 +520,7 @@ const RecipientDetails = () => {
     setError('');
     setIsPaying(true);
     try {
-      const { orderId: oid } = await createDraftOrder();
+      const { orderId: oid, cdekNumber: cdekNum } = await createDraftOrder();
       setOrderId(oid);
 
       if (isCustomType) {
@@ -525,12 +530,13 @@ const RecipientDetails = () => {
           console.warn("Manual confirm failed:", confirmErr);
         }
         setIsPaying(false);
-        navigate("/thank-you", { state: { orderNumber: oid, manual: true } });
+        navigate("/thank-you", { state: { orderNumber: oid, manual: true, cdekNumber: cdekNum || null } });
         return;
       }
 
       const { data } = await api.post('/payments/paykeeper/link', { orderId: oid });
       sessionStorage.setItem('pay_order_id', String(oid));
+      sessionStorage.setItem('pay_cdek_number', cdekNum ? String(cdekNum) : "");
       window.location.href = data.pay_url;
     } catch (e) {
       setError(e.message || 'Не удалось создать заказ или перейти к оплате');
@@ -559,7 +565,8 @@ const RecipientDetails = () => {
 
       try {
         await api.post(`/orders/confirm/${encodeURIComponent(orderId)}`, {});
-        navigate('/thank-you', { state: { orderNumber: orderId } });
+        const storedCdek = sessionStorage.getItem("pay_cdek_number") || null;
+        navigate('/thank-you', { state: { orderNumber: orderId, cdekNumber: storedCdek || null } });
       } catch (err) {
         const status = err.response?.status;
         const body = err.response?.data;

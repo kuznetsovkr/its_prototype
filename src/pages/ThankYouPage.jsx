@@ -4,7 +4,18 @@ import '../assets/styles/pages/_thx.scss';
 
 const ThankYouPage = () => {
   const location = useLocation();
-  const { orderNumber, manual } = location.state || {};
+  const { orderNumber, manual, cdekNumber: stateCdekNumber } = location.state || {};
+  const cdekNumber = stateCdekNumber || sessionStorage.getItem("pay_cdek_number") || null;
+
+  const copyTrack = async () => {
+    if (!cdekNumber) return;
+    try {
+      await navigator.clipboard.writeText(cdekNumber);
+      alert("Трек-номер скопирован");
+    } catch {
+      alert("Не удалось скопировать трек-номер");
+    }
+  };
 
   return (
     <main className="thx" role="main">
@@ -33,6 +44,12 @@ const ThankYouPage = () => {
           <p className="thx__hint">Номер заказа отсутствует — обратитесь в поддержку.</p>
         )}
 
+        {cdekNumber && (
+          <p className="thx__order" style={{ cursor: 'pointer' }} onClick={copyTrack}>
+            <span className="thx__order-label">Трек-номер СДЭК:</span>
+            <span className="thx__order-number">{cdekNumber}</span>
+          </p>
+        )}
 
       </section>
     </main>
