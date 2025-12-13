@@ -94,7 +94,15 @@ const ProfilePage = () => {
       const { data } = await api.put('/user/update', userData, {
         headers: { Authorization: `Bearer ${token}` }, // можно убрать, если есть интерсептор
       });
-      // data — ответ сервера
+      const updated = (data && typeof data === "object" ? (data.user || data) : null) || {};
+      setUserData((prev) => ({
+        firstName: updated.firstName ?? prev.firstName,
+        lastName: updated.lastName ?? prev.lastName,
+        middleName: updated.middleName ?? prev.middleName,
+        birthDate: updated.birthDate ?? prev.birthDate,
+        phone: updated.phone ?? prev.phone,
+      }));
+      setIsEditing(false); // закрываем режим редактирования после успешного сохранения
     } catch (err) {
       const msg = err.response?.data?.message || err.message || 'Неизвестная ошибка';
       console.error('Ошибка обновления данных:', msg);
