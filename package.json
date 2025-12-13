@@ -43,6 +43,7 @@
     ]
   },
   "devDependencies": {
+    "typescript": "^4.9.5",
     "web-vitals": "^4.2.4"
   }
 }
