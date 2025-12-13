@@ -1,62 +1,69 @@
-import { useEffect, useRef } from 'react';
-import CDEKWidget from '@cdek-it/widget';
+import { useEffect, useRef } from "react";
+import CDEKWidget from "@cdek-it/widget";
 
-// Подбираем тип изделия и габариты/вес для расчета доставки
+// Подбираем тип изделия и габариты/вес для расчёта доставки
 const detectClothingKey = (base) => {
-  const raw = String(base || '').toLowerCase();
-  if (raw.includes('худи') || raw.includes('hoodie') || raw.includes('hudi')) return 'hoodie';
-  if (raw.includes('свитшот') || raw.includes('свит') || raw.includes('sweatshirt') || raw.includes('svitshot')) return 'svitshot';
-  if (raw.includes('футбол') || raw.includes('t-shirt') || raw.includes('tshirt') || raw.includes('tee')) return 'tshirt';
-  return 'hoodie'; // чуть завышаем по умолчанию, чтобы не занизить доставку
+  const raw = String(base || "").toLowerCase();
+  if (raw.includes("худи") || raw.includes("hoodie") || raw.includes("hudi")) return "hoodie";
+  if (raw.includes("свитшот") || raw.includes("свит") || raw.includes("sweatshirt") || raw.includes("svitshot")) return "svitshot";
+  if (raw.includes("футбол") || raw.includes("t-shirt") || raw.includes("tshirt") || raw.includes("tee")) return "tshirt";
+  return "hoodie"; // по умолчанию чуть завышаем вес
 };
 
 const resolveProductName = (productType) => {
-  if (!productType) return '';
-  if (typeof productType === 'string') return productType;
-  if (typeof productType === 'object') {
-    return productType.name || productType.type || '';
+  if (!productType) return "";
+  if (typeof productType === "string") return productType;
+  if (typeof productType === "object") {
+    return productType.name || productType.type || "";
   }
-  return '';
+  return "";
 };
 
 const GOODS_PRESETS = {
-  hoodie:   { width: 35, height: 35, length: 7, weight: 0.8 },
+  hoodie: { width: 35, height: 35, length: 7, weight: 0.8 },
   svitshot: { width: 35, height: 35, length: 7, weight: 0.8 },
-  tshirt:   { width: 30, height: 20, length: 3, weight: 0.3 },
-  default:  { width: 35, height: 35, length: 7, weight: 0.8 },
+  tshirt: { width: 30, height: 20, length: 3, weight: 0.3 },
+  default: { width: 35, height: 35, length: 7, weight: 0.8 },
 };
 
 const FROM_LOCATION = {
-  country_code: 'RU',
-  city: 'Красноярск',
+  country_code: "RU",
+  city: "Красноярск",
   postal_code: 660135,
   code: 278,
-  address: 'ул. 78-й Добровольческой бригады, 1',
+  address: "ул. 78-й Добровольческой бригады, 1",
 };
 
 const DEFAULT_CITY = {
   code: 278,
-  city: 'Красноярск',
-  country_code: 'RU',
-  postal_code: '660135',
+  city: "Красноярск",
+  country_code: "RU",
+  postal_code: "660135",
+};
+
+const DEFAULT_FILTERS = {
+  city_code: DEFAULT_CITY.code,
+  city: DEFAULT_CITY.city,
+  country_code: DEFAULT_CITY.country_code,
+  postal_code: DEFAULT_CITY.postal_code,
 };
 
 const formatAddressLabel = (address) => {
-  if (!address) return '';
+  if (!address) return "";
   return (
     address.address ||
     address.formatted ||
     address.name ||
     address.location?.address ||
-    ''
+    ""
   );
 };
 
 const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType }) => {
-  const servicePath = process.env.REACT_APP_CDEK_SERVICE_URL || '/service.php';
-  const ymapsKey    = process.env.REACT_APP_YMAPS_KEY;
+  const servicePath = process.env.REACT_APP_CDEK_SERVICE_URL || "/service.php";
+  const ymapsKey = process.env.REACT_APP_YMAPS_KEY;
 
-  // keep latest callbacks without пересоздания виджета на каждое изменение state
+  // держим актуальные колбэки без пересоздания виджета
   const addressRef = useRef(onAddressSelect);
   const rateRef = useRef(onRateSelect);
   const cdekRef = useRef(onCdekSelect);
@@ -81,23 +88,24 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
       };
 
       instance = new CDEKWidget({
-        root: 'cdek-map',
+        root: "cdek-map",
         from: FROM_LOCATION,
         apiKey: ymapsKey,
         canChoose: true,
         servicePath,
-        hideFilters: { have_cashless:false, have_cash:false, is_dressing_room:false, type:false },
-        // Оставляем только пункты выдачи (office), доставка до двери скрыта
+        hideFilters: { have_cashless: false, have_cash: false, is_dressing_room: false, type: false },
+        // Только ПВЗ, доставку до двери скрываем
         hideDeliveryOptions: { office: false, door: true },
         debug: false,
         goods: [goods],
-        city: DEFAULT_CITY,           // предустанавливаем Красноярск
+        city: DEFAULT_CITY,           // стартовый город
         defaultLocation: DEFAULT_CENTER,
-        fixBounds: 'locality',        // ограничиваем область поиска границами населённого пункта
-        lang: 'rus',
-        currency: 'RUB',
-        // Оставляем один тариф, чтобы пользователь не выбирал тарифы вручную
-        tariffs: { office:[234], door:[] },
+        fixBounds: "locality",        // ограничиваем границами населённого пункта
+        lang: "rus",
+        currency: "RUB",
+        filters: DEFAULT_FILTERS,     // сразу фильтруем по Красноярску
+        // Один тариф, чтобы пользователь не выбирал вручную
+        tariffs: { office: [234], door: [] },
         onChoose(mode, selectedTariff, address) {
           const addressLabel = formatAddressLabel(address);
           addressRef.current?.(addressLabel);
@@ -113,7 +121,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
                   total_sum: selectedTariff.total_sum ?? null,
                   period_min: selectedTariff.period_min ?? null,
                   period_max: selectedTariff.period_max ?? null,
-                  currency: selectedTariff.currency ?? 'RUB',
+                  currency: selectedTariff.currency ?? "RUB",
                 }
               : null,
             address,
@@ -126,8 +134,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
 
       // Force initial centering and reflow the map container after mount
       instance.updateLocation(DEFAULT_CENTER, DEFAULT_ZOOM).catch(() => {});
-      requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
-
+      requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
     }, 0);
 
     return () => {
