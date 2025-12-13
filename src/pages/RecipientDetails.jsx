@@ -728,8 +728,16 @@ const RecipientDetails = () => {
         <div className="deliveryCost">
           <p className="title">РАСЧЁТ СТОИМОСТИ</p>
           <div className="aboutPrice">
-            <div className="aboutPrice_calculate"><p>Вышивка:</p> {isCustomType ? "стоимость рассчитает менеджер" : `${embroideryPrice || 0} \u20bd`}</div>
-            <div className="aboutPrice_calculate"><p>Доставка:</p> {`${deliveryPrice || 0} \u20bd`}</div>
+            <div className="aboutPrice_calculate">
+              <p>Вышивка:</p>
+              <span className={`aboutPrice_value${isCustomType ? " aboutPrice_value--manager" : ""}`}>
+                {isCustomType ? "стоимость рассчитает менеджер" : `${embroideryPrice || 0} \u20bd`}
+              </span>
+            </div>
+            <div className="aboutPrice_calculate">
+              <p>Доставка:</p>
+              <span className="aboutPrice_value">{`${deliveryPrice || 0} \u20bd`}</span>
+            </div>
             <div className="summaryCost"><p>ИТОГО:</p> {isCustomType ? `${deliveryPrice || 0} \u20bd` : `${totalPrice} \u20bd`}</div>
           </div>
 

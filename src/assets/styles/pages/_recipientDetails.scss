@@ -124,6 +124,23 @@
           display: flex;
           flex-direction: row;
           justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+
+          p{
+            margin: 0;
+            flex: 0 0 auto;
+          }
+
+          .aboutPrice_value{
+            flex: 1 1 auto;
+            text-align: right;
+            display: block;
+          }
+
+          .aboutPrice_value--manager{
+            text-align: right;
+          }
         }
 
         .summaryCost{
