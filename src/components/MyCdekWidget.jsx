@@ -88,7 +88,8 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         fixBounds: 'country',
         lang: 'rus',
         currency: 'RUB',
-        tariffs: { office:[234,136,138], door:[] },
+        // Оставляем один тариф, чтобы пользователь не выбирал тарифы вручную
+        tariffs: { office:[234], door:[] },
         onChoose(mode, selectedTariff, address) {
           const addressLabel = formatAddressLabel(address);
           addressRef.current?.(addressLabel);
