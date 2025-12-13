@@ -80,14 +80,15 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         canChoose: true,
         servicePath,
         hideFilters: { have_cashless:false, have_cash:false, is_dressing_room:false, type:false },
-        hideDeliveryOptions: { office:false, door:false },
+        // Оставляем только пункты выдачи (office), доставка до двери скрыта
+        hideDeliveryOptions: { office: false, door: true },
         debug: false,
         goods: [goods],
         defaultLocation: DEFAULT_CENTER,
         fixBounds: 'country',
         lang: 'rus',
         currency: 'RUB',
-        tariffs: { office:[234,136,138], door:[233,137,139] },
+        tariffs: { office:[234,136,138], door:[] },
         onChoose(mode, selectedTariff, address) {
           const addressLabel = formatAddressLabel(address);
           addressRef.current?.(addressLabel);
