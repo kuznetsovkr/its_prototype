@@ -56,6 +56,7 @@ const EmbroiderySelector = () => {
   const clothingKey = detectClothingKey(clothing.type || selectedClothing);
   const patronusLimit = clothingKey === "tshirt" ? 1 : 5;
   const patronusLimitText = clothingKey === "tshirt" ? "на футболки не более 1" : "не более 5";
+  const isCustomType = selectedType === "custom";
 
   useEffect(() => {
     setPatronusCount((prev) => Math.min(Math.max(1, prev), patronusLimit));
@@ -69,10 +70,21 @@ const EmbroiderySelector = () => {
   };
 
   const priceLabel = (type) => `${calcPrice(type)} ₽`;
+  const customPriceNote = "стоимость рассчитает менеджер";
   const hasFiles = uploadedImage.length > 0;
-  const canProceed = Boolean(selectedType && hasFiles);
-  const disabledHint = !hasFiles ? "Загрузите хотя бы одно изображение" : "";
-
+  const hasCustomText = customText.trim().length > 0;
+  const mustUpload = isCustomType && customOption.image;
+  const mustText = isCustomType && customOption.text;
+  const mustSelectCustom = isCustomType ? (customOption.image || customOption.text) : true;
+  const customOk = mustSelectCustom && (!mustUpload || hasFiles) && (!mustText || hasCustomText);
+  const canProceed = isCustomType ? customOk : Boolean(selectedType && hasFiles);
+  const disabledHint = (() => {
+    if (!isCustomType) return !hasFiles ? "Загрузите хотя бы одно изображение" : "";
+    if (!mustSelectCustom) return "Выберите: изображение или надпись";
+    if (mustUpload && !hasFiles) return "Загрузите изображение";
+    if (mustText && !hasCustomText) return "Введите текст для вышивки";
+    return "";
+  })();
   const MAX_MB = 5;
   const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
@@ -298,7 +310,7 @@ const EmbroiderySelector = () => {
                   className="circleButton"
                   onClick={() => setPatronusCount((prev) => Math.max(1, prev - 1))}
                 >
-                    −
+                    -
                 </button>
                 <span className="countValue">{patronusCount}</span>
                 <button
@@ -373,6 +385,7 @@ const EmbroiderySelector = () => {
                 <CheckIcon className="selector__check" />
               </span>
               другая
+              <span className="selector__price">{customPriceNote}</span>
             </label>
           </div>
         </div>
@@ -388,9 +401,12 @@ const EmbroiderySelector = () => {
                 <label className="selector__item">
                   <input
                     type="radio"
-                    name="customImage"
+                    name="customChoice"
                     checked={customOption.image}
-                    onChange={(e) => setCustomOption((prev) => ({ ...prev, image: e.target.checked }))}
+                    onChange={() => {
+                      setCustomOption({ image: true, text: false });
+                      setCustomText("");
+                    }}
                   />
                   <span className="selector__custom">
                     <CheckIcon className="selector__check" />
@@ -400,9 +416,13 @@ const EmbroiderySelector = () => {
 
                 <label className="selector__item" style={{ marginBottom: "10px" }}>
                   <input
-                    type="checkbox"
+                    type="radio"
+                    name="customChoice"
                     checked={customOption.text}
-                    onChange={(e) => setCustomOption((prev) => ({ ...prev, text: e.target.checked }))}
+                    onChange={() => {
+                      setCustomOption({ image: false, text: true });
+                      setUploadedImage([]);
+                    }}
                   />
                   <span className="selector__custom">
                     <CheckIcon className="selector__check" />
@@ -448,7 +468,7 @@ const EmbroiderySelector = () => {
             </>
           )}
 
-          {customOption.text && (
+          {selectedType === "custom" && customOption.text && (
             <>
               <div className="customTextBlock">
                   <p className="title">ТЕКСТ ДЛЯ ВЫШИВКИ:</p>
@@ -508,5 +528,3 @@ const EmbroiderySelector = () => {
 };
 
 export default EmbroiderySelector;
-
-

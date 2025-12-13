@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useLayoutEffect } from "react";
+﻿import { useState, useEffect, useMemo, useLayoutEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import MyCdekWidget from "../components/MyCdekWidget";
 import { AddressSuggestions } from 'react-dadata';
@@ -21,7 +21,7 @@ const isRu11 = (digits) => digits.length === 11 && digits.startsWith('7');
 const formatPhoneNumber = (value) => {
   let numbers = cleanPhone(value);
   if (!numbers.startsWith('7')) numbers = '7' + numbers; // принудительно 7 в начале
-  return (
+  return ( 
     '+7 ' +
     (numbers[1] ? `(${numbers.slice(1, 4)}` : '') +
     (numbers[4] ? `) ${numbers.slice(4, 7)}` : '') +
@@ -42,7 +42,9 @@ const RecipientDetails = () => {
   const size = clothing.size || locationState.size;
 
   const selectedType = embroidery.type || locationState.selectedType;
+  const isCustomType = selectedType === "custom";
   const customText = embroidery.customText || locationState.customText;
+  const customOption = embroidery.customOption || locationState.customOption || { image: false, text: false };
   const uploadedImage = embroidery.uploadedImage || locationState.uploadedImage || [];
   const comment = embroidery.comment || locationState.comment;
   const embroideryPrice = embroidery.price ?? locationState.embroideryPrice ?? 0;
@@ -60,7 +62,6 @@ const RecipientDetails = () => {
   const [phoneLocked, setPhoneLocked] = useState(false);             // поле зафиксировано (нельзя редачить)
   const [phoneVerified, setPhoneVerified] = useState(false);         // подтверждён (✓) или считается валидным, если из профиля и не редактируется
   const [phoneEditedSinceProfile, setPhoneEditedSinceProfile] = useState(false); // меняли после «изменить»
-
   // Шаги подтверждения
   const [smsRequested, setSmsRequested] = useState(false);
   const [smsStep, setSmsStep] = useState(0); // 0 - ничего, 1 - ввод кода, 2 - ввод пароля админа
@@ -86,7 +87,7 @@ const RecipientDetails = () => {
   );
 
   useLayoutEffect(() => {
-    // при переходе на шаг получателя всегда показываем верх страницы
+        // при переходе на шаг получателя всегда показываем верх страницы
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, []);
   
@@ -97,7 +98,6 @@ const RecipientDetails = () => {
   const isManualAddressFull = useMemo(() => {
     if (!manualAddress || !manualAddress.data) return false;
     const { house, block, flat } = manualAddress.data || {};
-    // ???????, ??? ????? "?? ????", ???? ???? ???? ?? ???/??????/????????
     return Boolean(house || block || flat);
   }, [manualAddress]);
 
@@ -185,15 +185,21 @@ const RecipientDetails = () => {
 
   useEffect(() => {
     const hasClothing = Boolean(productType && color && size);
-    const hasEmbroidery = Boolean(selectedType && (uploadedImage?.length || 0) > 0);
+    const hasEmbroidery =
+      selectedType === "custom"
+        ? (customOption.text
+            ? Boolean((customText || "").trim())
+            : customOption.image
+              ? (uploadedImage?.length || 0) > 0
+              : false)
+        : Boolean(selectedType && (uploadedImage?.length || 0) > 0);
     if (!hasClothing) {
       navigate("/order", { replace: true });
     } else if (!hasEmbroidery) {
       navigate("/embroidery", { replace: true });
     }
-  }, [productType, color, size, selectedType, uploadedImage?.length, navigate]);
+  }, [productType, color, size, selectedType, uploadedImage?.length, customOption.text, customOption.image, customText, navigate]);
 
-  // reset local inputs only when shared order data changes externally (например, сброс корзины)
   useEffect(() => {
     setUserData((prev) => ({
       ...prev,
@@ -217,9 +223,6 @@ const RecipientDetails = () => {
   ]);
 
 
-
-
-  // Подтягиваем профиль
   useEffect(() => {
     const fetchUserData = async () => {
       if (!isUserAuthenticated) return;
@@ -236,7 +239,7 @@ const RecipientDetails = () => {
         const hasProfilePhone = Boolean(data?.phone);
         setPhoneFromProfile(hasProfilePhone);
         setPhoneLocked(hasProfilePhone);
-        setPhoneVerified(hasProfilePhone); // авторизован и телефон пришёл — считаем ок, пока не изменён
+        setPhoneVerified(hasProfilePhone); 
         setPhoneEditedSinceProfile(false);
       } catch (e) {
         console.error("Ошибка получения данных пользователя:", e);
@@ -245,18 +248,16 @@ const RecipientDetails = () => {
     fetchUserData();
   }, [isUserAuthenticated]);
 
-  // Маска/валидация для полей
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    // Маска только для телефона
     if (name === 'phone') {
       const masked = formatPhoneNumber(value);
       setUserData((prev) => ({ ...prev, phone: masked }));
       setAuthError("");
       if (phoneFromProfile) {
         setPhoneEditedSinceProfile(true);
-        setPhoneVerified(false); // при редактировании подтверждение слетает
+        setPhoneVerified(false); 
       }
       return;
     }
@@ -270,11 +271,8 @@ const RecipientDetails = () => {
     userData.middleName.trim() !== "" &&
     userData.phone.trim() !== "";
 
-  const isDeliveryAddressFilled = isNoCdek
-    ? Boolean(manualAddress?.value && isManualAddressFull) // только полный адрес до дома
-    : Boolean(pickupPoint);      
-
-  // Телефон ок для оплаты, если подтверждён ИЛИ (пришёл из профиля, поле заблокировано и не редактировалось)
+  const isDeliveryAddressFilled = isNoCdek ? Boolean(manualAddress?.value && isManualAddressFull) : Boolean(pickupPoint);
+    
   const isPhoneOk = phoneVerified || (phoneFromProfile && phoneLocked && !phoneEditedSinceProfile);
   const isFormValid = isUserDataFilled && isDeliveryAddressFilled && isPhoneOk;
 
@@ -302,7 +300,6 @@ const RecipientDetails = () => {
   };
 
 
-  // ====== SMS: запрос/повтор/подтверждение ======
   useEffect(() => {
     if (resendTimer <= 0) return;
     const id = setTimeout(() => setResendTimer((s) => s - 1), 1000);
@@ -325,7 +322,6 @@ const RecipientDetails = () => {
 
     try {
       const response = await api.post('/auth/request-sms', { phone: digits });
-      // Если бэкенд просит пароль — это админ
       if (response.data?.message === "Введите пароль") {
         setSmsStep(2);
       } else {
@@ -458,11 +454,9 @@ const RecipientDetails = () => {
     return { ...base, weight_grams: Math.round((base.weight || 0) * 1000) };
   };
 
-  // ====== Создание черновика заказа и оплата ======
   async function createDraftOrder() {
     const fd = new FormData();
 
-    // Данные пользователя
     fd.append("firstName", userData.firstName || "");
     fd.append("lastName", userData.lastName || "");
     fd.append("middleName", userData.middleName || "");
@@ -470,7 +464,6 @@ const RecipientDetails = () => {
     fd.append("recipientPhoneDigits", normalizePhoneDigits(userData.phone) || "");
     fd.append("recipientFullName", `${userData.lastName || ""} ${userData.firstName || ""} ${userData.middleName || ""}`.trim());
 
-    // Товар
     const productTypeName =
       typeof productType === "object"
         ? (productType.name ?? productType.type ?? String(productType))
@@ -480,19 +473,17 @@ const RecipientDetails = () => {
     fd.append("color", color || "");
     fd.append("size", size || "");
 
-    // Кастомизация
     fd.append("embroideryType", selectedType || "");
     fd.append("embroideryTypeRu", embroideryTypeRu);
     fd.append("patronusCount", String(patronusCount || 0));
     fd.append("petFaceCount", String(petFaceCount || 0));
     fd.append("customText", customText || "");
+    fd.append("customOption", JSON.stringify(customOption || {}));
     fd.append("comment", comment || "");
 
-    // Доставка/сумма
     fd.append("deliveryAddress", pickupPoint || (manualAddress && manualAddress.value) || "");
     fd.append("totalPrice", String(totalPrice || 0));
 
-    // Детали CDEK (PVZ/дверь + тариф + посылка)
     const deliveryPayment = { payer: "sender", paidByUserOnSite: true };
     if (!isNoCdek && cdekData) {
       const goods = (cdekData.goods && cdekData.goods.length) ? cdekData.goods : [deriveGoodsPreset()];
@@ -506,7 +497,6 @@ const RecipientDetails = () => {
       fd.append("deliveryPayment", JSON.stringify(deliveryPayment));
     }
 
-    // Фото
     (uploadedImage || []).forEach((file, idx) => {
       if (file) fd.append("images", file, file.name || `image_${idx}.jpg`);
     });
@@ -520,22 +510,34 @@ const RecipientDetails = () => {
     }
   }
 
-  // Открыть оплату
   async function handlePayment() {
     if (isPaying) return;
-    setError(''); setIsPaying(true);
+    setError('');
+    setIsPaying(true);
     try {
       const { orderId: oid } = await createDraftOrder();
+      setOrderId(oid);
+
+      if (isCustomType) {
+        try {
+          await api.post(`/orders/confirm/${encodeURIComponent(oid)}`, { provider: "manual" });
+        } catch (confirmErr) {
+          console.warn("Manual confirm failed:", confirmErr);
+        }
+        setIsPaying(false);
+        navigate("/thank-you", { state: { orderNumber: oid, manual: true } });
+        return;
+      }
+
       const { data } = await api.post('/payments/paykeeper/link', { orderId: oid });
       sessionStorage.setItem('pay_order_id', String(oid));
       window.location.href = data.pay_url;
     } catch (e) {
-      setError(e.message || 'Ошибка при создании ссылки на оплату');
+      setError(e.message || 'Не удалось создать заказ или перейти к оплате');
       setIsPaying(false);
+      }
     }
-  }
 
-  // Сообщение об успешной оплате
   useEffect(() => {
     let confirming = false;
     const onMessage = async (event) => {
@@ -572,12 +574,10 @@ const RecipientDetails = () => {
   }, [orderId, navigate]);
 
   useEffect(() => {
-    // если галочку сняли — чистим ручной адрес
     if (!isNoCdek) {
       setManualAddress(null);
       return;
     }
-    // если выбрали “нет СДЭКа” — сбрасываем выбранный ПВЗ/тариф
     setCdekData(null);
     setPickupPoint("");
     setDeliveryPrice(null);
@@ -631,7 +631,7 @@ const RecipientDetails = () => {
                   ) : (
                     <>
                       {smsStep === 1 && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
                           <input
                             type="text"
                             inputMode="numeric"
@@ -647,15 +647,15 @@ const RecipientDetails = () => {
                             onClick={resendSms}
                             disabled={resendTimer > 0}
                             className="link-like"
-                            style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: resendTimer > 0 ? 'not-allowed' : 'pointer' }}
+                            style={{ textDecoration: "underline", background: "none", border: "none", cursor: resendTimer > 0 ? "not-allowed" : "pointer" }}
                           >
-                            {resendTimer > 0 ? `повторно отправить (${resendTimer}с)` : 'повторно отправить код'}
+                            {resendTimer > 0 ? `Можно отправить снова через (${resendTimer} c)` : "Отправить код ещё раз"}
                           </button>
                         </div>
                       )}
 
                       {smsStep === 2 && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
                           <input
                             type="password"
                             placeholder="Пароль администратора"
@@ -705,32 +705,28 @@ const RecipientDetails = () => {
                     placeholder: "Введите свой адрес",
                   }}
                 />
-                {manualAddress && !isManualAddressFull && (
-                  <p className="manualAddress__hint">
-                    Пожалуйста, выберите подсказку с указанием дома.
-                  </p>
+                {!isManualAddressFull && (
+                  <p className="manualAddress__hint">Пожалуйста, выберите подсказку с указанием дома.</p>
                 )}
                 {manualAddress?.value && (
-                  <p className="manualAddress__selected">
-                    Вы выбрали: {manualAddress.value}
-                  </p>
+                  <p className="manualAddress__selected">Вы выбрали: {manualAddress.value}</p>
                 )}
               </div>
             )}
+            </div>
           </div>
         </div>
-      </div>
 
       <div className="secondColumn">
         <div className="deliveryCost">
           <p className="title">РАСЧЁТ СТОИМОСТИ</p>
           <div className="aboutPrice">
-            <div className="aboutPrice_calculate"><p>Вышивка:</p> {`${embroideryPrice || 0} ₽`}</div>
-            <div className="aboutPrice_calculate"><p>Доставка:</p> {`${deliveryPrice || 0} ₽`}</div>
-            <div className="summaryCost"><p>ИТОГО:</p> {`${totalPrice} ₽`}</div>
+            <div className="aboutPrice_calculate"><p>Вышивка:</p> {isCustomType ? "стоимость рассчитает менеджер" : `${embroideryPrice || 0} \u20bd`}</div>
+            <div className="aboutPrice_calculate"><p>Доставка:</p> {`${deliveryPrice || 0} \u20bd`}</div>
+            <div className="summaryCost"><p>ИТОГО:</p> {isCustomType ? `${deliveryPrice || 0} \u20bd` : `${totalPrice} \u20bd`}</div>
           </div>
 
-          {error && <div className="error" style={{ color: 'crimson', marginTop: 8 }}>{error}</div>}
+          {error && <div className="error" style={{ color: "crimson", marginTop: 8 }}>{error}</div>}
 
           <div className="tooltip-container">
             <button
@@ -738,7 +734,7 @@ const RecipientDetails = () => {
               disabled={!isFormValid || isPaying}
               className="confirmButton"
             >
-              {isPaying ? 'ОПЛАТА…' : 'ПЕРЕЙТИ К ОПЛАТЕ'}
+              {isPaying ? "Обрабатываем..." : isCustomType ? "ОТПРАВИТЬ ЗАЯВКУ" : "ПЕРЕЙТИ К ОПЛАТЕ"}
             </button>
             {!isFormValid && (
               <div className="tooltip-text">{getMissingFieldsMessage()}</div>

@@ -1,10 +1,10 @@
-import React from 'react';
+﻿import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import '../assets/styles/pages/_thx.scss';
 
 const ThankYouPage = () => {
   const location = useLocation();
-  const { orderNumber } = location.state || {};
+  const { orderNumber, manual } = location.state || {};
 
   return (
     <main className="thx" role="main">
@@ -18,7 +18,11 @@ const ThankYouPage = () => {
 
         <h1 id="thx-title" className="thx__title">Спасибо за заказ!</h1>
 
-        <p className="thx__text">Данные вашего заказа:</p>
+        <p className="thx__text">
+          {manual
+            ? 'Мы приняли ваш заказ. Менеджер свяжется с вами для уточнения деталей и расчёта стоимости.'
+            : 'Мы приняли ваш заказ. Номер заказа:'}
+        </p>
 
         {orderNumber ? (
           <p className="thx__order">
@@ -26,7 +30,7 @@ const ThankYouPage = () => {
             <span className="thx__order-number">{orderNumber}</span>
           </p>
         ) : (
-          <p className="thx__hint">Номер заказа появится в личном кабинете.</p>
+          <p className="thx__hint">Номер заказа отсутствует — обратитесь в поддержку.</p>
         )}
 
 
