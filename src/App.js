@@ -19,6 +19,7 @@ import FakePayment from './pages/FakePayment';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFail from './pages/PaymentFail';
 import { useOrder } from "./context/OrderContext";
+import RequireAdmin from './components/RequireAdmin';
 
 const OrderFlowReset = () => {
     const location = useLocation();
@@ -70,7 +71,14 @@ const App = () => {
                             <Route path="/payment-fail" element={<PageLayout><PaymentFail /></PageLayout>} />
 
                             {/* Админку можно оставить без layout-а, если она отдельная */}
-                            <Route path="/admin/inventory" element={<PageLayout><AdminInventory /></PageLayout>} />
+                            <Route
+                              path="/admin/inventory"
+                              element={
+                                <RequireAdmin>
+                                  <PageLayout><AdminInventory /></PageLayout>
+                                </RequireAdmin>
+                              }
+                            />
                         </Routes>
                     </main>
                 <Footer />

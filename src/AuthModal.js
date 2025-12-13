@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from './api'
+import { applyAuthResponse } from "./utils/auth";
 
 const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
     const [phone, setPhone] = useState("+7 "); // Начинаем с +7
@@ -93,7 +94,7 @@ const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
 
         try {
             const response = await api.post('/auth/login', { phone, smsCode });
-            localStorage.setItem("token", response.data.token);
+            await applyAuthResponse(response.data);
             if (onLoginSuccess) onLoginSuccess();
         } catch (error) {
             console.error("Ошибка при авторизации:", error);
@@ -113,8 +114,7 @@ const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
                 password,
             });
 
-            localStorage.setItem("token", response.data.token);
-            localStorage.setItem("role", "admin"); // Сохраняем роль
+            await applyAuthResponse({ ...response.data, role: response.data?.role || "admin" });
             if (onLoginSuccess) onLoginSuccess();
         } catch (error) {
             console.error("Ошибка при входе админа:", error);

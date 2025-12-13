@@ -5,6 +5,7 @@ import { AddressSuggestions } from 'react-dadata';
 import 'react-dadata/dist/react-dadata.css';
 import api from '../api';
 import { useOrder } from "../context/OrderContext";
+import { applyAuthResponse, resolveUserRole } from "../utils/auth";
 
 const EMBROIDERY_TYPE_RU = {
   Patronus: "Патронус",
@@ -230,6 +231,8 @@ const RecipientDetails = () => {
       try {
         const { data } = await api.get('/user/me');
         const maskedPhone = data?.phone ? formatPhoneNumber(String(data.phone)) : "";
+        const role = resolveUserRole(data);
+        if (role) localStorage.setItem("role", role);
         setUserData({
           firstName: data?.firstName ?? "",
           lastName: data?.lastName ?? "",
@@ -355,11 +358,8 @@ const RecipientDetails = () => {
     }
     try {
       const response = await api.post('/auth/login', { phone: digits, smsCode });
-      const token = response.data?.token;
-      if (token) {
-        localStorage.setItem("token", token);
-        setIsUserAuthenticated(true);
-      }
+      await applyAuthResponse(response.data);
+      setIsUserAuthenticated(true);
       setPhoneVerified(true);
       setPhoneLocked(true);
       setSmsRequested(false);
@@ -383,12 +383,8 @@ const RecipientDetails = () => {
     }
     try {
       const response = await api.post('/auth/admin-login', { phone: digits, password: adminPassword });
-      const token = response.data?.token;
-      if (token) {
-        localStorage.setItem("token", token);
-        localStorage.setItem("role", "admin");
-        setIsUserAuthenticated(true);
-      }
+      await applyAuthResponse({ ...response.data, role: response.data?.role || "admin" });
+      setIsUserAuthenticated(true);
       setPhoneVerified(true);
       setPhoneLocked(true);
       setSmsRequested(false);

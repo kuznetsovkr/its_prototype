@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from '../api';
+import { resolveUserRole } from "../utils/auth";
 
 
 const ProfilePage = () => {
@@ -60,15 +61,18 @@ const ProfilePage = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      try {
-        const res = await api.get('/user/me', {
-          headers: { Authorization: `Bearer ${token}` }, // убери, если есть интерсептор
-        });
+        try {
+          const res = await api.get('/user/me', {
+            headers: { Authorization: `Bearer ${token}` }, // убери, если есть интерсептор
+          });
 
-        const u = res.data || {};
-        setUserData({
-          firstName: u.firstName || "",
-          lastName:  u.lastName  || "",
+          const u = res.data || {};
+          const roleFromApi = resolveUserRole(u);
+          setRole(roleFromApi || "user");
+          localStorage.setItem("role", roleFromApi || "user");
+          setUserData({
+            firstName: u.firstName || "",
+            lastName:  u.lastName  || "",
           middleName:u.middleName|| "",
           birthDate: u.birthDate || "",
           phone:     u.phone     || "",
