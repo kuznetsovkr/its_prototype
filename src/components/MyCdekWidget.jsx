@@ -34,6 +34,13 @@ const FROM_LOCATION = {
   address: 'ул. 78-й Добровольческой бригады, 1',
 };
 
+const DEFAULT_CITY = {
+  code: 278,
+  city: 'Красноярск',
+  country_code: 'RU',
+  postal_code: '660135',
+};
+
 const formatAddressLabel = (address) => {
   if (!address) return '';
   return (
@@ -84,8 +91,9 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         hideDeliveryOptions: { office: false, door: true },
         debug: false,
         goods: [goods],
+        city: DEFAULT_CITY,           // предустанавливаем Красноярск
         defaultLocation: DEFAULT_CENTER,
-        fixBounds: 'country',
+        fixBounds: 'city',            // ограничиваем область поиска границами города
         lang: 'rus',
         currency: 'RUB',
         // Оставляем один тариф, чтобы пользователь не выбирал тарифы вручную
