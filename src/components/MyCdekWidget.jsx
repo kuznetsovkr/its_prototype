@@ -7,7 +7,7 @@ const detectClothingKey = (base) => {
   if (raw.includes("худи") || raw.includes("hoodie") || raw.includes("hudi")) return "hoodie";
   if (raw.includes("свитшот") || raw.includes("свит") || raw.includes("sweatshirt") || raw.includes("svitshot")) return "svitshot";
   if (raw.includes("футбол") || raw.includes("t-shirt") || raw.includes("tshirt") || raw.includes("tee")) return "tshirt";
-  return "hoodie"; // по умолчанию чуть завышаем вес
+  return "hoodie"; // по умолчанию берём худи, чтобы не занизить вес
 };
 
 const resolveProductName = (productType) => {
@@ -39,13 +39,6 @@ const DEFAULT_CITY = {
   city: "Красноярск",
   country_code: "RU",
   postal_code: "660135",
-};
-
-const DEFAULT_FILTERS = {
-  city_code: DEFAULT_CITY.code,
-  city: DEFAULT_CITY.city,
-  country_code: DEFAULT_CITY.country_code,
-  postal_code: DEFAULT_CITY.postal_code,
 };
 
 const formatAddressLabel = (address) => {
@@ -98,14 +91,12 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         hideDeliveryOptions: { office: false, door: true },
         debug: false,
         goods: [goods],
-        city: DEFAULT_CITY,           // стартовый город
+        city: DEFAULT_CITY,           // стартовый город для первого запроса
         defaultLocation: DEFAULT_CENTER,
-        fixBounds: "locality",        // ограничиваем границами населённого пункта
+        fixBounds: "country",         // даём переключаться между городами/геолокацией
         lang: "rus",
         currency: "RUB",
-        filters: DEFAULT_FILTERS,     // сразу фильтруем по Красноярску
-        // Один тариф, чтобы пользователь не выбирал вручную
-        // Фиксированный склад-склад: оставляем только один тариф, выбор пользователю не показываем
+        // Один тариф склад–склад (136), выбор тарифов пользователю не показываем
         tariffs: { office: [136], door: [] },
         onChoose(mode, selectedTariff, address) {
           const addressLabel = formatAddressLabel(address);
@@ -133,7 +124,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         },
       });
 
-      // Force initial centering and reflow the map container after mount
+      // Принудительно центрируем на старте и перерисовываем контейнер
       instance.updateLocation(DEFAULT_CENTER, DEFAULT_ZOOM).catch(() => {});
       requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
     }, 0);
@@ -144,7 +135,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
     };
   }, [servicePath, ymapsKey, productType]);
 
-  return null; // renders into #cdek-map via widget internals
+  return null; // виджет сам рисует карту в #cdek-map
 };
 
 export default MyCdekWidget;
