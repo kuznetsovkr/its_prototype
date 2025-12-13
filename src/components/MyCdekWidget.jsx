@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import CDEKWidget from '@cdek-it/widget';
 
 // Подбираем тип изделия и габариты/вес для расчета доставки
@@ -49,6 +49,15 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
   const servicePath = process.env.REACT_APP_CDEK_SERVICE_URL || '/service.php';
   const ymapsKey    = process.env.REACT_APP_YMAPS_KEY;
 
+  // keep latest callbacks without пересоздания виджета на каждое изменение state
+  const addressRef = useRef(onAddressSelect);
+  const rateRef = useRef(onRateSelect);
+  const cdekRef = useRef(onCdekSelect);
+
+  useEffect(() => { addressRef.current = onAddressSelect; }, [onAddressSelect]);
+  useEffect(() => { rateRef.current = onRateSelect; }, [onRateSelect]);
+  useEffect(() => { cdekRef.current = onCdekSelect; }, [onCdekSelect]);
+
   // LngLat
   const DEFAULT_CENTER = [92.868, 56.0106];
   const DEFAULT_ZOOM = 10;
@@ -81,10 +90,10 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         tariffs: { office:[234,136,138], door:[233,137,139] },
         onChoose(mode, selectedTariff, address) {
           const addressLabel = formatAddressLabel(address);
-          onAddressSelect?.(addressLabel);
-          onRateSelect?.(selectedTariff?.delivery_sum ?? selectedTariff?.total_sum ?? null);
+          addressRef.current?.(addressLabel);
+          rateRef.current?.(selectedTariff?.delivery_sum ?? selectedTariff?.total_sum ?? null);
 
-          onCdekSelect?.({
+          cdekRef.current?.({
             mode,
             tariff: selectedTariff
               ? {
@@ -115,7 +124,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
       clearTimeout(t);
       try { instance?.destroy?.(); } catch {}
     };
-  }, [onAddressSelect, onRateSelect, onCdekSelect, servicePath, ymapsKey, productType]);
+  }, [servicePath, ymapsKey, productType]);
 
   return null; // renders into #cdek-map via widget internals
 };

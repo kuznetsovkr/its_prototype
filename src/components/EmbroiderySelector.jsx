@@ -55,7 +55,7 @@ const EmbroiderySelector = () => {
   const { selectedClothing } = location.state || {};
   const clothingKey = detectClothingKey(clothing.type || selectedClothing);
   const patronusLimit = clothingKey === "tshirt" ? 1 : 5;
-  const patronusLimitText = clothingKey === "tshirt" ? "на футболки не более 1" : "не более 5";
+  const patronusLimitText = clothingKey === "tshirt" ? "на футболке не более 1" : "не более 5";
   const isCustomType = selectedType === "custom";
 
   useEffect(() => {
