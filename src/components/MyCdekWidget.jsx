@@ -105,8 +105,8 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         currency: "RUB",
         filters: DEFAULT_FILTERS,     // сразу фильтруем по Красноярску
         // Один тариф, чтобы пользователь не выбирал вручную
-        // Передаём несколько тарифов office, чтобы виджет смог подобрать доступный сам
-        tariffs: { office: [234, 136, 138], door: [] },
+        // Фиксированный склад-склад: оставляем только один тариф, выбор пользователю не показываем
+        tariffs: { office: [136], door: [] },
         onChoose(mode, selectedTariff, address) {
           const addressLabel = formatAddressLabel(address);
           addressRef.current?.(addressLabel);
