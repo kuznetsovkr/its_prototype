@@ -1,7 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ReactComponent as CheckIcon } from "../images/Vector.svg";
 import { useOrder } from "../context/OrderContext";
+
+const isSameFiles = (a = [], b = []) => {
+  if (a === b) return true;
+  if (!Array.isArray(a) || !Array.isArray(b)) return false;
+  if (a.length !== b.length) return false;
+  return a.every((file, idx) => file === b[idx]);
+};
+
+const isSameOptions = (a = {}, b = {}) =>
+  (a?.image ?? false) === (b?.image ?? false) && (a?.text ?? false) === (b?.text ?? false);
 
 // Detect clothing type by name (ru/en)
 const detectClothingKey = (base) => {
@@ -14,7 +24,7 @@ const detectClothingKey = (base) => {
   const name = `${raw} ${translit}`;
   if (name.includes("hudi") || name.includes("hoodie")) return "hoodie";
   if (name.includes("svitshot") || name.includes("sweatshirt")) return "svitshot";
-  if (name.includes("t-shirt") || name.includes("tshirt") || name.includes("tee") || name.includes("futbol")) return "tshirt";
+  if (name.includes("t-shirt") || name.includes("tshirt") || name.includes("tee") || name.includes("futbol") || name.includes("футбол")) return "tshirt";
   return "tshirt";
 };
 
@@ -30,6 +40,7 @@ const EmbroiderySelector = () => {
   const { order, setEmbroidery } = useOrder();
   const { clothing, embroidery } = order;
   const prevTypeRef = useRef(null);
+  const skipSyncRef = useRef(false);
 
   const [selectedType, setSelectedType] = useState(embroidery.type || "Patronus");
   const [customText, setCustomText] = useState(embroidery.customText || "");
@@ -43,6 +54,12 @@ const EmbroiderySelector = () => {
 
   const { selectedClothing } = location.state || {};
   const clothingKey = detectClothingKey(clothing.type || selectedClothing);
+  const patronusLimit = clothingKey === "tshirt" ? 1 : 5;
+  const patronusLimitText = clothingKey === "tshirt" ? "на футболки не более 1" : "не более 5";
+
+  useEffect(() => {
+    setPatronusCount((prev) => Math.min(Math.max(1, prev), patronusLimit));
+  }, [patronusLimit]);
 
   const calcPrice = (type) => {
     const base = priceMatrix[type]?.[clothingKey] ?? 0;
@@ -92,13 +109,13 @@ const EmbroiderySelector = () => {
       const next = [...prev, ...toAdd];
 
       const msgs = [];
-      if (rejected.dup.length)  msgs.push(`дубликаты: ${rejected.dup.join(", ")}`);
-      if (rejected.type.length) msgs.push(`неподдерживаемый тип: ${rejected.type.join(", ")}`);
-      if (rejected.size.length) msgs.push(`слишком большие (> ${MAX_MB} МБ): ${rejected.size.join(", ")}`);
+      if (rejected.dup.length)  msgs.push(`Дубликаты: ${rejected.dup.join(", ")}`);
+      if (rejected.type.length) msgs.push(`Неподдерживаемый тип: ${rejected.type.join(", ")}`);
+      if (rejected.size.length) msgs.push(`Слишком большие файлы (> ${MAX_MB} МБ): ${rejected.size.join(", ")}`);
       if (accepted.length > remaining) {
-        msgs.push(`превышен лимит (${limit}). Добавлено файлов: ${toAdd.length}`);
+        msgs.push(`Превышен лимит (${limit}). Добавлено: ${toAdd.length}`);
       }
-      setError(msgs.join(" ? "));
+      setError(msgs.join(" • "));
 
       return next;
     });
@@ -125,7 +142,7 @@ const EmbroiderySelector = () => {
 
   useEffect(() => {
     const price = calcPrice(selectedType);
-    setEmbroidery({
+    const nextEmbroidery = {
       type: selectedType,
       customText,
       customTextFont,
@@ -135,7 +152,24 @@ const EmbroiderySelector = () => {
       petFaceCount,
       customOption,
       price,
-    });
+    };
+
+    const currentOption = embroidery.customOption || { image: false, text: false };
+    const sameState =
+      (embroidery.type || "Patronus") === nextEmbroidery.type &&
+      (embroidery.customText || "") === nextEmbroidery.customText &&
+      (embroidery.customTextFont || "Arial") === nextEmbroidery.customTextFont &&
+      (embroidery.comment || "") === nextEmbroidery.comment &&
+      (embroidery.patronusCount || 1) === nextEmbroidery.patronusCount &&
+      (embroidery.petFaceCount || 1) === nextEmbroidery.petFaceCount &&
+      (embroidery.price || 0) === nextEmbroidery.price &&
+      isSameFiles(embroidery.uploadedImage || [], nextEmbroidery.uploadedImage || []) &&
+      isSameOptions(currentOption, nextEmbroidery.customOption || { image: false, text: false });
+
+    if (!sameState) {
+      skipSyncRef.current = true;
+      setEmbroidery(nextEmbroidery);
+    }
   }, [
     selectedType,
     customText,
@@ -146,18 +180,56 @@ const EmbroiderySelector = () => {
     petFaceCount,
     customOption,
     clothingKey,
+    embroidery.type,
+    embroidery.customText,
+    embroidery.customTextFont,
+    embroidery.comment,
+    embroidery.uploadedImage,
+    embroidery.patronusCount,
+    embroidery.petFaceCount,
+    embroidery.customOption,
+    embroidery.price,
     setEmbroidery,
   ]);
 
   useEffect(() => {
-    setSelectedType(embroidery.type || "Patronus");
-    setCustomText(embroidery.customText || "");
-    setUploadedImage(embroidery.uploadedImage || []);
-    setComment(embroidery.comment || "");
-    setPatronusCount(embroidery.patronusCount || 1);
-    setPetFaceCount(embroidery.petFaceCount || 1);
-    setCustomOption(embroidery.customOption || { image: false, text: false });
-    setCustomTextFont(embroidery.customTextFont || "Arial");
+    const nextType = embroidery.type || "Patronus";
+    const nextCustomText = embroidery.customText || "";
+    const nextUploaded = embroidery.uploadedImage || [];
+    const nextComment = embroidery.comment || "";
+    const nextPatronusCount = embroidery.patronusCount || 1;
+    const nextPetFaceCount = embroidery.petFaceCount || 1;
+    const nextCustomOption = embroidery.customOption || { image: false, text: false };
+    const nextFont = embroidery.customTextFont || "Arial";
+
+    const inSync =
+      selectedType === nextType &&
+      customText === nextCustomText &&
+      isSameFiles(uploadedImage, nextUploaded) &&
+      comment === nextComment &&
+      patronusCount === nextPatronusCount &&
+      petFaceCount === nextPetFaceCount &&
+      isSameOptions(customOption, nextCustomOption) &&
+      customTextFont === nextFont;
+
+    if (inSync) {
+      skipSyncRef.current = false;
+      return;
+    }
+
+    if (skipSyncRef.current) {
+      skipSyncRef.current = false;
+      return;
+    }
+
+    if (selectedType !== nextType) setSelectedType(nextType);
+    if (customText !== nextCustomText) setCustomText(nextCustomText);
+    if (!isSameFiles(uploadedImage, nextUploaded)) setUploadedImage(nextUploaded);
+    if (comment !== nextComment) setComment(nextComment);
+    if (patronusCount !== nextPatronusCount) setPatronusCount(nextPatronusCount);
+    if (petFaceCount !== nextPetFaceCount) setPetFaceCount(nextPetFaceCount);
+    if (!isSameOptions(customOption, nextCustomOption)) setCustomOption(nextCustomOption);
+    if (customTextFont !== nextFont) setCustomTextFont(nextFont);
   }, [
     embroidery.type,
     embroidery.customText,
@@ -167,6 +239,14 @@ const EmbroiderySelector = () => {
     embroidery.petFaceCount,
     embroidery.customOption,
     embroidery.customTextFont,
+    selectedType,
+    customText,
+    uploadedImage,
+    comment,
+    patronusCount,
+    petFaceCount,
+    customOption,
+    customTextFont,
   ]);
 
   useEffect(() => {
@@ -223,11 +303,12 @@ const EmbroiderySelector = () => {
                 <span className="countValue">{patronusCount}</span>
                 <button
                   className="circleButton"
-                  onClick={() => setPatronusCount((prev) => Math.min(5, prev + 1))}
+                  onClick={() => setPatronusCount((prev) => Math.min(patronusLimit, prev + 1))}
+                  disabled={patronusCount >= patronusLimit}
                 >
                   +
                 </button>
-                <span className="limitText">*не более 5</span>
+                <span className="limitText">*{patronusLimitText}</span>
               </div>
             )}
 
@@ -412,7 +493,7 @@ const EmbroiderySelector = () => {
             className="confirmButton"
             onClick={handleNext}
             disabled={!canProceed}
-            title={!canProceed ? "Загрузите хотя бы одно изображение" : undefined}
+            title={!canProceed ? disabledHint : undefined}
           >
             ПЕРЕЙТИ К ОФОРМЛЕНИЮ
           </button>
@@ -427,3 +508,5 @@ const EmbroiderySelector = () => {
 };
 
 export default EmbroiderySelector;
+
+
