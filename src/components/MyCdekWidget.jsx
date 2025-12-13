@@ -93,7 +93,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         goods: [goods],
         city: DEFAULT_CITY,           // предустанавливаем Красноярск
         defaultLocation: DEFAULT_CENTER,
-        fixBounds: 'city',            // ограничиваем область поиска границами города
+        fixBounds: 'locality',        // ограничиваем область поиска границами населённого пункта
         lang: 'rus',
         currency: 'RUB',
         // Оставляем один тариф, чтобы пользователь не выбирал тарифы вручную
