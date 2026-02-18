@@ -1,13 +1,16 @@
 import { useEffect, useRef } from "react";
 import CDEKWidget from "@cdek-it/widget";
 
-// Подбираем тип изделия и габариты/вес для расчёта доставки
+const FIXED_TARIFF_CODE = 136;
+const DEFAULT_CENTER = [92.868, 56.0106];
+const DEFAULT_ZOOM = 10;
+
 const detectClothingKey = (base) => {
   const raw = String(base || "").toLowerCase();
   if (raw.includes("худи") || raw.includes("hoodie") || raw.includes("hudi")) return "hoodie";
   if (raw.includes("свитшот") || raw.includes("свит") || raw.includes("sweatshirt") || raw.includes("svitshot")) return "svitshot";
   if (raw.includes("футбол") || raw.includes("t-shirt") || raw.includes("tshirt") || raw.includes("tee")) return "tshirt";
-  return "hoodie"; // по умолчанию берём худи, чтобы не занизить вес
+  return "hoodie";
 };
 
 const resolveProductName = (productType) => {
@@ -52,25 +55,50 @@ const formatAddressLabel = (address) => {
   );
 };
 
+const normalizeTariff = (tariff, fallbackCode = FIXED_TARIFF_CODE) => {
+  if (!tariff) {
+    return {
+      tariff_code: fallbackCode,
+      tariff_name: "Склад-склад",
+      delivery_sum: null,
+      total_sum: null,
+      period_min: null,
+      period_max: null,
+      currency: "RUB",
+    };
+  }
+
+  return {
+    tariff_code: tariff.tariff_code ?? fallbackCode,
+    tariff_name: tariff.tariff_name ?? tariff.title ?? "Склад-склад",
+    delivery_sum: tariff.delivery_sum ?? null,
+    total_sum: tariff.total_sum ?? null,
+    period_min: tariff.period_min ?? null,
+    period_max: tariff.period_max ?? null,
+    currency: tariff.currency ?? "RUB",
+  };
+};
+
+const getWidgetStore = (widgetInstance, storeId) =>
+  widgetInstance?.app?._context?.provides?.pinia?._s?.get?.(storeId);
+
 const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType }) => {
   const servicePath = process.env.REACT_APP_CDEK_SERVICE_URL || "/service.php";
   const ymapsKey = process.env.REACT_APP_YMAPS_KEY;
 
-  // держим актуальные колбэки без пересоздания виджета
   const addressRef = useRef(onAddressSelect);
   const rateRef = useRef(onRateSelect);
   const cdekRef = useRef(onCdekSelect);
+  const autoTariffRef = useRef(normalizeTariff(null));
 
   useEffect(() => { addressRef.current = onAddressSelect; }, [onAddressSelect]);
   useEffect(() => { rateRef.current = onRateSelect; }, [onRateSelect]);
   useEffect(() => { cdekRef.current = onCdekSelect; }, [onCdekSelect]);
 
-  // LngLat
-  const DEFAULT_CENTER = [92.868, 56.0106];
-  const DEFAULT_ZOOM = 10;
-
   useEffect(() => {
     let instance;
+    const unsubscribeWidgetListeners = [];
+
     const t = setTimeout(() => {
       const typeName = resolveProductName(productType);
       const goodsKey = detectClothingKey(typeName);
@@ -87,35 +115,26 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         canChoose: true,
         servicePath,
         hideFilters: { have_cashless: false, have_cash: false, is_dressing_room: false, type: false },
-        // Только ПВЗ, доставку до двери скрываем
         hideDeliveryOptions: { office: false, door: true },
         debug: false,
         goods: [goods],
-        city: DEFAULT_CITY,           // стартовый город для первого запроса
+        city: DEFAULT_CITY,
         defaultLocation: DEFAULT_CENTER,
-        fixBounds: "country",         // даём переключаться между городами/геолокацией
+        fixBounds: "country",
         lang: "rus",
         currency: "RUB",
-        // Один тариф склад–склад (136), выбор тарифов пользователю не показываем
-        tariffs: { office: [136], door: [] },
+        tariffs: { office: [FIXED_TARIFF_CODE], door: [] },
         onChoose(mode, selectedTariff, address) {
+          const normalizedTariff = normalizeTariff(selectedTariff || autoTariffRef.current);
+          autoTariffRef.current = normalizedTariff;
+
           const addressLabel = formatAddressLabel(address);
           addressRef.current?.(addressLabel);
-          rateRef.current?.(selectedTariff?.delivery_sum ?? selectedTariff?.total_sum ?? null);
+          rateRef.current?.(normalizedTariff.delivery_sum ?? normalizedTariff.total_sum ?? null);
 
           cdekRef.current?.({
             mode,
-            tariff: selectedTariff
-              ? {
-                  tariff_code: selectedTariff.tariff_code,
-                  tariff_name: selectedTariff.tariff_name ?? selectedTariff.title ?? null,
-                  delivery_sum: selectedTariff.delivery_sum ?? null,
-                  total_sum: selectedTariff.total_sum ?? null,
-                  period_min: selectedTariff.period_min ?? null,
-                  period_max: selectedTariff.period_max ?? null,
-                  currency: selectedTariff.currency ?? "RUB",
-                }
-              : null,
+            tariff: normalizedTariff,
             address,
             addressLabel,
             goods: [goodsForApi],
@@ -124,18 +143,51 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         },
       });
 
-      // Принудительно центрируем на старте и перерисовываем контейнер
+      const coreStore = getWidgetStore(instance, "core");
+      const mapStore = getWidgetStore(instance, "map");
+
+      const autoSelectTariff = () => {
+        if (!coreStore || !mapStore) return;
+        if (coreStore.mode !== "office" || !mapStore.exactOffice) return;
+
+        const tariffsForOffice = mapStore.exactOffice?.type === "POSTAMAT"
+          ? coreStore.tariffs?.pickup
+          : coreStore.tariffs?.office;
+        if (!Array.isArray(tariffsForOffice) || tariffsForOffice.length === 0) return;
+
+        const targetTariff =
+          tariffsForOffice.find((tariff) => Number(tariff?.tariff_code) === FIXED_TARIFF_CODE) ||
+          tariffsForOffice[0];
+        if (!targetTariff) return;
+
+        autoTariffRef.current = normalizeTariff(targetTariff);
+
+        if (coreStore.selectedTariff?.tariff_code === autoTariffRef.current.tariff_code) return;
+        coreStore.$patch((state) => {
+          state.selectedTariff = targetTariff;
+        });
+      };
+
+      if (coreStore?.$subscribe && mapStore?.$subscribe) {
+        unsubscribeWidgetListeners.push(coreStore.$subscribe(() => autoSelectTariff()));
+        unsubscribeWidgetListeners.push(mapStore.$subscribe(() => autoSelectTariff()));
+        autoSelectTariff();
+      }
+
       instance.updateLocation(DEFAULT_CENTER, DEFAULT_ZOOM).catch(() => {});
       requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
     }, 0);
 
     return () => {
       clearTimeout(t);
+      unsubscribeWidgetListeners.forEach((unsubscribe) => {
+        try { unsubscribe?.(); } catch {}
+      });
       try { instance?.destroy?.(); } catch {}
     };
   }, [servicePath, ymapsKey, productType]);
 
-  return null; // виджет сам рисует карту в #cdek-map
+  return null;
 };
 
 export default MyCdekWidget;

@@ -202,27 +202,9 @@ const RecipientDetails = () => {
     }
   }, [productType, color, size, selectedType, uploadedImage?.length, customOption.text, customOption.image, customText, navigate]);
 
-  useEffect(() => {
-    setUserData((prev) => ({
-      ...prev,
-      ...recipientState.userData,
-    }));
-    setPickupPoint(recipientState.pickupPoint || "");
-    setDeliveryPrice(recipientState.deliveryPrice ?? null);
-    setManualAddress(recipientState.manualAddress || null);
-    setIsNoCdek(Boolean(recipientState.isNoCdek));
-    setCdekData(recipientState.cdek || null);
-  }, [
-    recipientState.userData?.firstName,
-    recipientState.userData?.lastName,
-    recipientState.userData?.middleName,
-    recipientState.userData?.phone,
-    recipientState.pickupPoint,
-    recipientState.deliveryPrice,
-    recipientState.manualAddress?.value,
-    recipientState.isNoCdek,
-    recipientState.cdek,
-  ]);
+  const handleNoCdekToggle = (event) => {
+    setIsNoCdek(event.target.checked);
+  };
 
 
   useEffect(() => {
@@ -695,7 +677,7 @@ const RecipientDetails = () => {
               onCdekSelect={handleCdekSelect}
             />
             <label>
-              <input type="checkbox" checked={isNoCdek} onChange={() => setIsNoCdek((p) => !p)} />
+              <input type="checkbox" checked={isNoCdek} onChange={handleNoCdekToggle} />
               В моём городе нет СДЭКа
             </label>
             {isNoCdek && (
