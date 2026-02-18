@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ReactComponent as CheckIcon } from "../images/Vector.svg";
 import { useOrder } from "../context/OrderContext";
@@ -62,12 +62,11 @@ const EmbroiderySelector = () => {
     setPatronusCount((prev) => Math.min(Math.max(1, prev), patronusLimit));
   }, [patronusLimit]);
 
-  const calcPrice = (type) => {
+  const calcPrice = useCallback((type) => {
     const base = priceMatrix[type]?.[clothingKey] ?? 0;
     if (type === "Patronus") return base + Math.max(0, patronusCount - 1) * 5000;
     if (type === "petFace") return base + Math.max(0, petFaceCount - 1) * 2000;
-    return base;
-  };
+    return base;  }, [clothingKey, patronusCount, petFaceCount]);
 
   const priceLabel = (type) => `${calcPrice(type)} ₽`;
   const customPriceNote = "стоимость рассчитает менеджер";
@@ -202,6 +201,7 @@ const EmbroiderySelector = () => {
     embroidery.customOption,
     embroidery.price,
     setEmbroidery,
+    calcPrice,
   ]);
 
   useEffect(() => {

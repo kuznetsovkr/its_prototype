@@ -84,7 +84,9 @@ const getWidgetStore = (widgetInstance, storeId) =>
 
 const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType }) => {
   const servicePath = process.env.REACT_APP_CDEK_SERVICE_URL || "/service.php";
-  const ymapsKey = process.env.REACT_APP_YMAPS_KEY;
+  const ymapsKey = String(process.env.REACT_APP_YMAPS_KEY || "")
+    .trim()
+    .replace(/^['"]|['"]$/g, "");
 
   const addressRef = useRef(onAddressSelect);
   const rateRef = useRef(onRateSelect);
@@ -120,7 +122,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         goods: [goods],
         city: DEFAULT_CITY,
         defaultLocation: DEFAULT_CENTER,
-        fixBounds: "country",
+        fixBounds: null,
         lang: "rus",
         currency: "RUB",
         tariffs: { office: [FIXED_TARIFF_CODE], door: [] },
@@ -162,9 +164,13 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
 
         autoTariffRef.current = normalizeTariff(targetTariff);
 
-        if (coreStore.selectedTariff?.tariff_code === autoTariffRef.current.tariff_code) return;
+        if (
+          coreStore.selectedTariff?.tariff_code === autoTariffRef.current.tariff_code &&
+          coreStore.selected
+        ) return;
         coreStore.$patch((state) => {
           state.selectedTariff = targetTariff;
+          state.selected = true;
         });
       };
 

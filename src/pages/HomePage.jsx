@@ -1,10 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useOrder } from "../context/OrderContext";
-import to2 from "../images/lines/Line1_2.svg";
-import to3 from "../images/lines/Line2_3.svg";
-import to4 from "../images/lines/Line3_4.svg";
-import to5 from "../images/lines/Line4_5.svg";
 
 const HomePage = () => {
     const navigate = useNavigate();

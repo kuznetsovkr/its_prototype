@@ -1,5 +1,5 @@
-﻿import React from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
 import '../assets/styles/pages/_thx.scss';
 
 const ThankYouPage = () => {

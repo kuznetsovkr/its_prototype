@@ -54,15 +54,12 @@ const AdminInventory = () => {
     try {
       const res = await api.get('/colors');
       if (Array.isArray(res.data) && res.data.length) {
-        // ожидаем [{name, code}]
         setColorOptions(res.data);
       }
     } catch {
-      // fallback на дефолтные
     }
   };
   const addColor = async ({ name, code }) => {
-    // пробуем на бэк, если нет — сохраняем локально
     try {
       const res = await api.post('/colors', { name, code });
       const saved = res.data?.name ? res.data : { name, code };
@@ -78,14 +75,6 @@ const AdminInventory = () => {
         return exists ? prev : [...prev, saved];
       });
       return saved;
-    }
-  };
-    const updateQuantity = async (id, quantity) => {
-    try {
-      await api.put(`/inventory/${id}`, { quantity });
-      fetchInventory();
-    } catch (err) {
-      console.error("Ошибка обновления:", err);
     }
   };
   const updateItem = async (updated) => {
@@ -162,7 +151,6 @@ const AdminInventory = () => {
   const toggleSortQuantity = () =>
     setSort((s) => ({ key: "quantity", dir: s.dir === "asc" ? "desc" : "asc" }));
   const resetFilters = () => setFilters({ type: ALL_VALUE, color: ALL_VALUE, size: ALL_VALUE });
-  // найти код по имени (на случай, если строки старые без colorCode)
   const codeByName = (name) =>
     colorOptions.find(c => c.name.toLowerCase() === String(name || "").toLowerCase())?.code || "";
   return (
@@ -179,7 +167,6 @@ const AdminInventory = () => {
           {isAddOpen ? "−" : "+"}
         </button>
       </div>
-      {/* Форма добавления — ЦВЕТ ТОЛЬКО ИЗ СПРАВОЧНИКА */}
       <div id="addForm" className={`collapsible ${isAddOpen ? "is-open" : ""}`}>
         <div className="card form-card">
           <div className="form-grid">
@@ -264,7 +251,6 @@ const AdminInventory = () => {
           </div>
         </div>
       </div>
-      {/* Фильтры */}
       <div className="card filters-card">
         <div className="filters-grid">
           <div className="field">
@@ -290,7 +276,6 @@ const AdminInventory = () => {
           </div>
         </div>
       </div>
-      {/* Таблица */}
       <WarehouseTable
         inventory={sorted}
         deleteItem={deleteItem}

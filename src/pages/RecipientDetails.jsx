@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useMemo, useLayoutEffect } from "react";
+import { useState, useEffect, useMemo, useLayoutEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import MyCdekWidget from "../components/MyCdekWidget";
 import { AddressSuggestions } from 'react-dadata';
@@ -78,7 +78,6 @@ const RecipientDetails = () => {
   ); // rate.delivery_sum
   const [manualAddress, setManualAddress] = useState(recipientState.manualAddress || null);
   const [cdekData, setCdekData] = useState(recipientState.cdek || null);
-  const [cdekNumber, setCdekNumber] = useState(null);
   const [isPaying, setIsPaying] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const [error, setError] = useState("");
@@ -102,6 +101,24 @@ const RecipientDetails = () => {
     const { house, block, flat } = manualAddress.data || {};
     return Boolean(house || block || flat);
   }, [manualAddress]);
+
+  const manualAddressNormalized = useMemo(() => {
+    const value = manualAddress?.value || "";
+    const house = manualAddress?.data?.house || "";
+    const block = manualAddress?.data?.block || "";
+    const flat = manualAddress?.data?.flat || "";
+
+    if (!value && !house && !block && !flat) return null;
+    return {
+      value,
+      data: { house, block, flat },
+    };
+  }, [
+    manualAddress?.value,
+    manualAddress?.data?.house,
+    manualAddress?.data?.block,
+    manualAddress?.data?.flat,
+  ]);
 
   const isRecipientSame = useMemo(() => {
     const stored = {
@@ -162,12 +179,7 @@ const RecipientDetails = () => {
       userData,
       pickupPoint,
       deliveryPrice,
-      manualAddress: manualAddress
-        ? {
-            value: manualAddress.value || "",
-            data: manualAddress.data || {},
-          }
-        : manualAddress,
+      manualAddress: manualAddressNormalized,
       isNoCdek,
       cdek: cdekData,
     });
@@ -179,6 +191,7 @@ const RecipientDetails = () => {
     manualAddress?.data?.house,
     manualAddress?.data?.block,
     manualAddress?.data?.flat,
+    manualAddressNormalized,
     isNoCdek,
     cdekData,
     setRecipient,
@@ -484,7 +497,6 @@ const RecipientDetails = () => {
       const { data } = await api.post('/orders/create', fd);
       setOrderId(data.orderId);
       if (data?.cdekNumber) {
-        setCdekNumber(data.cdekNumber);
         sessionStorage.setItem("pay_cdek_number", String(data.cdekNumber));
       }
       return data; // { orderId, cdekNumber, ... }

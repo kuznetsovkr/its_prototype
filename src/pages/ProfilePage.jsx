@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import api from '../api';
 import { resolveUserRole } from "../utils/auth";
@@ -7,10 +7,8 @@ import { resolveUserRole } from "../utils/auth";
 const ProfilePage = () => {
   const navigate = useNavigate();
 
-  // Роль (admin / user)
   const [role, setRole] = useState(localStorage.getItem("role") || "user");
 
-  // Данные пользователя
   const [userData, setUserData] = useState({
     firstName: "",
     lastName: "",
@@ -19,19 +17,15 @@ const ProfilePage = () => {
     phone: "",
   });
 
-  // Редактирование
   const [isEditing, setIsEditing] = useState(false);
 
-  // История заказов
   const [orders, setOrders] = useState([]);
 
-  // Авторизация
-  const [isUserAuthenticated, setIsUserAuthenticated] = useState(
+  const [isUserAuthenticated] = useState(
     !!localStorage.getItem("token")
   );
 
-  // === Загрузка заказов (axios) ===
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     const token = localStorage.getItem("token");
     if (!token) { setOrders([]); return; }
 
@@ -39,31 +33,30 @@ const ProfilePage = () => {
       const path = role === 'admin' ? '/orders/all' : '/orders/user';
 
       const res = await api.get(path, {
-        headers: { Authorization: `Bearer ${token}` }, // убери, если есть интерсептор
+        headers: { Authorization: `Bearer ${token}` }, 
       });
 
-      // Сервер может вернуть либо массив, либо объект { orders: [...] }
       const payload = res.data;
       const list = Array.isArray(payload) ? payload : (payload?.orders ?? []);
       setOrders(list);
     } catch (error) {
       const msg = error.response?.data?.message || error.message;
       console.error("Ошибка получения заказов:", msg);
-      setOrders([]); // безопасно обнулим, чтобы не падал рендер
+      setOrders([]); 
     }
-  };
+
+  }, [role]);
 
   useEffect(() => {
     setRole(localStorage.getItem("role") || "user");
 
-    // === Загрузка данных пользователя (axios) ===
     const fetchUserData = async () => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
         try {
           const res = await api.get('/user/me', {
-            headers: { Authorization: `Bearer ${token}` }, // убери, если есть интерсептор
+            headers: { Authorization: `Bearer ${token}` }, 
           });
 
           const u = res.data || {};
@@ -87,16 +80,15 @@ const ProfilePage = () => {
       fetchUserData();
       fetchOrders();
     }
-  }, [isUserAuthenticated, role]); // подхватываем смену роли тоже
+  }, [isUserAuthenticated, fetchOrders]); 
 
-  // Сохранение данных
   const handleSave = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
     try {
       const { data } = await api.put('/user/update', userData, {
-        headers: { Authorization: `Bearer ${token}` }, // можно убрать, если есть интерсептор
+        headers: { Authorization: `Bearer ${token}` }, 
       });
       const updated = (data && typeof data === "object" ? (data.user || data) : null) || {};
       setUserData((prev) => ({
@@ -106,14 +98,13 @@ const ProfilePage = () => {
         birthDate: updated.birthDate ?? prev.birthDate,
         phone: updated.phone ?? prev.phone,
       }));
-      setIsEditing(false); // закрываем режим редактирования после успешного сохранения
+      setIsEditing(false); 
     } catch (err) {
       const msg = err.response?.data?.message || err.message || 'Неизвестная ошибка';
       console.error('Ошибка обновления данных:', msg);
     }
   };
 
-  // Выход
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
@@ -123,7 +114,6 @@ const ProfilePage = () => {
 
   return (
     <section className="profile-page">
-      {/* Левая колонка — профиль */}
       <div className="user-card">
         <h2 className="heading">Мой профиль</h2>
 
@@ -212,7 +202,6 @@ const ProfilePage = () => {
         </div>
       </div>
 
-      {/* Правая колонка — заказы */}
       <div className="orders-card">
         <h2 className="heading">История заказов</h2>
 

@@ -12,12 +12,11 @@ const faqs = [
   { id: 9, q: "Уход за изделием с вышивкой", a: "Стирайте при 30° на деликатном режиме, выворачивая изделие. Не гладьте вышивку напрямую — используйте проутюжильник." },
   { id: 10, q: "Как связаться с поддержкой?", a: "Пишите в чат на сайте или на почту support@example.com. Работаем ежедневно с 10:00 до 20:00." },
 ];
-
 export default function FaqPage() {
-  const [openId, setOpenId] = useState(faqs[0].id); // первый открыт
+  const [openId, setOpenId] = useState(faqs[0].id); 
 
   const toggle = (id) => {
-    setOpenId((prev) => (prev === id ? null : id)); // аккордеон: только один открыт
+    setOpenId((prev) => (prev === id ? null : id)); 
   };
 
   return (
@@ -25,12 +24,11 @@ export default function FaqPage() {
       <div className="faq__container">
         <h1 id="faq-title" className="faq__title">Частые вопросы</h1>
 
-        <ul className="accordion" role="list">
+        <ul className="accordion">
           {faqs.map(({ id, q, a }) => {
             const isOpen = id === openId;
             return (
               <li key={id} className={`accordion__item ${isOpen ? "is-open" : ""}`}>
-                {/* Заголовок вопроса — кнопка */}
                 <button
                   className="accordion__header"
                   aria-expanded={isOpen}
@@ -42,7 +40,6 @@ export default function FaqPage() {
                   <span className="accordion__chevron" aria-hidden="true" />
                 </button>
 
-                {/* Панель с ответом */}
                 <div
                   id={`faq-panel-${id}`}
                   role="region"
