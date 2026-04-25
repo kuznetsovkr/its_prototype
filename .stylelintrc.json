@@ -8,12 +8,7 @@
     "build/**/*"
   ],
   "rules": {
-    "block-no-empty": null,
-    "declaration-block-no-duplicate-properties": null,
     "no-descending-specificity": null,
-    "no-duplicate-selectors": null,
-    "no-empty-source": null,
-    "property-no-deprecated": null,
-    "scss/no-global-function-names": null
+    "no-duplicate-selectors": null
   }
 }

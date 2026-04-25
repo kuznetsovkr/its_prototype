@@ -202,7 +202,7 @@
   pointer-events: none;
   max-width: min(90vw, 360px);
   white-space: normal;         // переносим строки
-  word-wrap: break-word;       // на всякий случай
+  overflow-wrap: break-word;   // на всякий случай
 }
 
 .tooltip-container:hover .tooltip-text {
