@@ -4,6 +4,7 @@ import CDEKWidget from "@cdek-it/widget";
 const FIXED_TARIFF_CODE = 136;
 const DEFAULT_CENTER = [92.868, 56.0106];
 const DEFAULT_ZOOM = 10;
+const INFO_POPUP_KEY = "info";
 
 const detectClothingKey = (base) => {
   const raw = String(base || "").toLowerCase();
@@ -82,6 +83,24 @@ const normalizeTariff = (tariff, fallbackCode = FIXED_TARIFF_CODE) => {
 const getWidgetStore = (widgetInstance, storeId) =>
   widgetInstance?.app?._context?.provides?.pinia?._s?.get?.(storeId);
 
+const closeInfoPopup = (widgetInstance) => {
+  const coreStore = getWidgetStore(widgetInstance, "core");
+  if (!coreStore?.openedPopups?.[INFO_POPUP_KEY]) return;
+
+  if (typeof coreStore.togglePopup === "function") {
+    coreStore.togglePopup(INFO_POPUP_KEY);
+    return;
+  }
+
+  if (typeof coreStore.$patch === "function") {
+    coreStore.$patch((state) => {
+      if (state.openedPopups?.[INFO_POPUP_KEY]) {
+        state.openedPopups[INFO_POPUP_KEY] = false;
+      }
+    });
+  }
+};
+
 const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType }) => {
   const servicePath = process.env.REACT_APP_CDEK_SERVICE_URL || "/service.php";
   const ymapsKey = String(process.env.REACT_APP_YMAPS_KEY || "")
@@ -142,6 +161,8 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
             goods: [goodsForApi],
             from: FROM_LOCATION,
           });
+
+          closeInfoPopup(instance);
         },
       });
 
@@ -172,6 +193,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
           state.selectedTariff = targetTariff;
           state.selected = true;
         });
+        closeInfoPopup(instance);
       };
 
       if (coreStore?.$subscribe && mapStore?.$subscribe) {

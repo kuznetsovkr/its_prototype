@@ -43,6 +43,7 @@ const uniqBy = (arr, keyFn) => {
 };
 
 const INNER_ORDER = { "с начёсом": 1, "без начёса": 2 };
+const PREVIEW_SWAP_MS = 220;
 
 const sizeColumns = [
   "Размер",
@@ -295,8 +296,58 @@ const ClothingSelector = () => {
   };
 
   const previewItem = useMemo(() => {
-    return filteredByType.find((item) => item.color === selectedColor) || filteredByType[0];
-  }, [filteredByType, selectedColor]);
+    const exact = filteredByType.find((item) => item.color === selectedColor);
+    if (exact) return exact;
+
+    if (!selectedClothing) return null;
+
+    const sameBase = typedInventory.filter((item) => item.parsed.base === selectedClothing);
+    if (selectedInnerType) {
+      const sameInner = sameBase.find((item) => item.parsed.inner === selectedInnerType);
+      if (sameInner) return sameInner;
+    }
+
+    return sameBase[0] || null;
+  }, [filteredByType, selectedColor, selectedClothing, selectedInnerType, typedInventory]);
+
+  const previewSrc = useMemo(() => buildImgSrc(previewItem?.imageUrl), [previewItem?.imageUrl]);
+  const previewAlt = selectedClothing || "Одежда";
+  const [visiblePreview, setVisiblePreview] = useState({ src: "", alt: "" });
+  const [incomingPreview, setIncomingPreview] = useState(null);
+
+  useEffect(() => {
+    if (!previewSrc) return undefined;
+    if (previewSrc === visiblePreview.src) {
+      if (visiblePreview.alt !== previewAlt) {
+        setVisiblePreview((prev) => ({ ...prev, alt: previewAlt }));
+      }
+      return undefined;
+    }
+
+    let cancelled = false;
+    let timerId;
+    const nextPreview = { src: previewSrc, alt: previewAlt };
+    const img = new Image();
+
+    const showNext = () => {
+      if (cancelled) return;
+      setIncomingPreview(nextPreview);
+      timerId = window.setTimeout(() => {
+        if (cancelled) return;
+        setVisiblePreview(nextPreview);
+        setIncomingPreview(null);
+      }, PREVIEW_SWAP_MS);
+    };
+
+    img.onload = showNext;
+    img.onerror = showNext;
+    img.src = previewSrc;
+
+    return () => {
+      cancelled = true;
+      if (timerId) window.clearTimeout(timerId);
+    };
+  }, [previewSrc, previewAlt, visiblePreview.alt, visiblePreview.src]);
 
   return (
     <>
@@ -304,16 +355,27 @@ const ClothingSelector = () => {
         <div className="clothing-block">
           <div className="image-wrapper">
             <div className="image-frame">
-              {previewItem ? (
-                <img
-                  src={buildImgSrc(previewItem?.imageUrl)}
-                  alt={selectedClothing}
-                  className="clotheImage"
-                  loading="lazy"
-                />
-              ) : (
-                <img src="placeholder.png" alt="Выберите одежду" className="clotheImage" />
-              )}
+              <div className="image-stack" aria-live="polite">
+                {visiblePreview.src && (
+                  <img
+                    src={visiblePreview.src}
+                    alt={visiblePreview.alt || previewAlt}
+                    className={`clotheImage ${incomingPreview ? "is-exiting" : ""}`}
+                    draggable="false"
+                  />
+                )}
+                {incomingPreview?.src && (
+                  <img
+                    src={incomingPreview.src}
+                    alt={incomingPreview.alt || previewAlt}
+                    className="clotheImage is-incoming"
+                    draggable="false"
+                  />
+                )}
+                {!visiblePreview.src && !incomingPreview?.src && (
+                  <div className="clotheImagePlaceholder" />
+                )}
+              </div>
             </div>
           </div>
         </div>

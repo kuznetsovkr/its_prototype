@@ -321,7 +321,7 @@ const RecipientDetails = () => {
 
     try {
       const response = await api.post('/auth/request-sms', { phone: digits });
-      if (response.data?.message === "Введите пароль") {
+      if (response.data?.authMode === "password") {
         setSmsStep(2);
       } else {
         setSmsStep(1);

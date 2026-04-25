@@ -70,7 +70,7 @@ const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
                 alert(`Тестовый СМС-код: ${debugCode}`);
             }
 
-            if (response.data.message === "Введите пароль") {
+            if (response.data?.authMode === "password") {
                 // ✅ Это админ, запрашиваем пароль вместо кода
                 setStep(3); // Новый шаг для ввода пароля
             } else {
