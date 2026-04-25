@@ -144,7 +144,7 @@
         gap: clamp(8px, 0.7vw, 12px);
         flex-wrap: wrap;
 
-        &__item {
+        .sizeSelector__item {
           position: relative;
           cursor: pointer;
 
@@ -194,9 +194,6 @@
   opacity: 0.45;
   pointer-events: none; /* disable click */
 }
-.confirmButton:disabled {
-  opacity: 0.5;
-}
 
 .confirmButton {
   border-radius: 20px;
@@ -209,6 +206,10 @@
   color: #fff;
   border: none;
   cursor: pointer;
+}
+
+.confirmButton:disabled {
+  opacity: 0.5;
 }
 
 @media (max-width: 768px) {
@@ -436,12 +437,6 @@
     min-height: unset;
     height: auto;
   }
-}
-
-.clothing-block .image-wrapper .clotheImage {
-  max-width: 100%;
-  height: 100%;
-  object-fit: contain;
 }
 
 .sizeTableGrid {

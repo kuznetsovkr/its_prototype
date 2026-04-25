@@ -10,8 +10,7 @@
 
 /* Заголовки и лейблы — RightGrotesk */
 .heading,
-.label,
-.orders-table thead th {
+.label {
   font-family: 'RightGrotesk', sans-serif;
   font-weight: 500;
   font-size: clamp(36px, 1vw, 54px);
@@ -23,8 +22,7 @@
 .input,
 .select,
 .btn,
-.muted,
-.orders-table tbody td {
+.muted {
   font-family: 'Raleway', sans-serif;
   font-weight: 400;
   font-size: clamp(20px, 1vw, 30px);
@@ -149,8 +147,18 @@
 }
 
 .orders-table thead th {
+  font-family: 'RightGrotesk', sans-serif;
+  font-weight: 500;
+  color: var(--brand);
   font-size: clamp(24px, 1vw, 36px);
   padding-bottom: 8px;
+}
+
+.orders-table tbody td {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 400;
+  font-size: clamp(20px, 1vw, 30px);
+  color: var(--text);
 }
 
 .orders-table tbody tr + tr td {

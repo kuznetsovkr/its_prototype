@@ -33,7 +33,7 @@
   }
 }
 
-.auth-button {
+.header .auth-button {
   height: 35px;
   cursor: pointer;
   img {
@@ -130,7 +130,7 @@
     height: 44px;           // чтобы уместилось по вертикали внутри 70px
   }
 
-  .auth-button {
+  .header .auth-button {
     height: 32px;
     img { height: 32px; }
   }

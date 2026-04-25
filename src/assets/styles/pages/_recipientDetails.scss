@@ -44,6 +44,53 @@
           &:focus { outline: none; border-color: #440a18; }
           &:disabled { background-color: #fff; }
         }
+
+        .PhoneContainer {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+          width: 100%;
+          max-width: 433px;
+
+          .PhoneBlock {
+            box-sizing: border-box;
+            display: flex;
+            gap: 5px;
+            width: 433px;
+            height: 43px;
+            max-width: 100%;
+            padding: 10px 10px 10px 20px;
+            border: 1px solid #121319;
+            border-radius: 10px;
+            font-weight: 400;
+            font-size: clamp(20px, 1vw, 30px);
+            font-family: "Raleway", sans-serif;
+            transition: border 0.2s ease-in-out;
+
+            input {
+              width: 300px !important;
+              border: none !important;
+              padding: 0 !important;
+              height: 100% !important;
+            }
+
+            span {
+              color: #121319;
+              font-size: 16px;
+            }
+          }
+
+          button {
+            font-size: 16px;
+            text-decoration: underline;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 400;
+            color: #121319;
+          }
+        }
       }
 
       .FIO{
@@ -68,21 +115,6 @@
       }
 
       .blockCDEK{
-        // адаптивная обёртка карты
-        #cdek-map{
-          width: 100%;
-          aspect-ratio: 16 / 9; // базовое соотношение
-          border-radius: 20px;
-          border: 2px solid #440a18;
-          overflow: hidden;
-
-          // на случай, если виджет внутри требует растяжения
-          & > * {
-            width: 100%;
-            height: 100%;
-          }
-        }
-
         label {
           font-family: 'Raleway', sans-serif;
           font-weight: 400;
@@ -287,6 +319,14 @@
     inset: 0;
     width: 100%;
     height: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 20px;
+    border: 2px solid #440a18;
+    overflow: hidden;
+    & > * {
+      width: 100%;
+      height: 100%;
+    }
     // пара «магических» свойств для Safari
     -webkit-transform: translateZ(0);
     contain: strict;
@@ -308,50 +348,6 @@
     text-decoration: underline;
     cursor: pointer;
     color: rgba(18, 19, 25, 0.8);
-  }
-}
-
-.PhoneBlock{
-  box-sizing: border-box;
-  display: flex;
-  gap: 5px;
-  width: 433px;
-  height: 43px;
-  max-width: 100%;
-  padding: 10px 10px 10px 20px;
-  border: 1px solid #121319;
-  border-radius: 10px;
-  font-weight: 400;
-  font-size: clamp(20px, 1vw, 30px);
-  font-family: "Raleway", sans-serif;
-  transition: border 0.2s ease-in-out;
-  input {
-    width: 300px !important;
-    border: none !important;
-    padding: 0 !important;
-    height: 100% !important;
-  }
-  span {
-    color: #121319;
-    font-size: 16px;
-  }
-}
-
-.PhoneContainer {
-  display: flex;
-  flex-direction: column;
-  gap:5px;
-  width: 100%;
-  max-width: 433px;
-  button {
-    font-size: 16px;
-    text-decoration: underline;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-family: 'Raleway', sans-serif;
-    font-weight: 400;
-    color: #121319;
   }
 }
 

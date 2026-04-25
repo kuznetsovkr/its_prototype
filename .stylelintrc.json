@@ -6,8 +6,5 @@
   "ignoreFiles": [
     "node_modules/**/*",
     "build/**/*"
-  ],
-  "rules": {
-    "no-descending-specificity": null
-  }
+  ]
 }

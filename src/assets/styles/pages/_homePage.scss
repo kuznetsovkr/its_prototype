@@ -111,6 +111,16 @@
     .step{
       width: 433px;
       height: 456px;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+      will-change: opacity, transform;
+
+      &.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
       .firstRow{
         display: flex;
         flex-direction: row;
@@ -167,18 +177,6 @@
       margin-top: -200px; // "залазит" на step-4
     }
 
-  }
-}
-
-.step {
-  opacity: 0;
-  transform: translateY(50px);
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-  will-change: opacity, transform;
-
-  &.visible {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
