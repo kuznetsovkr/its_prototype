@@ -43,7 +43,6 @@ const uniqBy = (arr, keyFn) => {
 };
 
 const INNER_ORDER = { "с начёсом": 1, "без начёса": 2 };
-const PREVIEW_SWAP_MS = 220;
 
 const sizeColumns = [
   "Размер",
@@ -312,42 +311,40 @@ const ClothingSelector = () => {
 
   const previewSrc = useMemo(() => buildImgSrc(previewItem?.imageUrl), [previewItem?.imageUrl]);
   const previewAlt = selectedClothing || "Одежда";
-  const [visiblePreview, setVisiblePreview] = useState({ src: "", alt: "" });
-  const [incomingPreview, setIncomingPreview] = useState(null);
+  const [stablePreview, setStablePreview] = useState({ src: "", alt: "" });
 
   useEffect(() => {
-    if (!previewSrc) return undefined;
-    if (previewSrc === visiblePreview.src) {
-      if (visiblePreview.alt !== previewAlt) {
-        setVisiblePreview((prev) => ({ ...prev, alt: previewAlt }));
+    if (!previewSrc) {
+      if (stablePreview.src) {
+        setStablePreview({ src: "", alt: "" });
+      }
+      return undefined;
+    }
+
+    if (previewSrc === stablePreview.src) {
+      if (stablePreview.alt !== previewAlt) {
+        setStablePreview((prev) => ({ ...prev, alt: previewAlt }));
       }
       return undefined;
     }
 
     let cancelled = false;
-    let timerId;
     const nextPreview = { src: previewSrc, alt: previewAlt };
     const img = new Image();
 
-    const showNext = () => {
+    const applyNext = () => {
       if (cancelled) return;
-      setIncomingPreview(nextPreview);
-      timerId = window.setTimeout(() => {
-        if (cancelled) return;
-        setVisiblePreview(nextPreview);
-        setIncomingPreview(null);
-      }, PREVIEW_SWAP_MS);
+      setStablePreview(nextPreview);
     };
 
-    img.onload = showNext;
-    img.onerror = showNext;
+    img.onload = applyNext;
+    img.onerror = applyNext;
     img.src = previewSrc;
 
     return () => {
       cancelled = true;
-      if (timerId) window.clearTimeout(timerId);
     };
-  }, [previewSrc, previewAlt, visiblePreview.alt, visiblePreview.src]);
+  }, [previewSrc, previewAlt, stablePreview.src, stablePreview.alt]);
 
   return (
     <>
@@ -356,23 +353,15 @@ const ClothingSelector = () => {
           <div className="image-wrapper">
             <div className="image-frame">
               <div className="image-stack" aria-live="polite">
-                {visiblePreview.src && (
+                {stablePreview.src && (
                   <img
-                    src={visiblePreview.src}
-                    alt={visiblePreview.alt || previewAlt}
-                    className={`clotheImage ${incomingPreview ? "is-exiting" : ""}`}
+                    src={stablePreview.src}
+                    alt={stablePreview.alt || previewAlt}
+                    className="clotheImage"
                     draggable="false"
                   />
                 )}
-                {incomingPreview?.src && (
-                  <img
-                    src={incomingPreview.src}
-                    alt={incomingPreview.alt || previewAlt}
-                    className="clotheImage is-incoming"
-                    draggable="false"
-                  />
-                )}
-                {!visiblePreview.src && !incomingPreview?.src && (
+                {!stablePreview.src && (
                   <div className="clotheImagePlaceholder" />
                 )}
               </div>
