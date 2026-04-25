@@ -554,7 +554,11 @@ const RecipientDetails = () => {
       confirming = true;
 
       try {
-        await api.post(`/orders/confirm/${encodeURIComponent(orderId)}`, {});
+        const confirmProvider =
+          process.env.NODE_ENV === "development" ? "manual" : "fallback";
+        await api.post(`/orders/confirm/${encodeURIComponent(orderId)}`, {
+          provider: confirmProvider,
+        });
         const storedCdek = sessionStorage.getItem("pay_cdek_number") || null;
         navigate('/thank-you', { state: { orderNumber: orderId, cdekNumber: storedCdek || null } });
       } catch (err) {
