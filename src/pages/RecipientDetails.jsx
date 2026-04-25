@@ -94,7 +94,7 @@ const RecipientDetails = () => {
   
   // Dadata
   const [isNoCdek, setIsNoCdek] = useState(Boolean(recipientState.isNoCdek));
-  const dadataToken = "0821b30c8abbf80ea31555ae120fed168b30b8dc"; // ваш токен
+  const dadataToken = process.env.REACT_APP_DADATA_TOKEN || "";
 
   const isManualAddressFull = useMemo(() => {
     if (!manualAddress || !manualAddress.data) return false;

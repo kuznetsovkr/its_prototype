@@ -12,7 +12,6 @@ const Header = () => {
   const [orderStatus, setOrderStatus] = useState(null);
   const [orderNumber, setOrderNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Авторизация
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -38,13 +37,8 @@ const Header = () => {
     setOrderStatus(null);
 
     try {
-      const { response } = await api.get(`/orders/status/${encodeURIComponent(orderNumber)}`);
-      if (response.ok) {
-        const data = await response.json();
-        setOrderStatus(`Статус заказа №${orderNumber}: ${data.status}`);
-      } else {
-        setOrderStatus("Заказ не найден. Проверьте номер.");
-      }
+      const { data } = await api.get(`/orders/status/${encodeURIComponent(orderNumber)}`);
+      setOrderStatus(`Статус заказа №${orderNumber}: ${data?.status || "неизвестен"}`);
     } catch (error) {
       console.error("Ошибка получения статуса заказа:", error);
       setOrderStatus("Ошибка сервера. Попробуйте позже.");
@@ -71,7 +65,7 @@ const Header = () => {
   // При открытии модалки -> body.style.overflow = 'hidden'
   // При закрытии -> body.style.overflow = 'auto'
   useEffect(() => {
-    if (isModalOpen) {
+    if (isOrderModalOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -81,7 +75,7 @@ const Header = () => {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [isModalOpen]);
+  }, [isOrderModalOpen]);
 
   // Переход в профиль или открытие окна авторизации
   const handleAuthClick = () => {
@@ -205,10 +199,7 @@ const Header = () => {
         <div className="modal-overlay" onClick={toggleOrderModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="close-button" 
-              onClick={()=>{
-                toggleOrderModal();
-                setIsModalOpen(false);
-              }}
+              onClick={toggleOrderModal}
             >
               ×
             </button>

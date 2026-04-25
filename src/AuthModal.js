@@ -55,16 +55,13 @@ const AuthModal = ({ isAuthModalOpen, toggleAuthModal, onLoginSuccess }) => {
 
     const handleRequestSMS = async () => {
         if (!validatePhone()) {
-            console.log("🚨 Номер телефона некорректный!");
             return;
         }
 
         const cleanNumber = phone.replace(/\D/g, ""); // Удаляем все нецифровые символы
-        console.log(`📞 Отправляем запрос на сервер с номером: ${cleanNumber}`);
 
         try {
             const response = await api.post('/auth/request-sms', { phone: cleanNumber });
-            console.log("✅ Ответ сервера:", response.data);
             const debugCode = response.data?.debugCode;
             if (debugCode) {
                 alert(`Тестовый СМС-код: ${debugCode}`);
