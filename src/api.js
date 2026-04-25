@@ -1,6 +1,27 @@
 import axios from 'axios';
 
-export const API_BASE = (process.env.REACT_APP_API_URL || '/api').replace(/\/+$/, '');
+const normalizeBase = (value) => (value || '/api').replace(/\/+$/, '');
+
+const isLoopbackUrl = (value) => {
+  if (!value) return false;
+  try {
+    const parsed = new URL(value, window.location.origin);
+    return ['localhost', '127.0.0.1', '::1'].includes(parsed.hostname);
+  } catch {
+    return false;
+  }
+};
+
+const shouldAvoidLoopback = () => {
+  const host = window.location.hostname;
+  return !['localhost', '127.0.0.1', '::1'].includes(host);
+};
+
+const configuredApiBase = process.env.REACT_APP_API_URL || '/api';
+
+export const API_BASE = normalizeBase(
+  shouldAvoidLoopback() && isLoopbackUrl(configuredApiBase) ? '/api' : configuredApiBase
+);
 
 const api = axios.create({
   baseURL: API_BASE,

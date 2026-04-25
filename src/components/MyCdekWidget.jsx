@@ -8,9 +8,9 @@ const INFO_POPUP_KEY = "info";
 
 const detectClothingKey = (base) => {
   const raw = String(base || "").toLowerCase();
-  if (raw.includes("худи") || raw.includes("hoodie") || raw.includes("hudi")) return "hoodie";
-  if (raw.includes("свитшот") || raw.includes("свит") || raw.includes("sweatshirt") || raw.includes("svitshot")) return "svitshot";
-  if (raw.includes("футбол") || raw.includes("t-shirt") || raw.includes("tshirt") || raw.includes("tee")) return "tshirt";
+  if (raw.includes("С…СѓРґРё") || raw.includes("hoodie") || raw.includes("hudi")) return "hoodie";
+  if (raw.includes("СЃРІРёС‚С€РѕС‚") || raw.includes("СЃРІРёС‚") || raw.includes("sweatshirt") || raw.includes("svitshot")) return "svitshot";
+  if (raw.includes("С„СѓС‚Р±РѕР»") || raw.includes("t-shirt") || raw.includes("tshirt") || raw.includes("tee")) return "tshirt";
   return "hoodie";
 };
 
@@ -32,19 +32,32 @@ const GOODS_PRESETS = {
 
 const FROM_LOCATION = {
   country_code: "RU",
-  city: "Красноярск",
+  city: "РљСЂР°СЃРЅРѕСЏСЂСЃРє",
   postal_code: 660135,
   code: 278,
-  address: "ул. 78-й Добровольческой бригады, 1",
+  address: "СѓР». 78-Р№ Р”РѕР±СЂРѕРІРѕР»СЊС‡РµСЃРєРѕР№ Р±СЂРёРіР°РґС‹, 1",
 };
 
 const DEFAULT_CITY = {
   code: 278,
-  city: "Красноярск",
+  city: "РљСЂР°СЃРЅРѕСЏСЂСЃРє",
   country_code: "RU",
   postal_code: "660135",
 };
 
+const LOOPBACK_HOSTS = ["localhost", "127.0.0.1", "::1"];
+
+const isLoopbackUrl = (value) => {
+  if (!value) return false;
+  try {
+    const parsed = new URL(value, window.location.origin);
+    return LOOPBACK_HOSTS.includes(parsed.hostname);
+  } catch {
+    return false;
+  }
+};
+
+const shouldAvoidLoopback = () => !LOOPBACK_HOSTS.includes(window.location.hostname);
 const formatAddressLabel = (address) => {
   if (!address) return "";
   return (
@@ -60,7 +73,7 @@ const normalizeTariff = (tariff, fallbackCode = FIXED_TARIFF_CODE) => {
   if (!tariff) {
     return {
       tariff_code: fallbackCode,
-      tariff_name: "Склад-склад",
+      tariff_name: "РЎРєР»Р°Рґ-СЃРєР»Р°Рґ",
       delivery_sum: null,
       total_sum: null,
       period_min: null,
@@ -71,7 +84,7 @@ const normalizeTariff = (tariff, fallbackCode = FIXED_TARIFF_CODE) => {
 
   return {
     tariff_code: tariff.tariff_code ?? fallbackCode,
-    tariff_name: tariff.tariff_name ?? tariff.title ?? "Склад-склад",
+    tariff_name: tariff.tariff_name ?? tariff.title ?? "РЎРєР»Р°Рґ-СЃРєР»Р°Рґ",
     delivery_sum: tariff.delivery_sum ?? null,
     total_sum: tariff.total_sum ?? null,
     period_min: tariff.period_min ?? null,
@@ -102,7 +115,11 @@ const closeInfoPopup = (widgetInstance) => {
 };
 
 const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType }) => {
-  const servicePath = process.env.REACT_APP_CDEK_SERVICE_URL || "/service.php";
+  const configuredServicePath = process.env.REACT_APP_CDEK_SERVICE_URL || "/service.php";
+  const servicePath =
+    shouldAvoidLoopback() && isLoopbackUrl(configuredServicePath)
+      ? "/service.php"
+      : configuredServicePath;
   const ymapsKey = String(process.env.REACT_APP_YMAPS_KEY || "")
     .trim()
     .replace(/^['"]|['"]$/g, "");
@@ -219,3 +236,5 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
 };
 
 export default MyCdekWidget;
+
+
