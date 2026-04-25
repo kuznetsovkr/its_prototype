@@ -22,6 +22,9 @@ export default function FaqPage() {
   return (
     <section className="faq" aria-labelledby="faq-title">
       <div className="faq__container">
+        <div className="faq__alert" role="note">
+          Текстовки приведены для примера, окончательные варианты пропишутся после выдачи заказчиком.
+        </div>
         <h1 id="faq-title" className="faq__title">Частые вопросы</h1>
 
         <ul className="accordion">
