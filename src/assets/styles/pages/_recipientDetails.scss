@@ -4,11 +4,14 @@
   gap: clamp(20px, 1vw, 30px);
   min-height: min(calc(100vh - 200px), 1008px);
   margin-top: 10px;
+  overflow-x: clip;
 
   .firstColumn{
     display: flex;
     flex-direction: column;
     gap: clamp(40px, 2vw, 60px);
+    min-width: 0;
+    flex: 1 1 60%;
 
     .recipientInfo{
       .title{
@@ -101,7 +104,9 @@
   }
 
   .secondColumn{
-    width: 100%;
+    min-width: 0;
+    flex: 1 1 40%;
+    width: auto;
     .deliveryCost{
       display: flex;
       flex-direction: column;
@@ -252,27 +257,6 @@
 @media (min-width: 1280px){
   .deliveryInfo .blockCDEK #cdek-map{
     aspect-ratio: 16 / 9;
-  }
-}
-
-.containerDetails{
-  /* страховка от любых мелких утечек */
-  overflow-x: clip;
-
-  /* ...остальное... */
-
-  .firstColumn, .secondColumn{
-    /* ключ! даём flex-элементам право ужиматься */
-    min-width: 0;
-  }
-
-  .firstColumn{
-    flex: 1 1 60%;
-  }
-  .secondColumn{
-    /* убираем width:100% на десктопе */
-    flex: 1 1 40%;
-    width: auto;
   }
 }
 
