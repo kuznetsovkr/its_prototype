@@ -13,6 +13,12 @@
 
 # misc
 .DS_Store
+.eslintcache
+.stylelintcache
+*.log
+logs/
+*.pid
+*.pid.lock
 .env
 .env.local
 .env.development.local
@@ -20,6 +26,7 @@
 .env.production.local
 .env.*
 !.env.example
+!.env*.example
 
 # editor / local
 .idea/
