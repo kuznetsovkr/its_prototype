@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import CDEKWidget from "@cdek-it/widget";
+import { API_BASE } from "../api";
 
 const FIXED_TARIFF_CODE = 136;
 const DEFAULT_CENTER = [92.868, 56.0106];
@@ -58,6 +59,76 @@ const isLoopbackUrl = (value) => {
 };
 
 const shouldAvoidLoopback = () => !LOOPBACK_HOSTS.includes(window.location.hostname);
+
+const normalizeBase = (value) => String(value || "").replace(/\/+$/, "");
+
+const deriveServicePathFromApiBase = (apiBase) => {
+  const normalized = normalizeBase(apiBase);
+  if (!normalized || normalized === "/api") return "/service.php";
+
+  try {
+    const parsed = new URL(normalized, window.location.origin);
+    const pathWithoutApiSuffix = parsed.pathname.replace(/\/api$/i, "");
+    const basePath = pathWithoutApiSuffix === "/" ? "" : pathWithoutApiSuffix;
+    return `${parsed.origin}${basePath}/service.php`;
+  } catch {
+    if (normalized.startsWith("/")) {
+      const localPath = normalized.replace(/\/api$/i, "");
+      return `${localPath}/service.php`;
+    }
+    return "/service.php";
+  }
+};
+
+const resolveServicePath = () => {
+  const configuredServicePath = String(process.env.REACT_APP_CDEK_SERVICE_URL || "").trim();
+  const fallbackServicePath = deriveServicePathFromApiBase(API_BASE);
+
+  if (!configuredServicePath) return fallbackServicePath;
+
+  if (shouldAvoidLoopback() && isLoopbackUrl(configuredServicePath)) {
+    return fallbackServicePath;
+  }
+
+  if (!shouldAvoidLoopback() && isLoopbackUrl(configuredServicePath) && isLoopbackUrl(fallbackServicePath)) {
+    try {
+      const configuredUrl = new URL(configuredServicePath, window.location.origin);
+      const fallbackUrl = new URL(fallbackServicePath, window.location.origin);
+      if (configuredUrl.port && fallbackUrl.port && configuredUrl.port !== fallbackUrl.port) {
+        return fallbackServicePath;
+      }
+    } catch {}
+  }
+
+  return configuredServicePath;
+};
+
+const YMAPS_LAYER_ERROR_SIGNATURES = [
+  "YMapDefaultSchemeLayer is not a constructor",
+  "YMapDefaultFeaturesLayer is not a constructor",
+];
+const MAP_ERROR_TEXT = "Карта СДЭК не загрузилась. Проверьте REACT_APP_YMAPS_KEY для JS API v3.";
+
+const isYmapsLayerConstructorError = (reason) => {
+  const message = String(reason?.message || reason || "");
+  return YMAPS_LAYER_ERROR_SIGNATURES.some((signature) => message.includes(signature));
+};
+
+const setMapErrorMessage = (message) => {
+  const root = document.getElementById("cdek-map");
+  if (!root) return;
+  root.innerHTML = `<div class="cdek-map__error">${message}</div>`;
+};
+
+const clearMapErrorMessage = () => {
+  const root = document.getElementById("cdek-map");
+  if (!root) return;
+  const errorNode = root.querySelector(".cdek-map__error");
+  if (errorNode) {
+    errorNode.remove();
+  }
+};
+
 const formatAddressLabel = (address) => {
   if (!address) return "";
   return (
@@ -115,11 +186,7 @@ const closeInfoPopup = (widgetInstance) => {
 };
 
 const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType }) => {
-  const configuredServicePath = process.env.REACT_APP_CDEK_SERVICE_URL || "/service.php";
-  const servicePath =
-    shouldAvoidLoopback() && isLoopbackUrl(configuredServicePath)
-      ? "/service.php"
-      : configuredServicePath;
+  const servicePath = resolveServicePath();
   const ymapsKey = String(process.env.REACT_APP_YMAPS_KEY || "")
     .trim()
     .replace(/^['"]|['"]$/g, "");
@@ -128,6 +195,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
   const rateRef = useRef(onRateSelect);
   const cdekRef = useRef(onCdekSelect);
   const autoTariffRef = useRef(normalizeTariff(null));
+  const hasLoggedMapErrorRef = useRef(false);
 
   useEffect(() => { addressRef.current = onAddressSelect; }, [onAddressSelect]);
   useEffect(() => { rateRef.current = onRateSelect; }, [onRateSelect]);
@@ -137,7 +205,33 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
     let instance;
     const unsubscribeWidgetListeners = [];
 
+    hasLoggedMapErrorRef.current = false;
+
+    const reportMapError = (reason) => {
+      if (hasLoggedMapErrorRef.current) return;
+      hasLoggedMapErrorRef.current = true;
+      setMapErrorMessage(MAP_ERROR_TEXT);
+      console.error("[CDEK] Widget map init error:", reason);
+      console.error(
+        "[CDEK] Проверьте ключ REACT_APP_YMAPS_KEY (доступ к Yandex Maps JS API v3 и разрешенный localhost/127.0.0.1 в ограничениях ключа)."
+      );
+    };
+
+    const handleUnhandledRejection = (event) => {
+      if (isYmapsLayerConstructorError(event.reason)) {
+        reportMapError(event.reason);
+      }
+    };
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+
     const t = setTimeout(() => {
+      if (!ymapsKey) {
+        reportMapError(new Error("REACT_APP_YMAPS_KEY is empty"));
+        return;
+      }
+
+      clearMapErrorMessage();
+
       const typeName = resolveProductName(productType);
       const goodsKey = detectClothingKey(typeName);
       const goods = GOODS_PRESETS[goodsKey] || GOODS_PRESETS.default;
@@ -146,42 +240,47 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         weight_grams: Math.round((goods.weight || 0) * 1000),
       };
 
-      instance = new CDEKWidget({
-        root: "cdek-map",
-        from: FROM_LOCATION,
-        apiKey: ymapsKey,
-        canChoose: true,
-        servicePath,
-        hideFilters: { have_cashless: false, have_cash: false, is_dressing_room: false, type: false },
-        hideDeliveryOptions: { office: false, door: true },
-        debug: false,
-        goods: [goods],
-        city: DEFAULT_CITY,
-        defaultLocation: DEFAULT_CENTER,
-        fixBounds: null,
-        lang: "rus",
-        currency: "RUB",
-        tariffs: { office: [FIXED_TARIFF_CODE], door: [] },
-        onChoose(mode, selectedTariff, address) {
-          const normalizedTariff = normalizeTariff(selectedTariff || autoTariffRef.current);
-          autoTariffRef.current = normalizedTariff;
+      try {
+        instance = new CDEKWidget({
+          root: "cdek-map",
+          from: FROM_LOCATION,
+          apiKey: ymapsKey,
+          canChoose: true,
+          servicePath,
+          hideFilters: { have_cashless: false, have_cash: false, is_dressing_room: false, type: false },
+          hideDeliveryOptions: { office: false, door: true },
+          debug: false,
+          goods: [goods],
+          city: DEFAULT_CITY,
+          defaultLocation: DEFAULT_CENTER,
+          fixBounds: null,
+          lang: "rus",
+          currency: "RUB",
+          tariffs: { office: [FIXED_TARIFF_CODE], door: [] },
+          onChoose(mode, selectedTariff, address) {
+            const normalizedTariff = normalizeTariff(selectedTariff || autoTariffRef.current);
+            autoTariffRef.current = normalizedTariff;
 
-          const addressLabel = formatAddressLabel(address);
-          addressRef.current?.(addressLabel);
-          rateRef.current?.(normalizedTariff.delivery_sum ?? normalizedTariff.total_sum ?? null);
+            const addressLabel = formatAddressLabel(address);
+            addressRef.current?.(addressLabel);
+            rateRef.current?.(normalizedTariff.delivery_sum ?? normalizedTariff.total_sum ?? null);
 
-          cdekRef.current?.({
-            mode,
-            tariff: normalizedTariff,
-            address,
-            addressLabel,
-            goods: [goodsForApi],
-            from: FROM_LOCATION,
-          });
+            cdekRef.current?.({
+              mode,
+              tariff: normalizedTariff,
+              address,
+              addressLabel,
+              goods: [goodsForApi],
+              from: FROM_LOCATION,
+            });
 
-          closeInfoPopup(instance);
-        },
-      });
+            closeInfoPopup(instance);
+          },
+        });
+      } catch (error) {
+        reportMapError(error);
+        return;
+      }
 
       const coreStore = getWidgetStore(instance, "core");
       const mapStore = getWidgetStore(instance, "map");
@@ -225,6 +324,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
 
     return () => {
       clearTimeout(t);
+      window.removeEventListener("unhandledrejection", handleUnhandledRejection);
       unsubscribeWidgetListeners.forEach((unsubscribe) => {
         try { unsubscribe?.(); } catch {}
       });
