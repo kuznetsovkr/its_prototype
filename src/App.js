@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -45,6 +45,18 @@ const OrderFlowReset = () => {
     return null;
 };
 
+const ScrollToTop = () => {
+    const { pathname } = useLocation();
+
+    useLayoutEffect(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+    }, [pathname]);
+
+    return null;
+};
+
 
 
 const App = () => {
@@ -52,6 +64,7 @@ const App = () => {
         <Router>
             <div className="App">
                 <Header />
+                <ScrollToTop />
                 <OrderFlowReset />
                     <main>
                         <Routes>
