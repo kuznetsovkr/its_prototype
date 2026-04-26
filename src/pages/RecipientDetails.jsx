@@ -270,7 +270,7 @@ const RecipientDetails = () => {
     userData.middleName.trim() !== "" &&
     userData.phone.trim() !== "";
 
-  const isDeliveryAddressFilled = isNoCdek ? Boolean(manualAddress?.value && isManualAddressFull) : Boolean(pickupPoint);
+  const isDeliveryAddressFilled = isNoCdek ? Boolean(manualAddress?.value && isManualAddressFull) : true;
     
   const isPhoneOk = phoneVerified || (phoneFromProfile && phoneLocked && !phoneEditedSinceProfile);
   const isFormValid = isUserDataFilled && isDeliveryAddressFilled && isPhoneOk;
@@ -286,8 +286,6 @@ const RecipientDetails = () => {
       if (!manualAddress?.value || !isManualAddressFull) {
         missing.push("полный адрес до дома");
       }
-    } else {
-      if (!pickupPoint) missing.push("пункт выдачи СДЭК");
     }
 
     if (!isPhoneOk) missing.push("подтвердите телефон");
