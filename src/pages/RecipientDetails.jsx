@@ -6,6 +6,8 @@ import 'react-dadata/dist/react-dadata.css';
 import api from '../api';
 import { useOrder } from "../context/OrderContext";
 import { applyAuthResponse, resolveUserRole } from "../utils/auth";
+import { IS_DEMO_MODE } from "../config/demoMode";
+import { buildDemoOrderId, buildDemoCdekNumber } from "../mocks/demoData";
 
 const EMBROIDERY_TYPE_RU = {
   Patronus: "Патронус",
@@ -31,6 +33,16 @@ const formatPhoneNumber = (value) => {
   );
 };
 
+const DEMO_RECIPIENT_DATA = {
+  firstName: "Ivan",
+  lastName: "Ivanov",
+  middleName: "Ivanovich",
+  phone: "+7 (900) 123-45-67",
+};
+
+const DEMO_PICKUP_POINT = "Demo pickup point: Krasnoyarsk, Mira 1";
+const DEMO_DELIVERY_PRICE = 390;
+
 const RecipientDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -53,15 +65,24 @@ const RecipientDetails = () => {
   const petFaceCount = embroidery.petFaceCount || 0;
   const embroideryTypeRu = EMBROIDERY_TYPE_RU[selectedType] || selectedType || "";
 
-  const [userData, setUserData] = useState(
-    recipientState.userData || { firstName: "", lastName: "", middleName: "", phone: "" }
-  );
+  const [userData, setUserData] = useState(() => {
+    const base = recipientState.userData || { firstName: "", lastName: "", middleName: "", phone: "" };
+    if (!IS_DEMO_MODE) return base;
+    return {
+      firstName: base.firstName || DEMO_RECIPIENT_DATA.firstName,
+      lastName: base.lastName || DEMO_RECIPIENT_DATA.lastName,
+      middleName: base.middleName || DEMO_RECIPIENT_DATA.middleName,
+      phone: base.phone || DEMO_RECIPIENT_DATA.phone,
+    };
+  });
 
   // Телефон/аутентификация
-  const [isUserAuthenticated, setIsUserAuthenticated] = useState(!!localStorage.getItem("token"));
-  const [phoneFromProfile, setPhoneFromProfile] = useState(false);   // телефон подтянулся из профиля
-  const [phoneLocked, setPhoneLocked] = useState(false);             // поле зафиксировано (нельзя редачить)
-  const [phoneVerified, setPhoneVerified] = useState(false);         // подтверждён (✓) или считается валидным, если из профиля и не редактируется
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState(
+    IS_DEMO_MODE || !!localStorage.getItem("token")
+  );
+  const [phoneFromProfile, setPhoneFromProfile] = useState(IS_DEMO_MODE);   // телефон подтянулся из профиля
+  const [phoneLocked, setPhoneLocked] = useState(IS_DEMO_MODE);             // поле зафиксировано (нельзя редачить)
+  const [phoneVerified, setPhoneVerified] = useState(IS_DEMO_MODE);         // подтверждён (✓) или считается валидным, если из профиля и не редактируется
   const [phoneEditedSinceProfile, setPhoneEditedSinceProfile] = useState(false); // меняли после «изменить»
   // Шаги подтверждения
   const [smsRequested, setSmsRequested] = useState(false);
@@ -72,12 +93,30 @@ const RecipientDetails = () => {
   const [authError, setAuthError] = useState("");
 
   // Оплата / заказы
-  const [pickupPoint, setPickupPoint] = useState(recipientState.pickupPoint || ""); // address.name
+  const [pickupPoint, setPickupPoint] = useState(
+    recipientState.pickupPoint || (IS_DEMO_MODE ? DEMO_PICKUP_POINT : "")
+  ); // address.name
   const [deliveryPrice, setDeliveryPrice] = useState(
-    recipientState.deliveryPrice ?? null
+    recipientState.deliveryPrice ?? (IS_DEMO_MODE ? DEMO_DELIVERY_PRICE : null)
   ); // rate.delivery_sum
   const [manualAddress, setManualAddress] = useState(recipientState.manualAddress || null);
-  const [cdekData, setCdekData] = useState(recipientState.cdek || null);
+  const [cdekData, setCdekData] = useState(
+    recipientState.cdek ||
+      (IS_DEMO_MODE
+        ? {
+            mode: "office",
+            tariff: {
+              tariff_code: 136,
+              tariff_name: "Demo office pickup",
+              delivery_sum: DEMO_DELIVERY_PRICE,
+              total_sum: DEMO_DELIVERY_PRICE,
+              currency: "RUB",
+            },
+            address: { address: DEMO_PICKUP_POINT },
+            addressLabel: DEMO_PICKUP_POINT,
+          }
+        : null)
+  );
   const [isPaying, setIsPaying] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const [error, setError] = useState("");
@@ -199,6 +238,7 @@ const RecipientDetails = () => {
   ]);
 
   useEffect(() => {
+    if (IS_DEMO_MODE) return;
     const hasClothing = Boolean(productType && color && size);
     const hasEmbroidery =
       selectedType === "custom"
@@ -216,12 +256,30 @@ const RecipientDetails = () => {
   }, [productType, color, size, selectedType, uploadedImage?.length, customOption.text, customOption.image, customText, navigate]);
 
   const handleNoCdekToggle = (event) => {
-    setIsNoCdek(event.target.checked);
+    const checked = event.target.checked;
+    setIsNoCdek(checked);
+
+    if (!IS_DEMO_MODE || checked) return;
+    setPickupPoint(DEMO_PICKUP_POINT);
+    setDeliveryPrice(DEMO_DELIVERY_PRICE);
+    setCdekData((prev) => prev || {
+      mode: "office",
+      tariff: {
+        tariff_code: 136,
+        tariff_name: "Demo office pickup",
+        delivery_sum: DEMO_DELIVERY_PRICE,
+        total_sum: DEMO_DELIVERY_PRICE,
+        currency: "RUB",
+      },
+      address: { address: DEMO_PICKUP_POINT },
+      addressLabel: DEMO_PICKUP_POINT,
+    });
   };
 
 
   useEffect(() => {
     const fetchUserData = async () => {
+      if (IS_DEMO_MODE) return;
       if (!isUserAuthenticated) return;
       try {
         const { data } = await api.get('/user/me');
@@ -272,7 +330,9 @@ const RecipientDetails = () => {
 
   const isDeliveryAddressFilled = isNoCdek ? Boolean(manualAddress?.value && isManualAddressFull) : true;
     
-  const isPhoneOk = phoneVerified || (phoneFromProfile && phoneLocked && !phoneEditedSinceProfile);
+  const isPhoneOk = IS_DEMO_MODE
+    ? Boolean(userData.phone.trim())
+    : phoneVerified || (phoneFromProfile && phoneLocked && !phoneEditedSinceProfile);
   const isFormValid = isUserDataFilled && isDeliveryAddressFilled && isPhoneOk;
 
   const getMissingFieldsMessage = () => {
@@ -317,6 +377,19 @@ const RecipientDetails = () => {
     const digits = validatePhoneMasked();
     if (!digits) return;
 
+    if (IS_DEMO_MODE) {
+      setIsUserAuthenticated(true);
+      setPhoneFromProfile(true);
+      setPhoneVerified(true);
+      setPhoneLocked(true);
+      setPhoneEditedSinceProfile(false);
+      setSmsRequested(false);
+      setSmsStep(0);
+      setSmsCode("");
+      setAdminPassword("");
+      return;
+    }
+
     try {
       const response = await api.post('/auth/request-sms', { phone: digits });
       if (response.data?.authMode === "password") {
@@ -345,6 +418,18 @@ const RecipientDetails = () => {
     setAuthError("");
     const digits = validatePhoneMasked();
     if (!digits) return;
+    if (IS_DEMO_MODE) {
+      setIsUserAuthenticated(true);
+      setPhoneFromProfile(true);
+      setPhoneVerified(true);
+      setPhoneLocked(true);
+      setSmsRequested(false);
+      setSmsStep(0);
+      setSmsCode("");
+      setAdminPassword("");
+      setPhoneEditedSinceProfile(false);
+      return;
+    }
     if (!smsCode || smsCode.length < 4) {
       setAuthError("Введите корректный код из SMS.");
       return;
@@ -370,6 +455,18 @@ const RecipientDetails = () => {
     setAuthError("");
     const digits = validatePhoneMasked();
     if (!digits) return;
+    if (IS_DEMO_MODE) {
+      setIsUserAuthenticated(true);
+      setPhoneFromProfile(true);
+      setPhoneVerified(true);
+      setPhoneLocked(true);
+      setSmsRequested(false);
+      setSmsStep(0);
+      setSmsCode("");
+      setAdminPassword("");
+      setPhoneEditedSinceProfile(false);
+      return;
+    }
     if (!adminPassword) {
       setAuthError("Введите пароль.");
       return;
@@ -444,6 +541,26 @@ const RecipientDetails = () => {
     return { ...base, weight_grams: Math.round((base.weight || 0) * 1000) };
   };
 
+  const applyDemoPickup = () => {
+    const goods = [deriveGoodsPreset()];
+    const payload = {
+      mode: "office",
+      tariff: {
+        tariff_code: 136,
+        tariff_name: "Demo office pickup",
+        delivery_sum: DEMO_DELIVERY_PRICE,
+        total_sum: DEMO_DELIVERY_PRICE,
+        currency: "RUB",
+      },
+      address: { address: DEMO_PICKUP_POINT },
+      addressLabel: DEMO_PICKUP_POINT,
+      goods,
+      from: { country_code: "RU", city: "Krasnoyarsk" },
+    };
+
+    handleCdekSelect(payload);
+  };
+
   async function createDraftOrder() {
     const fd = new FormData();
 
@@ -507,6 +624,29 @@ const RecipientDetails = () => {
     if (isPaying) return;
     setError('');
     setIsPaying(true);
+
+    if (IS_DEMO_MODE) {
+      const now = new Date();
+      const demoOrderId = buildDemoOrderId(now);
+      const demoCdekNumber = isNoCdek ? null : buildDemoCdekNumber(now);
+      setOrderId(demoOrderId);
+      sessionStorage.setItem("pay_order_id", demoOrderId);
+      if (demoCdekNumber) {
+        sessionStorage.setItem("pay_cdek_number", demoCdekNumber);
+      } else {
+        sessionStorage.removeItem("pay_cdek_number");
+      }
+      setIsPaying(false);
+      navigate("/thank-you", {
+        state: {
+          orderNumber: demoOrderId,
+          manual: isCustomType,
+          cdekNumber: demoCdekNumber,
+        },
+      });
+      return;
+    }
+
     try {
       const { orderId: oid, cdekNumber: cdekNum } = await createDraftOrder();
       setOrderId(oid);
@@ -533,6 +673,7 @@ const RecipientDetails = () => {
     }
 
   useEffect(() => {
+    if (IS_DEMO_MODE) return;
     let confirming = false;
     const onMessage = async (event) => {
       if (event.origin !== window.location.origin) return;
@@ -682,29 +823,65 @@ const RecipientDetails = () => {
           <p className="title">Выбор пункта выдачи (СДЭК)</p>
           <div className="blockCDEK">
             <div className="mapBox">
-              <div id="cdek-map" />
+              <div id="cdek-map">
+                {IS_DEMO_MODE && (
+                  <div className="cdek-map__demo">
+                    <p className="cdek-map__demo-title">CDEK map placeholder (demo mode)</p>
+                    <p className="cdek-map__demo-text">
+                      Use the button below to emulate pickup-point selection.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
-            <MyCdekWidget
-              productType={productType}
-              onAddressSelect={setPickupPoint}
-              onRateSelect={setDeliveryPrice}
-              onCdekSelect={handleCdekSelect}
-            />
+            {!IS_DEMO_MODE && (
+              <MyCdekWidget
+                productType={productType}
+                onAddressSelect={setPickupPoint}
+                onRateSelect={setDeliveryPrice}
+                onCdekSelect={handleCdekSelect}
+              />
+            )}
+            {IS_DEMO_MODE && !isNoCdek && (
+              <button type="button" className="demoPickupButton" onClick={applyDemoPickup}>
+                Select demo pickup point
+              </button>
+            )}
             <label>
               <input type="checkbox" checked={isNoCdek} onChange={handleNoCdekToggle} />
               В моём городе нет СДЭКа
             </label>
             {isNoCdek && (
               <div className="manualAddress">
-                <AddressSuggestions
-                  token={dadataToken}
-                  value={manualAddress}
-                  onChange={setManualAddress}
-                  inputProps={{
-                    placeholder: "Введите свой адрес",
-                  }}
-                />
-                {!isManualAddressFull && (
+                {IS_DEMO_MODE ? (
+                  <input
+                    type="text"
+                    className="manualAddress__input"
+                    placeholder="Enter delivery address"
+                    value={manualAddress?.value || ""}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      setManualAddress({
+                        value,
+                        data: {
+                          house: value.trim() ? "1" : "",
+                          block: "",
+                          flat: "",
+                        },
+                      });
+                    }}
+                  />
+                ) : (
+                  <AddressSuggestions
+                    token={dadataToken}
+                    value={manualAddress}
+                    onChange={setManualAddress}
+                    inputProps={{
+                      placeholder: "Введите свой адрес",
+                    }}
+                  />
+                )}
+                {!IS_DEMO_MODE && !isManualAddressFull && (
                   <p className="manualAddress__hint">Пожалуйста, выберите подсказку с указанием дома.</p>
                 )}
                 {manualAddress?.value && (

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ReactComponent as CheckIcon } from "../images/Vector.svg";
 import { useOrder } from "../context/OrderContext";
+import { IS_DEMO_MODE } from "../config/demoMode";
 
 const isSameFiles = (a = [], b = []) => {
   if (a === b) return true;
@@ -76,8 +77,13 @@ const EmbroiderySelector = () => {
   const mustText = isCustomType && customOption.text;
   const mustSelectCustom = isCustomType ? (customOption.image || customOption.text) : true;
   const customOk = mustSelectCustom && (!mustUpload || hasFiles) && (!mustText || hasCustomText);
-  const canProceed = isCustomType ? customOk : Boolean(selectedType && hasFiles);
+  const canProceed = IS_DEMO_MODE
+    ? Boolean(selectedType)
+    : isCustomType
+      ? customOk
+      : Boolean(selectedType && hasFiles);
   const disabledHint = (() => {
+    if (IS_DEMO_MODE) return "";
     if (!isCustomType) return !hasFiles ? "Загрузите хотя бы одно изображение" : "";
     if (!mustSelectCustom) return "Выберите: изображение или надпись";
     if (mustUpload && !hasFiles) return "Загрузите изображение";

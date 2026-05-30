@@ -7,6 +7,8 @@ import hoodieImg from '../images/hoodie.jpg';
 import switshotImg from '../images/switshot.jpg';
 import tshirtImg from '../images/tshirt.jpg';
 import { useOrder } from "../context/OrderContext";
+import { IS_DEMO_MODE } from "../config/demoMode";
+import { DEMO_INVENTORY } from "../mocks/demoData";
 
 // helper: обводка для белого цвета
 const isWhite = (c = "") => {
@@ -203,6 +205,13 @@ const ClothingSelector = () => {
 
   useEffect(() => {
     const fetchInventory = async () => {
+      if (IS_DEMO_MODE) {
+        setInventory(DEMO_INVENTORY);
+        const firstBase = parseTypeLabel(DEMO_INVENTORY?.[0]?.productType)?.base || "";
+        if (!clothing.type && firstBase) setSelectedClothing(firstBase);
+        return;
+      }
+
       try {
         const { data } = await api.get('/inventory');
         const cleaned = (Array.isArray(data) ? data : []).filter((item) => {
