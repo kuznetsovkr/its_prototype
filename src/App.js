@@ -62,6 +62,8 @@ const ScrollToTop = () => {
 const AppShell = () => {
     const { pathname } = useLocation();
     const isHomePage = pathname === '/';
+    const isOrderPage = pathname === '/order';
+    const isEmbroideryPage = pathname === '/embroidery';
 
     const routes = (
         <Routes>
@@ -93,7 +95,7 @@ const AppShell = () => {
     );
 
     return (
-            <div className="App">
+            <div className={`App${isOrderPage ? ' App--order' : ''}${isEmbroideryPage ? ' App--embroidery' : ''}`}>
                 {!isHomePage && <Header />}
                 <ScrollToTop />
                 <OrderFlowReset />

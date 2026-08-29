@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ReactComponent as CheckIcon } from "../images/Vector.svg";
 import api from '../api';
@@ -6,6 +6,7 @@ import { buildImgSrc } from '../utils/url';
 import hoodieImg from '../images/hoodie.jpg';
 import switshotImg from '../images/switshot.jpg';
 import tshirtImg from '../images/tshirt.jpg';
+import figmaTshirtImg from '../images/order/tshirt-black.png';
 import { useOrder } from "../context/OrderContext";
 import { IS_DEMO_MODE } from "../config/demoMode";
 import { DEMO_INVENTORY } from "../mocks/demoData";
@@ -121,6 +122,8 @@ const detectChartKey = (base) => {
   return "default";
 };
 
+const TYPE_ORDER = { tshirt: 1, hoodie: 2, svitshot: 3, default: 99 };
+
 const ClothingSelector = () => {
   const navigate = useNavigate();
   const { order, setClothing } = useOrder();
@@ -147,7 +150,9 @@ const ClothingSelector = () => {
       typedInventory.map((i) => i.parsed.base).filter(Boolean),
       (x) => x
     );
-    return list;
+    return list.sort(
+      (a, b) => TYPE_ORDER[detectChartKey(a)] - TYPE_ORDER[detectChartKey(b)]
+    );
   }, [typedInventory]);
 
   const presentInnerOptions = useMemo(() => {
@@ -355,40 +360,52 @@ const ClothingSelector = () => {
     };
   }, [previewSrc, previewAlt, stablePreview.src, stablePreview.alt]);
 
+  const displayPreviewSrc = stablePreview.src || figmaTshirtImg;
+  const displayPreviewAlt = stablePreview.src
+    ? stablePreview.alt || previewAlt
+    : "Чёрная футболка";
+  const rawPrice = previewItem?.price;
+  const parsedPrice = Number(rawPrice);
+  const hasInventoryPrice =
+    rawPrice !== null &&
+    rawPrice !== undefined &&
+    rawPrice !== "" &&
+    Number.isFinite(parsedPrice);
+  const displayPrice = hasInventoryPrice ? parsedPrice : 3000;
+
   return (
     <>
       <div className="blockClothingSelector">
         <div className="clothing-block">
+          <h1 className="orderStepTitle" id="order-clothing-title">заказ изделия</h1>
           <div className="image-wrapper">
             <div className="image-frame">
               <div className="image-stack" aria-live="polite">
-                {stablePreview.src && (
-                  <img
-                    src={stablePreview.src}
-                    alt={stablePreview.alt || previewAlt}
-                    className="clotheImage"
-                    draggable="false"
-                  />
-                )}
-                {!stablePreview.src && (
-                  <div className="clotheImagePlaceholder" />
-                )}
+                <img
+                  src={displayPreviewSrc}
+                  alt={displayPreviewAlt}
+                  className="clotheImage"
+                  draggable="false"
+                />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="blockSelection">
-          <div className="selectorGroup">
-            <p className="title">ТИП ИЗДЕЛИЯ:</p>
+        <div className="clothingControls">
+          <div className="blockSelection">
+            <div className="selectorGroup selectorGroup--type">
+              <p className="title">Выберите изделие</p>
 
-            <div className="selectorType">
-              {availableBaseTypes.length === 0 && (
-                <div className="muted">Нет доступных товаров</div>
-              )}
-              {availableBaseTypes.map((base) => (
-                <React.Fragment key={base}>
-                  <label className="selectorType__item">
+              <div className="selectorType">
+                {availableBaseTypes.length === 0 && (
+                  <div className="muted">Нет доступных товаров</div>
+                )}
+                {availableBaseTypes.map((base) => (
+                  <label
+                    className={`selectorType__item ${selectedClothing === base ? "active" : ""}`}
+                    key={base}
+                  >
                     <input
                       type="radio"
                       name="clothing"
@@ -401,96 +418,116 @@ const ClothingSelector = () => {
                     </span>
                     {base}
                   </label>
+                ))}
+              </div>
 
-                  {selectedClothing === base && needsInner && (
-                    <div className="selectorType selectorType--inner" key={`${base}-inner`}>
-                      {presentInnerOptions.map((inner) => (
-                        <label className="selectorType__item" key={inner}>
-                          <input
-                            type="radio"
-                            name="innerType"
-                            value={inner}
-                            checked={selectedInnerType === inner}
-                            onChange={(e) => setSelectedInnerType(e.target.value)}
-                          />
-                          <span className="selectorType__custom">
-                            <CheckIcon className="selectorType__check" />
-                          </span>
-                          {inner}
-                        </label>
-                      ))}
-                    </div>
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
-
-          <div className="selectorGroup">
-            <p className="title">ЦВЕТ:</p>
-            <div className="colorSelector">
-              {!needsInner || selectedInnerType ? (
-                availableColorOptions.length > 0 ? (
-                  availableColorOptions.map((opt) => (
-                    <div
-                      key={opt.label}
-                      className={`colorSquare ${selectedColor === opt.label ? "active" : ""}`}
-                      style={{
-                        backgroundColor: opt.code,
-                        border: isWhite(opt.code) ? "1px solid currentColor" : undefined,
-                      }}
-                      title={opt.label}
-                      onClick={() => setSelectedColor(opt.label)}
-                    />
-                  ))
-                ) : (
-                  <div className="muted">Нет доступных цветов</div>
-                )
-              ) : (
-                <div className="muted">Сначала выберите вариант («с начёсом» / «без начёса»)</div>
+              {needsInner && (
+                <div className="selectorType selectorType--inner">
+                  {presentInnerOptions.map((inner) => (
+                    <label
+                      className={`selectorType__item ${selectedInnerType === inner ? "active" : ""}`}
+                      key={inner}
+                    >
+                      <input
+                        type="radio"
+                        name="innerType"
+                        value={inner}
+                        checked={selectedInnerType === inner}
+                        onChange={(e) => setSelectedInnerType(e.target.value)}
+                      />
+                      <span className="selectorType__custom">
+                        <CheckIcon className="selectorType__check" />
+                      </span>
+                      {inner}
+                    </label>
+                  ))}
+                </div>
               )}
             </div>
-          </div>
 
-          <div className="selectorGroup">
-            <p className="title">РАЗМЕР:</p>
-            <div className="sizeSelector">
-              {sizes.map((size) => {
-                const isAvailable = availableSizes.includes(size);
-                return (
-                  <label
-                    className={`sizeSelector__item ${isAvailable ? "" : "is-disabled"}`}
-                    key={size}
-                    title={isAvailable ? "" : "Нет в наличии"}
-                  >
-                    <input
-                      type="radio"
-                      name="size"
-                      value={size}
-                      checked={selectedSize === size}
-                      onChange={(e) => setSelectedSize(e.target.value)}
-                      disabled={!isAvailable}
-                    />
-                    <span className="sizeSelector__box">{size}</span>
-                  </label>
-                );
-              })}
+            <div className="selectorGroup selectorGroup--color">
+              <p className="title">Цвет</p>
+              <div className="colorSelector">
+                {!needsInner || selectedInnerType ? (
+                  availableColorOptions.length > 0 ? (
+                    availableColorOptions.map((opt) => (
+                      <div
+                        key={opt.label}
+                        className={`colorSquare ${selectedColor === opt.label ? "active" : ""}`}
+                        style={{
+                          backgroundColor: opt.code,
+                          border: isWhite(opt.code) ? "1px solid #b4b4b4" : undefined,
+                        }}
+                        title={opt.label}
+                        onClick={() => setSelectedColor(opt.label)}
+                      />
+                    ))
+                  ) : (
+                    <div className="muted">Нет доступных цветов</div>
+                  )
+                ) : (
+                  <div className="muted">Сначала выберите вариант («с начёсом» / «без начёса»)</div>
+                )}
+              </div>
             </div>
 
-            <div
-              className="tableSize"
-              onClick={() => {
-                setChartKey(detectChartKey(selectedClothing));
-                setShowSizeModal(true);
-              }}
+            <div className="selectorGroup selectorGroup--size">
+              <div className="selectorGroup__heading">
+                <p className="title">Размер</p>
+                <div
+                  className="tableSize"
+                  onClick={() => {
+                    setChartKey(detectChartKey(selectedClothing));
+                    setShowSizeModal(true);
+                  }}
+                >
+                  Таблица размеров
+                </div>
+              </div>
+              <div className="sizeSelector">
+                {sizes.map((size) => {
+                  const isAvailable = availableSizes.includes(size);
+                  return (
+                    <label
+                      className={`sizeSelector__item ${isAvailable ? "" : "is-disabled"}`}
+                      key={size}
+                      title={isAvailable ? "" : "Нет в наличии"}
+                    >
+                      <input
+                        type="radio"
+                        name="size"
+                        value={size}
+                        checked={selectedSize === size}
+                        onChange={(e) => setSelectedSize(e.target.value)}
+                        disabled={!isAvailable}
+                      />
+                      <span className="sizeSelector__box">{size}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            <p className="clothingPrice">Цена: {displayPrice} руб</p>
+          </div>
+
+          <div className="orderNavigation">
+            <button
+              type="button"
+              className="orderActionButton orderActionButton--back"
+              onClick={() => navigate(-1)}
             >
-              таблица размеров
-            </div>
+              назад
+            </button>
+            <button
+              type="button"
+              className="orderActionButton orderActionButton--next"
+              onClick={handleConfirm}
+              disabled={!canProceed}
+            >
+              далее
+            </button>
           </div>
-
-          <button className="confirmButton" onClick={handleConfirm} disabled={!canProceed}>
-            ПЕРЕЙТИ К ВЫШИВКЕ
-          </button>
         </div>
       </div>
 

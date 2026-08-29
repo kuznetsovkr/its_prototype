@@ -489,3 +489,389 @@
     flex: 1 1 auto;
   }
 }
+
+/* Order redesign: the supplied Figma frame covers desktop only. */
+.orderPage {
+  width: 100%;
+}
+
+.orderStepTitle {
+  display: none;
+}
+
+.clothingControls {
+  flex: 0 0 auto;
+}
+
+.clothingPrice {
+  margin: 0;
+  font-family: 'Raleway', sans-serif;
+  font-size: clamp(20px, 1vw, 30px);
+  color: rgba(18, 19, 25, 0.6);
+}
+
+.orderNavigation {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.orderActionButton {
+  width: 50%;
+  min-height: 54px;
+  border: 1px solid #121319;
+  border-radius: 20px;
+  background: #fff;
+  font-family: 'Raleway', sans-serif;
+  font-size: 16px;
+  color: #121319;
+  cursor: pointer;
+}
+
+.orderActionButton--next {
+  border-color: #440a18;
+  background: #440a18;
+  color: #fff;
+}
+
+.orderActionButton:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+  .clothingControls {
+    width: 100%;
+  }
+}
+
+@media (min-width: 1280px) {
+  .App--order {
+    overflow-x: clip;
+
+    > .header,
+    > .footer {
+      display: none;
+    }
+  }
+
+  .orderPage {
+    width: 100vw;
+    min-height: 920px;
+    margin-left: calc(50% - 50vw);
+    padding: 40px clamp(20px, calc(6.25vw - 60px), 60px);
+    box-sizing: border-box;
+    background: #fff;
+  }
+
+  .orderPage__stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 840px;
+    padding: 80px 0;
+    box-sizing: border-box;
+    border-radius: 60px;
+    background: #161616;
+  }
+
+  .orderPage .orderBlock--clothing {
+    width: 100%;
+    margin: 0;
+  }
+
+  .orderPage .blockClothingSelector {
+    display: grid;
+    grid-template-columns: 562px 590px;
+    align-items: start;
+    justify-content: start;
+    gap: 0;
+    width: 1200px;
+    min-height: 680px;
+    padding: 48px 48px 48px 0;
+    box-sizing: border-box;
+    border-radius: 30px;
+    background: #fff;
+
+    .clothing-block {
+      position: relative;
+      width: 562px;
+      height: 584px;
+      flex: none;
+      align-self: auto;
+      overflow: visible;
+      border: 0;
+      border-radius: 0;
+      background: #fff;
+
+      .orderStepTitle {
+        position: absolute;
+        top: 10px;
+        left: 180px;
+        z-index: 1;
+        display: block;
+        width: 206px;
+        height: 32px;
+        margin: 0;
+        font-family: 'Jost', sans-serif;
+        font-size: 32px;
+        font-weight: 400;
+        line-height: 1;
+        color: #d0d0d0;
+        text-transform: lowercase;
+      }
+
+      .image-wrapper {
+        position: absolute;
+        top: 34px;
+        left: -5px;
+        display: block;
+        width: 567px;
+        height: 499px;
+        overflow: hidden;
+
+        .image-frame {
+          display: block;
+          width: 567px;
+          height: 499px;
+          min-height: 0;
+          overflow: hidden;
+          aspect-ratio: auto;
+          background: transparent;
+        }
+
+        .image-stack {
+          position: absolute;
+          inset: 0;
+          display: block;
+          width: 567px;
+          height: 499px;
+        }
+
+        .clotheImage {
+          position: absolute;
+          top: -120.409px;
+          left: 0;
+          display: block;
+          width: 567px;
+          height: 756.534px;
+          max-width: none;
+          max-height: none;
+          object-fit: fill;
+        }
+      }
+    }
+
+    .clothingControls {
+      width: 590px;
+      flex: none;
+    }
+
+    .blockSelection {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      width: 590px;
+      min-height: 510px;
+      padding: 36px;
+      box-sizing: border-box;
+      border-radius: 30px;
+      background: #f0f0f0;
+
+      .title {
+        margin: 0 0 20px;
+        font-family: 'Jost', sans-serif;
+        font-size: 20px;
+        font-weight: 500;
+        line-height: 1;
+        color: #2b2b2b;
+      }
+
+      .selectorType {
+        display: grid;
+        grid-template-columns: repeat(2, 200px);
+        grid-auto-rows: 54px;
+        gap: 12px 10px;
+
+        .selectorType__item {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 200px;
+          height: 54px;
+          padding: 0 14px;
+          box-sizing: border-box;
+          border-radius: 40px;
+          background: #fff;
+          font-family: 'Jost', sans-serif;
+          font-size: 13px;
+          font-weight: 600;
+          line-height: 1.4;
+          color: #4b4b4b;
+          text-align: center;
+          text-transform: uppercase;
+
+          .selectorType__custom {
+            display: none;
+          }
+
+          &.active {
+            background: #161616;
+            color: #fff;
+          }
+        }
+
+        .muted {
+          grid-column: 1 / -1;
+        }
+      }
+
+      .selectorType--inner {
+        width: 100%;
+        margin-top: 12px;
+        padding-left: 0;
+      }
+
+      .selectorGroup--color {
+        margin-top: 22px;
+      }
+
+      .colorSelector {
+        display: flex;
+        align-items: center;
+        min-height: 38px;
+        gap: 10px;
+      }
+
+      .colorSquare {
+        width: 32px;
+        height: 32px;
+        flex: 0 0 32px;
+        border: 0;
+        border-radius: 50%;
+        box-shadow: none;
+      }
+
+      .colorSquare:hover {
+        border-color: transparent;
+        box-shadow: none;
+      }
+
+      .colorSquare.active {
+        outline: 0;
+        box-shadow: 0 0 0 1px #fff, 0 0 0 3px #161616;
+      }
+
+      .selectorGroup--size {
+        margin-top: 19px;
+      }
+
+      .selectorGroup__heading {
+        position: relative;
+        height: 20px;
+        margin-bottom: 20px;
+
+        .title {
+          margin: 0;
+        }
+      }
+
+      .tableSize {
+        position: absolute;
+        top: 0;
+        left: 271px;
+        width: 169px;
+        margin: 0;
+        font-family: 'Jost', sans-serif;
+        font-size: 20px;
+        font-weight: 500;
+        line-height: 1;
+        color: #cc7d54;
+        white-space: nowrap;
+      }
+
+      .sizeSelector {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 10px;
+
+        .sizeSelector__item {
+          flex: 0 0 auto;
+
+          .sizeSelector__box {
+            width: 80px;
+            height: 54px;
+            border: 0;
+            border-radius: 40px;
+            background: #fff;
+            font-family: 'Jost', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.4;
+            color: #4b4b4b;
+            text-transform: uppercase;
+          }
+
+          &:nth-child(6) .sizeSelector__box {
+            width: 68px;
+          }
+
+          input:checked + .sizeSelector__box {
+            border: 0;
+            background: #161616;
+            color: #fff;
+          }
+        }
+      }
+
+      .clothingPrice {
+        margin-top: 45px;
+        font-family: 'Jost', sans-serif;
+        font-size: 20px;
+        font-weight: 500;
+        line-height: 1;
+        color: #a7a7a7;
+      }
+    }
+
+    .orderNavigation {
+      display: grid;
+      grid-template-columns: repeat(2, 285px);
+      gap: 20px;
+      width: 590px;
+      height: 54px;
+      margin-top: 20px;
+    }
+
+    .orderActionButton {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 285px;
+      height: 54px;
+      min-height: 54px;
+      padding: 0 62px;
+      box-sizing: border-box;
+      border-radius: 40px;
+      font-family: 'Jost', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .orderActionButton--back {
+      border: 1px solid #4b4b4b;
+      background: #fff;
+      color: #4b4b4b;
+    }
+
+    .orderActionButton--next {
+      border: 1px solid #161616;
+      background: #161616;
+      color: #fff;
+    }
+  }
+}

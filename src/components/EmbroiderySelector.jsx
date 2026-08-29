@@ -3,6 +3,20 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { ReactComponent as CheckIcon } from "../images/Vector.svg";
 import { useOrder } from "../context/OrderContext";
 import { IS_DEMO_MODE } from "../config/demoMode";
+import figmaTshirtImg from "../images/order/tshirt-black.png";
+import embroideryRadioActive from "../images/order/embroidery-radio-active.svg";
+import embroideryRadioInactive from "../images/order/embroidery-radio-inactive.svg";
+import embroideryCounter from "../images/order/embroidery-counter.svg";
+import orderBackIcon from "../images/order/order-back.svg";
+
+const desktopEmbroideryTypes = [
+  { value: "Patronus", label: "патронусы", hasExample: true },
+  { value: "Car", label: "автомобиль", hasExample: true },
+  { value: "petFace", label: "мордочка питомца", hasExample: true },
+  { value: "custom", label: "другая", hasExample: false },
+];
+
+const priceFormatter = new Intl.NumberFormat("ru-RU");
 
 const isSameFiles = (a = [], b = []) => {
   if (a === b) return true;
@@ -52,6 +66,10 @@ const EmbroiderySelector = () => {
   const [petFaceCount, setPetFaceCount] = useState(embroidery.petFaceCount || 1);
   const [customOption, setCustomOption] = useState(embroidery.customOption || { image: false, text: false });
   const [customTextFont, setCustomTextFont] = useState(embroidery.customTextFont || "Arial");
+  const [desktopTab, setDesktopTab] = useState(
+    embroidery.type === "custom" && embroidery.customOption?.text ? "text" : "image"
+  );
+  const [desktopDetailsOpen, setDesktopDetailsOpen] = useState(false);
 
   const { selectedClothing } = location.state || {};
   const clothingKey = detectClothingKey(clothing.type || selectedClothing);
@@ -63,6 +81,11 @@ const EmbroiderySelector = () => {
     setPatronusCount((prev) => Math.min(Math.max(1, prev), patronusLimit));
   }, [patronusLimit]);
 
+  useEffect(() => {
+    const nextTab = selectedType === "custom" && customOption.text ? "text" : "image";
+    setDesktopTab((currentTab) => currentTab === nextTab ? currentTab : nextTab);
+  }, [selectedType, customOption.text]);
+
   const calcPrice = useCallback((type) => {
     const base = priceMatrix[type]?.[clothingKey] ?? 0;
     if (type === "Patronus") return base + Math.max(0, patronusCount - 1) * 5000;
@@ -71,6 +94,9 @@ const EmbroiderySelector = () => {
 
   const priceLabel = (type) => `${calcPrice(type)} ₽`;
   const customPriceNote = "стоимость рассчитает менеджер";
+  const desktopPriceLabel = isCustomType
+    ? "Цена рассчитает менеджер"
+    : `Цена: ${priceFormatter.format(calcPrice(selectedType))} руб`;
   const hasFiles = uploadedImage.length > 0;
   const hasCustomText = customText.trim().length > 0;
   const mustUpload = isCustomType && customOption.image;
@@ -287,8 +313,268 @@ const EmbroiderySelector = () => {
     setPetFaceCount(1);
   };
 
+  const handleDesktopImageTab = () => {
+    setDesktopTab("image");
+    setDesktopDetailsOpen(false);
+
+    if (selectedType === "custom" && !customOption.image) {
+      setCustomOption({ image: true, text: false });
+      setCustomText("");
+    }
+  };
+
+  const handleDesktopTextTab = () => {
+    setDesktopTab("text");
+    setDesktopDetailsOpen(false);
+    handleSelectType("custom");
+    setCustomOption({ image: false, text: true });
+    setUploadedImage([]);
+  };
+
+  const handleDesktopType = (type) => {
+    setDesktopTab("image");
+    setDesktopDetailsOpen(false);
+    handleSelectType(type);
+
+    if (type === "custom") {
+      setCustomOption({ image: true, text: false });
+      setCustomText("");
+    }
+  };
+
+  const handleDesktopNext = () => {
+    if (desktopTab === "image" && !desktopDetailsOpen && !IS_DEMO_MODE) {
+      if (selectedType === "custom" && !customOption.image) {
+        setCustomOption({ image: true, text: false });
+      }
+      setDesktopDetailsOpen(true);
+      return;
+    }
+
+    if (canProceed) {
+      handleNext();
+      return;
+    }
+
+    setDesktopDetailsOpen(true);
+  };
+
+  const renderDesktopCounter = (value, setValue, limit) => (
+    <div className="embroideryDesktopCounter">
+      <button
+        type="button"
+        className="embroideryDesktopCounter__button"
+        onClick={() => setValue((prev) => Math.max(1, prev - 1))}
+        aria-label="Уменьшить количество"
+      >
+        <img src={embroideryCounter} alt="" aria-hidden="true" />
+        <span>−</span>
+      </button>
+      <span className="embroideryDesktopCounter__value">{value} шт</span>
+      <button
+        type="button"
+        className="embroideryDesktopCounter__button"
+        onClick={() => setValue((prev) => Math.min(limit, prev + 1))}
+        aria-label="Увеличить количество"
+      >
+        <img src={embroideryCounter} alt="" aria-hidden="true" />
+        <span>+</span>
+      </button>
+      <span className="embroideryDesktopCounter__limit">( не более {limit} шт )</span>
+    </div>
+  );
+
   return (
-    <div className="containerExampleType">
+    <>
+      <div className="embroiderySelectorDesktop">
+        <div className="embroiderySelectorDesktop__preview">
+          <button
+            type="button"
+            className="embroiderySelectorDesktop__arrow"
+            onClick={() => navigate(-1)}
+            aria-label="Вернуться назад"
+          >
+            <img src={orderBackIcon} alt="" aria-hidden="true" />
+          </button>
+
+          <h1 className="embroiderySelectorDesktop__title" id="order-embroidery-title">
+            заказ изделия
+          </h1>
+
+          <div className="embroiderySelectorDesktop__imageFrame">
+            <img src={figmaTshirtImg} alt="Чёрная футболка" />
+          </div>
+        </div>
+
+        <div className="embroiderySelectorDesktop__controls">
+          <section className="embroiderySelectorDesktop__panel">
+            <h2>Выберите тип вышивки</h2>
+
+            <div className="embroideryDesktopTabs" aria-label="Вид вышивки">
+              <button
+                type="button"
+                className={desktopTab === "image" ? "is-active" : ""}
+                onClick={handleDesktopImageTab}
+                aria-pressed={desktopTab === "image"}
+              >
+                изображение
+              </button>
+              <button
+                type="button"
+                className={desktopTab === "text" ? "is-active" : ""}
+                onClick={handleDesktopTextTab}
+                aria-pressed={desktopTab === "text"}
+              >
+                надпись
+              </button>
+            </div>
+
+            {desktopTab === "image" && !desktopDetailsOpen && (
+              <div className="embroideryDesktopChoices">
+                {desktopEmbroideryTypes.map((option) => (
+                  <React.Fragment key={option.value}>
+                    <label className="embroideryDesktopChoice">
+                      <input
+                        type="radio"
+                        name="embroideryTypeDesktop"
+                        value={option.value}
+                        checked={selectedType === option.value}
+                        onChange={(event) => handleDesktopType(event.target.value)}
+                      />
+                      <img
+                        className="embroideryDesktopChoice__radio"
+                        src={selectedType === option.value ? embroideryRadioActive : embroideryRadioInactive}
+                        alt=""
+                        aria-hidden="true"
+                      />
+                      <span className="embroideryDesktopChoice__label">{option.label}</span>
+                      {option.hasExample && (
+                        <span className="embroideryDesktopChoice__example">пример работы</span>
+                      )}
+                      {option.value === "custom" && (
+                        <span className="embroideryDesktopChoice__note">
+                          ( стоимость рассчитает менеджер )
+                        </span>
+                      )}
+                    </label>
+
+                    {option.value === "Patronus" && selectedType === "Patronus" &&
+                      renderDesktopCounter(patronusCount, setPatronusCount, patronusLimit)}
+                    {option.value === "petFace" && selectedType === "petFace" &&
+                      renderDesktopCounter(petFaceCount, setPetFaceCount, 5)}
+                  </React.Fragment>
+                ))}
+              </div>
+            )}
+
+            {desktopTab === "image" && desktopDetailsOpen && (
+              <div className="embroideryDesktopDetails">
+                <button
+                  type="button"
+                  className="embroideryDesktopDetails__return"
+                  onClick={() => setDesktopDetailsOpen(false)}
+                >
+                  выбрать тип вышивки
+                </button>
+
+                <label className="embroideryDesktopDetails__upload">
+                  загрузить изображение
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={handleFileChange}
+                  />
+                </label>
+                <p className="embroideryDesktopDetails__hint">
+                  PNG, JPG или WebP до {MAX_MB} МБ, не более {selectedType === "petFace" ? 5 : 10} файлов
+                </p>
+
+                <ul className="embroideryDesktopDetails__files">
+                  {uploadedImage.map((file, index) => (
+                    <li key={file.name + index}>
+                      <span title={file.name}>{file.name}</span>
+                      <button
+                        type="button"
+                        aria-label={`Удалить ${file.name}`}
+                        onClick={() => handleRemoveImage(index)}
+                      >
+                        ×
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+
+                <label className="embroideryDesktopDetails__field">
+                  <span>Комментарий</span>
+                  <textarea
+                    value={comment}
+                    onChange={(event) => setComment(event.target.value)}
+                    placeholder="Пожелания для дизайнера"
+                  />
+                </label>
+
+                {error && <p className="embroideryDesktopDetails__error">{error}</p>}
+              </div>
+            )}
+
+            {desktopTab === "text" && (
+              <div className="embroideryDesktopDetails embroideryDesktopDetails--text">
+                <label className="embroideryDesktopDetails__field">
+                  <span>Текст для вышивки</span>
+                  <textarea
+                    value={customText}
+                    onChange={(event) => setCustomText(event.target.value)}
+                    placeholder="Введите надпись"
+                    style={{ fontFamily: customTextFont }}
+                  />
+                </label>
+
+                <label className="embroideryDesktopDetails__field">
+                  <span>Шрифт</span>
+                  <select
+                    value={customTextFont}
+                    onChange={(event) => setCustomTextFont(event.target.value)}
+                  >
+                    <option value="Arial">Arial</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Comic Sans MS">Comic Sans MS</option>
+                  </select>
+                </label>
+
+                <label className="embroideryDesktopDetails__field">
+                  <span>Комментарий</span>
+                  <textarea
+                    value={comment}
+                    onChange={(event) => setComment(event.target.value)}
+                    placeholder="Пожелания для дизайнера"
+                  />
+                </label>
+              </div>
+            )}
+
+            <p className="embroiderySelectorDesktop__price">{desktopPriceLabel}</p>
+          </section>
+
+          <div className="embroiderySelectorDesktop__navigation">
+            <button type="button" className="is-back" onClick={() => navigate(-1)}>
+              назад
+            </button>
+            <button
+              type="button"
+              className="is-next"
+              onClick={handleDesktopNext}
+              title={!canProceed ? disabledHint : undefined}
+            >
+              далее
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="containerExampleType embroiderySelector__legacy">
       <div className="exampleImg"></div>
 
       <div className="containterType">
@@ -529,7 +815,8 @@ const EmbroiderySelector = () => {
           </button>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
