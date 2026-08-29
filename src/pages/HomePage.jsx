@@ -1,114 +1,177 @@
-import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useOrder } from "../context/OrderContext";
+import { homeAssets } from "../images/home";
+import AboutSection from "../components/home/AboutSection";
+import CustomersSection from "../components/home/CustomersSection";
+import FaqSection from "../components/home/FaqSection";
+import HeroSection from "../components/home/HeroSection";
+import HomeFooter from "../components/home/HomeFooter";
+import HomeHeader from "../components/home/HomeHeader";
+import ProcessSection from "../components/home/ProcessSection";
+import QuestionsSection from "../components/home/QuestionsSection";
+import ReviewsSection from "../components/home/ReviewsSection";
+import SocialSection from "../components/home/SocialSection";
+import WorksSection from "../components/home/WorksSection";
+import useHomeBreakpoint from "../components/home/useHomeBreakpoint";
 
 const HomePage = () => {
-    const navigate = useNavigate();
-    const { resetOrder } = useOrder();
-    const handleOrder = () => {
-        resetOrder();
-        navigate('/order');
-    };
+  const navigate = useNavigate();
+  const { resetOrder } = useOrder();
+  const breakpoint = useHomeBreakpoint();
+  const currentAssets = homeAssets[breakpoint];
 
-    useEffect(() => {
-    const observer = new IntersectionObserver(
-        entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            } else {
-            entry.target.classList.remove('visible');
-            }
-        });
-        },
-        { threshold: 0.2 }
-    );
+  const handleOrder = useCallback(() => {
+    resetOrder();
+    navigate("/order");
+  }, [navigate, resetOrder]);
 
-    const allAnimated = document.querySelectorAll('.step, .arrow');
-    allAnimated.forEach(el => observer.observe(el));
-    
+  const headerAssets = {
+    desktopLogo: homeAssets.desktop.hero.logoGraphite,
+    tabletLogo: homeAssets.tablet.hero.logoGraphite,
+    mobileLogo: homeAssets.mobile.hero.headerLogo,
+    heart: homeAssets.mobile.icons.heart,
+    bag: homeAssets.mobile.icons.bag,
+  };
 
-    return () => observer.disconnect();
-    }, []);
+  const heroAssets = {
+    background: {
+      desktop: homeAssets.desktop.hero.background,
+      tablet: homeAssets.tablet.hero.background,
+      mobile: homeAssets.mobile.hero.background,
+    },
+    subject: {
+      desktop: homeAssets.desktop.hero.subject,
+      tablet: homeAssets.tablet.hero.subject,
+    },
+    logo: {
+      desktop: homeAssets.desktop.hero.logoMilk,
+      tablet: homeAssets.tablet.hero.logoMilk,
+      mobile: homeAssets.mobile.hero.logoGraphite,
+    },
+  };
 
-    return (
-        <div>
-            <div id="main_block" className="container">
-                <div className="wrapper">
-                    <button className="main_block_order_button" onClick={handleOrder}>СДЕЛАТЬ ЗАКАЗ</button>
-                </div>
-            </div>
-            <div className="container">
-                <div className="wrapper">
-                    <div className="roadmap">
-                        <div className="titleRoadmap">
-                            <p className="titleFirstColumn" >КАК</p>
-                            <div className="titleSecondColumn">
-                                <p className="titleDo">СДЕЛАТЬ</p>
-                                <p className="titleOrder">ЗАКАЗ?</p>
-                            </div>
-                        </div>
-                        <section className="steps">
-                            <div className="step" id="step-1">
-                                <div className="firstRow">
-                                    <div className="number">1.</div>
-                                    <div className="text">
-                                        <p className="nameStep">ВАША ИДЕЯ</p>
-                                        <div className="descriptionStep">отправка фото или рисунка с вашей идеей</div>
-                                    </div>
-                                </div>
-                                <div className="image-placeholder"></div>
-                            </div>
+  const aboutAssets = {
+    primary: {
+      desktop: homeAssets.desktop.about.photo,
+      tablet: homeAssets.tablet.about.photo,
+      mobile: homeAssets.mobile.about.photoLayers[0],
+    },
+    overlay: {
+      mobile: homeAssets.mobile.about.photoLayers[1],
+    },
+  };
 
-                            <div className="step" id="step-2">
-                                <div className="firstRow">
-                                    <div className="number">2.</div>
-                                    <div className="text">
-                                        <p className="nameStep">ЭСКИЗ</p>
-                                        <div className="descriptionStep">отрисовка эскиза по вашей идее</div>
-                                    </div>
-                                </div>
-                                <div className="image-placeholder"></div>
-                            </div>
-                           
-                            <div className="step" id="step-3">
-                                <div className="firstRow">
-                                    <div className="number">3.</div>
-                                    <div className="text">
-                                        <p className="nameStep">ВЫШИВАЛЬНЫЙ ДИЗАЙН</p>
-                                        <div className="descriptionStep">подготовка макета по эскизу</div>
-                                    </div>
-                                </div>
-                                <div className="image-placeholder"></div>
-                            </div>
-                      
-                            <div className="step" id="step-4">
-                                <div className="firstRow">
-                                    <div className="number">4.</div>
-                                    <div className="text">
-                                        <p className="nameStep">ГОТОВЫЙ ВАРИАНТ</p>
-                                        <div className="descriptionStep">оформление финального варианта</div>
-                                    </div>
-                                </div>
-                                <div className="image-placeholder"></div>
-                            </div>
-                   
-                            <div className="step" id="step-5">
-                                <div className="firstRow">
-                                    <div className="number">5.</div>
-                                    <div className="text">
-                                        <p className="nameStep">ОТПРАВКА</p>
-                                        <div className="descriptionStep">отправка готового заказа</div>
-                                    </div>
-                                </div>
-                                <div className="image-placeholder"></div>
-                            </div>
-                        </section>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+  const worksAssets = {
+    desktopItems: homeAssets.desktop.works.items,
+    compactItems: homeAssets.tablet.works.compactItems,
+    expandedItems: homeAssets.tablet.works.expandedItems,
+    mobileItems: homeAssets.mobile.works.items,
+    headingAvatar: breakpoint === "desktop" ? homeAssets.desktop.works.headingAvatar : null,
+    headingStickers: breakpoint === "desktop" ? homeAssets.desktop.works.headingStickers : [],
+  };
+
+  const customerAssets = {
+    order: {
+      desktop: homeAssets.desktop.customers.orderPhoto,
+      tablet: homeAssets.tablet.customers.orderPhoto,
+      mobile: homeAssets.mobile.customers.orderPhoto,
+    },
+    delivery: {
+      desktop: homeAssets.desktop.customers.orderPhoto,
+      tablet: homeAssets.tablet.customers.deliveryPhoto,
+      mobile: homeAssets.mobile.customers.orderPhoto,
+    },
+  };
+
+  const questionsAssets = {
+    dogs: [0, 1].map((index) => ({
+      desktop: homeAssets.desktop.questions.dogs[index],
+      tablet: homeAssets.tablet.questions.dogs[index],
+      mobile: homeAssets.mobile.questions.dogs[index],
+    })),
+  };
+
+  const footerAssets = {
+    illustration: {
+      desktop: homeAssets.desktop.footer.illustration,
+      tablet: homeAssets.tablet.footer.illustration,
+      mobile: homeAssets.mobile.footer.illustration,
+    },
+    glow: {
+      desktop: homeAssets.desktop.footer.glow,
+      tablet: homeAssets.tablet.footer.glow,
+      mobile: homeAssets.mobile.footer.glow,
+    },
+    logo: {
+      desktop: homeAssets.desktop.footer.logoMilk,
+      tablet: homeAssets.tablet.footer.logoMilk,
+      mobile: homeAssets.mobile.footer.logoMilk,
+    },
+    icons: {
+      instagram: {
+        desktop: homeAssets.desktop.footer.instagram,
+        tablet: homeAssets.tablet.footer.instagram,
+        mobile: homeAssets.mobile.footer.instagram,
+      },
+      telegram: {
+        desktop: homeAssets.desktop.footer.telegram,
+        tablet: homeAssets.tablet.footer.telegram,
+        mobile: homeAssets.mobile.footer.telegram,
+      },
+      vk: {
+        desktop: homeAssets.desktop.footer.vk,
+        tablet: homeAssets.tablet.footer.vk,
+        mobile: homeAssets.mobile.footer.vk,
+      },
+    },
+  };
+
+  const reviews = <ReviewsSection assets={currentAssets.reviews} breakpoint={breakpoint} />;
+  const customers = <CustomersSection assets={customerAssets} />;
+
+  return (
+    <div className={`home-page home-page--${breakpoint}`} id="top">
+      <HomeHeader assets={headerAssets} onOrder={handleOrder} />
+      <main className="home-main">
+        <HeroSection assets={heroAssets} onOrder={handleOrder} />
+        <AboutSection assets={aboutAssets} onOrder={handleOrder} />
+
+        {breakpoint !== "tablet" && (
+          <ProcessSection
+            assets={{
+              desktop: homeAssets.desktop.process.items,
+              mobile: homeAssets.mobile.process.items,
+              connector: homeAssets.desktop.process.connector,
+            }}
+            onOrder={handleOrder}
+          />
+        )}
+
+        <WorksSection assets={worksAssets} breakpoint={breakpoint} onOrder={handleOrder} />
+
+        {breakpoint === "mobile" ? (
+          <>
+            {customers}
+            {reviews}
+          </>
+        ) : (
+          <>
+            {reviews}
+            {customers}
+          </>
+        )}
+
+        <FaqSection
+          breakpoint={breakpoint}
+          glow={breakpoint === "mobile" ? homeAssets.mobile.icons.faqGlow : null}
+        />
+        <QuestionsSection assets={questionsAssets} />
+        <SocialSection items={currentAssets.social.items} />
+      </main>
+      <HomeFooter assets={footerAssets} onOrder={handleOrder} />
+    </div>
+  );
 };
 
 export default HomePage;

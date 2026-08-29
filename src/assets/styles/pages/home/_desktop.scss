@@ -1,0 +1,21 @@
+@media (min-width: 1200px) and (max-width: 1599px) {
+  .home-section__inner,
+  .home-about__card { width: calc(100% - 80px); }
+
+  .home-process__flow {
+    width: min(1020px, 100%);
+    transform: scale(0.92);
+    transform-origin: top center;
+  }
+
+  .home-works__grid {
+    width: 100%;
+    grid-auto-rows: calc((100vw - 294px) / 4);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .home-social__item {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+}

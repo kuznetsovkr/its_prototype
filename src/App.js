@@ -59,43 +59,54 @@ const ScrollToTop = () => {
 
 
 
+const AppShell = () => {
+    const { pathname } = useLocation();
+    const isHomePage = pathname === '/';
+
+    const routes = (
+        <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/order" element={<PageLayout><OrderPage /></PageLayout>} />
+            <Route path="/embroidery" element={<PageLayout><EmbroideryPage /></PageLayout>} />
+            <Route path="/recipient" element={<PageLayout><RecipientDetails /></PageLayout>} />
+            <Route path="/thank-you" element={<PageLayout><ThankYouPage /></PageLayout>} />
+            <Route path="/profile" element={<PageLayout><ProfilePage /></PageLayout>} />
+            <Route path="/works" element={<WorksPage/>} />
+            <Route path="/about" element={<PageLayout><AboutPage /></PageLayout>} />
+            <Route path="/faq" element={<PageLayout><DeliveryPage /></PageLayout>} />
+            <Route path="/size-guide" element={<PageLayout><SizeGuidePage /></PageLayout>} />
+            <Route path="/payment" element={<PageLayout><PaymentPage /></PageLayout>} />
+            <Route path="/fake-payment" element={<FakePayment />} />
+            <Route path="/payment-success" element={<PageLayout><PaymentSuccess /></PageLayout>} />
+            <Route path="/payment-fail" element={<PageLayout><PaymentFail /></PageLayout>} />
+
+            {/* Админку можно оставить без layout-а, если она отдельная */}
+            <Route
+              path="/admin/inventory"
+              element={
+                <RequireAdmin>
+                  <PageLayout><AdminInventory /></PageLayout>
+                </RequireAdmin>
+              }
+            />
+        </Routes>
+    );
+
+    return (
+            <div className="App">
+                {!isHomePage && <Header />}
+                <ScrollToTop />
+                <OrderFlowReset />
+                {isHomePage ? routes : <main>{routes}</main>}
+                {!isHomePage && <Footer />}
+            </div>
+    );
+};
+
 const App = () => {
     return (
         <Router>
-            <div className="App">
-                <Header />
-                <ScrollToTop />
-                <OrderFlowReset />
-                    <main>
-                        <Routes>
-                            <Route path="/" element={<HomePage />} />
-                            <Route path="/order" element={<PageLayout><OrderPage /></PageLayout>} />
-                            <Route path="/embroidery" element={<PageLayout><EmbroideryPage /></PageLayout>} />
-                            <Route path="/recipient" element={<PageLayout><RecipientDetails /></PageLayout>} />
-                            <Route path="/thank-you" element={<PageLayout><ThankYouPage /></PageLayout>} />
-                            <Route path="/profile" element={<PageLayout><ProfilePage /></PageLayout>} />
-                            <Route path="/works" element={<WorksPage/>} />
-                            <Route path="/about" element={<PageLayout><AboutPage /></PageLayout>} />
-                            <Route path="/faq" element={<PageLayout><DeliveryPage /></PageLayout>} />
-                            <Route path="/size-guide" element={<PageLayout><SizeGuidePage /></PageLayout>} />
-                            <Route path="/payment" element={<PageLayout><PaymentPage /></PageLayout>} />
-                            <Route path="/fake-payment" element={<FakePayment />} />
-                            <Route path="/payment-success" element={<PageLayout><PaymentSuccess /></PageLayout>} />
-                            <Route path="/payment-fail" element={<PageLayout><PaymentFail /></PageLayout>} />
-
-                            {/* Админку можно оставить без layout-а, если она отдельная */}
-                            <Route
-                              path="/admin/inventory"
-                              element={
-                                <RequireAdmin>
-                                  <PageLayout><AdminInventory /></PageLayout>
-                                </RequireAdmin>
-                              }
-                            />
-                        </Routes>
-                    </main>
-                <Footer />
-            </div>
+            <AppShell />
         </Router>
     );
 };
