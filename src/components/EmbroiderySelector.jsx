@@ -24,6 +24,15 @@ const desktopEmbroideryTypes = [
   { value: "custom", label: "другая", hasExample: false },
 ];
 
+const uploadInstructions = [
+  "Отправьте, пожалуйста, фото вашего питомца:",
+  "1. Одно из фото должно быть мордочкой животного, которую Вы бы хотели видеть на эскизе.",
+  "2. Фото, на которых полностью видно окрас тела, лапы, хвост.",
+  "3.Если у Вашего питомца есть какая-либо особенность во внешности, а также есть атрибутика (например, ошейник), которые Вы хотели бы видеть, пожалуйста, укажите это.",
+  "Если нужна конкретная поза, то отправьте картинку-пример или подробно опишите ее. Если конкретных пожеланий по позе нет, то отправьте несколько вариантов, которые вам нравятся, и от которых может отталкиваться художник",
+  "Также, хотим предупредить, что полностью изменить позу на уже готовом эскизе возможно за доп.плату 1000 руб",
+];
+
 const priceFormatter = new Intl.NumberFormat("ru-RU");
 
 const isSameFiles = (a = [], b = []) => {
@@ -64,6 +73,7 @@ const EmbroiderySelector = () => {
   const { clothing, embroidery } = order;
   const prevTypeRef = useRef(null);
   const skipSyncRef = useRef(false);
+  const fileInputRef = useRef(null);
 
   const [selectedType, setSelectedType] = useState(embroidery.type || "Patronus");
   const [customText, setCustomText] = useState(embroidery.customText || "");
@@ -127,8 +137,7 @@ const EmbroiderySelector = () => {
   const MAX_MB = 5;
   const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
-  const handleFileChange = (e) => {
-    const incoming = Array.from(e.target.files);
+  const addFiles = (incoming) => {
     const limit = selectedType === "petFace" ? 5 : 10;
 
     setUploadedImage((prev) => {
@@ -170,6 +179,21 @@ const EmbroiderySelector = () => {
 
       return next;
     });
+  };
+
+  const handleFileChange = (event) => {
+    addFiles(Array.from(event.target.files || []));
+    event.target.value = "";
+  };
+
+  const handleFileDragOver = (event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+  };
+
+  const handleFileDrop = (event) => {
+    event.preventDefault();
+    addFiles(Array.from(event.dataTransfer.files || []));
   };
 
   const handleRemoveImage = (index) => {
@@ -367,6 +391,17 @@ const EmbroiderySelector = () => {
     setDesktopDetailsOpen(true);
   };
 
+  const isUploadStage = desktopTab === "image" && desktopDetailsOpen;
+
+  const handleDesktopBack = () => {
+    if (isUploadStage) {
+      setDesktopDetailsOpen(false);
+      return;
+    }
+
+    navigate(-1);
+  };
+
   const renderDesktopCounter = (value, setValue, limit) => (
     <div className="embroideryDesktopCounter">
       <button
@@ -402,12 +437,18 @@ const EmbroiderySelector = () => {
 
   return (
     <>
-      <div className="embroiderySelectorDesktop">
-        <div className="embroiderySelectorDesktop__preview">
+      <div
+        className={`embroiderySelectorDesktop${isUploadStage ? " embroiderySelectorDesktop--upload" : ""}`}
+      >
+        <div
+          className="embroiderySelectorDesktop__preview"
+          onDragOver={isUploadStage ? handleFileDragOver : undefined}
+          onDrop={isUploadStage ? handleFileDrop : undefined}
+        >
           <button
             type="button"
             className="embroiderySelectorDesktop__arrow"
-            onClick={() => navigate(-1)}
+            onClick={handleDesktopBack}
             aria-label="Вернуться назад"
           >
             <picture className="embroiderySelectorDesktop__arrowIcon">
@@ -428,26 +469,28 @@ const EmbroiderySelector = () => {
 
         <div className="embroiderySelectorDesktop__controls">
           <section className="embroiderySelectorDesktop__panel">
-            <h2>Выберите тип вышивки</h2>
+            <h2>{isUploadStage ? "Загрузите ваше изображение" : "Выберите тип вышивки"}</h2>
 
-            <div className="embroideryDesktopTabs" aria-label="Вид вышивки">
-              <button
-                type="button"
-                className={desktopTab === "image" ? "is-active" : ""}
-                onClick={handleDesktopImageTab}
-                aria-pressed={desktopTab === "image"}
-              >
-                изображение
-              </button>
-              <button
-                type="button"
-                className={desktopTab === "text" ? "is-active" : ""}
-                onClick={handleDesktopTextTab}
-                aria-pressed={desktopTab === "text"}
-              >
-                надпись
-              </button>
-            </div>
+            {!isUploadStage && (
+              <div className="embroideryDesktopTabs" aria-label="Вид вышивки">
+                <button
+                  type="button"
+                  className={desktopTab === "image" ? "is-active" : ""}
+                  onClick={handleDesktopImageTab}
+                  aria-pressed={desktopTab === "image"}
+                >
+                  изображение
+                </button>
+                <button
+                  type="button"
+                  className={desktopTab === "text" ? "is-active" : ""}
+                  onClick={handleDesktopTextTab}
+                  aria-pressed={desktopTab === "text"}
+                >
+                  надпись
+                </button>
+              </div>
+            )}
 
             {desktopTab === "image" && !desktopDetailsOpen && (
               <div className="embroideryDesktopChoices">
@@ -503,53 +546,82 @@ const EmbroiderySelector = () => {
             )}
 
             {desktopTab === "image" && desktopDetailsOpen && (
-              <div className="embroideryDesktopDetails">
-                <button
-                  type="button"
-                  className="embroideryDesktopDetails__return"
-                  onClick={() => setDesktopDetailsOpen(false)}
+              <div
+                className="embroideryUploadStage"
+                onDragOver={handleFileDragOver}
+                onDrop={handleFileDrop}
+              >
+                <div
+                  className={`embroideryUploadStage__instructions${hasFiles || error ? " is-status" : ""}`}
                 >
-                  выбрать тип вышивки
-                </button>
+                  {hasFiles || error ? (
+                    <div className="embroideryUploadStage__status">
+                      {hasFiles && (
+                        <>
+                          <p className="embroideryUploadStage__summary">
+                            Загружено файлов: {uploadedImage.length}
+                          </p>
+                          <ul className="embroideryUploadStage__files">
+                            {uploadedImage.map((file, index) => (
+                              <li key={`${file.name}_${file.size}_${file.lastModified}`}>
+                                <span title={file.name}>{file.name}</span>
+                                <button
+                                  type="button"
+                                  aria-label={`Удалить ${file.name}`}
+                                  onClick={() => handleRemoveImage(index)}
+                                >
+                                  ×
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                          <label className="embroideryUploadStage__comment">
+                            <span className="embroideryUploadStage__commentLabel">Комментарий</span>
+                            <textarea
+                              value={comment}
+                              onChange={(event) => setComment(event.target.value)}
+                              placeholder="Пожелания для дизайнера"
+                            />
+                          </label>
+                        </>
+                      )}
+                      {error && (
+                        <p className="embroideryUploadStage__error" role="status" aria-live="polite">
+                          {error}
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    uploadInstructions.map((instruction) => (
+                      <p key={instruction}>{instruction}</p>
+                    ))
+                  )}
+                </div>
 
-                <label className="embroideryDesktopDetails__upload">
-                  загрузить изображение
+                <label className="embroideryUploadStage__upload">
+                  загрузите изображение
                   <input
+                    ref={fileInputRef}
+                    className="embroideryUploadStage__fileInput"
                     type="file"
                     multiple
                     accept="image/png,image/jpeg,image/webp"
+                    aria-describedby="embroidery-upload-rules"
                     onChange={handleFileChange}
                   />
                 </label>
-                <p className="embroideryDesktopDetails__hint">
+
+                <button
+                  type="button"
+                  className="embroideryUploadStage__dropzone"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  Загрузите фото или перетащите файл на область визуализации слева
+                </button>
+
+                <p className="embroideryUploadStage__rules" id="embroidery-upload-rules">
                   PNG, JPG или WebP до {MAX_MB} МБ, не более {selectedType === "petFace" ? 5 : 10} файлов
                 </p>
-
-                <ul className="embroideryDesktopDetails__files">
-                  {uploadedImage.map((file, index) => (
-                    <li key={file.name + index}>
-                      <span title={file.name}>{file.name}</span>
-                      <button
-                        type="button"
-                        aria-label={`Удалить ${file.name}`}
-                        onClick={() => handleRemoveImage(index)}
-                      >
-                        ×
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-
-                <label className="embroideryDesktopDetails__field">
-                  <span>Комментарий</span>
-                  <textarea
-                    value={comment}
-                    onChange={(event) => setComment(event.target.value)}
-                    placeholder="Пожелания для дизайнера"
-                  />
-                </label>
-
-                {error && <p className="embroideryDesktopDetails__error">{error}</p>}
               </div>
             )}
 
@@ -594,7 +666,7 @@ const EmbroiderySelector = () => {
           </section>
 
           <div className="embroiderySelectorDesktop__navigation">
-            <button type="button" className="is-back" onClick={() => navigate(-1)}>
+            <button type="button" className="is-back" onClick={handleDesktopBack}>
               назад
             </button>
             <button

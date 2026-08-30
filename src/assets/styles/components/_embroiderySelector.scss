@@ -1816,3 +1816,388 @@
     margin-top: 14px;
   }
 }
+
+.embroideryUploadStage {
+  position: absolute;
+  inset: 0;
+  font-family: 'Jost', sans-serif;
+}
+
+.embroideryUploadStage__instructions,
+.embroideryUploadStage__upload,
+.embroideryUploadStage__dropzone {
+  position: absolute;
+  box-sizing: border-box;
+}
+
+.embroideryUploadStage__instructions {
+  overflow: hidden;
+  background: #fff;
+  color: #b1b1b1;
+
+  > p {
+    margin: 0 0 1.3em;
+  }
+
+  > p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.embroideryUploadStage__upload,
+.embroideryUploadStage__dropzone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-family: 'Jost', sans-serif;
+  text-align: center;
+  cursor: pointer;
+}
+
+.embroideryUploadStage__upload {
+  border-radius: 40px;
+  background: #161616;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.embroideryUploadStage__fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.embroideryUploadStage__dropzone {
+  border: 0;
+  border-radius: 40px;
+  background: #fff;
+  font-weight: 500;
+  color: #b1b1b1;
+}
+
+.embroideryUploadStage__rules {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.embroideryUploadStage__status {
+  height: 100%;
+  color: #4b4b4b;
+}
+
+.embroideryUploadStage__summary {
+  margin: 0;
+  font-weight: 500;
+}
+
+.embroideryUploadStage__files {
+  display: grid;
+  gap: 4px;
+  margin: 7px 0 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-width: thin;
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 22px;
+    padding: 2px 8px;
+    border-radius: 11px;
+    background: #f0f0f0;
+  }
+
+  li > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  button {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #2b2b2b;
+    line-height: 1;
+    cursor: pointer;
+  }
+}
+
+.embroideryUploadStage__comment {
+  display: grid;
+  gap: 4px;
+  margin-top: 7px;
+
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    resize: none;
+    border: 1px solid #d2d2d2;
+    outline: 0;
+    background: #fff;
+    font: inherit;
+    color: #2b2b2b;
+  }
+}
+
+.embroideryUploadStage__commentLabel {
+  font-weight: 500;
+}
+
+.embroideryUploadStage__error {
+  margin: 6px 0 0;
+  color: #a53636;
+}
+
+@media (max-width: 639px) {
+  .embroideryPage .embroiderySelectorDesktop--upload {
+    min-height: 915px;
+  }
+
+  .embroiderySelectorDesktop--upload {
+    .embroiderySelectorDesktop__panel {
+      height: 516px;
+    }
+
+    .embroiderySelectorDesktop__price {
+      bottom: 20px;
+    }
+  }
+
+  .embroideryUploadStage__instructions {
+    top: 58px;
+    left: 20px;
+    width: 268px;
+    height: 304px;
+    padding: 14px 15px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  .embroideryUploadStage__instructions.is-status {
+    padding: 14px 15px;
+  }
+
+  .embroideryUploadStage__upload {
+    top: 374px;
+    left: 20px;
+    width: 268px;
+    height: 40px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .embroideryUploadStage__dropzone {
+    top: 426px;
+    left: 20px;
+    width: 268px;
+    height: 36px;
+    padding: 0 15px;
+    font-size: 10px;
+    line-height: 1;
+  }
+
+  .embroideryUploadStage__files {
+    max-height: 88px;
+    font-size: 9px;
+
+    li {
+      min-height: 20px;
+      padding: 1px 6px;
+    }
+
+    button {
+      width: 18px;
+      height: 18px;
+      flex-basis: 18px;
+      font-size: 14px;
+    }
+  }
+
+  .embroideryUploadStage__comment {
+    font-size: 9px;
+
+    textarea {
+      height: 54px;
+      padding: 5px 7px;
+      border-radius: 9px;
+      font-size: 9px;
+    }
+  }
+
+  .embroideryUploadStage__error {
+    font-size: 9px;
+    line-height: 1.25;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1279px) {
+  .embroideryPage .embroiderySelectorDesktop--upload {
+    height: 484px;
+  }
+
+  .embroiderySelectorDesktop--upload {
+    .embroiderySelectorDesktop__preview {
+      height: 424px;
+    }
+
+    .embroiderySelectorDesktop__panel {
+      height: 384px;
+    }
+
+    .embroiderySelectorDesktop__price {
+      bottom: 25px;
+    }
+  }
+
+  .embroideryUploadStage__instructions {
+    top: 51px;
+    left: 25px;
+    width: 240px;
+    height: 184px;
+    padding: 11px;
+    border-radius: 15px;
+    font-size: 7px;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: .01em;
+  }
+
+  .embroideryUploadStage__instructions.is-status {
+    padding: 10px 11px;
+  }
+
+  .embroideryUploadStage__upload {
+    top: 245px;
+    left: 25px;
+    width: 240px;
+    height: 36px;
+    font-size: 8px;
+    line-height: 1.4;
+  }
+
+  .embroideryUploadStage__dropzone {
+    top: 291px;
+    left: 25px;
+    width: 240px;
+    height: 36px;
+    padding: 0 26px;
+    font-size: 8px;
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  .embroideryUploadStage__files {
+    max-height: 58px;
+    font-size: 7px;
+
+    li {
+      min-height: 17px;
+      padding: 1px 5px;
+      border-radius: 8px;
+    }
+
+    button {
+      width: 15px;
+      height: 15px;
+      flex-basis: 15px;
+      font-size: 11px;
+    }
+  }
+
+  .embroideryUploadStage__comment {
+    font-size: 7px;
+
+    textarea {
+      height: 43px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      font-size: 7px;
+    }
+  }
+
+  .embroideryUploadStage__error {
+    font-size: 7px;
+    line-height: 1.2;
+  }
+}
+
+@media (min-width: 1280px) {
+  .embroideryUploadStage__instructions {
+    top: 72px;
+    left: 36px;
+    width: 518px;
+    height: 236px;
+    padding: 20px 35px 21px;
+    border-radius: 40px;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: .01em;
+  }
+
+  .embroideryUploadStage__instructions.is-status {
+    padding: 18px 24px;
+  }
+
+  .embroideryUploadStage__upload {
+    top: 318px;
+    left: 36px;
+    width: 518px;
+    height: 56px;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .embroideryUploadStage__dropzone {
+    top: 384px;
+    left: 36px;
+    width: 518px;
+    height: 50px;
+    padding: 0 60px;
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  .embroideryUploadStage__files {
+    max-height: 76px;
+    font-size: 10px;
+  }
+
+  .embroideryUploadStage__comment {
+    font-size: 10px;
+
+    textarea {
+      height: 52px;
+      padding: 7px 9px;
+      border-radius: 10px;
+      font-size: 10px;
+    }
+  }
+
+  .embroideryUploadStage__error {
+    font-size: 10px;
+    line-height: 1.3;
+  }
+}
