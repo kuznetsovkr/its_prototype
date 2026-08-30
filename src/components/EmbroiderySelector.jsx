@@ -5,9 +5,17 @@ import { useOrder } from "../context/OrderContext";
 import { IS_DEMO_MODE } from "../config/demoMode";
 import figmaTshirtImg from "../images/order/tshirt-black.png";
 import embroideryRadioActive from "../images/order/embroidery-radio-active.svg";
+import embroideryRadioActiveMobile from "../images/order/embroidery-radio-active-mobile.svg";
+import embroideryRadioActiveTablet from "../images/order/embroidery-radio-active-tablet.svg";
 import embroideryRadioInactive from "../images/order/embroidery-radio-inactive.svg";
+import embroideryRadioInactiveMobile from "../images/order/embroidery-radio-inactive-mobile.svg";
+import embroideryRadioInactiveTablet from "../images/order/embroidery-radio-inactive-tablet.svg";
 import embroideryCounter from "../images/order/embroidery-counter.svg";
+import embroideryCounterMobile from "../images/order/embroidery-counter-mobile.svg";
+import embroideryCounterTablet from "../images/order/embroidery-counter-tablet.svg";
 import orderBackIcon from "../images/order/order-back.svg";
+import orderBackIconMobile from "../images/order/order-back-mobile.svg";
+import orderBackIconTablet from "../images/order/order-back-tablet.svg";
 
 const desktopEmbroideryTypes = [
   { value: "Patronus", label: "патронусы", hasExample: true },
@@ -367,7 +375,11 @@ const EmbroiderySelector = () => {
         onClick={() => setValue((prev) => Math.max(1, prev - 1))}
         aria-label="Уменьшить количество"
       >
-        <img src={embroideryCounter} alt="" aria-hidden="true" />
+        <picture className="embroideryDesktopCounter__icon">
+          <source media="(max-width: 639px)" srcSet={embroideryCounterMobile} />
+          <source media="(max-width: 1279px)" srcSet={embroideryCounterTablet} />
+          <img src={embroideryCounter} alt="" aria-hidden="true" />
+        </picture>
         <span>−</span>
       </button>
       <span className="embroideryDesktopCounter__value">{value} шт</span>
@@ -377,7 +389,11 @@ const EmbroiderySelector = () => {
         onClick={() => setValue((prev) => Math.min(limit, prev + 1))}
         aria-label="Увеличить количество"
       >
-        <img src={embroideryCounter} alt="" aria-hidden="true" />
+        <picture className="embroideryDesktopCounter__icon">
+          <source media="(max-width: 639px)" srcSet={embroideryCounterMobile} />
+          <source media="(max-width: 1279px)" srcSet={embroideryCounterTablet} />
+          <img src={embroideryCounter} alt="" aria-hidden="true" />
+        </picture>
         <span>+</span>
       </button>
       <span className="embroideryDesktopCounter__limit">( не более {limit} шт )</span>
@@ -394,7 +410,11 @@ const EmbroiderySelector = () => {
             onClick={() => navigate(-1)}
             aria-label="Вернуться назад"
           >
-            <img src={orderBackIcon} alt="" aria-hidden="true" />
+            <picture className="embroiderySelectorDesktop__arrowIcon">
+              <source media="(max-width: 639px)" srcSet={orderBackIconMobile} />
+              <source media="(max-width: 1279px)" srcSet={orderBackIconTablet} />
+              <img src={orderBackIcon} alt="" aria-hidden="true" />
+            </picture>
           </button>
 
           <h1 className="embroiderySelectorDesktop__title" id="order-embroidery-title">
@@ -441,12 +461,27 @@ const EmbroiderySelector = () => {
                         checked={selectedType === option.value}
                         onChange={(event) => handleDesktopType(event.target.value)}
                       />
-                      <img
-                        className="embroideryDesktopChoice__radio"
-                        src={selectedType === option.value ? embroideryRadioActive : embroideryRadioInactive}
-                        alt=""
-                        aria-hidden="true"
-                      />
+                      <picture className="embroideryDesktopChoice__radio">
+                        <source
+                          media="(max-width: 639px)"
+                          srcSet={selectedType === option.value
+                            ? embroideryRadioActiveMobile
+                            : embroideryRadioInactiveMobile}
+                        />
+                        <source
+                          media="(max-width: 1279px)"
+                          srcSet={selectedType === option.value
+                            ? embroideryRadioActiveTablet
+                            : embroideryRadioInactiveTablet}
+                        />
+                        <img
+                          src={selectedType === option.value
+                            ? embroideryRadioActive
+                            : embroideryRadioInactive}
+                          alt=""
+                          aria-hidden="true"
+                        />
+                      </picture>
                       <span className="embroideryDesktopChoice__label">{option.label}</span>
                       {option.hasExample && (
                         <span className="embroideryDesktopChoice__example">пример работы</span>

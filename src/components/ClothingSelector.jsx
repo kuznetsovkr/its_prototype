@@ -7,6 +7,7 @@ import hoodieImg from '../images/hoodie.jpg';
 import switshotImg from '../images/switshot.jpg';
 import tshirtImg from '../images/tshirt.jpg';
 import figmaTshirtImg from '../images/order/tshirt-black.png';
+import orderBackMobile from '../images/order/order-back-mobile.svg';
 import { useOrder } from "../context/OrderContext";
 import { IS_DEMO_MODE } from "../config/demoMode";
 import { DEMO_INVENTORY } from "../mocks/demoData";
@@ -44,6 +45,13 @@ const uniqBy = (arr, keyFn) => {
   }
   return Array.from(map.values());
 };
+
+const hasStock = (item) => {
+  const quantity = Number(item?.quantity ?? 0);
+  return Number.isFinite(quantity) && quantity > 0;
+};
+
+const normalizeKey = (value) => String(value || "").trim().toLowerCase();
 
 const INNER_ORDER = { "с начёсом": 1, "без начёса": 2 };
 
@@ -123,6 +131,21 @@ const detectChartKey = (base) => {
 };
 
 const TYPE_ORDER = { tshirt: 1, hoodie: 2, svitshot: 3, default: 99 };
+const CORE_SIZES = ["XS", "S", "M", "L", "XL"];
+const COLOR_ORDER = new Map([
+  ["белый", 1],
+  ["white", 1],
+  ["чёрный", 2],
+  ["черный", 2],
+  ["black", 2],
+  ["серый", 3],
+  ["gray", 3],
+  ["grey", 3],
+  ["красный", 4],
+  ["red", 4],
+  ["синий", 5],
+  ["blue", 5],
+]);
 
 const ClothingSelector = () => {
   const navigate = useNavigate();
@@ -130,11 +153,13 @@ const ClothingSelector = () => {
   const { clothing } = order;
 
   const [inventory, setInventory] = useState([]);
+  const [clothingTypes, setClothingTypes] = useState([]);
+  const [colorCatalog, setColorCatalog] = useState([]);
+  const [inventoryLoaded, setInventoryLoaded] = useState(false);
   const [selectedClothing, setSelectedClothing] = useState(clothing.type || "");
   const [selectedInnerType, setSelectedInnerType] = useState(clothing.innerType || "");
   const [selectedColor, setSelectedColor] = useState(clothing.color || "");
   const [selectedSize, setSelectedSize] = useState(clothing.size || "");
-  const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
   const [showSizeModal, setShowSizeModal] = useState(false);
   const [chartKey, setChartKey] = useState(() => detectChartKey(clothing.type));
 
@@ -145,55 +170,98 @@ const ClothingSelector = () => {
     [inventory]
   );
 
-  const availableBaseTypes = useMemo(() => {
-    const list = uniqBy(
-      typedInventory.map((i) => i.parsed.base).filter(Boolean),
-      (x) => x
-    );
-    return list.sort(
-      (a, b) => TYPE_ORDER[detectChartKey(a)] - TYPE_ORDER[detectChartKey(b)]
-    );
-  }, [typedInventory]);
+  const typedInStockInventory = useMemo(
+    () => typedInventory.filter(hasStock),
+    [typedInventory]
+  );
+
+  const sizeOptions = useMemo(() => {
+    const supportsXXL =
+      normalizeKey(selectedSize) === "xxl" ||
+      typedInventory.some((item) => normalizeKey(item.size) === "xxl");
+    return supportsXXL ? [...CORE_SIZES, "XXL"] : CORE_SIZES;
+  }, [typedInventory, selectedSize]);
+
+  const baseTypeOptions = useMemo(() => {
+    const catalogTypes = clothingTypes
+      .map((item) => parseTypeLabel(item?.name).base)
+      .filter(Boolean);
+    const inventoryTypes = typedInventory.map((item) => item.parsed.base).filter(Boolean);
+    const list = uniqBy([...inventoryTypes, ...catalogTypes], normalizeKey);
+
+    return list
+      .sort((a, b) => TYPE_ORDER[detectChartKey(a)] - TYPE_ORDER[detectChartKey(b)])
+      .map((label) => ({
+        label,
+        isAvailable: typedInStockInventory.some(
+          (item) => normalizeKey(item.parsed.base) === normalizeKey(label)
+        ),
+      }));
+  }, [clothingTypes, typedInventory, typedInStockInventory]);
 
   const presentInnerOptions = useMemo(() => {
     const set = new Set(
-      typedInventory
-        .filter((i) => i.parsed.base === selectedClothing)
+      typedInStockInventory
+        .filter(
+          (i) => normalizeKey(i.parsed.base) === normalizeKey(selectedClothing)
+        )
         .map((i) => i.parsed.inner)
         .filter(Boolean)
     );
     return Array.from(set).sort(
       (a, b) => (INNER_ORDER[a] ?? 99) - (INNER_ORDER[b] ?? 99)
     );
-  }, [typedInventory, selectedClothing]);
+  }, [typedInStockInventory, selectedClothing]);
 
   const needsInner = presentInnerOptions.length > 0;
 
   const filteredByType = useMemo(() => {
     return typedInventory.filter((i) => {
-      if (i.parsed.base !== selectedClothing) return false;
+      if (normalizeKey(i.parsed.base) !== normalizeKey(selectedClothing)) return false;
       if (!needsInner) return true;
       if (!selectedInnerType) return false;
       return i.parsed.inner === selectedInnerType;
     });
   }, [typedInventory, selectedClothing, needsInner, selectedInnerType]);
 
-  const availableColorOptions = useMemo(() => {
+  const colorOptions = useMemo(() => {
     const byName = new Map();
+
+    const addColor = (label, code, preferLabel = false) => {
+      const normalizedLabel = String(label || "").trim();
+      if (!normalizedLabel) return;
+      const key = normalizedLabel.toLowerCase();
+      const current = byName.get(key);
+      byName.set(key, {
+        label: preferLabel ? normalizedLabel : current?.label || normalizedLabel,
+        code: code || current?.code || "#CCCCCC",
+      });
+    };
+
+    colorCatalog.forEach((color) => addColor(color?.name, color?.code));
     filteredByType.forEach((i) => {
-      if (!byName.has(i.color)) {
-        byName.set(i.color, {
-          label: i.color,
-          code: i.colorCode || i.color || "#CCCCCC",
-        });
-      }
+      addColor(i.color, i.colorCode, true);
     });
-    return Array.from(byName.values());
-  }, [filteredByType]);
+
+    return Array.from(byName.values())
+      .map((option) => ({
+        ...option,
+        isAvailable: filteredByType.some(
+          (item) => hasStock(item) && normalizeKey(item.color) === normalizeKey(option.label)
+        ),
+      }))
+      .sort(
+        (a, b) =>
+          (COLOR_ORDER.get(normalizeKey(a.label)) ?? 99) -
+          (COLOR_ORDER.get(normalizeKey(b.label)) ?? 99)
+      );
+  }, [colorCatalog, filteredByType]);
 
   const availableSizes = useMemo(() => {
     const list = filteredByType
-      .filter((i) => i.color === selectedColor)
+      .filter(
+        (i) => hasStock(i) && normalizeKey(i.color) === normalizeKey(selectedColor)
+      )
       .reduce((acc, i) => {
         if (!acc.includes(i.size)) acc.push(i.size);
         return acc;
@@ -205,62 +273,131 @@ const ClothingSelector = () => {
     selectedClothing &&
       selectedColor &&
       selectedSize &&
-      (!needsInner || selectedInnerType)
+      (!needsInner || selectedInnerType) &&
+      filteredByType.some(
+        (item) =>
+          hasStock(item) &&
+          normalizeKey(item.color) === normalizeKey(selectedColor) &&
+          item.size === selectedSize
+      )
   );
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchInventory = async () => {
       if (IS_DEMO_MODE) {
+        const demoTypes = uniqBy(
+          DEMO_INVENTORY.map((item) => ({ name: parseTypeLabel(item.productType).base }))
+            .filter((item) => item.name),
+          (item) => item.name
+        );
+        const demoColors = uniqBy(
+          DEMO_INVENTORY.map((item) => ({
+            name: item.color,
+            code: item.colorCode || item.color || "#CCCCCC",
+          })).filter((item) => item.name),
+          (item) => item.name
+        );
+
+        if (cancelled) return;
         setInventory(DEMO_INVENTORY);
-        const firstBase = parseTypeLabel(DEMO_INVENTORY?.[0]?.productType)?.base || "";
-        if (!clothing.type && firstBase) setSelectedClothing(firstBase);
+        setClothingTypes(demoTypes);
+        setColorCatalog(demoColors);
+        setInventoryLoaded(true);
         return;
       }
 
-      try {
-        const { data } = await api.get('/inventory');
-        const cleaned = (Array.isArray(data) ? data : []).filter((item) => {
-          const qty = Number(item?.quantity ?? 0);
-          return Number.isFinite(qty) && qty > 0;
-        });
-        setInventory(cleaned);
-        const firstBase = parseTypeLabel(cleaned?.[0]?.productType)?.base || "";
-        if (!clothing.type && firstBase) setSelectedClothing(firstBase);
-      } catch (err) {
-        console.error("Error loading inventory:", err);
+      const [inventoryResult, typesResult, colorsResult] = await Promise.allSettled([
+        api.get('/inventory'),
+        api.get('/clothing-types'),
+        api.get('/colors'),
+      ]);
+
+      if (cancelled) return;
+
+      if (
+        inventoryResult.status === "fulfilled" &&
+        Array.isArray(inventoryResult.value.data)
+      ) {
+        setInventory(inventoryResult.value.data);
+        setInventoryLoaded(true);
+      } else {
+        console.error(
+          "Error loading inventory:",
+          inventoryResult.status === "rejected"
+            ? inventoryResult.reason
+            : "Unexpected response format"
+        );
       }
+
+      if (typesResult.status === "fulfilled") {
+        setClothingTypes(Array.isArray(typesResult.value.data) ? typesResult.value.data : []);
+      }
+
+      if (colorsResult.status === "fulfilled") {
+        setColorCatalog(Array.isArray(colorsResult.value.data) ? colorsResult.value.data : []);
+      }
+
     };
+
     fetchInventory();
-  }, [clothing.type]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     setChartKey(detectChartKey(selectedClothing));
   }, [selectedClothing]);
 
   useEffect(() => {
+    if (!inventoryLoaded) return;
+
+    const firstAvailableType = baseTypeOptions.find((option) => option.isAvailable)?.label || "";
+    const selectedTypeIsAvailable = baseTypeOptions.some(
+      (option) =>
+        normalizeKey(option.label) === normalizeKey(selectedClothing) && option.isAvailable
+    );
+
+    if (!selectedTypeIsAvailable && selectedClothing !== firstAvailableType) {
+      setSelectedClothing(firstAvailableType);
+      setSelectedInnerType("");
+      setSelectedColor("");
+      setSelectedSize("");
+    }
+  }, [inventoryLoaded, baseTypeOptions, selectedClothing]);
+
+  useEffect(() => {
+    if (!inventoryLoaded) return;
     if (!selectedClothing) return;
-    setSelectedColor("");
-    setSelectedSize("");
 
     if (presentInnerOptions.length > 0) {
       if (!presentInnerOptions.includes(selectedInnerType)) {
         setSelectedInnerType(presentInnerOptions[0]);
+        setSelectedColor("");
+        setSelectedSize("");
       }
     } else {
       if (selectedInnerType) setSelectedInnerType("");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedClothing, presentInnerOptions]);
+  }, [inventoryLoaded, selectedClothing, presentInnerOptions, selectedInnerType]);
 
   useEffect(() => {
+    if (!inventoryLoaded) return;
     if (needsInner && !selectedInnerType) {
       setSelectedColor("");
       setSelectedSize("");
       return;
     }
 
+    const availableColorOptions = colorOptions.filter((option) => option.isAvailable);
+
     if (availableColorOptions.length > 0) {
-      const hasSelected = availableColorOptions.some((o) => o.label === selectedColor);
+      const hasSelected = availableColorOptions.some(
+        (o) => normalizeKey(o.label) === normalizeKey(selectedColor)
+      );
       if (!hasSelected) {
         setSelectedColor(availableColorOptions[0].label);
         setSelectedSize("");
@@ -269,13 +406,32 @@ const ClothingSelector = () => {
       if (selectedColor) setSelectedColor("");
       if (selectedSize) setSelectedSize("");
     }
-  }, [selectedInnerType, needsInner, availableColorOptions, selectedColor, selectedSize]);
+  }, [inventoryLoaded, selectedInnerType, needsInner, colorOptions, selectedColor, selectedSize]);
 
   useEffect(() => {
+    if (!inventoryLoaded) return;
     if (selectedSize && !availableSizes.includes(selectedSize)) {
       setSelectedSize("");
     }
-  }, [availableSizes, selectedSize]);
+  }, [inventoryLoaded, availableSizes, selectedSize]);
+
+  const handleSelectClothing = (value) => {
+    setSelectedClothing(value);
+    setSelectedInnerType("");
+    setSelectedColor("");
+    setSelectedSize("");
+  };
+
+  const handleSelectInnerType = (value) => {
+    setSelectedInnerType(value);
+    setSelectedColor("");
+    setSelectedSize("");
+  };
+
+  const handleSelectColor = (value) => {
+    setSelectedColor(value);
+    setSelectedSize("");
+  };
 
   useEffect(() => {
     // keep shared order state in sync to survive route changes/back navigation
@@ -309,7 +465,10 @@ const ClothingSelector = () => {
   };
 
   const previewItem = useMemo(() => {
-    const exact = filteredByType.find((item) => item.color === selectedColor);
+    const exact = filteredByType.find(
+      (item) =>
+        hasStock(item) && normalizeKey(item.color) === normalizeKey(selectedColor)
+    );
     if (exact) return exact;
 
     if (!selectedClothing) return null;
@@ -377,6 +536,14 @@ const ClothingSelector = () => {
     <>
       <div className="blockClothingSelector">
         <div className="clothing-block">
+          <button
+            type="button"
+            className="clothingSelectorMobile__arrow"
+            onClick={() => navigate(-1)}
+            aria-label="Вернуться назад"
+          >
+            <img src={orderBackMobile} alt="" aria-hidden="true" />
+          </button>
           <h1 className="orderStepTitle" id="order-clothing-title">заказ изделия</h1>
           <div className="image-wrapper">
             <div className="image-frame">
@@ -398,25 +565,27 @@ const ClothingSelector = () => {
               <p className="title">Выберите изделие</p>
 
               <div className="selectorType">
-                {availableBaseTypes.length === 0 && (
+                {baseTypeOptions.length === 0 && (
                   <div className="muted">Нет доступных товаров</div>
                 )}
-                {availableBaseTypes.map((base) => (
+                {baseTypeOptions.map((option) => (
                   <label
-                    className={`selectorType__item ${selectedClothing === base ? "active" : ""}`}
-                    key={base}
+                    className={`selectorType__item ${normalizeKey(selectedClothing) === normalizeKey(option.label) ? "active" : ""} ${option.isAvailable ? "" : "is-disabled"}`}
+                    key={option.label}
+                    title={option.isAvailable ? "" : "Нет в наличии"}
                   >
                     <input
                       type="radio"
                       name="clothing"
-                      value={base}
-                      checked={selectedClothing === base}
-                      onChange={(e) => setSelectedClothing(e.target.value)}
+                      value={option.label}
+                      checked={normalizeKey(selectedClothing) === normalizeKey(option.label)}
+                      onChange={(e) => handleSelectClothing(e.target.value)}
+                      disabled={!option.isAvailable}
                     />
                     <span className="selectorType__custom">
                       <CheckIcon className="selectorType__check" />
                     </span>
-                    {base}
+                    {option.label}
                   </label>
                 ))}
               </div>
@@ -433,7 +602,7 @@ const ClothingSelector = () => {
                         name="innerType"
                         value={inner}
                         checked={selectedInnerType === inner}
-                        onChange={(e) => setSelectedInnerType(e.target.value)}
+                        onChange={(e) => handleSelectInnerType(e.target.value)}
                       />
                       <span className="selectorType__custom">
                         <CheckIcon className="selectorType__check" />
@@ -449,17 +618,25 @@ const ClothingSelector = () => {
               <p className="title">Цвет</p>
               <div className="colorSelector">
                 {!needsInner || selectedInnerType ? (
-                  availableColorOptions.length > 0 ? (
-                    availableColorOptions.map((opt) => (
-                      <div
+                  colorOptions.length > 0 ? (
+                    colorOptions.map((opt) => (
+                      <button
+                        type="button"
                         key={opt.label}
-                        className={`colorSquare ${selectedColor === opt.label ? "active" : ""}`}
+                        className={`colorSquare ${normalizeKey(selectedColor) === normalizeKey(opt.label) && opt.isAvailable ? "active" : ""} ${opt.isAvailable ? "" : "is-disabled"}`}
                         style={{
-                          backgroundColor: opt.code,
-                          border: isWhite(opt.code) ? "1px solid #b4b4b4" : undefined,
+                          backgroundColor: opt.isAvailable ? opt.code : "#e4e4e4",
+                          border:
+                            opt.isAvailable &&
+                            isWhite(opt.code) &&
+                            normalizeKey(selectedColor) !== normalizeKey(opt.label)
+                              ? "1px solid #b4b4b4"
+                              : undefined,
                         }}
-                        title={opt.label}
-                        onClick={() => setSelectedColor(opt.label)}
+                        title={opt.isAvailable ? opt.label : `${opt.label}: нет в наличии`}
+                        aria-label={opt.isAvailable ? opt.label : `${opt.label}: нет в наличии`}
+                        onClick={() => handleSelectColor(opt.label)}
+                        disabled={!opt.isAvailable}
                       />
                     ))
                   ) : (
@@ -485,7 +662,7 @@ const ClothingSelector = () => {
                 </div>
               </div>
               <div className="sizeSelector">
-                {sizes.map((size) => {
+                {sizeOptions.map((size) => {
                   const isAvailable = availableSizes.includes(size);
                   return (
                     <label

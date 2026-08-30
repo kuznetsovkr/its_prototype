@@ -2,6 +2,28 @@
   display: none;
 }
 
+.embroiderySelectorDesktop__arrowIcon,
+.embroiderySelectorDesktop__arrowIcon img,
+.embroideryDesktopChoice__radio img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.embroideryDesktopCounter__icon {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
 .containerExampleType {
   display: flex;
   flex-direction: row;
@@ -419,6 +441,899 @@
   .navigationButtons .backButton {
     align-self: center;
     font-size: 16px;
+  }
+}
+
+@media (max-width: 1279px) {
+  .App--embroidery {
+    overflow-x: clip;
+
+    > .header,
+    > .footer {
+      display: none;
+    }
+  }
+
+  .embroideryPage {
+    position: relative;
+    left: 50%;
+    margin: 0;
+    box-sizing: border-box;
+    transform: translateX(-50%);
+  }
+
+  .embroideryPage .orderBlock--embroidery {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
+
+  .embroideryPage .embroiderySelector__legacy {
+    display: none;
+  }
+
+  .embroideryPage .embroiderySelectorDesktop {
+    font-family: 'Jost', sans-serif;
+  }
+
+  .embroideryDesktopDetails {
+    padding-right: 2px;
+    overflow-y: auto;
+    color: #2b2b2b;
+    scrollbar-width: thin;
+  }
+
+  .embroideryDesktopDetails__return {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    color: #bc5823;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .embroideryDesktopDetails__upload {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 40px;
+    background: #161616;
+    font-weight: 600;
+    color: #fff;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+    }
+  }
+
+  .embroideryDesktopDetails__hint,
+  .embroideryDesktopDetails__error {
+    color: #4b4b4b;
+  }
+
+  .embroideryDesktopDetails__error {
+    color: #a53636;
+  }
+
+  .embroideryDesktopDetails__field {
+    display: grid;
+
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #d2d2d2;
+      outline: 0;
+      background: #fff;
+      font: inherit;
+      color: #2b2b2b;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+  }
+
+  .embroideryDesktopDetails__files {
+    display: grid;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+    }
+
+    li > span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    button {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      line-height: 1;
+      cursor: pointer;
+    }
+  }
+}
+
+@media (max-width: 639px) {
+  .App--embroidery main > .container > .wrapper {
+    padding: 0;
+  }
+
+  .embroideryPage {
+    width: 320px;
+    max-width: 100vw;
+    min-height: 771px;
+    padding: 10px 3px;
+    background: #161616;
+  }
+
+  .embroideryPage__stage {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    min-height: 751px;
+    padding: 0;
+    border-radius: 20px;
+    background: #fff;
+  }
+
+  .embroideryPage .embroiderySelectorDesktop {
+    display: block;
+    width: 314px;
+    min-height: 751px;
+    border-radius: 20px;
+    background: #fff;
+  }
+
+  .embroiderySelectorDesktop__preview {
+    position: relative;
+    width: 314px;
+    height: 319px;
+  }
+
+  .embroiderySelectorDesktop__arrow {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 2;
+    display: block;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .embroiderySelectorDesktop__arrowIcon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .embroiderySelectorDesktop__title {
+    position: absolute;
+    top: 27px;
+    left: 7px;
+    width: 300px;
+    height: 24px;
+    margin: 0;
+    font-family: 'Jost', sans-serif;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1;
+    color: #0c0c0c;
+    text-align: center;
+    text-transform: lowercase;
+    white-space: nowrap;
+  }
+
+  .embroiderySelectorDesktop__imageFrame {
+    position: absolute;
+    top: 71px;
+    left: 22px;
+    width: 270px;
+    height: 238px;
+    overflow: hidden;
+
+    img {
+      position: absolute;
+      top: -57.429px;
+      left: 0;
+      display: block;
+      width: 270px;
+      height: 360.832px;
+      max-width: none;
+      max-height: none;
+      object-fit: fill;
+    }
+  }
+
+  .embroiderySelectorDesktop__controls {
+    width: 314px;
+  }
+
+  .embroiderySelectorDesktop__panel {
+    position: relative;
+    width: 308px;
+    height: 352px;
+    margin-left: 3px;
+    padding: 30px 20px;
+    overflow: hidden;
+    border-radius: 30px;
+    background: #f0f0f0;
+
+    h2 {
+      height: 16px;
+      margin: 0;
+      font-family: 'Jost', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1;
+      color: #2b2b2b;
+      white-space: nowrap;
+    }
+  }
+
+  .embroideryDesktopTabs {
+    display: grid;
+    grid-template-columns: repeat(2, 130px);
+    gap: 8px;
+    height: 40px;
+    margin-top: 20px;
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 130px;
+      height: 40px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 40px;
+      background: #fff;
+      font-family: 'Jost', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: #4b4b4b;
+      text-align: center;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    button.is-active {
+      background: #161616;
+      color: #fff;
+    }
+  }
+
+  .embroideryDesktopChoices {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+    margin-left: -4px;
+  }
+
+  .embroideryDesktopChoice__radio {
+    display: block;
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+  }
+
+  .embroideryDesktopChoice {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 20px;
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #161616;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+    }
+
+    input:focus-visible + .embroideryDesktopChoice__radio {
+      border-radius: 50%;
+      outline: 2px solid #bc5823;
+      outline-offset: 2px;
+    }
+  }
+
+  .embroideryDesktopChoice__label {
+    margin-left: 7px;
+    white-space: nowrap;
+  }
+
+  .embroideryDesktopChoice__example {
+    margin-left: 7px;
+    color: #bc5823;
+    text-decoration: underline;
+    text-decoration-skip-ink: none;
+    white-space: nowrap;
+  }
+
+  .embroideryDesktopChoice__note {
+    margin-left: 7px;
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #4b4b4b;
+    text-transform: lowercase;
+    white-space: nowrap;
+  }
+
+  .embroideryDesktopCounter {
+    display: flex;
+    align-items: center;
+    height: 20px;
+    font-family: 'Jost', sans-serif;
+    color: #161616;
+  }
+
+  .embroideryDesktopCounter__button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #161616;
+    cursor: pointer;
+
+    span {
+      position: relative;
+      z-index: 1;
+      font-size: 10px;
+      font-weight: 600;
+      line-height: 1;
+    }
+  }
+
+  .embroideryDesktopCounter__value {
+    width: 24px;
+    margin: 0 7px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .embroideryDesktopCounter__limit {
+    margin-left: 7px;
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #4b4b4b;
+    white-space: nowrap;
+  }
+
+  .embroiderySelectorDesktop__price {
+    position: absolute;
+    bottom: 30px;
+    left: 20px;
+    margin: 0;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+    color: #a7a7a7;
+  }
+
+  .embroiderySelectorDesktop__navigation {
+    display: block;
+    width: 274px;
+    height: 40px;
+    margin: 20px 20px 0;
+
+    button {
+      align-items: center;
+      justify-content: center;
+      width: 274px;
+      height: 40px;
+      padding: 0 20px;
+      border-radius: 40px;
+      font-family: 'Jost', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.4;
+      text-align: center;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .is-back {
+      display: none;
+    }
+
+    .is-next {
+      display: flex;
+      border: 1px solid #0c0c0c;
+      background: #0c0c0c;
+      color: #fff;
+    }
+  }
+
+  .embroideryDesktopDetails {
+    max-height: 172px;
+    margin-top: 12px;
+    font-size: 10px;
+  }
+
+  .embroideryDesktopDetails__return {
+    font-size: 10px;
+  }
+
+  .embroideryDesktopDetails__upload {
+    width: 180px;
+    height: 32px;
+    margin-top: 8px;
+    font-size: 9px;
+  }
+
+  .embroideryDesktopDetails__hint,
+  .embroideryDesktopDetails__error {
+    margin: 5px 0 0;
+    font-size: 8px;
+    line-height: 1.3;
+  }
+
+  .embroideryDesktopDetails__field {
+    gap: 3px;
+    margin-top: 6px;
+
+    > span {
+      font-size: 9px;
+      font-weight: 500;
+    }
+
+    textarea,
+    select {
+      min-height: 30px;
+      padding: 5px 7px;
+      border-radius: 9px;
+      font-size: 9px;
+    }
+
+    textarea {
+      height: 36px;
+    }
+  }
+
+  .embroideryDesktopDetails__files {
+    gap: 3px;
+    max-height: 42px;
+    margin: 5px 0 0;
+
+    li {
+      min-height: 20px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 9px;
+    }
+
+    button {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 18px;
+      font-size: 14px;
+    }
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1279px) {
+  .embroideryPage {
+    width: 640px;
+    max-width: 100vw;
+    min-height: 516px;
+    padding: 10px;
+    background: #fff;
+  }
+
+  .embroideryPage__stage {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    min-height: 496px;
+    padding: 30px;
+    border-radius: 20px;
+    background: #161616;
+  }
+
+  .embroideryPage .embroiderySelectorDesktop {
+    display: grid;
+    grid-template-columns: 240px 290px;
+    align-items: start;
+    width: 560px;
+    height: 436px;
+    padding: 30px 30px 30px 0;
+    border-radius: 20px;
+    background: #fff;
+  }
+
+  .embroiderySelectorDesktop__preview {
+    position: relative;
+    width: 240px;
+    height: 376px;
+  }
+
+  .embroiderySelectorDesktop__arrow {
+    position: absolute;
+    top: -6px;
+    left: 24px;
+    z-index: 2;
+    display: block;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .embroiderySelectorDesktop__arrowIcon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .embroiderySelectorDesktop__title {
+    position: absolute;
+    top: 0;
+    left: 69px;
+    width: 103px;
+    height: 16px;
+    margin: 0;
+    font-family: 'Jost', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1;
+    color: #d0d0d0;
+    text-transform: lowercase;
+    white-space: nowrap;
+  }
+
+  .embroiderySelectorDesktop__imageFrame {
+    position: absolute;
+    top: 44px;
+    left: 8px;
+    width: 225px;
+    height: 198px;
+    overflow: hidden;
+
+    img {
+      position: absolute;
+      top: -47.777px;
+      left: 0;
+      display: block;
+      width: 225px;
+      height: 300.188px;
+      max-width: none;
+      max-height: none;
+      object-fit: fill;
+    }
+  }
+
+  .embroiderySelectorDesktop__controls {
+    width: 290px;
+  }
+
+  .embroiderySelectorDesktop__panel {
+    position: relative;
+    width: 290px;
+    height: 336px;
+    padding: 24px 25px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #f0f0f0;
+
+    h2 {
+      height: 17px;
+      margin: 0;
+      font-family: 'Jost', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: #2b2b2b;
+      white-space: nowrap;
+    }
+  }
+
+  .embroideryDesktopTabs {
+    display: grid;
+    grid-template-columns: repeat(2, 100px);
+    gap: 5px;
+    height: 28px;
+    margin-top: 10px;
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100px;
+      height: 28px;
+      padding: 0 8px;
+      border: 0;
+      border-radius: 40px;
+      background: #fff;
+      font-family: 'Jost', sans-serif;
+      font-size: 8px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: #4b4b4b;
+      text-align: center;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    button.is-active {
+      background: #161616;
+      color: #fff;
+    }
+  }
+
+  .embroideryDesktopChoices {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .embroideryDesktopChoice__radio {
+    display: block;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+  }
+
+  .embroideryDesktopChoice {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 24px;
+    font-family: 'Jost', sans-serif;
+    font-size: 8px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #161616;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+    }
+
+    input:focus-visible + .embroideryDesktopChoice__radio {
+      border-radius: 50%;
+      outline: 2px solid #bc5823;
+      outline-offset: 2px;
+    }
+  }
+
+  .embroideryDesktopChoice__label {
+    margin-left: 10px;
+    white-space: nowrap;
+  }
+
+  .embroideryDesktopChoice__example {
+    margin-left: 10px;
+    color: #bc5823;
+    text-decoration: underline;
+    text-decoration-skip-ink: none;
+    white-space: nowrap;
+  }
+
+  .embroideryDesktopChoice__note {
+    margin-left: 10px;
+    font-size: 8px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #4b4b4b;
+    text-transform: lowercase;
+    white-space: nowrap;
+  }
+
+  .embroideryDesktopCounter {
+    display: flex;
+    align-items: center;
+    height: 24px;
+    font-family: 'Jost', sans-serif;
+    color: #161616;
+  }
+
+  .embroideryDesktopCounter__button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #161616;
+    cursor: pointer;
+
+    span {
+      position: relative;
+      z-index: 1;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+  }
+
+  .embroideryDesktopCounter__value {
+    width: 19px;
+    margin: 0 10px;
+    font-size: 8px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .embroideryDesktopCounter__limit {
+    margin-left: 10px;
+    font-size: 8px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #4b4b4b;
+    white-space: nowrap;
+  }
+
+  .embroiderySelectorDesktop__price {
+    position: absolute;
+    bottom: 24px;
+    left: 25px;
+    margin: 0;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+    color: #a7a7a7;
+  }
+
+  .embroiderySelectorDesktop__navigation {
+    display: grid;
+    grid-template-columns: repeat(2, 140px);
+    gap: 10px;
+    width: 290px;
+    height: 28px;
+    margin-top: 12px;
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 140px;
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 40px;
+      font-family: 'Jost', sans-serif;
+      font-size: 8px;
+      font-weight: 600;
+      line-height: 1.4;
+      text-align: center;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .is-back {
+      border: 1px solid #4b4b4b;
+      background: #fff;
+      color: #4b4b4b;
+    }
+
+    .is-next {
+      border: 1px solid #161616;
+      background: #161616;
+      color: #fff;
+    }
+  }
+
+  .embroideryDesktopDetails {
+    max-height: 188px;
+    margin-top: 10px;
+    font-size: 8px;
+  }
+
+  .embroideryDesktopDetails__return {
+    font-size: 8px;
+  }
+
+  .embroideryDesktopDetails__upload {
+    width: 150px;
+    height: 28px;
+    margin-top: 7px;
+    font-size: 8px;
+  }
+
+  .embroideryDesktopDetails__hint,
+  .embroideryDesktopDetails__error {
+    margin: 4px 0 0;
+    font-size: 7px;
+    line-height: 1.3;
+  }
+
+  .embroideryDesktopDetails__field {
+    gap: 3px;
+    margin-top: 5px;
+
+    > span {
+      font-size: 8px;
+      font-weight: 500;
+    }
+
+    textarea,
+    select {
+      min-height: 27px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      font-size: 8px;
+    }
+
+    textarea {
+      height: 32px;
+    }
+  }
+
+  .embroideryDesktopDetails__files {
+    gap: 3px;
+    max-height: 38px;
+    margin: 4px 0 0;
+
+    li {
+      min-height: 18px;
+      padding: 2px 5px;
+      border-radius: 9px;
+      font-size: 8px;
+    }
+
+    button {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
+      font-size: 12px;
+    }
   }
 }
 
