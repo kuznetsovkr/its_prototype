@@ -64,6 +64,7 @@ const AppShell = () => {
     const isHomePage = pathname === '/';
     const isOrderPage = pathname === '/order';
     const isEmbroideryPage = pathname === '/embroidery';
+    const isRecipientPage = pathname === '/recipient';
 
     const routes = (
         <Routes>
@@ -95,7 +96,7 @@ const AppShell = () => {
     );
 
     return (
-            <div className={`App${isOrderPage ? ' App--order' : ''}${isEmbroideryPage ? ' App--embroidery' : ''}`}>
+            <div className={`App${isOrderPage ? ' App--order' : ''}${isEmbroideryPage ? ' App--embroidery' : ''}${isRecipientPage ? ' App--recipient' : ''}`}>
                 {!isHomePage && <Header />}
                 <ScrollToTop />
                 <OrderFlowReset />

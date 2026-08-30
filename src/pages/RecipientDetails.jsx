@@ -8,6 +8,14 @@ import { useOrder } from "../context/OrderContext";
 import { applyAuthResponse, resolveUserRole } from "../utils/auth";
 import { IS_DEMO_MODE } from "../config/demoMode";
 import { buildDemoOrderId, buildDemoCdekNumber } from "../mocks/demoData";
+import figmaTshirtImg from "../images/order/tshirt-black.png";
+import recipientBackIcon from "../images/order/recipient-back.svg";
+import orderBackIconTablet from "../images/order/order-back-tablet.svg";
+import orderBackIconMobile from "../images/order/order-back-mobile.svg";
+import recipientRadioOuter from "../images/order/recipient-radio-outer.svg";
+import recipientRadioInner from "../images/order/recipient-radio-inner.svg";
+import recipientRadioTablet from "../images/order/recipient-radio-tablet.svg";
+import recipientRadioMobile from "../images/order/recipient-radio-mobile.svg";
 
 const EMBROIDERY_TYPE_RU = {
   Patronus: "Патронус",
@@ -31,6 +39,18 @@ const formatPhoneNumber = (value) => {
     (numbers[7] ? `-${numbers.slice(7, 9)}` : '') +
     (numbers[9] ? `-${numbers.slice(9, 11)}` : '')
   );
+};
+
+const joinFullName = (data = {}) =>
+  [data.lastName, data.firstName, data.middleName].filter(Boolean).join(" ");
+
+const splitFullName = (value) => {
+  const parts = String(value || "").trim().split(/\s+/).filter(Boolean);
+  return {
+    lastName: parts[0] || "",
+    firstName: parts[1] || "",
+    middleName: parts.slice(2).join(" "),
+  };
 };
 
 const DEMO_RECIPIENT_DATA = {
@@ -75,6 +95,39 @@ const RecipientDetails = () => {
       phone: base.phone || DEMO_RECIPIENT_DATA.phone,
     };
   });
+  const [fullNameInput, setFullNameInput] = useState(() => joinFullName(
+    recipientState.userData || (IS_DEMO_MODE ? DEMO_RECIPIENT_DATA : {})
+  ));
+  const [email, setEmail] = useState(recipientState.email || "");
+  const [preferredContact, setPreferredContact] = useState(recipientState.preferredContact || "");
+  const [orderComment, setOrderComment] = useState(recipientState.orderComment || comment || "");
+  const [city, setCity] = useState(recipientState.city || "");
+  const [deliveryRecipient, setDeliveryRecipient] = useState(
+    recipientState.deliveryRecipient || joinFullName(
+      recipientState.userData || (IS_DEMO_MODE ? DEMO_RECIPIENT_DATA : {})
+    )
+  );
+  const [deliveryComment, setDeliveryComment] = useState(recipientState.deliveryComment || "");
+  const [privacyConsent, setPrivacyConsent] = useState(Boolean(recipientState.privacyConsent));
+  const [isCdekPickerOpen, setIsCdekPickerOpen] = useState(false);
+  const [isMobileLayout, setIsMobileLayout] = useState(() =>
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(max-width: 639px)").matches
+  );
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") return undefined;
+    const query = window.matchMedia("(max-width: 639px)");
+    const handleLayoutChange = (event) => setIsMobileLayout(event.matches);
+    setIsMobileLayout(query.matches);
+    if (typeof query.addEventListener === "function") {
+      query.addEventListener("change", handleLayoutChange);
+      return () => query.removeEventListener("change", handleLayoutChange);
+    }
+    query.addListener(handleLayoutChange);
+    return () => query.removeListener(handleLayoutChange);
+  }, []);
 
   // Телефон/аутентификация
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(
@@ -170,6 +223,13 @@ const RecipientDetails = () => {
       manualFlat: recipientState.manualAddress?.data?.flat || "",
       isNoCdek: Boolean(recipientState.isNoCdek),
       cdek: recipientState.cdek,
+      email: recipientState.email || "",
+      preferredContact: recipientState.preferredContact || "",
+      orderComment: recipientState.orderComment || "",
+      city: recipientState.city || "",
+      deliveryRecipient: recipientState.deliveryRecipient || "",
+      deliveryComment: recipientState.deliveryComment || "",
+      privacyConsent: Boolean(recipientState.privacyConsent),
     };
     const local = {
       userData,
@@ -181,6 +241,13 @@ const RecipientDetails = () => {
       manualFlat: manualAddress?.data?.flat || "",
       isNoCdek: Boolean(isNoCdek),
       cdek: cdekData,
+      email,
+      preferredContact,
+      orderComment,
+      city,
+      deliveryRecipient,
+      deliveryComment,
+      privacyConsent,
     };
     const sameUser =
       (local.userData.firstName || "") === (stored.userData?.firstName || "") &&
@@ -196,7 +263,14 @@ const RecipientDetails = () => {
       local.manualBlock === stored.manualBlock &&
       local.manualFlat === stored.manualFlat &&
       local.isNoCdek === stored.isNoCdek &&
-      JSON.stringify(local.cdek ?? null) === JSON.stringify(stored.cdek ?? null)
+      JSON.stringify(local.cdek ?? null) === JSON.stringify(stored.cdek ?? null) &&
+      local.email === stored.email &&
+      local.preferredContact === stored.preferredContact &&
+      local.orderComment === stored.orderComment &&
+      local.city === stored.city &&
+      local.deliveryRecipient === stored.deliveryRecipient &&
+      local.deliveryComment === stored.deliveryComment &&
+      local.privacyConsent === stored.privacyConsent
     );
   }, [
     userData,
@@ -208,6 +282,13 @@ const RecipientDetails = () => {
     manualAddress?.data?.flat,
     isNoCdek,
     cdekData,
+    email,
+    preferredContact,
+    orderComment,
+    city,
+    deliveryRecipient,
+    deliveryComment,
+    privacyConsent,
     recipientState,
   ]);
 
@@ -221,6 +302,13 @@ const RecipientDetails = () => {
       manualAddress: manualAddressNormalized,
       isNoCdek,
       cdek: cdekData,
+      email,
+      preferredContact,
+      orderComment,
+      city,
+      deliveryRecipient,
+      deliveryComment,
+      privacyConsent,
     });
   }, [
     userData,
@@ -233,6 +321,13 @@ const RecipientDetails = () => {
     manualAddressNormalized,
     isNoCdek,
     cdekData,
+    email,
+    preferredContact,
+    orderComment,
+    city,
+    deliveryRecipient,
+    deliveryComment,
+    privacyConsent,
     setRecipient,
     isRecipientSame,
   ]);
@@ -286,12 +381,17 @@ const RecipientDetails = () => {
         const maskedPhone = data?.phone ? formatPhoneNumber(String(data.phone)) : "";
         const role = resolveUserRole(data);
         if (role) localStorage.setItem("role", role);
-        setUserData({
+        const nextUserData = {
           firstName: data?.firstName ?? "",
           lastName: data?.lastName ?? "",
           middleName: data?.middleName ?? "",
           phone: maskedPhone,
-        });
+        };
+        const profileFullName = joinFullName(nextUserData);
+        setUserData(nextUserData);
+        setFullNameInput(profileFullName);
+        setDeliveryRecipient((current) => current || profileFullName);
+        setEmail((current) => current || data?.email || "");
 
         const hasProfilePhone = Boolean(data?.phone);
         setPhoneFromProfile(hasProfilePhone);
@@ -320,6 +420,13 @@ const RecipientDetails = () => {
     }
 
     setUserData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFullNameChange = (event) => {
+    const value = event.target.value;
+    setDeliveryRecipient((current) => (!current || current === fullNameInput ? value : current));
+    setFullNameInput(value);
+    setUserData((current) => ({ ...current, ...splitFullName(value) }));
   };
 
   const isUserDataFilled =
@@ -509,6 +616,8 @@ const RecipientDetails = () => {
     setCdekData(payload || null);
     setIsNoCdek(false);
     setManualAddress(null);
+    setCity((current) => current || payload?.address?.city || payload?.address?.location?.city || "");
+    setIsCdekPickerOpen(false);
   };
 
   const normalizePhoneDigits = (value) => {
@@ -563,13 +672,26 @@ const RecipientDetails = () => {
 
   async function createDraftOrder() {
     const fd = new FormData();
+    const recipientFullName = deliveryRecipient.trim() || joinFullName(userData);
+    const primaryOrderComment = orderComment.trim() || String(comment || "").trim();
+    const formComment = [
+      primaryOrderComment,
+      email.trim() ? `E-mail: ${email.trim()}` : "",
+      preferredContact.trim() ? `Удобный способ связи: ${preferredContact.trim()}` : "",
+      deliveryComment.trim() ? `Комментарий к доставке: ${deliveryComment.trim()}` : "",
+    ].filter(Boolean).join("\n");
 
     fd.append("firstName", userData.firstName || "");
     fd.append("lastName", userData.lastName || "");
     fd.append("middleName", userData.middleName || "");
     fd.append("phone", userData.phone || "");
     fd.append("recipientPhoneDigits", normalizePhoneDigits(userData.phone) || "");
-    fd.append("recipientFullName", `${userData.lastName || ""} ${userData.firstName || ""} ${userData.middleName || ""}`.trim());
+    fd.append("recipientFullName", recipientFullName);
+    fd.append("email", email.trim());
+    fd.append("preferredContact", preferredContact.trim());
+    fd.append("deliveryComment", deliveryComment.trim());
+    fd.append("deliveryCity", city.trim());
+    fd.append("privacyConsent", String(privacyConsent));
 
     const productTypeName =
       typeof productType === "object"
@@ -586,7 +708,7 @@ const RecipientDetails = () => {
     fd.append("petFaceCount", String(petFaceCount || 0));
     fd.append("customText", customText || "");
     fd.append("customOption", JSON.stringify(customOption || {}));
-    fd.append("comment", comment || "");
+    fd.append("comment", formComment);
 
     fd.append("deliveryAddress", pickupPoint || (manualAddress && manualAddress.value) || "");
     fd.append("totalPrice", String(totalPrice || 0));
@@ -725,111 +847,265 @@ const RecipientDetails = () => {
 
 
   return (
-    <div className="containerDetails">
-      <div className="firstColumn">
-        <div className="recipientInfo">
-          <p className="title">ДАННЫЕ О ПОЛУЧАТЕЛЕ:</p>
-          <div className="data">
-            <div className="FIO">
-              <input type="text" name="lastName" placeholder="Фамилия" value={userData.lastName} onChange={handleInputChange} />
-              <input type="text" name="firstName" placeholder="Имя" value={userData.firstName} onChange={handleInputChange} />
-              <input type="text" name="middleName" placeholder="Отчество" value={userData.middleName} onChange={handleInputChange} />
+    <>
+      <section className="recipientOrderPage" aria-labelledby="recipient-order-title">
+        <div className="recipientOrderPage__stage">
+          <div className="recipientOrderCard">
+            <div className="recipientOrderCard__preview">
+              <button
+                type="button"
+                className="recipientOrderCard__backArrow"
+                onClick={() => navigate(-1)}
+                aria-label="Вернуться назад"
+              >
+                <picture className="recipientOrderCard__backIcon">
+                  <source media="(max-width: 639px)" srcSet={orderBackIconMobile} />
+                  <source media="(max-width: 1279px)" srcSet={orderBackIconTablet} />
+                  <img src={recipientBackIcon} alt="" aria-hidden="true" />
+                </picture>
+              </button>
+
+              <h1 className="recipientOrderCard__title" id="recipient-order-title">
+                заказ изделия
+              </h1>
+
+              <div className="recipientOrderCard__imageFrame">
+                <img src={figmaTshirtImg} alt="Чёрная футболка" />
+              </div>
             </div>
-            <div className="PhoneContainer">
-              <div className="PhoneBlock">
+
+            <div className="recipientOrderCard__controls">
+              <div className="recipientOrderForm">
+                <h2 className="recipientOrderForm__heading recipientOrderForm__heading--personal">
+                  Введите свои данные
+                </h2>
+
                 <input
-                  type="tel"
-                  name="phone"
-                  placeholder="+7 (___) ___-__-__"
-                  value={userData.phone}
-                  onChange={handleInputChange}
-                  disabled={phoneLocked || isPaying}
-                  maxLength={18}
+                  className="recipientOrderForm__field recipientOrderForm__field--fullName"
+                  type="text"
+                  autoComplete="name"
+                  placeholder="ФИО"
+                  value={fullNameInput}
+                  onChange={handleFullNameChange}
+                  disabled={isPaying}
                 />
 
-                {phoneFromProfile && phoneLocked && (
-                  <button
-                    type="button"
-                    className="link-like"
-                    onClick={onClickEditPhone}
-                  >
-                    изменить
-                  </button>
-                )}
-              </div>
-
-              {(!phoneLocked || !phoneFromProfile) && (
-                <div>
-                  {!smsRequested ? (
+                <div className="recipientOrderForm__phoneField">
+                  <input
+                    className="recipientOrderForm__field recipientOrderForm__field--phone"
+                    type="tel"
+                    name="phone"
+                    autoComplete="tel"
+                    placeholder="Номер телефона"
+                    value={userData.phone}
+                    onChange={handleInputChange}
+                    disabled={phoneLocked || isPaying}
+                    maxLength={18}
+                  />
+                  {phoneFromProfile && phoneLocked && (
                     <button
                       type="button"
-                      className="link-like"
-                      onClick={requestSms}
+                      className="recipientOrderForm__phoneEdit"
+                      onClick={onClickEditPhone}
                     >
-                      подтвердить номер телефона
+                      изменить
                     </button>
-                  ) : (
-                    <>
-                      {smsStep === 1 && (
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            placeholder="Код из SMS"
-                            value={smsCode}
-                            onChange={(e) => setSmsCode(e.target.value)}
-                            maxLength={6}
-                            style={{ width: 140 }}
-                          />
-                          <button type="button" onClick={confirmSmsCode} className="btn-confirm">подтвердить</button>
-                          <button
-                            type="button"
-                            onClick={resendSms}
-                            disabled={resendTimer > 0}
-                            className="link-like"
-                            style={{ textDecoration: "underline", background: "none", border: "none", cursor: resendTimer > 0 ? "not-allowed" : "pointer" }}
-                          >
-                            {resendTimer > 0 ? `Можно отправить снова через (${resendTimer} c)` : "Отправить код ещё раз"}
-                          </button>
-                        </div>
-                      )}
-
-                      {smsStep === 2 && (
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
-                          <input
-                            type="password"
-                            placeholder="Пароль администратора"
-                            value={adminPassword}
-                            onChange={(e) => setAdminPassword(e.target.value)}
-                            style={{ width: 200 }}
-                          />
-                          <button type="button" onClick={confirmAdminPassword} className="btn-confirm">подтвердить</button>
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {!!authError && (
-                    <div style={{ color: 'crimson', marginTop: 6, fontSize: 13 }}>{authError}</div>
                   )}
                 </div>
-              )}
 
+                <input
+                  className="recipientOrderForm__field recipientOrderForm__field--email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="E-mail"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  disabled={isPaying}
+                />
+
+                <input
+                  className="recipientOrderForm__field recipientOrderForm__field--contact"
+                  type="text"
+                  placeholder={isMobileLayout ? "Удобный способ связи" : "Удобный способ связи ( Telegram / VK / другое )"}
+                  value={preferredContact}
+                  onChange={(event) => setPreferredContact(event.target.value)}
+                  disabled={isPaying}
+                />
+
+                <textarea
+                  className="recipientOrderForm__field recipientOrderForm__field--orderComment"
+                  placeholder="Комментарий / пожелание к заказу"
+                  value={orderComment}
+                  onChange={(event) => setOrderComment(event.target.value)}
+                  disabled={isPaying}
+                />
+
+                {(!phoneLocked || !phoneFromProfile) && Boolean(userData.phone) && (
+                  <div className="recipientOrderForm__phoneVerification">
+                    {!smsRequested ? (
+                      <button type="button" onClick={requestSms}>
+                        подтвердить номер телефона
+                      </button>
+                    ) : (
+                      <>
+                        {smsStep === 1 && (
+                          <div className="recipientOrderForm__verificationRow">
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              placeholder="Код из SMS"
+                              value={smsCode}
+                              onChange={(event) => setSmsCode(event.target.value)}
+                              maxLength={6}
+                            />
+                            <button type="button" onClick={confirmSmsCode}>подтвердить</button>
+                            <button type="button" onClick={resendSms} disabled={resendTimer > 0}>
+                              {resendTimer > 0 ? `Повторить через ${resendTimer} c` : "Отправить ещё раз"}
+                            </button>
+                          </div>
+                        )}
+                        {smsStep === 2 && (
+                          <div className="recipientOrderForm__verificationRow">
+                            <input
+                              type="password"
+                              placeholder="Пароль администратора"
+                              value={adminPassword}
+                              onChange={(event) => setAdminPassword(event.target.value)}
+                            />
+                            <button type="button" onClick={confirmAdminPassword}>подтвердить</button>
+                          </div>
+                        )}
+                      </>
+                    )}
+                    {authError && <p role="alert">{authError}</p>}
+                  </div>
+                )}
+
+                <h2 className="recipientOrderForm__heading recipientOrderForm__heading--delivery">
+                  Доставка
+                </h2>
+
+                <label className="recipientOrderForm__group recipientOrderForm__group--city">
+                  <span>Город</span>
+                  <input
+                    type="text"
+                    placeholder={isMobileLayout ? "Санкт - Петербург" : "Санкт-Петербург"}
+                    value={city}
+                    onChange={(event) => setCity(event.target.value)}
+                    disabled={isPaying}
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  className="recipientOrderForm__deliveryMethod"
+                  onClick={() => setIsCdekPickerOpen(true)}
+                >
+                  <span className="recipientOrderForm__radio" aria-hidden="true">
+                    <picture className="recipientOrderForm__radioResponsive">
+                      <source media="(max-width: 639px)" srcSet={recipientRadioMobile} />
+                      <img src={recipientRadioTablet} alt="" />
+                    </picture>
+                    <img className="recipientOrderForm__radioOuter" src={recipientRadioOuter} alt="" />
+                    <img className="recipientOrderForm__radioInner" src={recipientRadioInner} alt="" />
+                  </span>
+                  <span className="recipientOrderForm__deliveryMethodText">
+                    <strong>СДЭК — </strong>
+                    Доставка до пункта выдачи заказов <span>от 4 дней, от 450 р</span>
+                  </span>
+                </button>
+
+                <label className="recipientOrderForm__group recipientOrderForm__group--pickup">
+                  <span>Пункт получения</span>
+                  <button type="button" onClick={() => setIsCdekPickerOpen(true)}>
+                    {pickupPoint || "Выберите пункт получения"}
+                  </button>
+                </label>
+
+                <label className="recipientOrderForm__group recipientOrderForm__group--recipient">
+                  <span>Получатель (ФИО полностью)</span>
+                  <input
+                    type="text"
+                    autoComplete="name"
+                    placeholder="Иванов Иван Иванович"
+                    value={deliveryRecipient}
+                    onChange={(event) => setDeliveryRecipient(event.target.value)}
+                    disabled={isPaying}
+                  />
+                </label>
+
+                <label className="recipientOrderForm__group recipientOrderForm__group--deliveryComment">
+                  <span>Комментарий</span>
+                  <input
+                    type="text"
+                    placeholder="Комментарий к доставке"
+                    value={deliveryComment}
+                    onChange={(event) => setDeliveryComment(event.target.value)}
+                    disabled={isPaying}
+                  />
+                </label>
+
+                <label className="recipientOrderForm__consent">
+                  <input
+                    type="checkbox"
+                    checked={privacyConsent}
+                    onChange={(event) => setPrivacyConsent(event.target.checked)}
+                  />
+                  <span>
+                    Я даю <em>своё согласие на обработку моих персональных данных</em> в соответствии с <em>политикой конфиденциальности</em>
+                  </span>
+                </label>
+              </div>
+
+              {error && <p className="recipientOrderCard__error" role="alert">{error}</p>}
+
+              <div className="recipientOrderNavigation">
+                <button type="button" className="recipientOrderNavigation__back" onClick={() => navigate(-1)}>
+                  назад
+                </button>
+                <button
+                  type="button"
+                  className="recipientOrderNavigation__submit"
+                  onClick={handlePayment}
+                  disabled={!isFormValid || isPaying}
+                  title={!isFormValid ? getMissingFieldsMessage() : undefined}
+                >
+                  {isPaying ? "Обрабатываем..." : isCustomType ? "отправить заявку" : (
+                    <>
+                      <span className="recipientOrderNavigation__paymentLabel">к оплате</span>
+                      <span className="recipientOrderNavigation__tabletLabel">далее</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        <div className="deliveryInfo">
-          <p className="title">Выбор пункта выдачи (СДЭК)</p>
-          <div className="blockCDEK">
+      <div
+        className={`recipientCdekDialog${isCdekPickerOpen ? " is-open" : ""}`}
+        aria-hidden={!isCdekPickerOpen}
+      >
+        <button
+          type="button"
+          className="recipientCdekDialog__backdrop"
+          onClick={() => setIsCdekPickerOpen(false)}
+          aria-label="Закрыть выбор пункта получения"
+        />
+        <section className="recipientCdekDialog__surface" role="dialog" aria-modal="true" aria-label="Выбор пункта СДЭК">
+          <div className="recipientCdekDialog__header">
+            <h2>Выберите пункт получения</h2>
+            <button type="button" onClick={() => setIsCdekPickerOpen(false)} aria-label="Закрыть">×</button>
+          </div>
+
+          <div className="blockCDEK recipientCdekDialog__content">
             <div className="mapBox">
               <div id="cdek-map">
                 {IS_DEMO_MODE && (
                   <div className="cdek-map__demo">
                     <p className="cdek-map__demo-title">CDEK map placeholder (demo mode)</p>
-                    <p className="cdek-map__demo-text">
-                      Use the button below to emulate pickup-point selection.
-                    </p>
+                    <p className="cdek-map__demo-text">Use the button below to emulate pickup-point selection.</p>
                   </div>
                 )}
               </div>
@@ -847,7 +1123,7 @@ const RecipientDetails = () => {
                 Select demo pickup point
               </button>
             )}
-            <label>
+            <label className="recipientCdekDialog__manualToggle">
               <input type="checkbox" checked={isNoCdek} onChange={handleNoCdekToggle} />
               В моём городе нет СДЭКа
             </label>
@@ -857,17 +1133,13 @@ const RecipientDetails = () => {
                   <input
                     type="text"
                     className="manualAddress__input"
-                    placeholder="Enter delivery address"
+                    placeholder="Введите адрес доставки"
                     value={manualAddress?.value || ""}
                     onChange={(event) => {
                       const value = event.target.value;
                       setManualAddress({
                         value,
-                        data: {
-                          house: value.trim() ? "1" : "",
-                          block: "",
-                          flat: "",
-                        },
+                        data: { house: value.trim() ? "1" : "", block: "", flat: "" },
                       });
                     }}
                   />
@@ -876,9 +1148,7 @@ const RecipientDetails = () => {
                     token={dadataToken}
                     value={manualAddress}
                     onChange={setManualAddress}
-                    inputProps={{
-                      placeholder: "Введите свой адрес",
-                    }}
+                    inputProps={{ placeholder: "Введите свой адрес" }}
                   />
                 )}
                 {!IS_DEMO_MODE && !isManualAddressFull && (
@@ -889,44 +1159,10 @@ const RecipientDetails = () => {
                 )}
               </div>
             )}
-            </div>
           </div>
-        </div>
-
-      <div className="secondColumn">
-        <div className="deliveryCost">
-          <p className="title">РАСЧЁТ СТОИМОСТИ</p>
-          <div className="aboutPrice">
-            <div className="aboutPrice_calculate">
-              <p>Вышивка:</p>
-              <span className={`aboutPrice_value${isCustomType ? " aboutPrice_value--manager" : ""}`}>
-                {isCustomType ? "стоимость рассчитает менеджер" : `${embroideryPrice || 0} \u20bd`}
-              </span>
-            </div>
-            <div className="aboutPrice_calculate">
-              <p>Доставка:</p>
-              <span className="aboutPrice_value">{`${deliveryPrice || 0} \u20bd`}</span>
-            </div>
-            <div className="summaryCost"><p>ИТОГО:</p> {isCustomType ? `${deliveryPrice || 0} \u20bd` : `${totalPrice} \u20bd`}</div>
-          </div>
-
-          {error && <div className="error" style={{ color: "crimson", marginTop: 8 }}>{error}</div>}
-
-          <div className="tooltip-container">
-            <button
-              onClick={handlePayment}
-              disabled={!isFormValid || isPaying}
-              className="confirmButton"
-            >
-              {isPaying ? "Обрабатываем..." : isCustomType ? "ОТПРАВИТЬ ЗАЯВКУ" : "ПЕРЕЙТИ К ОПЛАТЕ"}
-            </button>
-            {!isFormValid && (
-              <div className="tooltip-text">{getMissingFieldsMessage()}</div>
-            )}
-          </div>
-        </div>
+        </section>
       </div>
-    </div>
+    </>
   );
 };
 

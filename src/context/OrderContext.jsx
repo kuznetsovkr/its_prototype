@@ -50,6 +50,13 @@ const isSameRecipient = (a, b) =>
   (a?.userData?.lastName || "") === (b?.userData?.lastName || "") &&
   (a?.userData?.middleName || "") === (b?.userData?.middleName || "") &&
   (a?.userData?.phone || "") === (b?.userData?.phone || "") &&
+  (a?.email || "") === (b?.email || "") &&
+  (a?.preferredContact || "") === (b?.preferredContact || "") &&
+  (a?.orderComment || "") === (b?.orderComment || "") &&
+  (a?.city || "") === (b?.city || "") &&
+  (a?.deliveryRecipient || "") === (b?.deliveryRecipient || "") &&
+  (a?.deliveryComment || "") === (b?.deliveryComment || "") &&
+  Boolean(a?.privacyConsent) === Boolean(b?.privacyConsent) &&
   (a?.pickupPoint || "") === (b?.pickupPoint || "") &&
   Number(a?.deliveryPrice ?? 0) === Number(b?.deliveryPrice ?? 0) &&
   Boolean(a?.isNoCdek) === Boolean(b?.isNoCdek) &&
@@ -93,6 +100,13 @@ const initialState = {
   },
   recipient: {
     userData: { firstName: "", lastName: "", middleName: "", phone: "" },
+    email: "",
+    preferredContact: "",
+    orderComment: "",
+    city: "",
+    deliveryRecipient: "",
+    deliveryComment: "",
+    privacyConsent: false,
     pickupPoint: "",
     deliveryPrice: null,
     manualAddress: null,
