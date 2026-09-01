@@ -9,8 +9,6 @@ import RecipientDetails from './pages/RecipientDetails';
 import ThankYouPage from './pages/ThankYouPage';
 import ProfilePage from './pages/ProfilePage';
 import WorksPage from './pages/WorksPage';
-import AboutPage from './pages/AboutPage';
-import DeliveryPage from './pages/DeliveryPage';
 import SizeGuidePage from './pages/SizeGuidePage';
 import PaymentPage from './pages/PaymentPage';
 import AdminInventory from "./admin/AdminInventory";
@@ -75,8 +73,6 @@ const AppShell = () => {
             <Route path="/thank-you" element={<PageLayout><ThankYouPage /></PageLayout>} />
             <Route path="/profile" element={<PageLayout><ProfilePage /></PageLayout>} />
             <Route path="/works" element={<WorksPage/>} />
-            <Route path="/about" element={<PageLayout><AboutPage /></PageLayout>} />
-            <Route path="/faq" element={<PageLayout><DeliveryPage /></PageLayout>} />
             <Route path="/size-guide" element={<PageLayout><SizeGuidePage /></PageLayout>} />
             <Route path="/payment" element={<PageLayout><PaymentPage /></PageLayout>} />
             <Route path="/fake-payment" element={<FakePayment />} />
