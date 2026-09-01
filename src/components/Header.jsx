@@ -58,6 +58,7 @@ const Header = ({ onOrder: onOrderOverride, standalone = true }) => {
       <HomeHeader
         activeNavigationId={activeNavigationId}
         assets={siteHeaderAssets}
+        mobileActiveNavigationId={pathname === "/" ? "about" : activeNavigationId}
         navigationBase={standalone ? "/" : ""}
         onOrder={handleOrder}
         onProfile={handleProfile}

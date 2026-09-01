@@ -6,6 +6,17 @@ export const homeNavigation = [
   { id: "contacts", label: "Контакты", href: "#contacts" },
 ];
 
+export const mobileMenuNavigation = [
+  { id: "about", label: "О бренде", href: "#about" },
+  { id: "constructor", label: "Конструктор", href: "/order", orderAction: true },
+  { id: "certificate", label: "Сертификат", href: "/certificate" },
+  { id: "reviews", label: "Отзывы", href: "#reviews" },
+  { id: "customers", label: "Клиентам", href: "#customers" },
+  { id: "faq", label: "Вопрос - ответ", href: "#faq" },
+  { id: "works", label: "Примеры работ", href: "#works" },
+  { id: "contacts", label: "Контакты", href: "#contacts" },
+];
+
 export const processSteps = [
   {
     id: "photo",

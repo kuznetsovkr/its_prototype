@@ -1,13 +1,33 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import { homeNavigation } from "../../data/homeContent";
+import { Link, useLocation } from "react-router-dom";
+import {
+  homeNavigation,
+  mobileMenuNavigation,
+  socialLinks,
+} from "../../data/homeContent";
 import ResponsiveAsset from "./ResponsiveAsset";
 
 const focusableSelector = "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])";
 
+const focusVisibleHeaderControl = () => {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const controls = Array.from(document.querySelectorAll(".home-header__burger, .home-header__logo"));
+      const target = controls.find((element) => (
+        getComputedStyle(element).display !== "none"
+        && getComputedStyle(element).visibility !== "hidden"
+        && element.getClientRects().length > 0
+      ));
+
+      target?.focus({ preventScroll: true });
+    });
+  });
+};
+
 const HomeHeader = ({
   activeNavigationId,
   assets,
+  mobileActiveNavigationId,
   navigationBase = "",
   onOrder,
   onProfile,
@@ -18,11 +38,24 @@ const HomeHeader = ({
   const menuRef = useRef(null);
   const triggerRef = useRef(null);
   const shouldRestoreTriggerFocusRef = useRef(true);
+  const { key: locationKey } = useLocation();
+  const previousLocationKeyRef = useRef(locationKey);
+
+  useEffect(() => {
+    if (previousLocationKeyRef.current === locationKey) return;
+
+    previousLocationKeyRef.current = locationKey;
+
+    if (isOpen) {
+      setIsOpen(false);
+    }
+  }, [isOpen, locationKey]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
 
     const previousOverflow = document.body.style.overflow;
+    const previousDocumentOverflow = document.documentElement.style.overflow;
     const header = headerRef.current;
     const menu = menuRef.current;
     const trigger = triggerRef.current;
@@ -45,6 +78,7 @@ const HomeHeader = ({
       element.setAttribute("inert", "");
     });
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
 
     const focusFirstMenuItem = () => {
       const first = focusable[0];
@@ -85,7 +119,6 @@ const HomeHeader = ({
 
     const handleResize = () => {
       if (window.innerWidth >= 640) {
-        shouldRestoreTriggerFocusRef.current = false;
         setIsOpen(false);
       }
     };
@@ -95,6 +128,7 @@ const HomeHeader = ({
     return () => {
       cancelAnimationFrame(focusFrame);
       document.body.style.overflow = previousOverflow;
+      document.documentElement.style.overflow = previousDocumentOverflow;
       document.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("resize", handleResize);
       backgroundState.forEach(({
@@ -117,7 +151,12 @@ const HomeHeader = ({
       });
 
       if (shouldRestoreTriggerFocusRef.current) {
-        trigger?.focus({ preventScroll: true });
+        const triggerIsVisible = trigger?.isConnected && getComputedStyle(trigger).display !== "none";
+        const headerLogo = header?.querySelector(".home-header__logo");
+        const focusTarget = triggerIsVisible ? trigger : headerLogo;
+
+        if (focusTarget?.isConnected) focusTarget.focus({ preventScroll: true });
+        else focusVisibleHeaderControl();
       }
 
       shouldRestoreTriggerFocusRef.current = true;
@@ -134,10 +173,31 @@ const HomeHeader = ({
     setIsOpen(false);
   };
 
+  const closeMenuForNavigation = () => {
+    closeMenu({ restoreFocus: false });
+    focusVisibleHeaderControl();
+  };
+
   const renderNavItem = (item, mobile = false) => {
     const baseClassName = mobile ? "home-header__mobile-link" : "home-header__link";
-    const isActive = activeNavigationId === item.id;
+    const currentActiveNavigationId = mobile ? mobileActiveNavigationId : activeNavigationId;
+    const isActive = currentActiveNavigationId === item.id;
     const className = `${baseClassName} ${baseClassName}--${item.id}${isActive ? " is-active" : ""}`;
+    const content = mobile ? (
+      <>
+        {isActive && (
+          <img
+            className="home-header__mobile-link-dot"
+            src={assets.menu.activeDot}
+            alt=""
+            aria-hidden="true"
+            width="6"
+            height="6"
+          />
+        )}
+        <span>{item.label}</span>
+      </>
+    ) : item.label;
 
     if (item.orderAction) {
       return (
@@ -147,11 +207,11 @@ const HomeHeader = ({
           type="button"
           aria-current={isActive ? "page" : undefined}
           onClick={() => {
-            closeMenu({ restoreFocus: false });
+            if (mobile) closeMenuForNavigation();
             onOrder();
           }}
         >
-          {item.label}
+          {content}
         </button>
       );
     }
@@ -163,9 +223,9 @@ const HomeHeader = ({
           key={item.id}
           to={item.href}
           aria-current={isActive ? "page" : undefined}
-          onClick={mobile ? () => closeMenu({ restoreFocus: false }) : undefined}
+          onClick={mobile ? closeMenuForNavigation : undefined}
         >
-          {item.label}
+          {content}
         </Link>
       );
     }
@@ -176,15 +236,18 @@ const HomeHeader = ({
         href={item.href.startsWith("#") ? `${navigationBase}${item.href}` : item.href}
         key={item.id}
         aria-current={isActive ? "page" : undefined}
-        onClick={mobile ? () => closeMenu({ restoreFocus: false }) : undefined}
+        onClick={mobile ? closeMenuForNavigation : undefined}
       >
-        {item.label}
+        {content}
       </a>
     );
   };
 
   return (
-    <header className={`home-header${standalone ? " home-header--standalone" : ""}`} ref={headerRef}>
+    <header
+      className={`home-header${standalone ? " home-header--standalone" : ""}${isOpen ? " home-header--menu-open" : ""}`}
+      ref={headerRef}
+    >
       <div className="home-header__bar">
         <button
           ref={triggerRef}
@@ -257,25 +320,86 @@ const HomeHeader = ({
         aria-label="Мобильное меню"
         aria-modal={isOpen}
         role="dialog"
+        ref={menuRef}
       >
-        <div className="home-header__menu-panel" ref={menuRef}>
-          <button className="home-header__menu-close" type="button" aria-label="Закрыть меню" onClick={() => closeMenu()}>
-            <span aria-hidden="true">×</span>
+        <div className="home-header__menu-panel">
+          <Link
+            className="home-header__menu-logo"
+            to="/"
+            aria-label="И так сойдёт — на главную"
+            onClick={closeMenuForNavigation}
+          >
+            <img src={assets.menu.logo} alt="" width="100" height="44" />
+          </Link>
+
+          <button
+            className="home-header__menu-bag"
+            type="button"
+            aria-label="Перейти к заказу"
+            onClick={() => {
+              closeMenuForNavigation();
+              onOrder();
+            }}
+          >
+            <img src={assets.menu.bag} alt="" width="20" height="19" />
           </button>
+
           <nav className="home-header__mobile-navigation" aria-label="Мобильная навигация">
-            {homeNavigation.map((item) => renderNavItem(item, true))}
+            {mobileMenuNavigation.map((item) => renderNavItem(item, true))}
           </nav>
+
+          <div className="home-header__menu-socials" role="group" aria-label="Социальные сети">
+            <a
+              className="home-header__menu-social-link"
+              href={socialLinks.telegram}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Telegram"
+            >
+              <img src={assets.menu.telegram} alt="" width="30" height="30" />
+            </a>
+            <a
+              className="home-header__menu-social-link"
+              href={socialLinks.instagram}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Instagram"
+            >
+              <img src={assets.menu.instagram} alt="" width="30" height="30" />
+            </a>
+            <a
+              className="home-header__menu-social-link"
+              href={socialLinks.vk}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="ВКонтакте"
+            >
+              <img src={assets.menu.vk} alt="" width="30" height="30" />
+            </a>
+          </div>
+
           <button
             className="home-header__mobile-order"
             type="button"
             onClick={() => {
-              closeMenu({ restoreFocus: false });
+              closeMenuForNavigation();
               onOrder();
             }}
           >
             Сделать заказ
           </button>
+
+          <p className="home-header__menu-copyright">
+            2026 “И так сойдёт”. Все права защищены
+          </p>
         </div>
+
+        <button
+          className="home-header__menu-dismiss"
+          type="button"
+          aria-label="Закрыть меню"
+          onClick={() => closeMenu()}
+        />
       </div>
     </header>
   );

@@ -117,6 +117,12 @@ import mobileFooterLogoMilk from './mobile/footer-logo-milk.png';
 import mobileFooterIllustration from './mobile/footer-illustration.png';
 import mobileHeaderHeart from './mobile/header-heart.svg';
 import mobileHeaderBag from './mobile/header-bag.svg';
+import mobileMenuActiveDot from './mobile/menu-active-dot.svg';
+import mobileMenuBag from './mobile/menu-bag.svg';
+import mobileMenuInstagram from './mobile/menu-instagram.svg';
+import mobileMenuLogoGraphite from './mobile/menu-logo-graphite.png';
+import mobileMenuTelegram from './mobile/menu-telegram.svg';
+import mobileMenuVk from './mobile/menu-vk.svg';
 import mobileFaqGlow from './mobile/faq-glow.svg';
 import mobileFooterTelegram from './mobile/footer-telegram.svg';
 import mobileFooterInstagram from './mobile/footer-instagram.svg';
@@ -349,6 +355,14 @@ export const siteHeaderAssets = {
   mobileLogo: homeAssets.mobile.footer.logoMilk,
   heart: homeAssets.mobile.icons.heart,
   bag: homeAssets.mobile.icons.bag,
+  menu: {
+    activeDot: mobileMenuActiveDot,
+    bag: mobileMenuBag,
+    logo: mobileMenuLogoGraphite,
+    instagram: mobileMenuInstagram,
+    telegram: mobileMenuTelegram,
+    vk: mobileMenuVk,
+  },
 };
 
 const createFooterAssets = ({ instagram, telegram, vk }) => ({
