@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
+import CertificatePage from './pages/CertificatePage';
 import OrderPage from './pages/OrderPage'; // Добавьте новый компонент для страницы заказа
 import EmbroideryPage from './pages/EmbroideryPage';
 import RecipientDetails from './pages/RecipientDetails';
@@ -63,10 +64,12 @@ const AppShell = () => {
     const isOrderPage = pathname === '/order';
     const isEmbroideryPage = pathname === '/embroidery';
     const isRecipientPage = pathname === '/recipient';
+    const isCertificatePage = pathname === '/certificate';
 
     const routes = (
         <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/certificate" element={<CertificatePage />} />
             <Route path="/order" element={<PageLayout><OrderPage /></PageLayout>} />
             <Route path="/embroidery" element={<PageLayout><EmbroideryPage /></PageLayout>} />
             <Route path="/recipient" element={<PageLayout><RecipientDetails /></PageLayout>} />
@@ -92,7 +95,7 @@ const AppShell = () => {
     );
 
     return (
-            <div className={`App${isOrderPage ? ' App--order' : ''}${isEmbroideryPage ? ' App--embroidery' : ''}${isRecipientPage ? ' App--recipient' : ''}`}>
+            <div className={`App${isOrderPage ? ' App--order' : ''}${isEmbroideryPage ? ' App--embroidery' : ''}${isRecipientPage ? ' App--recipient' : ''}${isCertificatePage ? ' App--certificate' : ''}`}>
                 {!isHomePage && <Header />}
                 <ScrollToTop />
                 <OrderFlowReset />

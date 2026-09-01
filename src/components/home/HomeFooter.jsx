@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { homeNavigation, legalLinks, socialLinks } from "../../data/homeContent";
 import ResponsiveAsset from "./ResponsiveAsset";
 
@@ -5,6 +6,10 @@ const HomeFooter = ({ assets, navigationBase = "", onOrder, variant = "home" }) 
   const renderNavigationItem = (item) => {
     if (item.orderAction) {
       return <button type="button" onClick={onOrder} key={item.id}>{item.label}</button>;
+    }
+
+    if (item.href.startsWith("/")) {
+      return <Link to={item.href} key={item.id}>{item.label}</Link>;
     }
 
     const href = item.href.startsWith("#") ? `${navigationBase}${item.href}` : item.href;

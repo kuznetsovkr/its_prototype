@@ -2,7 +2,7 @@ export const homeNavigation = [
   { id: "about", label: "О бренде", href: "#about" },
   { id: "constructor", label: "Конструктор", href: "/order", orderAction: true },
   { id: "customers", label: "Клиентам", href: "#customers" },
-  { id: "certificate", label: "Сертификат", href: "#questions" },
+  { id: "certificate", label: "Сертификат", href: "/certificate" },
   { id: "contacts", label: "Контакты", href: "#contacts" },
 ];
 

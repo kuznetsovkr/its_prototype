@@ -47,11 +47,16 @@ const Header = ({ onOrder: onOrderOverride, standalone = true }) => {
   };
 
   const handleOrder = onOrderOverride || (() => navigate("/order"));
+  const activeNavigationId = pathname.startsWith("/certificate")
+    ? "certificate"
+    : orderFlowPaths.some((path) => pathname.startsWith(path))
+      ? "constructor"
+      : undefined;
 
   return (
     <>
       <HomeHeader
-        activeNavigationId={orderFlowPaths.some((path) => pathname.startsWith(path)) ? "constructor" : undefined}
+        activeNavigationId={activeNavigationId}
         assets={siteHeaderAssets}
         navigationBase={standalone ? "/" : ""}
         onOrder={handleOrder}

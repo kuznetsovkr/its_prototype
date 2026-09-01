@@ -136,7 +136,8 @@ const HomeHeader = ({
 
   const renderNavItem = (item, mobile = false) => {
     const baseClassName = mobile ? "home-header__mobile-link" : "home-header__link";
-    const className = `${baseClassName} ${baseClassName}--${item.id}${activeNavigationId === item.id ? " is-active" : ""}`;
+    const isActive = activeNavigationId === item.id;
+    const className = `${baseClassName} ${baseClassName}--${item.id}${isActive ? " is-active" : ""}`;
 
     if (item.orderAction) {
       return (
@@ -144,6 +145,7 @@ const HomeHeader = ({
           className={className}
           key={item.id}
           type="button"
+          aria-current={isActive ? "page" : undefined}
           onClick={() => {
             closeMenu({ restoreFocus: false });
             onOrder();
@@ -154,11 +156,26 @@ const HomeHeader = ({
       );
     }
 
+    if (item.href.startsWith("/")) {
+      return (
+        <Link
+          className={className}
+          key={item.id}
+          to={item.href}
+          aria-current={isActive ? "page" : undefined}
+          onClick={mobile ? () => closeMenu({ restoreFocus: false }) : undefined}
+        >
+          {item.label}
+        </Link>
+      );
+    }
+
     return (
       <a
         className={className}
         href={item.href.startsWith("#") ? `${navigationBase}${item.href}` : item.href}
         key={item.id}
+        aria-current={isActive ? "page" : undefined}
         onClick={mobile ? () => closeMenu({ restoreFocus: false }) : undefined}
       >
         {item.label}
