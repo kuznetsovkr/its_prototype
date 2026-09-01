@@ -1,13 +1,13 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOrder } from "../context/OrderContext";
-import { homeAssets } from "../images/home";
+import { homeAssets, siteFooterAssets } from "../images/home";
+import Header from "../components/Header";
 import AboutSection from "../components/home/AboutSection";
 import CustomersSection from "../components/home/CustomersSection";
 import FaqSection from "../components/home/FaqSection";
 import HeroSection from "../components/home/HeroSection";
 import HomeFooter from "../components/home/HomeFooter";
-import HomeHeader from "../components/home/HomeHeader";
 import ProcessSection from "../components/home/ProcessSection";
 import QuestionsSection from "../components/home/QuestionsSection";
 import ReviewsSection from "../components/home/ReviewsSection";
@@ -25,14 +25,6 @@ const HomePage = () => {
     resetOrder();
     navigate("/order");
   }, [navigate, resetOrder]);
-
-  const headerAssets = {
-    desktopLogo: homeAssets.desktop.hero.logoGraphite,
-    tabletLogo: homeAssets.tablet.hero.logoGraphite,
-    mobileLogo: homeAssets.mobile.hero.headerLogo,
-    heart: homeAssets.mobile.icons.heart,
-    bag: homeAssets.mobile.icons.bag,
-  };
 
   const heroAssets = {
     background: {
@@ -92,47 +84,12 @@ const HomePage = () => {
     })),
   };
 
-  const footerAssets = {
-    illustration: {
-      desktop: homeAssets.desktop.footer.illustration,
-      tablet: homeAssets.tablet.footer.illustration,
-      mobile: homeAssets.mobile.footer.illustration,
-    },
-    glow: {
-      desktop: homeAssets.desktop.footer.glow,
-      tablet: homeAssets.tablet.footer.glow,
-      mobile: homeAssets.mobile.footer.glow,
-    },
-    logo: {
-      desktop: homeAssets.desktop.footer.logoMilk,
-      tablet: homeAssets.tablet.footer.logoMilk,
-      mobile: homeAssets.mobile.footer.logoMilk,
-    },
-    icons: {
-      instagram: {
-        desktop: homeAssets.desktop.footer.instagram,
-        tablet: homeAssets.tablet.footer.instagram,
-        mobile: homeAssets.mobile.footer.instagram,
-      },
-      telegram: {
-        desktop: homeAssets.desktop.footer.telegram,
-        tablet: homeAssets.tablet.footer.telegram,
-        mobile: homeAssets.mobile.footer.telegram,
-      },
-      vk: {
-        desktop: homeAssets.desktop.footer.vk,
-        tablet: homeAssets.tablet.footer.vk,
-        mobile: homeAssets.mobile.footer.vk,
-      },
-    },
-  };
-
   const reviews = <ReviewsSection assets={currentAssets.reviews} breakpoint={breakpoint} />;
   const customers = <CustomersSection assets={customerAssets} />;
 
   return (
     <div className={`home-page home-page--${breakpoint}`} id="top">
-      <HomeHeader assets={headerAssets} onOrder={handleOrder} />
+      <Header onOrder={handleOrder} standalone={false} />
       <main className="home-main">
         <HeroSection assets={heroAssets} onOrder={handleOrder} />
         <AboutSection assets={aboutAssets} onOrder={handleOrder} />
@@ -169,7 +126,7 @@ const HomePage = () => {
         <QuestionsSection assets={questionsAssets} />
         <SocialSection items={currentAssets.social.items} />
       </main>
-      <HomeFooter assets={footerAssets} onOrder={handleOrder} />
+      <HomeFooter assets={siteFooterAssets.home} onOrder={handleOrder} />
     </div>
   );
 };

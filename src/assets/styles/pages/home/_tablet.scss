@@ -22,28 +22,6 @@
     font-size: clamp(12px, 1.875vw, 22px);
   }
 
-  .home-header {
-    top: 10px;
-    width: calc(100% - 40px);
-    height: clamp(24px, 3.75vw, 45px);
-  }
-
-  .home-header__bar { grid-template-columns: 64px 1fr 76px; }
-  .home-header__logo { width: 54px; height: 24px; }
-  .home-header__navigation { gap: 2px; }
-
-  .home-header__link {
-    height: clamp(24px, 3.75vw, 45px);
-    padding: 0 clamp(5px, 0.78125vw, 9px);
-    font-size: clamp(6px, 0.9375vw, 11px);
-  }
-
-  .home-header__order {
-    width: 76px;
-    height: clamp(24px, 3.75vw, 45px);
-    font-size: clamp(6px, 0.9375vw, 11px);
-  }
-
   .home-hero {
     width: calc(100% - 20px);
     height: 62.5vw;
@@ -159,33 +137,6 @@
   .home-social__actions { gap: 8px; margin-top: 20px; }
   .home-social__actions .home-button { min-width: 0; width: 30%; height: 36px; padding: 0 8px; }
 
-  .home-footer__panel {
-    width: calc(100% - 20px);
-    height: 786px;
-    border-radius: 20px;
-    background: linear-gradient(to bottom, var(--home-orange) 0 42%, var(--home-ink) 42% 100%);
-  }
-
-  .home-footer__illustration-picture,
-  .home-footer__illustration { top: 0; width: 360px; height: 330px; }
-  .home-footer__glow-picture,
-  .home-footer__glow { top: 20px; width: 540px; height: 330px; }
-  .home-footer__navigation { top: 360px; left: 70px; gap: 12px; }
-  .home-footer__socials { top: 360px; right: 70px; }
-  .home-footer__navigation strong,
-  .home-footer__socials strong { font-size: 10px; }
-  .home-footer__navigation a,
-  .home-footer__navigation button { font-size: 8px; }
-  .home-footer__social-list { gap: 10px; margin-top: 10px; }
-  .home-footer__social-list a,
-  .home-footer__social-icon-picture,
-  .home-footer__social-icon { width: 42px; height: 42px; }
-  .home-footer__socials small { width: 150px; font-size: 6px; }
-  .home-footer__logo-picture,
-  .home-footer__logo { top: 570px; width: 280px; height: 116px; }
-  .home-footer__details { top: 520px; gap: 8px; font-size: 7px; }
-  .home-footer__copyright { top: 704px; font-size: 7px; }
-  .home-footer__legal { width: calc(100% - 40px); min-height: 56px; font-size: 7px; }
 }
 
 /* stylelint-enable no-descending-specificity */

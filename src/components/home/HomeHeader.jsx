@@ -5,7 +5,14 @@ import ResponsiveAsset from "./ResponsiveAsset";
 
 const focusableSelector = "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])";
 
-const HomeHeader = ({ assets, onOrder }) => {
+const HomeHeader = ({
+  activeNavigationId,
+  assets,
+  navigationBase = "",
+  onOrder,
+  onProfile,
+  standalone = false,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const headerRef = useRef(null);
   const menuRef = useRef(null);
@@ -20,7 +27,7 @@ const HomeHeader = ({ assets, onOrder }) => {
     const menu = menuRef.current;
     const trigger = triggerRef.current;
     const focusable = menu ? Array.from(menu.querySelectorAll(focusableSelector)) : [];
-    const page = header?.closest(".home-page");
+    const page = header?.closest(".home-page, .App");
     const backgroundElements = [
       header?.querySelector(".home-header__bar"),
       ...(page ? Array.from(page.children).filter((element) => element !== header) : []),
@@ -128,7 +135,8 @@ const HomeHeader = ({ assets, onOrder }) => {
   };
 
   const renderNavItem = (item, mobile = false) => {
-    const className = mobile ? "home-header__mobile-link" : "home-header__link";
+    const baseClassName = mobile ? "home-header__mobile-link" : "home-header__link";
+    const className = `${baseClassName} ${baseClassName}--${item.id}${activeNavigationId === item.id ? " is-active" : ""}`;
 
     if (item.orderAction) {
       return (
@@ -149,7 +157,7 @@ const HomeHeader = ({ assets, onOrder }) => {
     return (
       <a
         className={className}
-        href={item.href}
+        href={item.href.startsWith("#") ? `${navigationBase}${item.href}` : item.href}
         key={item.id}
         onClick={mobile ? () => closeMenu({ restoreFocus: false }) : undefined}
       >
@@ -159,7 +167,7 @@ const HomeHeader = ({ assets, onOrder }) => {
   };
 
   return (
-    <header className="home-header" ref={headerRef}>
+    <header className={`home-header${standalone ? " home-header--standalone" : ""}`} ref={headerRef}>
       <div className="home-header__bar">
         <button
           ref={triggerRef}
@@ -175,16 +183,31 @@ const HomeHeader = ({ assets, onOrder }) => {
           <span />
         </button>
 
-        <a className="home-header__logo" href="#top" aria-label="И так сойдёт — на главную">
-          <ResponsiveAsset
-            desktop={assets.desktopLogo}
-            tablet={assets.tabletLogo}
-            mobile={assets.mobileLogo}
-            alt=""
-            className="home-header__logo-image"
-            loading="eager"
-          />
-        </a>
+        {standalone ? (
+          <Link className="home-header__logo" to="/" aria-label="И так сойдёт — на главную">
+            <ResponsiveAsset
+              desktop={assets.desktopLogo}
+              tablet={assets.tabletLogo}
+              mobile={assets.mobileLogo}
+              alt=""
+              className="home-header__logo-image"
+              loading="eager"
+              tabletMax={1279}
+            />
+          </Link>
+        ) : (
+          <a className="home-header__logo" href="#top" aria-label="И так сойдёт — на главную">
+            <ResponsiveAsset
+              desktop={assets.desktopLogo}
+              tablet={assets.tabletLogo}
+              mobile={assets.mobileLogo}
+              alt=""
+              className="home-header__logo-image"
+              loading="eager"
+              tabletMax={1279}
+            />
+          </a>
+        )}
 
         <nav className="home-header__navigation" aria-label="Навигация по главной странице">
           {homeNavigation.map((item) => renderNavItem(item))}
@@ -195,9 +218,15 @@ const HomeHeader = ({ assets, onOrder }) => {
         </button>
 
         <div className="home-header__mobile-actions">
-          <Link to="/profile" aria-label="Перейти в профиль" className="home-header__icon-link">
-            <img src={assets.heart} alt="" width="24" height="24" />
-          </Link>
+          {onProfile ? (
+            <button type="button" aria-label="Перейти в профиль" className="home-header__icon-link" onClick={onProfile}>
+              <img src={assets.heart} alt="" width="24" height="24" />
+            </button>
+          ) : (
+            <Link to="/profile" aria-label="Перейти в профиль" className="home-header__icon-link">
+              <img src={assets.heart} alt="" width="24" height="24" />
+            </Link>
+          )}
           <button type="button" aria-label="Перейти к заказу" className="home-header__icon-link" onClick={onOrder}>
             <img src={assets.bag} alt="" width="24" height="24" />
           </button>

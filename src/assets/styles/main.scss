@@ -9,8 +9,6 @@
 @import "components/clothingSelector";
 @import "components/embroiderySelector";
 @import "components/modal";
-@import "components/footer";
-@import "components/header";
 
 @import "pages/homePage";
 @import "pages/worksPage";
@@ -19,3 +17,7 @@
 @import "pages/faq";
 @import "pages/adminInventory";
 @import "pages/thx";
+
+// Shared shell styles intentionally come last so legacy page rules cannot hide or restyle it.
+@import "components/footer";
+@import "components/header";

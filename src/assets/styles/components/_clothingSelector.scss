@@ -572,9 +572,9 @@
 
   .orderPage {
     width: 100vw;
-    min-height: 920px;
+    min-height: 900px;
     margin-left: calc(50% - 50vw);
-    padding: 40px clamp(20px, calc(6.25vw - 60px), 60px);
+    padding: 0 clamp(20px, calc(6.25vw - 60px), 60px) 60px;
     box-sizing: border-box;
     background: #fff;
   }

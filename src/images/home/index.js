@@ -44,6 +44,9 @@ import desktopFooterGlow from './desktop/footer-glow.svg';
 import desktopFooterTelegram from './desktop/footer-telegram.svg';
 import desktopFooterVk from './desktop/footer-vk.svg';
 import desktopFooterInstagram from './desktop/footer-instagram.svg';
+import desktopFooterTelegramInternal from './desktop/footer-telegram-internal.svg';
+import desktopFooterVkInternal from './desktop/footer-vk-internal.svg';
+import desktopFooterInstagramInternal from './desktop/footer-instagram-internal.svg';
 import tabletHeroBackground from './tablet/hero-background.jpg';
 import tabletHeroSubject from './tablet/hero-subject.png';
 import tabletHeroLogoGraphite from './tablet/hero-logo-graphite.png';
@@ -340,5 +343,60 @@ export const homeAssets = {
   },
 };
 
-export default homeAssets;
+export const siteHeaderAssets = {
+  desktopLogo: homeAssets.desktop.footer.logoMilk,
+  tabletLogo: homeAssets.tablet.footer.logoMilk,
+  mobileLogo: homeAssets.mobile.footer.logoMilk,
+  heart: homeAssets.mobile.icons.heart,
+  bag: homeAssets.mobile.icons.bag,
+};
 
+const createFooterAssets = ({ instagram, telegram, vk }) => ({
+  illustration: {
+    desktop: homeAssets.desktop.footer.illustration,
+    tablet: homeAssets.tablet.footer.illustration,
+    mobile: homeAssets.mobile.footer.illustration,
+  },
+  glow: {
+    desktop: homeAssets.desktop.footer.glow,
+    tablet: homeAssets.tablet.footer.glow,
+    mobile: homeAssets.mobile.footer.glow,
+  },
+  logo: {
+    desktop: homeAssets.desktop.footer.logoMilk,
+    tablet: homeAssets.tablet.footer.logoMilk,
+    mobile: homeAssets.mobile.footer.logoMilk,
+  },
+  icons: {
+    instagram: {
+      desktop: instagram,
+      tablet: homeAssets.tablet.footer.instagram,
+      mobile: homeAssets.mobile.footer.instagram,
+    },
+    telegram: {
+      desktop: telegram,
+      tablet: homeAssets.tablet.footer.telegram,
+      mobile: homeAssets.mobile.footer.telegram,
+    },
+    vk: {
+      desktop: vk,
+      tablet: homeAssets.tablet.footer.vk,
+      mobile: homeAssets.mobile.footer.vk,
+    },
+  },
+});
+
+export const siteFooterAssets = {
+  home: createFooterAssets({
+    instagram: homeAssets.desktop.footer.instagram,
+    telegram: homeAssets.desktop.footer.telegram,
+    vk: homeAssets.desktop.footer.vk,
+  }),
+  internal: createFooterAssets({
+    instagram: desktopFooterInstagramInternal,
+    telegram: desktopFooterTelegramInternal,
+    vk: desktopFooterVkInternal,
+  }),
+};
+
+export default homeAssets;
