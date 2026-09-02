@@ -410,12 +410,20 @@
     transform: translate(-50%, -50%) rotate(7deg);
   }
 
+  .certificatePage__ticketImage {
+    filter: contrast(1.7) brightness(0.35);
+  }
+
   .certificatePage__offer {
     top: 238px;
     right: 15px;
     width: 270px;
     height: 233px;
     border-radius: 30px;
+    background:
+      radial-gradient(ellipse 170px 95px at 50% 0, rgb(105 86 143 / 48%) 0%, rgb(105 86 143 / 12%) 35%, transparent 65%),
+      linear-gradient(to bottom, rgb(80 75 85 / 50%) 0, transparent 60px),
+      var(--certificate-ink);
   }
 
   .certificatePage__offerTitle {
@@ -477,6 +485,15 @@
     left: 25px;
     width: 220px;
     padding-left: 12px;
+    list-style: none;
     font-size: 8px;
+  }
+
+  .certificatePage__conditions li { position: relative; }
+
+  .certificatePage__conditions li::before {
+    position: absolute;
+    left: -8px;
+    content: "-";
   }
 }
