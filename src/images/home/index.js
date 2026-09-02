@@ -102,7 +102,7 @@ import mobileWorksCard02 from './mobile/works-card-02.jpg';
 import mobileWorksCard03 from './mobile/works-card-03.jpg';
 import mobileWorksCard04Layer01 from './mobile/works-card-04-layer-01.png';
 import mobileWorksCard04Layer02 from './mobile/works-card-04-layer-02.jpg';
-import mobileWorksCard05 from './mobile/works-card-05.png';
+import mobileWorksCard05 from './mobile/works-card-05-composite.png';
 import mobileWorksCard06 from './mobile/works-card-06.jpg';
 import mobileCustomersOrderPhoto from './mobile/customers-order-photo.jpg';
 import mobileReviewsItem01 from './mobile/reviews-item-01.jpg';

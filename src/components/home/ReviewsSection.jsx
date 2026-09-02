@@ -1,8 +1,7 @@
-import { socialLinks } from "../../data/homeContent";
 import LayeredAsset from "./LayeredAsset";
 import { HomeButton, ReviewsCarousel } from "./primitives";
 
-const ReviewsSection = ({ assets, breakpoint }) => (
+const ReviewsSection = ({ assets, breakpoint, onOrder }) => (
   <section className="home-section home-reviews" id="reviews" aria-labelledby="home-reviews-title">
     <div className="home-section__surface home-reviews__surface">
       <div className="home-section__inner home-reviews__inner">
@@ -22,13 +21,11 @@ const ReviewsSection = ({ assets, breakpoint }) => (
         />
         <HomeButton
           className="home-reviews__all"
-          href={socialLinks.vk}
-          target="_blank"
-          rel="noreferrer"
-          variant="accent"
+          onClick={onOrder}
+          variant="dark"
           size="medium"
         >
-          Все отзывы
+          Сделать заказ
         </HomeButton>
       </div>
     </div>

@@ -39,7 +39,7 @@ const HomePage = () => {
     logo: {
       desktop: homeAssets.desktop.hero.logoMilk,
       tablet: homeAssets.tablet.hero.logoMilk,
-      mobile: homeAssets.mobile.hero.logoGraphite,
+      mobile: homeAssets.mobile.footer.logoMilk,
     },
   };
 
@@ -84,7 +84,9 @@ const HomePage = () => {
     })),
   };
 
-  const reviews = <ReviewsSection assets={currentAssets.reviews} breakpoint={breakpoint} />;
+  const reviews = (
+    <ReviewsSection assets={currentAssets.reviews} breakpoint={breakpoint} onOrder={handleOrder} />
+  );
   const customers = <CustomersSection assets={customerAssets} />;
 
   return (
@@ -107,17 +109,8 @@ const HomePage = () => {
 
         <WorksSection assets={worksAssets} breakpoint={breakpoint} onOrder={handleOrder} />
 
-        {breakpoint === "mobile" ? (
-          <>
-            {customers}
-            {reviews}
-          </>
-        ) : (
-          <>
-            {reviews}
-            {customers}
-          </>
-        )}
+        {reviews}
+        {customers}
 
         <FaqSection
           breakpoint={breakpoint}
