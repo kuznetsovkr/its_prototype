@@ -96,21 +96,22 @@ const HomePage = () => {
         <HeroSection assets={heroAssets} onOrder={handleOrder} />
         <AboutSection assets={aboutAssets} onOrder={handleOrder} />
 
-        {breakpoint !== "tablet" && (
-          <ProcessSection
-            assets={{
-              desktop: homeAssets.desktop.process.items,
-              mobile: homeAssets.mobile.process.items,
-              connector: homeAssets.desktop.process.connector,
-            }}
-            onOrder={handleOrder}
-          />
-        )}
+        <ProcessSection
+          assets={{
+            desktop: homeAssets.desktop.process.items,
+            tablet: homeAssets.tablet.process.items,
+            mobile: homeAssets.mobile.process.items,
+            connector: breakpoint === "tablet"
+              ? homeAssets.tablet.process.connector
+              : homeAssets.desktop.process.connector,
+          }}
+          onOrder={handleOrder}
+        />
 
         <WorksSection assets={worksAssets} breakpoint={breakpoint} onOrder={handleOrder} />
 
-        {reviews}
-        {customers}
+        {breakpoint === "tablet" ? customers : reviews}
+        {breakpoint === "tablet" ? reviews : customers}
 
         <FaqSection
           breakpoint={breakpoint}

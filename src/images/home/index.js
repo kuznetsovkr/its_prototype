@@ -48,10 +48,10 @@ import desktopFooterTelegramInternal from './desktop/footer-telegram-internal.sv
 import desktopFooterVkInternal from './desktop/footer-vk-internal.svg';
 import desktopFooterInstagramInternal from './desktop/footer-instagram-internal.svg';
 import tabletHeroBackground from './tablet/hero-background.jpg';
-import tabletHeroSubject from './tablet/hero-subject.png';
 import tabletHeroLogoGraphite from './tablet/hero-logo-graphite.png';
 import tabletHeroLogoMilk from './tablet/hero-logo-milk.png';
 import tabletAboutPhoto from './tablet/about-photo.jpg';
+import tabletProcessConnector from './tablet/process-connector.svg';
 import tabletSocialCard01Layer01 from './tablet/social-card-01-layer-01.jpg';
 import tabletSocialCard01Layer02 from './tablet/social-card-01-layer-02.png';
 import tabletSocialCard02 from './tablet/social-card-02.png';
@@ -156,9 +156,9 @@ const tabletWorksCompactItems = [
   { layers: [tabletWorksCompact04] },
   { layers: [tabletWorksCompact05] },
   { layers: [tabletWorksCompact06] },
-  { layers: [tabletWorksCompact07] },
-  { layers: [tabletWorksCompact08] },
+  { layers: [tabletAboutPhoto] },
   { layers: [tabletWorksCompact09] },
+  { layers: [tabletWorksCompact07] },
 ];
 
 const tabletWorksExpandedItems = [
@@ -258,14 +258,22 @@ export const homeAssets = {
   tablet: {
     hero: {
       background: tabletHeroBackground,
-      subject: tabletHeroSubject,
+      subject: tabletWorksCompact09,
       logoGraphite: tabletHeroLogoGraphite,
       logoMilk: tabletHeroLogoMilk,
     },
     about: {
       photo: tabletAboutPhoto,
     },
-    process: {},
+    process: {
+      items: [
+        desktopProcessStep03Photo,
+        desktopProcessStep02Photo,
+        desktopProcessStep01Photo,
+        desktopProcessStep04Photo,
+      ],
+      connector: tabletProcessConnector,
+    },
     works: {
       compactItems: tabletWorksCompactItems,
       expandedItems: tabletWorksExpandedItems,

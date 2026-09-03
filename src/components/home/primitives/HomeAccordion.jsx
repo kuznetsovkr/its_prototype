@@ -2,6 +2,7 @@ import { useId, useState } from "react";
 
 
 const HomeAccordion = ({
+  allowMultiple = false,
   className = "",
   defaultOpenItemId = null,
   items = [],
@@ -15,8 +16,31 @@ const HomeAccordion = ({
   const currentOpenId = isControlled ? openItemId : uncontrolledOpenId;
   const classes = ["home-accordion", className].filter(Boolean).join(" ");
 
+  const currentOpenIds = allowMultiple
+    ? new Set(Array.isArray(currentOpenId) ? currentOpenId : currentOpenId ? [currentOpenId] : [])
+    : null;
+
   const toggleItem = (itemId) => {
-    const nextOpenId = currentOpenId === itemId ? null : itemId;
+    if (allowMultiple && !isControlled) {
+      setUncontrolledOpenId((currentValue) => {
+        const openIds = new Set(
+          Array.isArray(currentValue) ? currentValue : currentValue ? [currentValue] : [],
+        );
+        const nextOpenId = openIds.has(itemId)
+          ? [...openIds].filter((id) => id !== itemId)
+          : [...openIds, itemId];
+
+        onChange?.(nextOpenId);
+        return nextOpenId;
+      });
+      return;
+    }
+
+    const nextOpenId = allowMultiple
+      ? currentOpenIds.has(itemId)
+        ? [...currentOpenIds].filter((id) => id !== itemId)
+        : [...currentOpenIds, itemId]
+      : currentOpenId === itemId ? null : itemId;
 
     if (!isControlled) {
       setUncontrolledOpenId(nextOpenId);
@@ -29,7 +53,7 @@ const HomeAccordion = ({
     <div className={classes}>
       {items.map((item, index) => {
         const itemId = item.id ?? index;
-        const isOpen = currentOpenId === itemId;
+        const isOpen = allowMultiple ? currentOpenIds.has(itemId) : currentOpenId === itemId;
         const buttonId = `home-accordion-${generatedId}-button-${index}`;
         const panelId = `home-accordion-${generatedId}-panel-${index}`;
         const itemClasses = [

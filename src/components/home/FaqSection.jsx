@@ -8,6 +8,7 @@ const FaqSection = ({ breakpoint, glow }) => (
       <div className="home-section__inner home-faq__inner">
         <h2 className="home-section__title" id="home-faq-title">вопрос - ответ</h2>
         <HomeAccordion
+          allowMultiple={breakpoint === "tablet"}
           className="home-faq__accordion"
           defaultOpenItemId={breakpoint === "mobile" ? faqItems[0].id : null}
           items={faqItems}
