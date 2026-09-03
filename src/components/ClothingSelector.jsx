@@ -661,7 +661,9 @@ const ClothingSelector = () => {
                   Таблица размеров
                 </div>
               </div>
-              <div className="sizeSelector">
+              <div
+                className={`sizeSelector${sizeOptions.length > CORE_SIZES.length ? " sizeSelector--six" : ""}`}
+              >
                 {sizeOptions.map((size) => {
                   const isAvailable = availableSizes.includes(size);
                   return (

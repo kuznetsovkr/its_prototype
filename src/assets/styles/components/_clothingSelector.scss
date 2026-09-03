@@ -1153,9 +1153,13 @@
 
       .sizeSelector {
         display: grid;
-        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-template-columns: repeat(5, 44px);
         gap: 5px;
         width: 100%;
+
+        &.sizeSelector--six {
+          grid-template-columns: repeat(6, minmax(0, 1fr));
+        }
 
         .sizeSelector__item {
           display: block;
