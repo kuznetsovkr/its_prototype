@@ -395,9 +395,6 @@
     min-height: 38px; height: 38px; padding: 0 20px; font-size: 14px;
   }
 
-  .home-accordion__trigger[aria-expanded="true"] { background: transparent; }
-  .home-accordion__item:first-child .home-accordion__trigger { background: var(--home-orange); }
-
   .home-accordion__panel { color: var(--home-dark); background: var(--home-white); }
 
   .home-accordion__content {

@@ -1,3 +1,29 @@
+@media (min-width: 1200px) {
+  .home-accordion__item { display: contents; }
+
+  .home-accordion__heading,
+  .home-accordion__panel {
+    overflow: hidden;
+    border-radius: 20px;
+  }
+
+  .home-accordion__heading { background: var(--home-dark); }
+
+  .home-accordion__panel {
+    min-height: 90px;
+    color: var(--home-ink);
+    background: var(--home-white);
+  }
+
+  .home-accordion__content {
+    display: flex;
+    min-height: 90px;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+}
+
 @media (min-width: 1200px) and (max-width: 1599px) {
   .home-section__inner,
   .home-about__card { width: calc(100% - 80px); }

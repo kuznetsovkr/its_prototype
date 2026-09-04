@@ -392,10 +392,10 @@
 .home-customers__copy p { margin: 0; font-size: 14px; line-height: 1.4; }
 .home-customers__copy p + p { margin-top: 10px; }
 
-.home-faq__surface { min-height: 944px; padding: 72px 0 40px; }
+.home-faq__surface { min-height: 944px; padding: 72px 0 80px; }
 .home-faq__inner { width: min(1200px, calc(100% - 80px)); background: transparent; }
 .home-faq__glow { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.home-faq__accordion { margin-top: 40px; }
+.home-faq__accordion { margin-top: 38px; }
 .home-accordion { display: flex; flex-direction: column; gap: 30px; }
 .home-accordion__item { overflow: hidden; border-radius: 20px; background: var(--home-dark); }
 .home-accordion__heading { margin: 0; }
@@ -417,7 +417,6 @@
   text-align: center;
 }
 
-.home-accordion__item:first-child .home-accordion__trigger,
 .home-accordion__trigger[aria-expanded="true"] { background: var(--home-orange); }
 .home-accordion__indicator { display: none; }
 .home-accordion__panel { color: var(--home-white); background: var(--home-dark); }
