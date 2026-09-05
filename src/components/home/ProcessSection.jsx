@@ -23,7 +23,7 @@ const ProcessSection = ({ assets, onOrder }) => (
                 <span className="home-process__number" aria-hidden="true">{index + 1}</span>
                 <p>{step.text}</p>
               </div>
-              {index < processSteps.length - 1 && assets.connector && (
+              {assets.connector && (
                 <span className="home-process__connector-frame" aria-hidden="true">
                   <img className="home-process__connector" src={assets.connector} alt="" />
                 </span>

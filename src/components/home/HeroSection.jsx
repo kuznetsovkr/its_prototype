@@ -22,6 +22,12 @@ const HeroSection = ({ assets, onOrder }) => (
           fetchPriority="high"
         />
       )}
+      {assets.subject.desktop && (
+        <span
+          className="home-hero__desktop-subject"
+          style={{ backgroundImage: `url(${assets.subject.desktop})` }}
+        />
+      )}
     </div>
 
     <div className="home-hero__content">

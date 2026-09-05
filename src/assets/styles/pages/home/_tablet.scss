@@ -243,7 +243,8 @@
 
   .home-process__step--1 .home-process__connector-frame { top: 81px; left: 140px; }
   .home-process__step--2 .home-process__connector-frame { top: 250px; left: 315px; }
-  .home-process__step--3 .home-process__connector-frame { display: none; }
+  .home-process__step--3 .home-process__connector-frame,
+  .home-process__step--4 .home-process__connector-frame { display: none; }
 
   .home-process__connector {
     display: block;

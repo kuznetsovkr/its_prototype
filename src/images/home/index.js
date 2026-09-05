@@ -1,5 +1,4 @@
 import desktopHeroBackground from './desktop/hero-background.jpg';
-import desktopHeroSubject from './desktop/hero-subject.png';
 import desktopHeroLogoGraphite from './desktop/hero-logo-graphite.png';
 import desktopHeroLogoMilk from './desktop/hero-logo-milk.png';
 import desktopAboutPhoto from './desktop/about-photo.jpg';
@@ -16,7 +15,7 @@ import desktopWorksCard05Layer02 from './desktop/works-card-05-layer-02.png';
 import desktopWorksCard05Layer03 from './desktop/works-card-05-layer-03.jpg';
 import desktopWorksCard09 from './desktop/works-card-09.jpg';
 import desktopWorksCard01 from './desktop/works-card-01.jpg';
-import desktopWorksCard08 from './desktop/works-card-08.png';
+import desktopWorksCard07 from './desktop/works-card-07-2026.png';
 import desktopWorksCard06Layer01 from './desktop/works-card-06-layer-01.png';
 import desktopWorksCard06Layer02 from './desktop/works-card-06-layer-02.jpg';
 import desktopWorksCard04 from './desktop/works-card-04.jpg';
@@ -136,9 +135,9 @@ const desktopWorksItems = [
   { layers: [desktopWorksCard04] },
   { layers: [desktopWorksCard05Layer01, desktopWorksCard05Layer02, desktopWorksCard05Layer03] },
   { layers: [desktopWorksCard06Layer01, desktopWorksCard06Layer02] },
-  { layers: [desktopWorksSharedPortrait] },
-  { layers: [desktopWorksCard08] },
+  { layers: [desktopWorksCard07] },
   { layers: [desktopWorksCard09] },
+  { layers: [desktopWorksSharedPortrait] },
 ];
 
 const desktopSocialItems = [
@@ -201,7 +200,7 @@ export const homeAssets = {
   desktop: {
     hero: {
       background: desktopHeroBackground,
-      subject: desktopHeroSubject,
+      subject: desktopWorksCard09,
       logoGraphite: desktopHeroLogoGraphite,
       logoMilk: desktopHeroLogoMilk,
     },
@@ -210,9 +209,9 @@ export const homeAssets = {
     },
     process: {
       items: [
-        desktopProcessStep01Photo,
-        desktopProcessStep02Photo,
         desktopProcessStep03Photo,
+        desktopProcessStep02Photo,
+        desktopProcessStep01Photo,
         desktopProcessStep04Photo,
       ],
       connector: desktopProcessConnector,

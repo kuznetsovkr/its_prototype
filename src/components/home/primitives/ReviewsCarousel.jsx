@@ -29,8 +29,10 @@ const ReviewsCarousel = forwardRef(({
   ariaLabel = "Отзывы клиентов",
   className = "",
   getReviewKey = getDefaultReviewKey,
+  nextIcon,
   nextLabel = "Следующие отзывы",
   onActiveIndexChange,
+  previousIcon,
   previousLabel = "Предыдущие отзывы",
   renderReview,
   reviews = [],
@@ -241,7 +243,9 @@ const ReviewsCarousel = forwardRef(({
             size="icon"
             variant="carousel"
           >
-            <span aria-hidden="true">←</span>
+            {previousIcon
+              ? <img src={previousIcon} alt="" aria-hidden="true" />
+              : <span aria-hidden="true">←</span>}
           </HomeButton>
           <HomeButton
             aria-controls={viewportId}
@@ -252,7 +256,9 @@ const ReviewsCarousel = forwardRef(({
             size="icon"
             variant="carousel"
           >
-            <span aria-hidden="true">→</span>
+            {nextIcon
+              ? <img src={nextIcon} alt="" aria-hidden="true" />
+              : <span aria-hidden="true">→</span>}
           </HomeButton>
         </div>
       )}

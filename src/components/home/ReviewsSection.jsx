@@ -9,6 +9,8 @@ const ReviewsSection = ({ assets, breakpoint, onOrder }) => (
         <ReviewsCarousel
           className="home-reviews__carousel"
           reviews={assets.items}
+          nextIcon={assets.nextArrow}
+          previousIcon={assets.previousArrow}
           showControls={breakpoint === "desktop"}
           showDots={breakpoint === "desktop"}
           renderReview={(review, index) => (
