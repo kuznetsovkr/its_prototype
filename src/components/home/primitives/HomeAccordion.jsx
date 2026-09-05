@@ -2,6 +2,7 @@ import { useId, useState } from "react";
 
 
 const HomeAccordion = ({
+  allowCollapse = true,
   allowMultiple = false,
   className = "",
   defaultOpenItemId = null,
@@ -40,7 +41,7 @@ const HomeAccordion = ({
       ? currentOpenIds.has(itemId)
         ? [...currentOpenIds].filter((id) => id !== itemId)
         : [...currentOpenIds, itemId]
-      : currentOpenId === itemId ? null : itemId;
+      : currentOpenId === itemId && allowCollapse ? null : itemId;
 
     if (!isControlled) {
       setUncontrolledOpenId(nextOpenId);
