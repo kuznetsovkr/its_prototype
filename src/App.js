@@ -8,8 +8,6 @@ import OrderPage from './pages/OrderPage'; // Добавьте новый ком
 import EmbroideryPage from './pages/EmbroideryPage';
 import RecipientDetails from './pages/RecipientDetails';
 import ThankYouPage from './pages/ThankYouPage';
-import WorksPage from './pages/WorksPage';
-import SizeGuidePage from './pages/SizeGuidePage';
 import PaymentPage from './pages/PaymentPage';
 import AdminInventory from "./admin/AdminInventory";
 import PageLayout from './components/PageLayout';
@@ -74,8 +72,6 @@ const AppShell = () => {
             <Route path="/embroidery" element={<PageLayout><EmbroideryPage /></PageLayout>} />
             <Route path="/recipient" element={<PageLayout><RecipientDetails /></PageLayout>} />
             <Route path="/thank-you" element={<PageLayout><ThankYouPage /></PageLayout>} />
-            <Route path="/works" element={<WorksPage/>} />
-            <Route path="/size-guide" element={<PageLayout><SizeGuidePage /></PageLayout>} />
             <Route path="/payment" element={<PageLayout><PaymentPage /></PageLayout>} />
             <Route path="/fake-payment" element={<FakePayment />} />
             <Route path="/payment-success" element={<PageLayout><PaymentSuccess /></PageLayout>} />

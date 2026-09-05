@@ -44,12 +44,10 @@ const WorksSection = ({ assets, breakpoint, onOrder }) => {
           </div>
 
           <div className="home-works__actions">
-            {canExpand ? (
+            {canExpand && (
               <HomeButton variant="dark" size="medium" onClick={() => setIsExpanded((value) => !value)}>
                 {isExpanded ? "Скрыть примеры" : "Ещё примеры"}
               </HomeButton>
-            ) : (
-              <HomeButton href="/works" variant="dark" size="medium">Ещё примеры</HomeButton>
             )}
             <HomeButton variant="accent" size="medium" onClick={onOrder}>Сделать заказ</HomeButton>
           </div>
