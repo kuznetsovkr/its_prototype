@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { getStoredRole, syncRoleFromProfile } from "../utils/auth";
+import { verifyAdminSession } from "../utils/auth";
 
 const RequireAdmin = ({ children }) => {
   const location = useLocation();
@@ -15,12 +15,7 @@ const RequireAdmin = ({ children }) => {
         return;
       }
 
-      const cached = getStoredRole();
-      if (cached === "admin") {
-        if (isMounted) setStatus("allowed");
-      }
-
-      const role = await syncRoleFromProfile();
+      const role = await verifyAdminSession();
       if (!isMounted) return;
       setStatus(role === "admin" ? "allowed" : "denied");
     };
@@ -36,7 +31,7 @@ const RequireAdmin = ({ children }) => {
   }
 
   if (status !== "allowed") {
-    return <Navigate to="/profile" state={{ from: location.pathname }} replace />;
+    return <Navigate to="/admin" state={{ from: location.pathname }} replace />;
   }
 
   return children;

@@ -197,6 +197,13 @@
   margin: 0;
 }
 
+.admin-header__actions {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  gap: 12px;
+}
+
 /* Кнопка-иконка рядом с заголовком */
 .btn-icon {
   width: 24px;

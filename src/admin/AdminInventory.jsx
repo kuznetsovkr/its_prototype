@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import WarehouseTable from "../components/WarehouseTable";
 import ColorSelect from "../components/ColorSelect";
 import api from '../api'
+import { clearAuth } from "../utils/auth";
 const defaultColors = [
   { name: "Черный", code: "#000000" },
   { name: "Белый",  code: "#FFFFFF" },
@@ -12,6 +14,7 @@ const defaultColors = [
 const popularSizes = ["XS", "S", "M", "L", "XL", "XXL"];
 const ALL_VALUE = "Все";
 const AdminInventory = () => {
+  const navigate = useNavigate();
   const [inventory, setInventory] = useState([]);
   const [colorOptions, setColorOptions] = useState(defaultColors);
   const [clothingTypes, setClothingTypes] = useState([]);
@@ -153,19 +156,28 @@ const AdminInventory = () => {
   const resetFilters = () => setFilters({ type: ALL_VALUE, color: ALL_VALUE, size: ALL_VALUE });
   const codeByName = (name) =>
     colorOptions.find(c => c.name.toLowerCase() === String(name || "").toLowerCase())?.code || "";
+  const handleLogout = () => {
+    clearAuth();
+    navigate("/admin", { replace: true });
+  };
   return (
     <section className="admin-wrap">
       <div className="admin-header">
         <h1 className="heading admin-title">Управление складом</h1>
-        <button
-          type="button"
-          className="btn btn-outline btn-icon"
-          aria-expanded={isAddOpen}
-          aria-controls="addForm"
-          onClick={() => setIsAddOpen((v) => !v)}
-        >
-          {isAddOpen ? "−" : "+"}
-        </button>
+        <div className="admin-header__actions">
+          <button
+            type="button"
+            className="btn btn-outline btn-icon"
+            aria-expanded={isAddOpen}
+            aria-controls="addForm"
+            onClick={() => setIsAddOpen((v) => !v)}
+          >
+            {isAddOpen ? "−" : "+"}
+          </button>
+          <button type="button" className="btn btn-outline" onClick={handleLogout}>
+            Выйти
+          </button>
+        </div>
       </div>
       <div id="addForm" className={`collapsible ${isAddOpen ? "is-open" : ""}`}>
         <div className="card form-card">

@@ -5,7 +5,7 @@ import { AddressSuggestions } from 'react-dadata';
 import 'react-dadata/dist/react-dadata.css';
 import api from '../api';
 import { useOrder } from "../context/OrderContext";
-import { applyAuthResponse, resolveUserRole } from "../utils/auth";
+import { applyAuthResponse } from "../utils/auth";
 import { IS_DEMO_MODE } from "../config/demoMode";
 import { buildDemoOrderId, buildDemoCdekNumber } from "../mocks/demoData";
 import figmaTshirtImg from "../images/order/tshirt-black.png";
@@ -130,18 +130,11 @@ const RecipientDetails = () => {
   }, []);
 
   // Телефон/аутентификация
-  const [isUserAuthenticated, setIsUserAuthenticated] = useState(
-    IS_DEMO_MODE || !!localStorage.getItem("token")
-  );
-  const [phoneFromProfile, setPhoneFromProfile] = useState(IS_DEMO_MODE);   // телефон подтянулся из профиля
-  const [phoneLocked, setPhoneLocked] = useState(IS_DEMO_MODE);             // поле зафиксировано (нельзя редачить)
-  const [phoneVerified, setPhoneVerified] = useState(IS_DEMO_MODE);         // подтверждён (✓) или считается валидным, если из профиля и не редактируется
-  const [phoneEditedSinceProfile, setPhoneEditedSinceProfile] = useState(false); // меняли после «изменить»
+  const [phoneLocked, setPhoneLocked] = useState(IS_DEMO_MODE);
+  const [phoneVerified, setPhoneVerified] = useState(IS_DEMO_MODE);
   // Шаги подтверждения
   const [smsRequested, setSmsRequested] = useState(false);
-  const [smsStep, setSmsStep] = useState(0); // 0 - ничего, 1 - ввод кода, 2 - ввод пароля админа
   const [smsCode, setSmsCode] = useState("");
-  const [adminPassword, setAdminPassword] = useState("");
   const [resendTimer, setResendTimer] = useState(0); // сек до повторной отправки
   const [authError, setAuthError] = useState("");
 
@@ -371,40 +364,6 @@ const RecipientDetails = () => {
     });
   };
 
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (IS_DEMO_MODE) return;
-      if (!isUserAuthenticated) return;
-      try {
-        const { data } = await api.get('/user/me');
-        const maskedPhone = data?.phone ? formatPhoneNumber(String(data.phone)) : "";
-        const role = resolveUserRole(data);
-        if (role) localStorage.setItem("role", role);
-        const nextUserData = {
-          firstName: data?.firstName ?? "",
-          lastName: data?.lastName ?? "",
-          middleName: data?.middleName ?? "",
-          phone: maskedPhone,
-        };
-        const profileFullName = joinFullName(nextUserData);
-        setUserData(nextUserData);
-        setFullNameInput(profileFullName);
-        setDeliveryRecipient((current) => current || profileFullName);
-        setEmail((current) => current || data?.email || "");
-
-        const hasProfilePhone = Boolean(data?.phone);
-        setPhoneFromProfile(hasProfilePhone);
-        setPhoneLocked(hasProfilePhone);
-        setPhoneVerified(hasProfilePhone); 
-        setPhoneEditedSinceProfile(false);
-      } catch (e) {
-        console.error("Ошибка получения данных пользователя:", e);
-      }
-    };
-    fetchUserData();
-  }, [isUserAuthenticated]);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -412,10 +371,10 @@ const RecipientDetails = () => {
       const masked = formatPhoneNumber(value);
       setUserData((prev) => ({ ...prev, phone: masked }));
       setAuthError("");
-      if (phoneFromProfile) {
-        setPhoneEditedSinceProfile(true);
-        setPhoneVerified(false); 
-      }
+      setPhoneLocked(false);
+      setPhoneVerified(false);
+      setSmsRequested(false);
+      setSmsCode("");
       return;
     }
 
@@ -439,7 +398,7 @@ const RecipientDetails = () => {
     
   const isPhoneOk = IS_DEMO_MODE
     ? Boolean(userData.phone.trim())
-    : phoneVerified || (phoneFromProfile && phoneLocked && !phoneEditedSinceProfile);
+    : phoneVerified;
   const isFormValid = isUserDataFilled && isDeliveryAddressFilled && isPhoneOk;
 
   const getMissingFieldsMessage = () => {
@@ -485,25 +444,15 @@ const RecipientDetails = () => {
     if (!digits) return;
 
     if (IS_DEMO_MODE) {
-      setIsUserAuthenticated(true);
-      setPhoneFromProfile(true);
       setPhoneVerified(true);
       setPhoneLocked(true);
-      setPhoneEditedSinceProfile(false);
       setSmsRequested(false);
-      setSmsStep(0);
       setSmsCode("");
-      setAdminPassword("");
       return;
     }
 
     try {
       const response = await api.post('/auth/request-sms', { phone: digits });
-      if (response.data?.authMode === "password") {
-        setSmsStep(2);
-      } else {
-        setSmsStep(1);
-      }
       setSmsRequested(true);
       setResendTimer(60);
       const debugCode = response.data?.debugCode;
@@ -526,15 +475,10 @@ const RecipientDetails = () => {
     const digits = validatePhoneMasked();
     if (!digits) return;
     if (IS_DEMO_MODE) {
-      setIsUserAuthenticated(true);
-      setPhoneFromProfile(true);
       setPhoneVerified(true);
       setPhoneLocked(true);
       setSmsRequested(false);
-      setSmsStep(0);
       setSmsCode("");
-      setAdminPassword("");
-      setPhoneEditedSinceProfile(false);
       return;
     }
     if (!smsCode || smsCode.length < 4) {
@@ -543,64 +487,22 @@ const RecipientDetails = () => {
     }
     try {
       const response = await api.post('/auth/login', { phone: digits, smsCode });
-      await applyAuthResponse(response.data);
-      setIsUserAuthenticated(true);
+      applyAuthResponse(response.data);
       setPhoneVerified(true);
       setPhoneLocked(true);
       setSmsRequested(false);
-      setSmsStep(0);
       setSmsCode("");
-      setAdminPassword("");
-      setPhoneEditedSinceProfile(false);
     } catch (err) {
       console.error("Ошибка при авторизации:", err);
       setAuthError("Неверный код, попробуйте снова.");
     }
   };
 
-  const confirmAdminPassword = async () => {
-    setAuthError("");
-    const digits = validatePhoneMasked();
-    if (!digits) return;
-    if (IS_DEMO_MODE) {
-      setIsUserAuthenticated(true);
-      setPhoneFromProfile(true);
-      setPhoneVerified(true);
-      setPhoneLocked(true);
-      setSmsRequested(false);
-      setSmsStep(0);
-      setSmsCode("");
-      setAdminPassword("");
-      setPhoneEditedSinceProfile(false);
-      return;
-    }
-    if (!adminPassword) {
-      setAuthError("Введите пароль.");
-      return;
-    }
-    try {
-      const response = await api.post('/auth/admin-login', { phone: digits, password: adminPassword });
-      await applyAuthResponse({ ...response.data, role: response.data?.role || "admin" });
-      setIsUserAuthenticated(true);
-      setPhoneVerified(true);
-      setPhoneLocked(true);
-      setSmsRequested(false);
-      setSmsStep(0);
-      setSmsCode("");
-      setAdminPassword("");
-      setPhoneEditedSinceProfile(false);
-    } catch (err) {
-      console.error("Ошибка при входе админа:", err);
-      setAuthError("Неверный пароль.");
-    }
-  };
-
   const onClickEditPhone = () => {
     setPhoneLocked(false);
     setPhoneVerified(false);
-    setPhoneEditedSinceProfile(true);
     setSmsRequested(false);
-    setSmsStep(0);
+    setSmsCode("");
     setAuthError("");
   };
 
@@ -902,7 +804,7 @@ const RecipientDetails = () => {
                     disabled={phoneLocked || isPaying}
                     maxLength={18}
                   />
-                  {phoneFromProfile && phoneLocked && (
+                  {phoneLocked && (
                     <button
                       type="button"
                       className="recipientOrderForm__phoneEdit"
@@ -940,7 +842,7 @@ const RecipientDetails = () => {
                   disabled={isPaying}
                 />
 
-                {(!phoneLocked || !phoneFromProfile) && Boolean(userData.phone) && (
+                {!phoneLocked && Boolean(userData.phone) && (
                   <div className="recipientOrderForm__phoneVerification">
                     {!smsRequested ? (
                       <button type="button" onClick={requestSms}>
@@ -948,33 +850,20 @@ const RecipientDetails = () => {
                       </button>
                     ) : (
                       <>
-                        {smsStep === 1 && (
-                          <div className="recipientOrderForm__verificationRow">
-                            <input
-                              type="text"
-                              inputMode="numeric"
-                              placeholder="Код из SMS"
-                              value={smsCode}
-                              onChange={(event) => setSmsCode(event.target.value)}
-                              maxLength={6}
-                            />
-                            <button type="button" onClick={confirmSmsCode}>подтвердить</button>
-                            <button type="button" onClick={resendSms} disabled={resendTimer > 0}>
-                              {resendTimer > 0 ? `Повторить через ${resendTimer} c` : "Отправить ещё раз"}
-                            </button>
-                          </div>
-                        )}
-                        {smsStep === 2 && (
-                          <div className="recipientOrderForm__verificationRow">
-                            <input
-                              type="password"
-                              placeholder="Пароль администратора"
-                              value={adminPassword}
-                              onChange={(event) => setAdminPassword(event.target.value)}
-                            />
-                            <button type="button" onClick={confirmAdminPassword}>подтвердить</button>
-                          </div>
-                        )}
+                        <div className="recipientOrderForm__verificationRow">
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="Код из SMS"
+                            value={smsCode}
+                            onChange={(event) => setSmsCode(event.target.value)}
+                            maxLength={6}
+                          />
+                          <button type="button" onClick={confirmSmsCode}>подтвердить</button>
+                          <button type="button" onClick={resendSms} disabled={resendTimer > 0}>
+                            {resendTimer > 0 ? `Повторить через ${resendTimer} c` : "Отправить ещё раз"}
+                          </button>
+                        </div>
                       </>
                     )}
                     {authError && <p role="alert">{authError}</p>}

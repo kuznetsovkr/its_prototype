@@ -82,7 +82,7 @@ export default function PaymentSuccess() {
         if (!finalizedRef.current && tries > 20) {
           finalizedRef.current = true;
           setStatus('timeout');
-          setMsg('Долго не получаем подтверждение. Попробуйте обновить страницу или зайдите в профиль.');
+          setMsg('Долго не получаем подтверждение. Попробуйте обновить страницу немного позже.');
         }
       } catch {
         // silent retry

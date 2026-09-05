@@ -8,7 +8,6 @@ import OrderPage from './pages/OrderPage'; // Добавьте новый ком
 import EmbroideryPage from './pages/EmbroideryPage';
 import RecipientDetails from './pages/RecipientDetails';
 import ThankYouPage from './pages/ThankYouPage';
-import ProfilePage from './pages/ProfilePage';
 import WorksPage from './pages/WorksPage';
 import SizeGuidePage from './pages/SizeGuidePage';
 import PaymentPage from './pages/PaymentPage';
@@ -19,6 +18,7 @@ import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFail from './pages/PaymentFail';
 import { useOrder } from "./context/OrderContext";
 import RequireAdmin from './components/RequireAdmin';
+import AdminLoginPage from './pages/AdminLoginPage';
 
 const OrderFlowReset = () => {
     const location = useLocation();
@@ -74,13 +74,13 @@ const AppShell = () => {
             <Route path="/embroidery" element={<PageLayout><EmbroideryPage /></PageLayout>} />
             <Route path="/recipient" element={<PageLayout><RecipientDetails /></PageLayout>} />
             <Route path="/thank-you" element={<PageLayout><ThankYouPage /></PageLayout>} />
-            <Route path="/profile" element={<PageLayout><ProfilePage /></PageLayout>} />
             <Route path="/works" element={<WorksPage/>} />
             <Route path="/size-guide" element={<PageLayout><SizeGuidePage /></PageLayout>} />
             <Route path="/payment" element={<PageLayout><PaymentPage /></PageLayout>} />
             <Route path="/fake-payment" element={<FakePayment />} />
             <Route path="/payment-success" element={<PageLayout><PaymentSuccess /></PageLayout>} />
             <Route path="/payment-fail" element={<PageLayout><PaymentFail /></PageLayout>} />
+            <Route path="/admin" element={<PageLayout><AdminLoginPage /></PageLayout>} />
 
             {/* Админку можно оставить без layout-а, если она отдельная */}
             <Route

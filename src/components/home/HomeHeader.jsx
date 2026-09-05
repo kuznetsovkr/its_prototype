@@ -30,7 +30,6 @@ const HomeHeader = ({
   mobileActiveNavigationId,
   navigationBase = "",
   onOrder,
-  onProfile,
   standalone = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -298,15 +297,6 @@ const HomeHeader = ({
         </button>
 
         <div className="home-header__mobile-actions">
-          {onProfile ? (
-            <button type="button" aria-label="Перейти в профиль" className="home-header__icon-link" onClick={onProfile}>
-              <img src={assets.heart} alt="" width="24" height="24" />
-            </button>
-          ) : (
-            <Link to="/profile" aria-label="Перейти в профиль" className="home-header__icon-link">
-              <img src={assets.heart} alt="" width="24" height="24" />
-            </Link>
-          )}
           <button type="button" aria-label="Перейти к заказу" className="home-header__icon-link" onClick={onOrder}>
             <img src={assets.bag} alt="" width="24" height="24" />
           </button>
