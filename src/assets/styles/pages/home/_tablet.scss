@@ -450,13 +450,13 @@
   }
 
   .home-social__feed { gap: 10px; margin-top: 20px; }
-  .home-social__item { width: 160px; height: 160px; flex: 0 0 160px; border-radius: 20px; }
-
-  .home-social__item:first-child,
-  .home-social__item:last-child { width: 150px; height: 150px; flex-basis: 150px; }
-
-  .home-social__item--3 .home-layered-asset__layer {
-    top: -49.59%; height: 170.03%; object-fit: fill;
+  .home-social__item {
+    width: 160px;
+    max-width: 160px;
+    height: auto;
+    aspect-ratio: 1;
+    flex: 1 1 160px;
+    border-radius: 20px;
   }
 
   .home-social__actions { gap: 10px; margin-top: 20px; }

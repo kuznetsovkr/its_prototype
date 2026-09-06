@@ -16,28 +16,41 @@
     background: var(--home-white);
   }
 
+  .home-hero::after {
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    border-radius: 30px 30px 0 0;
+    background: var(--home-white);
+    content: "";
+    pointer-events: none;
+  }
+
   .home-hero__media {
-    height: 551px;
+    height: 601px;
     overflow: hidden;
-    border-radius: 0 0 30px 30px;
+    border-radius: 0;
   }
 
   .home-hero__background-picture {
+    inset: 0;
     width: 100%;
     height: 601px;
     overflow: hidden;
-    border-radius: 0 0 30px 30px;
+    border-radius: 0;
   }
 
   .home-hero__background {
-    inset: auto;
-    top: -0.12%;
-    left: -17.16%;
-    width: 149.95%;
-    max-width: none;
-    height: 106.46%;
+    inset: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
     border-radius: 0;
-    object-fit: fill;
+    object-fit: cover;
+    object-position: center top;
   }
 
   .home-hero__subject-picture { display: none; }
@@ -254,12 +267,13 @@
   .home-works__grid {
     position: absolute;
     top: 78px;
-    left: 7px;
+    left: 50%;
     display: block;
     width: 300px;
     max-width: calc(100% - 14px);
     height: 486px;
     margin: 0;
+    transform: translateX(-50%);
   }
 
   .home-works__item { position: absolute; border-radius: 20px; }
@@ -327,11 +341,12 @@
   .home-works__actions {
     position: absolute;
     top: 574px;
-    left: 7px;
+    left: 50%;
     width: 300px;
     max-width: calc(100% - 14px);
     gap: 4px;
     margin: 0;
+    transform: translateX(-50%);
   }
 
   .home-works__actions .home-button { width: 148px; padding: 0 8px; }
@@ -359,7 +374,7 @@
     width: 300px;
     max-width: 100%;
     padding-left: 15px;
-    margin: 0;
+    margin: 0 auto;
     scroll-padding-left: 15px;
   }
   .home-reviews-carousel__track { padding-left: 0; gap: 5px; }
@@ -397,10 +412,11 @@
   .home-reviews__all {
     position: absolute;
     top: 444px;
-    left: 30px;
+    left: 50%;
     display: flex;
     width: 240px;
     margin: 0;
+    transform: translateX(-50%);
   }
 
   .home-customers { height: 740px; min-height: 740px; padding-top: 10px; }
@@ -429,11 +445,12 @@
     position: absolute;
     z-index: 2;
     top: 74px;
-    left: 15px;
+    left: 50%;
     display: grid;
     width: 270px;
     grid-template-columns: repeat(6, 1fr);
     gap: 3px;
+    transform: translateX(-50%);
   }
 
   .home-tabs__tab { height: 40px; padding: 0 4px; border-radius: 30px; font-size: 10px; }
@@ -448,7 +465,7 @@
   .home-customers__content {
     position: absolute;
     top: 188px;
-    left: 0;
+    left: 50%;
     display: block;
     width: 300px;
     height: 478px;
@@ -456,6 +473,7 @@
     border-radius: 20px;
     color: var(--home-white);
     background: var(--home-ink);
+    transform: translateX(-50%);
   }
 
   .home-customers__photo {
@@ -538,7 +556,9 @@
     padding: 8px 14px;
     border-radius: 20px;
     background: var(--home-black);
+    font-family: var(--home-font-body);
     font-size: 12px;
+    font-style: normal;
     font-weight: 500;
   }
 
@@ -557,6 +577,8 @@
     padding: 20px;
     font-family: var(--home-font-meta);
     font-size: 11px;
+    font-style: normal;
+    font-weight: 400;
     line-height: 1.4;
     text-align: left;
   }
@@ -582,7 +604,7 @@
   .home-questions__title {
     position: absolute;
     top: 110px;
-    left: 30px;
+    left: calc(50% - 120px);
     width: 223px;
     height: 60px;
     font-size: 30px;
@@ -592,7 +614,7 @@
   .home-questions__card p {
     position: absolute;
     top: 186px;
-    left: 30px;
+    left: calc(50% - 120px);
     margin: 0;
     font-size: 16px;
     line-height: 1;
@@ -601,13 +623,14 @@
   .home-questions__card .home-button {
     position: absolute;
     top: 218px;
-    left: 30px;
+    left: 50%;
     width: 240px;
+    transform: translateX(-50%);
   }
 
   .home-questions__dog--1-picture {
     top: -21px;
-    left: -29px;
+    left: calc(50% - 186px);
     display: flex;
     width: 196.885px;
     height: 196.885px;
@@ -626,7 +649,7 @@
 
   .home-questions__dog--2-picture {
     top: -67px;
-    left: 87px;
+    left: calc(50% - 70px);
     display: flex;
     width: 353.643px;
     height: 353.643px;
@@ -698,15 +721,17 @@
   .home-social__actions {
     position: absolute;
     top: 218px;
-    left: 30px;
+    left: 50%;
     width: 240px;
+    max-width: calc(100% - 30px);
     flex-direction: column;
     align-items: center;
     gap: 10px;
     margin: 0;
+    transform: translateX(-50%);
   }
 
-  .home-social__actions .home-button { width: 240px; height: 40px; }
+  .home-social__actions .home-button { width: 100%; height: 40px; }
 }
 
 /* stylelint-enable no-descending-specificity */
