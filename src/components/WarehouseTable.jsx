@@ -118,7 +118,13 @@ const WarehouseTable = ({
                       )}
                       {isEditing && (
                         <div className="file-mini" style={{ marginTop: 6 }}>
-                          <input id={`file-${row.id}`} type="file" onChange={handleFileUpload} hidden />
+                          <input
+                            id={`file-${row.id}`}
+                            type="file"
+                            accept="image/png,image/jpeg,image/webp"
+                            onChange={handleFileUpload}
+                            hidden
+                          />
                           <label htmlFor={`file-${row.id}`} className="btn btn-outline">Выберите файл</label>
                         </div>
                       )}

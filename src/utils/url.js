@@ -4,7 +4,7 @@ import { API_BASE } from '../api';
 const HOST_BASE = (API_BASE || '').replace(/\/api(?:\/|$)/, '');
 
 // корни, которые реально отдаются бэкендом (подправь под себя, если нужно)
-const BACKEND_FILE_ROOTS = ['uploads', 'files'];
+const BACKEND_FILE_ROOTS = ['api/uploads', 'api/files', 'uploads', 'files'];
 
 export const buildImgSrc = (url) => {
   if (!url) return null;
@@ -17,7 +17,7 @@ export const buildImgSrc = (url) => {
   const path = s.replace(/^\/+/, '');
 
   // только для серверных путей добавляем HOST_BASE
-  if (BACKEND_FILE_ROOTS.some(root => path.startsWith(root))) {
+  if (BACKEND_FILE_ROOTS.some(root => path === root || path.startsWith(`${root}/`))) {
     return `${HOST_BASE}/${path}`;
   }
 

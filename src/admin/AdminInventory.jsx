@@ -239,7 +239,7 @@ const AdminInventory = () => {
             <div className="field">
               <label className="label">Изображение</label>
               <div className="file-row">
-                <input id="fileUpload" type="file" onChange={async (e) => {
+                <input id="fileUpload" type="file" accept="image/png,image/jpeg,image/webp" onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
                   const formData = new FormData();
