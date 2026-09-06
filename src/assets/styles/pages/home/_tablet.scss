@@ -20,9 +20,9 @@
 
   .home-button {
     min-width: 75px;
-    height: clamp(36px, 5.625vw, 67px);
+    height: 36px;
     padding: 0 22px;
-    font-size: clamp(12px, 1.875vw, 22px);
+    font-size: 12px;
   }
 
   .home-page .home-hero__background,
@@ -341,7 +341,10 @@
   .home-tabs__tab:nth-child(5) { width: 67px; }
 
   .home-customers__content {
-    margin-top: 20px; grid-template-columns: 166px 324px; gap: 10px;
+    width: 500px;
+    margin: 20px auto 0;
+    grid-template-columns: 166px 324px;
+    gap: 10px;
   }
 
   .home-customers__photo,
@@ -362,7 +365,10 @@
   .home-reviews__carousel { margin-top: 20px; }
 
   .home-reviews-carousel__viewport {
-    width: 560px; max-width: none; margin-left: -30px;
+    width: 560px;
+    max-width: none;
+    margin-left: 50%;
+    transform: translateX(-50%);
   }
 
   .home-reviews-carousel__track { padding-left: 30px; gap: 6px; }
@@ -422,8 +428,8 @@
     top: 50px; width: calc(100% - 60px); height: 250px; justify-content: flex-start; border-radius: 20px;
   }
 
-  .home-questions__title { position: absolute; top: 78px; font-size: clamp(46px, 7.1875vw, 86px); }
-  .home-questions__card p { position: absolute; top: 136px; margin: 0; font-size: clamp(28px, 4.375vw, 52px); }
+  .home-questions__title { position: absolute; top: 78px; font-size: 46px; }
+  .home-questions__card p { position: absolute; top: 136px; margin: 0; font-size: 28px; }
   .home-questions__card .home-button { position: absolute; top: 184px; left: 30px; width: calc(100% - 60px); height: 36px; }
 
   .home-questions__dog--1-picture {

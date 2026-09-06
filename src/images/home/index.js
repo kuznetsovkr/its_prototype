@@ -114,6 +114,7 @@ import mobileSocialCard02 from './mobile/social-card-02.png';
 import mobileSocialCard03 from './mobile/social-card-03.png';
 import mobileFooterLogoMilk from './mobile/footer-logo-milk.png';
 import mobileFooterIllustration from './mobile/footer-illustration.png';
+import mobileHeaderHeart from './mobile/header-heart.svg';
 import mobileHeaderBag from './mobile/header-bag.svg';
 import mobileMenuActiveDot from './mobile/menu-active-dot.svg';
 import mobileMenuBag from './mobile/menu-bag.svg';
@@ -344,6 +345,7 @@ export const homeAssets = {
       instagram: mobileFooterInstagram,
     },
     icons: {
+      heart: mobileHeaderHeart,
       bag: mobileHeaderBag,
       faqGlow: mobileFaqGlow,
       footerGlow: mobileFooterGlow,
@@ -358,6 +360,7 @@ export const siteHeaderAssets = {
   desktopLogo: homeAssets.desktop.footer.logoMilk,
   tabletLogo: homeAssets.tablet.footer.logoMilk,
   mobileLogo: homeAssets.mobile.footer.logoMilk,
+  heart: homeAssets.mobile.icons.heart,
   bag: homeAssets.mobile.icons.bag,
   menu: {
     activeDot: mobileMenuActiveDot,

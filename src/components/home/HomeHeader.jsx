@@ -297,6 +297,14 @@ const HomeHeader = ({
         </button>
 
         <div className="home-header__mobile-actions">
+          <button
+            type="button"
+            aria-label="Избранное"
+            className="home-header__icon-link"
+            disabled
+          >
+            <img src={assets.heart} alt="" width="24" height="24" />
+          </button>
           <button type="button" aria-label="Перейти к заказу" className="home-header__icon-link" onClick={onOrder}>
             <img src={assets.bag} alt="" width="24" height="24" />
           </button>
