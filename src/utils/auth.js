@@ -2,7 +2,7 @@ import api from "../api";
 
 const extractRole = (payload) => payload?.role ?? null;
 
-export const persistAuth = ({ token, role }) => {
+export const persistAdminAuth = ({ token, role }) => {
   if (token) localStorage.setItem("token", token);
   if (role) localStorage.setItem("role", role);
 };
@@ -27,9 +27,9 @@ export const verifyAdminSession = async () => {
   }
 };
 
-export const applyAuthResponse = (payload) => {
+export const applyAdminAuthResponse = (payload) => {
   const token = payload?.token;
   const role = extractRole(payload);
-  persistAuth({ token, role });
+  persistAdminAuth({ token, role });
   return role || null;
 };

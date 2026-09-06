@@ -5,7 +5,7 @@ import { AddressSuggestions } from 'react-dadata';
 import 'react-dadata/dist/react-dadata.css';
 import api from '../api';
 import { useOrder } from "../context/OrderContext";
-import { applyAuthResponse } from "../utils/auth";
+import { orderAccessConfig, storeOrderAccessToken } from "../utils/orderAccess";
 import { IS_DEMO_MODE } from "../config/demoMode";
 import { buildDemoOrderId, buildDemoCdekNumber } from "../mocks/demoData";
 import figmaTshirtImg from "../images/order/tshirt-black.png";
@@ -31,7 +31,9 @@ const isRu11 = (digits) => digits.length === 11 && digits.startsWith('7');
 // Маска +7 (___) ___-__-__
 const formatPhoneNumber = (value) => {
   let numbers = cleanPhone(value);
-  if (!numbers.startsWith('7')) numbers = '7' + numbers; // принудительно 7 в начале
+  if (numbers.startsWith('8')) numbers = `7${numbers.slice(1)}`;
+  else if (!numbers.startsWith('7')) numbers = `7${numbers}`;
+  numbers = numbers.slice(0, 11);
   return ( 
     '+7 ' +
     (numbers[1] ? `(${numbers.slice(1, 4)}` : '') +
@@ -128,15 +130,6 @@ const RecipientDetails = () => {
     query.addListener(handleLayoutChange);
     return () => query.removeListener(handleLayoutChange);
   }, []);
-
-  // Телефон/аутентификация
-  const [phoneLocked, setPhoneLocked] = useState(IS_DEMO_MODE);
-  const [phoneVerified, setPhoneVerified] = useState(IS_DEMO_MODE);
-  // Шаги подтверждения
-  const [smsRequested, setSmsRequested] = useState(false);
-  const [smsCode, setSmsCode] = useState("");
-  const [resendTimer, setResendTimer] = useState(0); // сек до повторной отправки
-  const [authError, setAuthError] = useState("");
 
   // Оплата / заказы
   const [pickupPoint, setPickupPoint] = useState(
@@ -370,11 +363,6 @@ const RecipientDetails = () => {
     if (name === 'phone') {
       const masked = formatPhoneNumber(value);
       setUserData((prev) => ({ ...prev, phone: masked }));
-      setAuthError("");
-      setPhoneLocked(false);
-      setPhoneVerified(false);
-      setSmsRequested(false);
-      setSmsCode("");
       return;
     }
 
@@ -396,10 +384,8 @@ const RecipientDetails = () => {
 
   const isDeliveryAddressFilled = isNoCdek ? Boolean(manualAddress?.value && isManualAddressFull) : true;
     
-  const isPhoneOk = IS_DEMO_MODE
-    ? Boolean(userData.phone.trim())
-    : phoneVerified;
-  const isFormValid = isUserDataFilled && isDeliveryAddressFilled && isPhoneOk;
+  const isPhoneOk = isRu11(cleanPhone(userData.phone));
+  const isFormValid = isUserDataFilled && isDeliveryAddressFilled && isPhoneOk && privacyConsent;
 
   const getMissingFieldsMessage = () => {
     const missing = [];
@@ -414,96 +400,13 @@ const RecipientDetails = () => {
       }
     }
 
-    if (!isPhoneOk) missing.push("подтвердите телефон");
+    if (!isPhoneOk) missing.push("корректный телефон");
+    if (!privacyConsent) missing.push("согласие на обработку данных");
 
     if (missing.length === 0) return "";
     const last = missing.pop();
     const list = missing.length ? `${missing.join(', ')} и ${last}` : last;
     return `Пожалуйста, заполните ${list}`;
-  };
-
-
-  useEffect(() => {
-    if (resendTimer <= 0) return;
-    const id = setTimeout(() => setResendTimer((s) => s - 1), 1000);
-    return () => clearTimeout(id);
-  }, [resendTimer]);
-
-  const validatePhoneMasked = () => {
-    const digits = cleanPhone(userData.phone);
-    if (!isRu11(digits)) {
-      setAuthError("Введите корректный номер телефона.");
-      return null;
-    }
-    return digits;
-  };
-
-  const requestSms = async () => {
-    setAuthError("");
-    const digits = validatePhoneMasked();
-    if (!digits) return;
-
-    if (IS_DEMO_MODE) {
-      setPhoneVerified(true);
-      setPhoneLocked(true);
-      setSmsRequested(false);
-      setSmsCode("");
-      return;
-    }
-
-    try {
-      const response = await api.post('/auth/request-sms', { phone: digits });
-      setSmsRequested(true);
-      setResendTimer(60);
-      const debugCode = response.data?.debugCode;
-      if (debugCode) {
-        alert(`Тестовый СМС-код: ${debugCode}`);
-      }
-    } catch (err) {
-      console.error("Ошибка при запросе SMS:", err);
-      setAuthError("Ошибка при отправке SMS, попробуйте снова.");
-    }
-  };
-
-  const resendSms = async () => {
-    if (resendTimer > 0) return;
-    await requestSms();
-  };
-
-  const confirmSmsCode = async () => {
-    setAuthError("");
-    const digits = validatePhoneMasked();
-    if (!digits) return;
-    if (IS_DEMO_MODE) {
-      setPhoneVerified(true);
-      setPhoneLocked(true);
-      setSmsRequested(false);
-      setSmsCode("");
-      return;
-    }
-    if (!smsCode || smsCode.length < 4) {
-      setAuthError("Введите корректный код из SMS.");
-      return;
-    }
-    try {
-      const response = await api.post('/auth/login', { phone: digits, smsCode });
-      applyAuthResponse(response.data);
-      setPhoneVerified(true);
-      setPhoneLocked(true);
-      setSmsRequested(false);
-      setSmsCode("");
-    } catch (err) {
-      console.error("Ошибка при авторизации:", err);
-      setAuthError("Неверный код, попробуйте снова.");
-    }
-  };
-
-  const onClickEditPhone = () => {
-    setPhoneLocked(false);
-    setPhoneVerified(false);
-    setSmsRequested(false);
-    setSmsCode("");
-    setAuthError("");
   };
 
   const handleCdekSelect = (payload) => {
@@ -634,7 +537,12 @@ const RecipientDetails = () => {
 
     try {
       const { data } = await api.post('/orders/create', fd);
+      if (!data?.orderId || !data?.orderToken) {
+        throw new Error("Сервер не вернул данные доступа к заказу");
+      }
       setOrderId(data.orderId);
+      storeOrderAccessToken(data.orderId, data.orderToken);
+      sessionStorage.setItem("pay_order_id", String(data.orderId));
       if (data?.cdekNumber) {
         sessionStorage.setItem("pay_cdek_number", String(data.cdekNumber));
       }
@@ -672,12 +580,16 @@ const RecipientDetails = () => {
     }
 
     try {
-      const { orderId: oid, cdekNumber: cdekNum } = await createDraftOrder();
+      const { orderId: oid, orderToken, cdekNumber: cdekNum } = await createDraftOrder();
       setOrderId(oid);
 
       if (isCustomType) {
         try {
-          await api.post(`/orders/confirm/${encodeURIComponent(oid)}`, { provider: "manual" });
+          await api.post(
+            `/orders/confirm/${encodeURIComponent(oid)}`,
+            { provider: "manual" },
+            orderAccessConfig(oid, orderToken)
+          );
         } catch (confirmErr) {
           console.warn("Manual confirm failed:", confirmErr);
         }
@@ -686,7 +598,11 @@ const RecipientDetails = () => {
         return;
       }
 
-      const { data } = await api.post('/payments/paykeeper/link', { orderId: oid });
+      const { data } = await api.post(
+        '/payments/paykeeper/link',
+        { orderId: oid },
+        orderAccessConfig(oid, orderToken)
+      );
       sessionStorage.setItem('pay_order_id', String(oid));
       sessionStorage.setItem('pay_cdek_number', cdekNum ? String(cdekNum) : "");
       window.location.href = data.pay_url;
@@ -719,9 +635,11 @@ const RecipientDetails = () => {
       try {
         const confirmProvider =
           process.env.NODE_ENV === "development" ? "manual" : "fallback";
-        await api.post(`/orders/confirm/${encodeURIComponent(orderId)}`, {
-          provider: confirmProvider,
-        });
+        await api.post(
+          `/orders/confirm/${encodeURIComponent(orderId)}`,
+          { provider: confirmProvider },
+          orderAccessConfig(orderId)
+        );
         const storedCdek = sessionStorage.getItem("pay_cdek_number") || null;
         navigate('/thank-you', { state: { orderNumber: orderId, cdekNumber: storedCdek || null } });
       } catch (err) {
@@ -801,18 +719,9 @@ const RecipientDetails = () => {
                     placeholder="Номер телефона"
                     value={userData.phone}
                     onChange={handleInputChange}
-                    disabled={phoneLocked || isPaying}
+                    disabled={isPaying}
                     maxLength={18}
                   />
-                  {phoneLocked && (
-                    <button
-                      type="button"
-                      className="recipientOrderForm__phoneEdit"
-                      onClick={onClickEditPhone}
-                    >
-                      изменить
-                    </button>
-                  )}
                 </div>
 
                 <input
@@ -841,34 +750,6 @@ const RecipientDetails = () => {
                   onChange={(event) => setOrderComment(event.target.value)}
                   disabled={isPaying}
                 />
-
-                {!phoneLocked && Boolean(userData.phone) && (
-                  <div className="recipientOrderForm__phoneVerification">
-                    {!smsRequested ? (
-                      <button type="button" onClick={requestSms}>
-                        подтвердить номер телефона
-                      </button>
-                    ) : (
-                      <>
-                        <div className="recipientOrderForm__verificationRow">
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            placeholder="Код из SMS"
-                            value={smsCode}
-                            onChange={(event) => setSmsCode(event.target.value)}
-                            maxLength={6}
-                          />
-                          <button type="button" onClick={confirmSmsCode}>подтвердить</button>
-                          <button type="button" onClick={resendSms} disabled={resendTimer > 0}>
-                            {resendTimer > 0 ? `Повторить через ${resendTimer} c` : "Отправить ещё раз"}
-                          </button>
-                        </div>
-                      </>
-                    )}
-                    {authError && <p role="alert">{authError}</p>}
-                  </div>
-                )}
 
                 <h2 className="recipientOrderForm__heading recipientOrderForm__heading--delivery">
                   Доставка

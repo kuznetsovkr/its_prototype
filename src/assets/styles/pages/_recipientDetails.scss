@@ -608,58 +608,6 @@
   height: 100%;
 }
 
-.recipientOrderForm__phoneEdit {
-  position: absolute;
-  top: 50%;
-  right: 16px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #bc5823;
-  text-decoration: underline;
-  transform: translateY(-50%);
-}
-
-.recipientOrderForm__phoneVerification {
-  position: absolute;
-  z-index: 5;
-  right: 16px;
-  color: #4b4b4b;
-}
-
-.recipientOrderForm__phoneVerification > button {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #bc5823;
-  text-decoration: underline;
-}
-
-.recipientOrderForm__verificationRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 8px;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-}
-
-.recipientOrderForm__verificationRow input,
-.recipientOrderForm__verificationRow button {
-  min-height: 28px;
-  padding: 4px 8px;
-  border: 1px solid #d0d0d0;
-  border-radius: 12px;
-  background: #fff;
-  color: #2b2b2b;
-}
-
-.recipientOrderForm__phoneVerification p {
-  margin: 4px 0 0;
-  color: #a53636;
-}
-
 .recipientOrderForm__group {
   position: absolute;
   display: block;
@@ -1094,16 +1042,6 @@
     padding-top: 18px;
   }
 
-  .recipientOrderForm__phoneEdit {
-    font-size: 11px;
-  }
-
-  .recipientOrderForm__phoneVerification {
-    top: 168px;
-    max-width: 330px;
-    font-size: 10px;
-  }
-
   .recipientOrderForm__group {
     left: 36px;
     width: 518px;
@@ -1373,18 +1311,6 @@
     height: 80px;
     padding-top: 10px;
     border-radius: 15px;
-  }
-
-  .recipientOrderForm__phoneEdit {
-    right: 10px;
-    font-size: 7px;
-  }
-
-  .recipientOrderForm__phoneVerification {
-    top: 103px;
-    right: 34px;
-    max-width: 190px;
-    font-size: 7px;
   }
 
   .recipientOrderForm__group {
@@ -1667,18 +1593,6 @@
     top: 242px;
     height: 36px;
     padding-top: 10px;
-  }
-
-  .recipientOrderForm__phoneEdit {
-    right: 12px;
-    font-size: 8px;
-  }
-
-  .recipientOrderForm__phoneVerification {
-    top: 114px;
-    right: 32px;
-    max-width: 200px;
-    font-size: 8px;
   }
 
   .recipientOrderForm__group {

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import { getOrderAccessToken, orderAccessConfig } from '../utils/orderAccess';
 import s from './PaymentSuccess.module.scss';
 
 const STATUS_MEDIA = {
@@ -43,7 +44,8 @@ export default function PaymentSuccess() {
     inFlightRef.current = false;
 
     const orderId = sessionStorage.getItem('pay_order_id');
-    if (!orderId) {
+    const orderToken = getOrderAccessToken(orderId);
+    if (!orderId || !orderToken) {
       setStatus('missing');
       setMsg('Не найден номер заказа. Вернёмся на главную.');
       const t = setTimeout(() => navigate('/'), 5000);
@@ -58,11 +60,15 @@ export default function PaymentSuccess() {
       tries += 1;
 
       try {
-        const { data } = await api.get(`/orders/${orderId}`);
+        const { data } = await api.get(`/orders/${orderId}`, orderAccessConfig(orderId, orderToken));
         if (data.paymentStatus === 'paid') {
           if (data.status !== 'Оплачено') {
             try {
-              await api.post(`/orders/confirm/${orderId}`, { provider: 'fallback' });
+              await api.post(
+                `/orders/confirm/${orderId}`,
+                { provider: 'fallback' },
+                orderAccessConfig(orderId, orderToken)
+              );
             } catch {
               // do nothing; retry on next tick
             }

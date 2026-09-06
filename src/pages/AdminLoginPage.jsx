@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import api from "../api";
-import { applyAuthResponse } from "../utils/auth";
+import { applyAdminAuthResponse } from "../utils/auth";
 
 const AdminLoginPage = () => {
   const location = useLocation();
@@ -27,7 +27,7 @@ const AdminLoginPage = () => {
         phone: normalizedPhone,
         password,
       });
-      applyAuthResponse(data);
+      applyAdminAuthResponse(data);
       navigate(location.state?.from || "/admin/inventory", { replace: true });
     } catch (requestError) {
       setError(requestError.message || "Не удалось войти в админку.");
