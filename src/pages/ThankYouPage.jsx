@@ -1,11 +1,54 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import api from '../api';
+import { getOrderAccessToken, orderAccessConfig } from '../utils/orderAccess';
 import '../assets/styles/pages/_thx.scss';
 
 const ThankYouPage = () => {
   const location = useLocation();
   const { orderNumber, manual, cdekNumber: stateCdekNumber } = location.state || {};
-  const cdekNumber = stateCdekNumber || sessionStorage.getItem("pay_cdek_number") || null;
+  const [cdekNumber, setCdekNumber] = useState(
+    stateCdekNumber || sessionStorage.getItem("pay_cdek_number") || null
+  );
+
+  useEffect(() => {
+    if (manual || cdekNumber || !orderNumber) return undefined;
+    const orderToken = getOrderAccessToken(orderNumber);
+    if (!orderToken) return undefined;
+
+    let attempts = 0;
+    let stopped = false;
+    const loadShipmentNumber = async () => {
+      attempts += 1;
+      try {
+        const { data } = await api.get(
+          `/orders/${encodeURIComponent(orderNumber)}`,
+          orderAccessConfig(orderNumber, orderToken)
+        );
+        if (data?.cdekNumber && !stopped) {
+          const value = String(data.cdekNumber);
+          sessionStorage.setItem("pay_cdek_number", value);
+          setCdekNumber(value);
+        }
+      } catch {
+        // Фоновое обновление номера не должно мешать странице благодарности.
+      }
+    };
+
+    loadShipmentNumber();
+    const timer = setInterval(() => {
+      if (attempts >= 20 || stopped) {
+        clearInterval(timer);
+        return;
+      }
+      loadShipmentNumber();
+    }, 3000);
+
+    return () => {
+      stopped = true;
+      clearInterval(timer);
+    };
+  }, [cdekNumber, manual, orderNumber]);
 
   const copyTrack = async () => {
     if (!cdekNumber) return;

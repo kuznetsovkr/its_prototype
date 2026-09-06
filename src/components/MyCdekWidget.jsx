@@ -9,9 +9,9 @@ const INFO_POPUP_KEY = "info";
 
 const detectClothingKey = (base) => {
   const raw = String(base || "").toLowerCase();
-  if (raw.includes("С…СѓРґРё") || raw.includes("hoodie") || raw.includes("hudi")) return "hoodie";
-  if (raw.includes("СЃРІРёС‚С€РѕС‚") || raw.includes("СЃРІРёС‚") || raw.includes("sweatshirt") || raw.includes("svitshot")) return "svitshot";
-  if (raw.includes("С„СѓС‚Р±РѕР»") || raw.includes("t-shirt") || raw.includes("tshirt") || raw.includes("tee")) return "tshirt";
+  if (raw.includes("худи") || raw.includes("hoodie") || raw.includes("hudi")) return "hoodie";
+  if (raw.includes("свитшот") || raw.includes("свит") || raw.includes("sweatshirt") || raw.includes("svitshot")) return "svitshot";
+  if (raw.includes("футбол") || raw.includes("t-shirt") || raw.includes("tshirt") || raw.includes("tee")) return "tshirt";
   return "hoodie";
 };
 
@@ -33,15 +33,15 @@ const GOODS_PRESETS = {
 
 const FROM_LOCATION = {
   country_code: "RU",
-  city: "РљСЂР°СЃРЅРѕСЏСЂСЃРє",
+  city: "Красноярск",
   postal_code: 660135,
   code: 278,
-  address: "СѓР». 78-Р№ Р”РѕР±СЂРѕРІРѕР»СЊС‡РµСЃРєРѕР№ Р±СЂРёРіР°РґС‹, 1",
+  address: "ул. 78-й Добровольческой бригады, 1",
 };
 
 const DEFAULT_CITY = {
   code: 278,
-  city: "РљСЂР°СЃРЅРѕСЏСЂСЃРє",
+  city: "Красноярск",
   country_code: "RU",
   postal_code: "660135",
 };
@@ -144,7 +144,7 @@ const normalizeTariff = (tariff, fallbackCode = FIXED_TARIFF_CODE) => {
   if (!tariff) {
     return {
       tariff_code: fallbackCode,
-      tariff_name: "РЎРєР»Р°Рґ-СЃРєР»Р°Рґ",
+      tariff_name: "Склад-склад",
       delivery_sum: null,
       total_sum: null,
       period_min: null,
@@ -155,7 +155,7 @@ const normalizeTariff = (tariff, fallbackCode = FIXED_TARIFF_CODE) => {
 
   return {
     tariff_code: tariff.tariff_code ?? fallbackCode,
-    tariff_name: tariff.tariff_name ?? tariff.title ?? "РЎРєР»Р°Рґ-СЃРєР»Р°Рґ",
+    tariff_name: tariff.tariff_name ?? tariff.title ?? "Склад-склад",
     delivery_sum: tariff.delivery_sum ?? null,
     total_sum: tariff.total_sum ?? null,
     period_min: tariff.period_min ?? null,
