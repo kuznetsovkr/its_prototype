@@ -82,7 +82,6 @@ const RecipientDetails = () => {
   const customOption = embroidery.customOption || locationState.customOption || { image: false, text: false };
   const uploadedImage = embroidery.uploadedImage || locationState.uploadedImage || [];
   const comment = embroidery.comment || locationState.comment;
-  const embroideryPrice = embroidery.price ?? locationState.embroideryPrice ?? 0;
   const patronusCount = embroidery.patronusCount || 0;
   const petFaceCount = embroidery.petFaceCount || 0;
   const embroideryTypeRu = EMBROIDERY_TYPE_RU[selectedType] || selectedType || "";
@@ -159,11 +158,6 @@ const RecipientDetails = () => {
   const [isPaying, setIsPaying] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const [error, setError] = useState("");
-
-  const totalPrice = useMemo(
-    () => (embroideryPrice || 0) + (deliveryPrice || 0),
-    [embroideryPrice, deliveryPrice]
-  );
 
   useLayoutEffect(() => {
         // при переходе на шаг получателя всегда показываем верх страницы
@@ -516,19 +510,10 @@ const RecipientDetails = () => {
     fd.append("comment", formComment);
 
     fd.append("deliveryAddress", pickupPoint || (manualAddress && manualAddress.value) || "");
-    fd.append("totalPrice", String(totalPrice || 0));
-
-    const deliveryPayment = { payer: "sender", paidByUserOnSite: true };
     if (!isNoCdek && cdekData) {
-      const goods = (cdekData.goods && cdekData.goods.length) ? cdekData.goods : [deriveGoodsPreset()];
       fd.append("cdekMode", cdekData.mode || "");
-      fd.append("cdekTariffCode", cdekData.tariff?.tariff_code || "");
-      fd.append("cdekTariff", JSON.stringify(cdekData.tariff || {}));
       fd.append("cdekAddress", JSON.stringify(cdekData.address || {}));
       fd.append("cdekAddressLabel", cdekData.addressLabel || "");
-      fd.append("cdekGoods", JSON.stringify(goods));
-      fd.append("cdekFrom", JSON.stringify(cdekData.from || {}));
-      fd.append("deliveryPayment", JSON.stringify(deliveryPayment));
     }
 
     (uploadedImage || []).forEach((file, idx) => {
@@ -580,10 +565,15 @@ const RecipientDetails = () => {
     }
 
     try {
-      const { orderId: oid, orderToken, cdekNumber: cdekNum } = await createDraftOrder();
+      const {
+        orderId: oid,
+        orderToken,
+        cdekNumber: cdekNum,
+        pricePending,
+      } = await createDraftOrder();
       setOrderId(oid);
 
-      if (isCustomType) {
+      if (pricePending) {
         try {
           await api.post(
             `/orders/confirm/${encodeURIComponent(oid)}`,

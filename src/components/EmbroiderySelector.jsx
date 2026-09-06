@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { ReactComponent as CheckIcon } from "../images/Vector.svg";
 import { useOrder } from "../context/OrderContext";
 import { IS_DEMO_MODE } from "../config/demoMode";
+import api from "../api";
 import figmaTshirtImg from "../images/order/tshirt-black.png";
 import embroideryRadioActive from "../images/order/embroidery-radio-active.svg";
 import embroideryRadioActiveMobile from "../images/order/embroidery-radio-active-mobile.svg";
@@ -60,7 +61,7 @@ const detectClothingKey = (base) => {
   return "tshirt";
 };
 
-const priceMatrix = {
+const DEMO_PRICE_MATRIX = {
   Patronus: { tshirt: 8500, svitshot: 9500, hoodie: 10000 },
   Car: { tshirt: 6500, svitshot: 8000, hoodie: 8500 },
   petFace: { tshirt: 6000, svitshot: 7000, hoodie: 8000 },
@@ -88,6 +89,9 @@ const EmbroiderySelector = () => {
     embroidery.type === "custom" && embroidery.customOption?.text ? "text" : "image"
   );
   const [desktopDetailsOpen, setDesktopDetailsOpen] = useState(false);
+  const [serverPrices, setServerPrices] = useState(null);
+  const [priceLoading, setPriceLoading] = useState(!IS_DEMO_MODE);
+  const [priceError, setPriceError] = useState("");
 
   const { selectedClothing } = location.state || {};
   const clothingKey = detectClothingKey(clothing.type || selectedClothing);
@@ -104,17 +108,69 @@ const EmbroiderySelector = () => {
     setDesktopTab((currentTab) => currentTab === nextTab ? currentTab : nextTab);
   }, [selectedType, customOption.text]);
 
-  const calcPrice = useCallback((type) => {
-    const base = priceMatrix[type]?.[clothingKey] ?? 0;
-    if (type === "Patronus") return base + Math.max(0, patronusCount - 1) * 5000;
-    if (type === "petFace") return base + Math.max(0, petFaceCount - 1) * 2000;
-    return base;  }, [clothingKey, patronusCount, petFaceCount]);
+  useEffect(() => {
+    if (IS_DEMO_MODE) {
+      setServerPrices({
+        Patronus: DEMO_PRICE_MATRIX.Patronus[clothingKey] + Math.max(0, patronusCount - 1) * 5000,
+        Car: DEMO_PRICE_MATRIX.Car[clothingKey],
+        petFace: DEMO_PRICE_MATRIX.petFace[clothingKey] + Math.max(0, petFaceCount - 1) * 2000,
+      });
+      setPriceLoading(false);
+      setPriceError("");
+      return undefined;
+    }
 
-  const priceLabel = (type) => `${calcPrice(type)} ₽`;
+    const productType = clothing.type || selectedClothing;
+    if (!productType || !clothing.color || !clothing.size) {
+      setServerPrices(null);
+      setPriceLoading(false);
+      setPriceError("Не удалось определить выбранное изделие");
+      return undefined;
+    }
+
+    let cancelled = false;
+    setPriceLoading(true);
+    setPriceError("");
+
+    api.post("/pricing/quote", {
+      productType,
+      color: clothing.color,
+      size: clothing.size,
+      patronusCount,
+      petFaceCount,
+    }).then(({ data }) => {
+      if (cancelled) return;
+      setServerPrices(data?.prices || null);
+      setPriceLoading(false);
+    }).catch((requestError) => {
+      if (cancelled) return;
+      setServerPrices(null);
+      setPriceLoading(false);
+      setPriceError(requestError.message || "Не удалось рассчитать стоимость");
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [clothing.type, clothing.color, clothing.size, selectedClothing, clothingKey, patronusCount, petFaceCount]);
+
+  const calcPrice = useCallback((type) => {
+    const value = serverPrices?.[type];
+    return Number.isFinite(Number(value)) ? Number(value) : null;
+  }, [serverPrices]);
+
+  const priceLabel = (type) => {
+    const value = calcPrice(type);
+    return value == null ? "рассчитываем…" : `${priceFormatter.format(value)} ₽`;
+  };
   const customPriceNote = "стоимость рассчитает менеджер";
+  const selectedPrice = calcPrice(selectedType);
+  const hasServerPrice = isCustomType || selectedPrice != null;
   const desktopPriceLabel = isCustomType
     ? "Цена рассчитает менеджер"
-    : `Цена: ${priceFormatter.format(calcPrice(selectedType))} руб`;
+    : selectedPrice == null
+      ? "Цена рассчитывается…"
+      : `Цена: ${priceFormatter.format(selectedPrice)} руб`;
   const hasFiles = uploadedImage.length > 0;
   const hasCustomText = customText.trim().length > 0;
   const mustUpload = isCustomType && customOption.image;
@@ -122,12 +178,14 @@ const EmbroiderySelector = () => {
   const mustSelectCustom = isCustomType ? (customOption.image || customOption.text) : true;
   const customOk = mustSelectCustom && (!mustUpload || hasFiles) && (!mustText || hasCustomText);
   const canProceed = IS_DEMO_MODE
-    ? Boolean(selectedType)
+    ? Boolean(selectedType && hasServerPrice)
     : isCustomType
       ? customOk
-      : Boolean(selectedType && hasFiles);
+      : Boolean(selectedType && hasFiles && hasServerPrice && !priceLoading);
   const disabledHint = (() => {
     if (IS_DEMO_MODE) return "";
+    if (priceLoading) return "Дождитесь расчёта стоимости";
+    if (priceError) return priceError;
     if (!isCustomType) return !hasFiles ? "Загрузите хотя бы одно изображение" : "";
     if (!mustSelectCustom) return "Выберите: изображение или надпись";
     if (mustUpload && !hasFiles) return "Загрузите изображение";
@@ -202,7 +260,7 @@ const EmbroiderySelector = () => {
 
   const handleNext = () => {
     if (!canProceed) return;
-    navigate("/recipient", { state: { embroideryPrice: calcPrice(selectedType) } });
+    navigate("/recipient");
   };
 
   const textareaRef = useRef(null);
@@ -237,7 +295,7 @@ const EmbroiderySelector = () => {
       (embroidery.comment || "") === nextEmbroidery.comment &&
       (embroidery.patronusCount || 1) === nextEmbroidery.patronusCount &&
       (embroidery.petFaceCount || 1) === nextEmbroidery.petFaceCount &&
-      (embroidery.price || 0) === nextEmbroidery.price &&
+      (embroidery.price ?? null) === nextEmbroidery.price &&
       isSameFiles(embroidery.uploadedImage || [], nextEmbroidery.uploadedImage || []) &&
       isSameOptions(currentOption, nextEmbroidery.customOption || { image: false, text: false });
 
@@ -663,6 +721,7 @@ const EmbroiderySelector = () => {
             )}
 
             <p className="embroiderySelectorDesktop__price">{desktopPriceLabel}</p>
+            {priceError && <p className="embroideryUploadStage__error" role="alert">{priceError}</p>}
           </section>
 
           <div className="embroiderySelectorDesktop__navigation">
@@ -892,7 +951,7 @@ const EmbroiderySelector = () => {
             </>
           )}
 
-          {error && <p style={{ color: "red" }}>{error}</p>}
+          {(error || priceError) && <p style={{ color: "red" }}>{error || priceError}</p>}
         </div>
 
         <div className="commentBlock">

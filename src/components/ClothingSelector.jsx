@@ -530,7 +530,7 @@ const ClothingSelector = () => {
     rawPrice !== undefined &&
     rawPrice !== "" &&
     Number.isFinite(parsedPrice);
-  const displayPrice = hasInventoryPrice ? parsedPrice : 3000;
+  const displayPrice = hasInventoryPrice ? `${parsedPrice} руб` : "уточняется";
 
   return (
     <>
@@ -687,7 +687,7 @@ const ClothingSelector = () => {
               </div>
             </div>
 
-            <p className="clothingPrice">Цена: {displayPrice} руб</p>
+            <p className="clothingPrice">Цена: {displayPrice}</p>
           </div>
 
           <div className="orderNavigation">
