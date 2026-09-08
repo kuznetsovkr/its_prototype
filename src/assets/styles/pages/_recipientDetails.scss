@@ -1,3 +1,5 @@
+@use "../base/breakpoints" as bp;
+
 .containerDetails{
   --recipient-input-height: 43px;
   --recipient-input-font-size: 20px;
@@ -318,7 +320,7 @@
 }
 
 /* (Опционально) Для очень широких экранов можно чуть "сплющить" карту */
-@media (min-width: 1280px){
+@media (min-width: bp.$desktop-min){
   .deliveryInfo .blockCDEK #cdek-map{
     aspect-ratio: 16 / 9;
   }
@@ -894,7 +896,7 @@
   height: 18px;
 }
 
-@media (min-width: 1280px) {
+@media (min-width: bp.$desktop-min) {
   .recipientOrderPage {
     width: 100vw;
     min-height: 1452px;
@@ -1158,7 +1160,7 @@
   }
 }
 
-@media (min-width: 640px) and (max-width: 1279px) {
+@media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
   .App--recipient main > .container > .wrapper {
     padding: 0;
   }
@@ -1444,7 +1446,7 @@
   }
 }
 
-@media (max-width: 639px) {
+@media (max-width: bp.$mobile-max) {
   .App--recipient main > .container > .wrapper {
     padding: 0;
   }

@@ -5,6 +5,7 @@ import {
   mobileMenuNavigation,
   socialLinks,
 } from "../../data/homeContent";
+import { VIEWPORT_BREAKPOINTS } from "../../config/breakpoints";
 import ResponsiveAsset from "./ResponsiveAsset";
 
 const focusableSelector = "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])";
@@ -117,7 +118,7 @@ const HomeHeader = ({
     };
 
     const handleResize = () => {
-      if (window.innerWidth >= 640) {
+      if (window.innerWidth >= VIEWPORT_BREAKPOINTS.tabletMin) {
         setIsOpen(false);
       }
     };
@@ -271,7 +272,6 @@ const HomeHeader = ({
               alt=""
               className="home-header__logo-image"
               loading="eager"
-              tabletMax={1279}
             />
           </Link>
         ) : (
@@ -283,7 +283,6 @@ const HomeHeader = ({
               alt=""
               className="home-header__logo-image"
               loading="eager"
-              tabletMax={1279}
             />
           </a>
         )}

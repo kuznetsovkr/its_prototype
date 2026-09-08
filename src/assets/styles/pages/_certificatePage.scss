@@ -1,3 +1,5 @@
+@use "../base/breakpoints" as bp;
+
 .App--certificate { overflow-x: clip; }
 
 .certificatePage {
@@ -239,7 +241,7 @@
   line-height: 1.4;
 }
 
-@media (min-width: 640px) and (max-width: 1279px) {
+@media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
   .certificatePage {
     width: min(100vw, 640px);
     min-height: 426px;
@@ -359,7 +361,7 @@
   .certificatePage__conditions li { margin-left: 12px; }
 }
 
-@media (max-width: 639px) {
+@media (max-width: bp.$mobile-max) {
   .certificatePage {
     position: relative;
     left: 50%;

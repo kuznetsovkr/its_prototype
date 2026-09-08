@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
+import { resolveViewportMode } from "../../config/breakpoints";
 
 const getBreakpoint = () => {
   if (typeof window === "undefined") return "desktop";
-  if (window.innerWidth < 640) return "mobile";
-  if (window.innerWidth < 1200) return "tablet";
-  return "desktop";
+  return resolveViewportMode(window.innerWidth);
 };
 
 const useHomeBreakpoint = () => {

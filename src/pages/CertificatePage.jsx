@@ -18,7 +18,6 @@ const CertificatePage = () => (
               alt=""
               className="certificatePage__glowImage"
               loading="eager"
-              tabletMax={1279}
             />
           </div>
         </div>
@@ -31,7 +30,6 @@ const CertificatePage = () => (
             alt="Подарочный сертификат"
             className="certificatePage__ticketImage"
             loading="eager"
-            tabletMax={1279}
           />
         </div>
         <div className="certificatePage__ticket certificatePage__ticket--luminosity" aria-hidden="true">
@@ -42,7 +40,6 @@ const CertificatePage = () => (
             alt=""
             className="certificatePage__ticketImage"
             loading="eager"
-            tabletMax={1279}
           />
         </div>
 
@@ -62,7 +59,6 @@ const CertificatePage = () => (
                 mobile={certificateAssets.arrow.mobile}
                 alt=""
                 className="certificatePage__arrowImage"
-                tabletMax={1279}
               />
             </span>
           </div>

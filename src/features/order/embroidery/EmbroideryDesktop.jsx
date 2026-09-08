@@ -1,4 +1,5 @@
 import React from "react";
+import { MEDIA_QUERIES } from "../../../config/breakpoints";
 import figmaTshirtImg from "../../../images/order/tshirt-black.webp";
 import embroideryRadioActive from "../../../images/order/embroidery-radio-active.svg";
 import embroideryRadioActiveMobile from "../../../images/order/embroidery-radio-active-mobile.svg";
@@ -42,8 +43,8 @@ const EmbroideryDesktop = ({
     <div className="embroideryDesktopCounter">
       <button type="button" className="embroideryDesktopCounter__button" onClick={() => setValue((current) => Math.max(1, current - 1))} aria-label="Уменьшить количество">
         <picture className="embroideryDesktopCounter__icon">
-          <source media="(max-width: 639px)" srcSet={embroideryCounterMobile} />
-          <source media="(max-width: 1279px)" srcSet={embroideryCounterTablet} />
+          <source media={MEDIA_QUERIES.mobile} srcSet={embroideryCounterMobile} />
+          <source media={MEDIA_QUERIES.tabletMax} srcSet={embroideryCounterTablet} />
           <img src={embroideryCounter} alt="" aria-hidden="true" />
         </picture>
         <span>−</span>
@@ -51,8 +52,8 @@ const EmbroideryDesktop = ({
       <span className="embroideryDesktopCounter__value">{value} шт</span>
       <button type="button" className="embroideryDesktopCounter__button" onClick={() => setValue((current) => Math.min(limit, current + 1))} aria-label="Увеличить количество">
         <picture className="embroideryDesktopCounter__icon">
-          <source media="(max-width: 639px)" srcSet={embroideryCounterMobile} />
-          <source media="(max-width: 1279px)" srcSet={embroideryCounterTablet} />
+          <source media={MEDIA_QUERIES.mobile} srcSet={embroideryCounterMobile} />
+          <source media={MEDIA_QUERIES.tabletMax} srcSet={embroideryCounterTablet} />
           <img src={embroideryCounter} alt="" aria-hidden="true" />
         </picture>
         <span>+</span>
@@ -77,8 +78,8 @@ const EmbroideryDesktop = ({
             aria-label="Вернуться назад"
           >
             <picture className="embroiderySelectorDesktop__arrowIcon">
-              <source media="(max-width: 639px)" srcSet={orderBackIconMobile} />
-              <source media="(max-width: 1279px)" srcSet={orderBackIconTablet} />
+              <source media={MEDIA_QUERIES.mobile} srcSet={orderBackIconMobile} />
+              <source media={MEDIA_QUERIES.tabletMax} srcSet={orderBackIconTablet} />
               <img src={orderBackIcon} alt="" aria-hidden="true" />
             </picture>
           </button>
@@ -131,13 +132,13 @@ const EmbroideryDesktop = ({
                       />
                       <picture className="embroideryDesktopChoice__radio">
                         <source
-                          media="(max-width: 639px)"
+                          media={MEDIA_QUERIES.mobile}
                           srcSet={selectedType === option.value
                             ? embroideryRadioActiveMobile
                             : embroideryRadioInactiveMobile}
                         />
                         <source
-                          media="(max-width: 1279px)"
+                          media={MEDIA_QUERIES.tabletMax}
                           srcSet={selectedType === option.value
                             ? embroideryRadioActiveTablet
                             : embroideryRadioInactiveTablet}

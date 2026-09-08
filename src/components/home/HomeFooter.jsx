@@ -31,7 +31,6 @@ const HomeFooter = ({ assets, navigationBase = "", onOrder, variant = "home" }) 
           mobile={assets.glow.mobile}
           alt=""
           className="home-footer__glow"
-          tabletMax={1279}
         />
         <ResponsiveAsset
           desktop={assets.illustration.desktop}
@@ -39,7 +38,6 @@ const HomeFooter = ({ assets, navigationBase = "", onOrder, variant = "home" }) 
           mobile={assets.illustration.mobile}
           alt="Собака с иглой и нитью"
           className="home-footer__illustration"
-          tabletMax={1279}
         />
 
         <nav className="home-footer__navigation" aria-label="Навигация в подвале">
@@ -68,7 +66,6 @@ const HomeFooter = ({ assets, navigationBase = "", onOrder, variant = "home" }) 
                   mobile={item.icon.mobile}
                   alt=""
                   className="home-footer__social-icon"
-                  tabletMax={1279}
                 />
                 {item.id === "instagram" && <span className="home-footer__instagram-star" aria-hidden="true">*</span>}
               </a>
@@ -83,7 +80,6 @@ const HomeFooter = ({ assets, navigationBase = "", onOrder, variant = "home" }) 
           mobile={assets.logo.mobile}
           alt="И так сойдёт"
           className="home-footer__logo"
-          tabletMax={1279}
         />
 
         <address className="home-footer__details">

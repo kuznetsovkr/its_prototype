@@ -1,6 +1,8 @@
+@use "../../base/breakpoints" as bp;
+
 /* stylelint-disable no-descending-specificity */
 
-@media (min-width: 640px) and (max-width: 1199px) {
+@media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
   .home-section {
     padding: 10px 0;
     scroll-margin-top: 40px;

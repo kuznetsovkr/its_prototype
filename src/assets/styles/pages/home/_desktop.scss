@@ -1,4 +1,6 @@
-@media (min-width: 1200px) {
+@use "../../base/breakpoints" as bp;
+
+@media (min-width: bp.$desktop-min) {
   .home-page {
     width: 100vw;
     max-width: none;
@@ -369,7 +371,7 @@
   .home-social__inner { padding: 60px 50px 53px; }
 }
 
-@media (min-width: 1200px) and (max-width: 1599px) {
+@media (min-width: bp.$desktop-min) and (max-width: 1599px) {
   .home-section__inner,
   .home-about__card { width: calc(100% - 80px); }
 

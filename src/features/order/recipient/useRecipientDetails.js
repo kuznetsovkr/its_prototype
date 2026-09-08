@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IS_DEMO_MODE } from "../../../config/demoMode";
+import { MEDIA_QUERIES } from "../../../config/breakpoints";
 import { APP_ENV } from "../../../config/env";
 import { useOrder } from "../../../context/OrderContext";
 import { buildDemoCdekNumber, buildDemoOrderId } from "../../../mocks/demoData";
@@ -82,12 +83,12 @@ export const useRecipientDetails = () => {
   const [isMobileLayout, setIsMobileLayout] = useState(() =>
     typeof window !== "undefined" &&
     typeof window.matchMedia === "function" &&
-    window.matchMedia("(max-width: 639px)").matches
+    window.matchMedia(MEDIA_QUERIES.mobile).matches
   );
 
   useEffect(() => {
     if (typeof window.matchMedia !== "function") return undefined;
-    const query = window.matchMedia("(max-width: 639px)");
+    const query = window.matchMedia(MEDIA_QUERIES.mobile);
     const handleLayoutChange = (event) => setIsMobileLayout(event.matches);
     setIsMobileLayout(query.matches);
     if (typeof query.addEventListener === "function") {

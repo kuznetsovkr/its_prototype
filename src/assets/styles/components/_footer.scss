@@ -1,3 +1,5 @@
+@use "../base/breakpoints" as bp;
+
 /* Shared 2026 footer. Desktop has home/internal variants; compact layouts are common. */
 .home-footer {
   --home-white: #fff;
@@ -250,7 +252,7 @@
   text-underline-position: from-font;
 }
 
-@media (min-width: 640px) and (max-width: 1279px) {
+@media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
   .home-footer { height: 796px; }
 
   .home-footer--home .home-footer__panel,
@@ -392,7 +394,7 @@
   }
 }
 
-@media (max-width: 639px) {
+@media (max-width: bp.$mobile-max) {
   .home-footer { height: 958px; min-height: 958px; }
 
   .home-footer--home .home-footer__panel,

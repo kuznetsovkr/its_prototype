@@ -1,3 +1,5 @@
+import { MEDIA_QUERIES } from "../../config/breakpoints";
+
 const ResponsiveAsset = ({
   desktop,
   tablet,
@@ -8,11 +10,10 @@ const ResponsiveAsset = ({
   fetchPriority,
   width,
   height,
-  tabletMax = 1199,
 }) => (
   <picture className={className ? `${className}-picture` : undefined}>
-    {mobile && <source media="(max-width: 639px)" srcSet={mobile} />}
-    {tablet && <source media={`(max-width: ${tabletMax}px)`} srcSet={tablet} />}
+    {mobile && <source media={MEDIA_QUERIES.mobile} srcSet={mobile} />}
+    {tablet && <source media={MEDIA_QUERIES.tabletMax} srcSet={tablet} />}
     <img
       src={desktop || tablet || mobile}
       alt={alt}

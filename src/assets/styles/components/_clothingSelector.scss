@@ -1,3 +1,5 @@
+@use "../base/breakpoints" as bp;
+
 .orderBlock {
   width: 100%;
   display: flex;
@@ -565,7 +567,7 @@
   }
 }
 
-@media (min-width: 1280px) {
+@media (min-width: bp.$desktop-min) {
   .App--order {
     overflow-x: clip;
   }
@@ -893,7 +895,7 @@
 
 /* Order redesign: tablet frame 640 x 477. Keep this block after the legacy
    responsive rules so the supplied tablet layout wins at 640-768px. */
-@media (min-width: 640px) and (max-width: 1279px) {
+@media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
   .App--order {
     overflow-x: clip;
   }
@@ -1241,7 +1243,7 @@
 
 /* Order redesign: mobile frame 320 x 830. The canvas stays at the supplied
    width and is centred on wider phones until the tablet breakpoint. */
-@media (max-width: 639px) {
+@media (max-width: bp.$mobile-max) {
   .App--order {
     overflow-x: clip;
   }

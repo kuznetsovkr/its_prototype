@@ -1,8 +1,13 @@
+$mobile-max: 639px;
+$tablet-min: 640px;
+$tablet-max: 1199px;
+$desktop-min: 1200px;
+
 $xs: 480px;
-$sm: 640px;
+$sm: $tablet-min;
 $md: 768px;
 $lg: 1024px;
-$xl: 1280px;
+$xl: $desktop-min;
 
 @mixin xs {
   @media (max-width: $xs) {

@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { AddressSuggestions } from "react-dadata";
 import "react-dadata/dist/react-dadata.css";
 import { IS_DEMO_MODE } from "../config/demoMode";
+import { MEDIA_QUERIES } from "../config/breakpoints";
 import { useRecipientDetails } from "../features/order/recipient/useRecipientDetails";
 import figmaTshirtImg from "../images/order/tshirt-black.webp";
 import recipientBackIcon from "../images/order/recipient-back.svg";
@@ -41,8 +42,8 @@ const RecipientDetails = () => {
                 aria-label="Вернуться назад"
               >
                 <picture className="recipientOrderCard__backIcon">
-                  <source media="(max-width: 639px)" srcSet={orderBackIconMobile} />
-                  <source media="(max-width: 1279px)" srcSet={orderBackIconTablet} />
+                  <source media={MEDIA_QUERIES.mobile} srcSet={orderBackIconMobile} />
+                  <source media={MEDIA_QUERIES.tabletMax} srcSet={orderBackIconTablet} />
                   <img src={recipientBackIcon} alt="" aria-hidden="true" />
                 </picture>
               </button>
@@ -135,7 +136,7 @@ const RecipientDetails = () => {
                 >
                   <span className="recipientOrderForm__radio" aria-hidden="true">
                     <picture className="recipientOrderForm__radioResponsive">
-                      <source media="(max-width: 639px)" srcSet={recipientRadioMobile} />
+                      <source media={MEDIA_QUERIES.mobile} srcSet={recipientRadioMobile} />
                       <img src={recipientRadioTablet} alt="" />
                     </picture>
                     <img className="recipientOrderForm__radioOuter" src={recipientRadioOuter} alt="" />
