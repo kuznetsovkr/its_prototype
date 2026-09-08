@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import { selectUploadFiles } from "./embroideryConfig";
 
 const image = (name, overrides = {}) => ({

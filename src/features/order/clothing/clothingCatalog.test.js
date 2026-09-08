@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import { hasStock, normalizeInner, parseTypeLabel } from "./clothingCatalog";
 
 describe("clothing catalog rules", () => {

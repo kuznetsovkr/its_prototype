@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IS_DEMO_MODE } from "../../../config/demoMode";
+import { APP_ENV } from "../../../config/env";
 import { useOrder } from "../../../context/OrderContext";
 import { buildDemoCdekNumber, buildDemoOrderId } from "../../../mocks/demoData";
 import { storeOrderAccessToken } from "../../../utils/orderAccess";
@@ -133,7 +134,7 @@ export const useRecipientDetails = () => {
   
   // Dadata
   const [isNoCdek, setIsNoCdek] = useState(Boolean(recipientState.isNoCdek));
-  const dadataToken = process.env.REACT_APP_DADATA_TOKEN || "";
+  const dadataToken = APP_ENV.dadataToken;
 
   const isManualAddressFull = useMemo(() => {
     return hasFullManualAddress(manualAddress);
@@ -491,7 +492,7 @@ export const useRecipientDetails = () => {
 
       try {
         const confirmProvider =
-          process.env.NODE_ENV === "development" ? "manual" : "fallback";
+          APP_ENV.isDevelopment ? "manual" : "fallback";
         await confirmOrder(orderId, confirmProvider);
         const storedCdek = sessionStorage.getItem("pay_cdek_number") || null;
         navigate('/thank-you', { state: { orderNumber: orderId, cdekNumber: storedCdek || null } });

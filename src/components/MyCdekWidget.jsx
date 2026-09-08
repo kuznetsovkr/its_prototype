@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import CDEKWidget from "@cdek-it/widget";
 import { API_BASE } from "../api";
+import { APP_ENV } from "../config/env";
 
 const FIXED_TARIFF_CODE = 136;
 const DEFAULT_CENTER = [92.868, 56.0106];
@@ -81,7 +82,7 @@ const deriveServicePathFromApiBase = (apiBase) => {
 };
 
 const resolveServicePath = () => {
-  const configuredServicePath = String(process.env.REACT_APP_CDEK_SERVICE_URL || "").trim();
+  const configuredServicePath = String(APP_ENV.cdekServiceUrl).trim();
   const fallbackServicePath = deriveServicePathFromApiBase(API_BASE);
 
   if (!configuredServicePath) return fallbackServicePath;
@@ -107,7 +108,7 @@ const YMAPS_LAYER_ERROR_SIGNATURES = [
   "YMapDefaultSchemeLayer is not a constructor",
   "YMapDefaultFeaturesLayer is not a constructor",
 ];
-const MAP_ERROR_TEXT = "Карта СДЭК не загрузилась. Проверьте REACT_APP_YMAPS_KEY для JS API v3.";
+const MAP_ERROR_TEXT = "Карта СДЭК не загрузилась. Проверьте VITE_YMAPS_KEY для JS API v3.";
 
 const isYmapsLayerConstructorError = (reason) => {
   const message = String(reason?.message || reason || "");
@@ -187,7 +188,7 @@ const closeInfoPopup = (widgetInstance) => {
 
 const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType }) => {
   const servicePath = resolveServicePath();
-  const ymapsKey = String(process.env.REACT_APP_YMAPS_KEY || "")
+  const ymapsKey = String(APP_ENV.ymapsKey)
     .trim()
     .replace(/^['"]|['"]$/g, "");
 
@@ -213,7 +214,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
       setMapErrorMessage(MAP_ERROR_TEXT);
       console.error("[CDEK] Widget map init error:", reason);
       console.error(
-        "[CDEK] Проверьте ключ REACT_APP_YMAPS_KEY (доступ к Yandex Maps JS API v3 и разрешенный localhost/127.0.0.1 в ограничениях ключа)."
+        "[CDEK] Проверьте ключ VITE_YMAPS_KEY (доступ к Yandex Maps JS API v3 и разрешенный localhost/127.0.0.1 в ограничениях ключа)."
       );
     };
 
@@ -226,7 +227,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
 
     const t = setTimeout(() => {
       if (!ymapsKey) {
-        reportMapError(new Error("REACT_APP_YMAPS_KEY is empty"));
+        reportMapError(new Error("VITE_YMAPS_KEY is empty"));
         return;
       }
 

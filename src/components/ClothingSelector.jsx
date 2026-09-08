@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ReactComponent as CheckIcon } from "../images/Vector.svg";
+import checkIcon from "../images/Vector.svg";
 import orderBackMobile from "../images/order/order-back-mobile.svg";
 import { CORE_SIZES, detectChartKey, isWhite, normalizeKey } from "../features/order/clothing/clothingCatalog";
 import SizeGuideModal from "../features/order/clothing/SizeGuideModal";
@@ -58,7 +58,7 @@ const ClothingSelector = () => {
                       onChange={(event) => handleSelectClothing(event.target.value)}
                       disabled={!option.isAvailable}
                     />
-                    <span className="selectorType__custom"><CheckIcon className="selectorType__check" /></span>
+                    <span className="selectorType__custom"><img src={checkIcon} className="selectorType__check" alt="" aria-hidden="true" /></span>
                     {option.label}
                   </label>
                 ))}
@@ -68,7 +68,7 @@ const ClothingSelector = () => {
                   {presentInnerOptions.map((inner) => (
                     <label className={`selectorType__item ${selectedInnerType === inner ? "active" : ""}`} key={inner}>
                       <input type="radio" name="innerType" value={inner} checked={selectedInnerType === inner} onChange={(event) => handleSelectInnerType(event.target.value)} />
-                      <span className="selectorType__custom"><CheckIcon className="selectorType__check" /></span>
+                      <span className="selectorType__custom"><img src={checkIcon} className="selectorType__check" alt="" aria-hidden="true" /></span>
                       {inner}
                     </label>
                   ))}

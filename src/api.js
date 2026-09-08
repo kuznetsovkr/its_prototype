@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { APP_ENV } from './config/env';
 
 const normalizeBase = (value) => (value || '/api').replace(/\/+$/, '');
 
@@ -17,7 +18,7 @@ const shouldAvoidLoopback = () => {
   return !['localhost', '127.0.0.1', '::1'].includes(host);
 };
 
-const configuredApiBase = process.env.REACT_APP_API_URL || '/api';
+const configuredApiBase = APP_ENV.apiUrl;
 
 export const API_BASE = normalizeBase(
   shouldAvoidLoopback() && isLoopbackUrl(configuredApiBase) ? '/api' : configuredApiBase

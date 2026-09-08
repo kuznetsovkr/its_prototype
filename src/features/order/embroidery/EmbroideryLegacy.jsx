@@ -1,4 +1,4 @@
-import { ReactComponent as CheckIcon } from "../../../images/Vector.svg";
+import checkIcon from "../../../images/Vector.svg";
 
 const EmbroideryLegacy = ({ selection, navigate, textareaRef }) => {
   const {
@@ -30,7 +30,7 @@ const EmbroideryLegacy = ({ selection, navigate, textareaRef }) => {
                 checked={selectedType === "Patronus"}
               />
               <span className="selector__custom">
-                <CheckIcon className="selector__check" />
+                <img src={checkIcon} className="selector__check" alt="" aria-hidden="true" />
               </span>
               патронусы
               <span className="selector__price">{priceLabel("Patronus")}</span>
@@ -65,7 +65,7 @@ const EmbroideryLegacy = ({ selection, navigate, textareaRef }) => {
                 checked={selectedType === "Car"}
               />
               <span className="selector__custom">
-                <CheckIcon className="selector__check" />
+                <img src={checkIcon} className="selector__check" alt="" aria-hidden="true" />
               </span>
               автомобиль
               <span className="selector__price">{priceLabel("Car")}</span>
@@ -80,7 +80,7 @@ const EmbroideryLegacy = ({ selection, navigate, textareaRef }) => {
                 checked={selectedType === "petFace"}
               />
               <span className="selector__custom">
-                <CheckIcon className="selector__check" />
+                <img src={checkIcon} className="selector__check" alt="" aria-hidden="true" />
               </span>
               вышивка мордочки питомца по фото
               <span className="selector__price">{priceLabel("petFace")}</span>
@@ -114,7 +114,7 @@ const EmbroideryLegacy = ({ selection, navigate, textareaRef }) => {
                 checked={selectedType === "custom"}
               />
               <span className="selector__custom">
-                <CheckIcon className="selector__check" />
+                <img src={checkIcon} className="selector__check" alt="" aria-hidden="true" />
               </span>
               другая
               <span className="selector__price">{customPriceNote}</span>
@@ -141,7 +141,7 @@ const EmbroideryLegacy = ({ selection, navigate, textareaRef }) => {
                     }}
                   />
                   <span className="selector__custom">
-                    <CheckIcon className="selector__check" />
+                    <img src={checkIcon} className="selector__check" alt="" aria-hidden="true" />
                   </span>
                   изображение
                 </label>
@@ -157,7 +157,7 @@ const EmbroideryLegacy = ({ selection, navigate, textareaRef }) => {
                     }}
                   />
                   <span className="selector__custom">
-                    <CheckIcon className="selector__check" />
+                    <img src={checkIcon} className="selector__check" alt="" aria-hidden="true" />
                   </span>
                   надпись
                 </label>
@@ -260,4 +260,3 @@ const EmbroideryLegacy = ({ selection, navigate, textareaRef }) => {
 };
 
 export default EmbroideryLegacy;
-
