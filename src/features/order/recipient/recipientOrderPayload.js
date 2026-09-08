@@ -4,17 +4,12 @@ export const buildOrderFormData = ({
   userData, deliveryRecipient, orderComment, embroideryComment, email,
   preferredContact, deliveryComment, city, privacyConsent, productType,
   color, size, selectedType, embroideryTypeRu, patronusCount, petFaceCount,
-  customText, customOption, pickupPoint, manualAddress, isNoCdek, cdekData,
+  customText, customTextFont, customOption, pickupPoint, manualAddress, isNoCdek, cdekData,
   uploadedImage,
 }) => {
   const formData = new FormData();
   const recipientFullName = deliveryRecipient.trim() || joinFullName(userData);
-  const comment = [
-    orderComment.trim() || String(embroideryComment || "").trim(),
-    email.trim() ? `E-mail: ${email.trim()}` : "",
-    preferredContact.trim() ? `Удобный способ связи: ${preferredContact.trim()}` : "",
-    deliveryComment.trim() ? `Комментарий к доставке: ${deliveryComment.trim()}` : "",
-  ].filter(Boolean).join("\n");
+  const comment = orderComment.trim() || String(embroideryComment || "").trim();
   const productTypeName = typeof productType === "object"
     ? productType.name ?? productType.type ?? String(productType)
     : productType;
@@ -39,6 +34,7 @@ export const buildOrderFormData = ({
     patronusCount: String(patronusCount || 0),
     petFaceCount: String(petFaceCount || 0),
     customText: customText || "",
+    customTextFont: customTextFont || "",
     customOption: JSON.stringify(customOption || {}),
     comment,
     deliveryAddress: pickupPoint || manualAddress?.value || "",

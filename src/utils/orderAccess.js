@@ -10,6 +10,11 @@ export const getOrderAccessToken = (orderId) => {
   return sessionStorage.getItem(storageKey(orderId));
 };
 
+export const clearOrderAccessToken = (orderId) => {
+  if (!orderId) return;
+  sessionStorage.removeItem(storageKey(orderId));
+};
+
 export const orderAccessConfig = (orderId, token) => {
   const accessToken = token || getOrderAccessToken(orderId);
   return accessToken

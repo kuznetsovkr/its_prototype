@@ -692,6 +692,25 @@
   font-weight: 600;
 }
 
+.recipientOrderSummary {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  color: #2b2b2b;
+  line-height: 1.2;
+}
+
+.recipientOrderSummary strong {
+  color: #bc5823;
+  font-weight: 600;
+}
+
+.recipientOrderSummary__error {
+  color: #a53636;
+}
+
 .recipientOrderForm__consent {
   position: absolute;
   display: flex;
@@ -764,6 +783,14 @@
 
 .recipientOrderNavigation__submit:disabled {
   cursor: not-allowed;
+}
+
+.recipientOrderCard__backArrow:disabled,
+.recipientOrderForm__deliveryMethod:disabled,
+.recipientOrderForm__group button:disabled,
+.recipientOrderNavigation__back:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .recipientOrderNavigation__tabletLabel {
@@ -1125,6 +1152,14 @@
     top: 886px;
   }
 
+  .recipientOrderSummary {
+    top: 950px;
+    left: 36px;
+    width: 518px;
+    min-height: 28px;
+    font-size: 12px;
+  }
+
   .recipientOrderForm__consent {
     top: 988px;
     left: 36px;
@@ -1400,6 +1435,15 @@
 
   .recipientOrderForm__group--deliveryComment {
     top: 561px;
+  }
+
+  .recipientOrderSummary {
+    top: 594px;
+    left: 29px;
+    display: grid;
+    width: 236px;
+    font-size: 7px;
+    line-height: 1.05;
   }
 
   .recipientOrderForm__consent {
@@ -1681,6 +1725,15 @@
 
   .recipientOrderForm__group--deliveryComment {
     top: 576px;
+  }
+
+  .recipientOrderSummary {
+    top: 616px;
+    left: 20px;
+    display: grid;
+    width: 268px;
+    font-size: 8px;
+    line-height: 1.05;
   }
 
   .recipientOrderForm__consent {

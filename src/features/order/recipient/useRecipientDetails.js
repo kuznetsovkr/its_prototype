@@ -5,8 +5,13 @@ import { MEDIA_QUERIES } from "../../../config/breakpoints";
 import { APP_ENV } from "../../../config/env";
 import { useOrder } from "../../../context/OrderContext";
 import { buildDemoCdekNumber, buildDemoOrderId } from "../../../mocks/demoData";
-import { storeOrderAccessToken } from "../../../utils/orderAccess";
-import { confirmOrder, createOrder, getPaymentLink } from "./recipientApi";
+import { getOrderAccessToken, storeOrderAccessToken } from "../../../utils/orderAccess";
+import {
+  confirmOrder,
+  createOrder,
+  getCheckoutQuote,
+  getPaymentLink,
+} from "./recipientApi";
 import { buildOrderFormData } from "./recipientOrderPayload";
 import {
   deriveGoodsPreset,
@@ -48,6 +53,7 @@ export const useRecipientDetails = () => {
   const selectedType = embroidery.type || locationState.selectedType;
   const isCustomType = selectedType === "custom";
   const customText = embroidery.customText || locationState.customText;
+  const customTextFont = embroidery.customTextFont || locationState.customTextFont || "Arial";
   const customOption = embroidery.customOption || locationState.customOption || { image: false, text: false };
   const uploadedImage = embroidery.uploadedImage || locationState.uploadedImage || [];
   const comment = embroidery.comment || locationState.comment;
@@ -126,6 +132,10 @@ export const useRecipientDetails = () => {
   );
   const [isPaying, setIsPaying] = useState(false);
   const [orderId, setOrderId] = useState(null);
+  const [draftOrder, setDraftOrder] = useState(null);
+  const [checkoutQuote, setCheckoutQuote] = useState(null);
+  const [checkoutQuoteLoading, setCheckoutQuoteLoading] = useState(false);
+  const [checkoutQuoteError, setCheckoutQuoteError] = useState("");
   const [error, setError] = useState("");
 
   useLayoutEffect(() => {
@@ -343,6 +353,76 @@ export const useRecipientDetails = () => {
   const isCdekPickupSelected = Boolean(
     String(pickupPoint || "").trim() && cdekData?.mode === "office" && cdekOfficeCode
   );
+  const isManualCheckout = isCustomType || isNoCdek;
+
+  useEffect(() => {
+    if (isManualCheckout) {
+      setCheckoutQuote({ manual: true, merchandisePrice: null, deliveryPrice: null, totalPrice: null });
+      setCheckoutQuoteLoading(false);
+      setCheckoutQuoteError("");
+      return undefined;
+    }
+    if (!productType || !color || !size || !selectedType || !isCdekPickupSelected) {
+      setCheckoutQuote(null);
+      setCheckoutQuoteLoading(false);
+      setCheckoutQuoteError("");
+      return undefined;
+    }
+
+    if (IS_DEMO_MODE) {
+      const merchandisePrice = Number(embroidery.price);
+      const normalizedDeliveryPrice = Number(deliveryPrice);
+      const hasDemoPrice = Number.isFinite(merchandisePrice) && Number.isFinite(normalizedDeliveryPrice);
+      setCheckoutQuote(hasDemoPrice ? {
+        manual: false,
+        merchandisePrice,
+        deliveryPrice: normalizedDeliveryPrice,
+        totalPrice: merchandisePrice + normalizedDeliveryPrice,
+      } : null);
+      setCheckoutQuoteLoading(false);
+      setCheckoutQuoteError(hasDemoPrice ? "" : "Не удалось рассчитать итоговую стоимость");
+      return undefined;
+    }
+
+    let cancelled = false;
+    setCheckoutQuote(null);
+    setCheckoutQuoteLoading(true);
+    setCheckoutQuoteError("");
+    getCheckoutQuote({
+      productType: typeof productType === "object"
+        ? productType.name || productType.type || String(productType)
+        : productType,
+      color,
+      size,
+      embroideryType: selectedType,
+      patronusCount,
+      petFaceCount,
+      cdekMode: "office",
+      cdekAddress: { code: cdekOfficeCode },
+    }).then((quote) => {
+      if (!cancelled) setCheckoutQuote(quote);
+    }).catch((quoteError) => {
+      if (!cancelled) {
+        setCheckoutQuoteError(quoteError.message || "Не удалось рассчитать итоговую стоимость");
+      }
+    }).finally(() => {
+      if (!cancelled) setCheckoutQuoteLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [
+    isManualCheckout,
+    productType,
+    color,
+    size,
+    selectedType,
+    isCdekPickupSelected,
+    cdekOfficeCode,
+    patronusCount,
+    petFaceCount,
+    deliveryPrice,
+    embroidery.price,
+  ]);
+
   const recipientValidation = validateRecipient({
     userData,
     isNoCdek,
@@ -352,6 +432,17 @@ export const useRecipientDetails = () => {
   });
   const isFormValid = recipientValidation.isValid;
   const getMissingFieldsMessage = () => recipientValidation.message;
+  const hasCheckoutTotal = Number.isFinite(Number(checkoutQuote?.totalPrice));
+  const canSubmit = isFormValid && (
+    isManualCheckout || (!checkoutQuoteLoading && !checkoutQuoteError && hasCheckoutTotal)
+  );
+  const getSubmitDisabledMessage = () => {
+    if (!isFormValid) return getMissingFieldsMessage();
+    if (checkoutQuoteLoading) return "Дождитесь итогового расчёта стоимости";
+    if (checkoutQuoteError) return checkoutQuoteError;
+    if (!isManualCheckout && !hasCheckoutTotal) return "Не удалось рассчитать итоговую стоимость";
+    return "";
+  };
 
   const handleCdekSelect = (payload) => {
     const label =
@@ -390,15 +481,17 @@ export const useRecipientDetails = () => {
   };
 
   async function createDraftOrder() {
+    if (draftOrder?.orderId && draftOrder?.orderToken) return draftOrder;
     try {
       const data = await createOrder(buildOrderFormData({
         userData, deliveryRecipient, orderComment, embroideryComment: comment,
         email, preferredContact, deliveryComment, city, privacyConsent,
         productType, color, size, selectedType, embroideryTypeRu,
-        patronusCount, petFaceCount, customText, customOption, pickupPoint,
+        patronusCount, petFaceCount, customText, customTextFont, customOption, pickupPoint,
         manualAddress, isNoCdek, cdekData, uploadedImage,
       }));
       setOrderId(data.orderId);
+      setDraftOrder(data);
       storeOrderAccessToken(data.orderId, data.orderToken);
       sessionStorage.setItem("pay_order_id", String(data.orderId));
       if (data?.cdekNumber) {
@@ -412,8 +505,8 @@ export const useRecipientDetails = () => {
 
   async function handlePayment() {
     if (isPaying) return;
-    if (!isFormValid) {
-      setError(getMissingFieldsMessage());
+    if (!canSubmit) {
+      setError(getSubmitDisabledMessage());
       return;
     }
     setError('');
@@ -434,39 +527,53 @@ export const useRecipientDetails = () => {
       navigate("/thank-you", {
         state: {
           orderNumber: demoOrderId,
-          manual: isCustomType,
+          manual: isManualCheckout,
           cdekNumber: demoCdekNumber,
         },
       });
       return;
     }
 
+    let activeDraft = draftOrder;
+
     try {
+      activeDraft = await createDraftOrder();
       const {
         orderId: oid,
         orderToken,
         cdekNumber: cdekNum,
         pricePending,
-      } = await createDraftOrder();
+        merchandisePrice,
+        deliveryPrice: confirmedDeliveryPrice,
+        totalPrice,
+      } = activeDraft;
       setOrderId(oid);
 
+      if (Number.isFinite(Number(totalPrice))) {
+        setCheckoutQuote({
+          manual: false,
+          merchandisePrice,
+          deliveryPrice: confirmedDeliveryPrice,
+          totalPrice,
+        });
+      }
+
       if (pricePending) {
-        try {
-          await confirmOrder(oid, "manual", orderToken);
-        } catch (confirmErr) {
-          console.warn("Manual confirm failed:", confirmErr);
-        }
+        await confirmOrder(oid, "manual", orderToken);
         setIsPaying(false);
         navigate("/thank-you", { state: { orderNumber: oid, manual: true, cdekNumber: cdekNum || null } });
         return;
       }
 
-      const paymentUrl = await getPaymentLink(oid, orderToken);
+      const paymentUrl = await getPaymentLink(oid, orderToken || getOrderAccessToken(oid));
       sessionStorage.setItem('pay_order_id', String(oid));
       sessionStorage.setItem('pay_cdek_number', cdekNum ? String(cdekNum) : "");
       window.location.href = paymentUrl;
     } catch (e) {
-      setError(e.message || 'Не удалось создать заказ или перейти к оплате');
+      setError(
+        `${e.message || "Не удалось создать заказ или перейти к оплате"}` +
+        (activeDraft?.orderId ? ". Заказ уже сохранён — повторите оплату." : "")
+      );
       setIsPaying(false);
       }
     }
@@ -529,7 +636,9 @@ export const useRecipientDetails = () => {
     pickupPoint, setPickupPoint, setDeliveryPrice, isNoCdek,
     isCdekPickupSelected, deliveryRecipient, setDeliveryRecipient,
     deliveryComment, setDeliveryComment, privacyConsent, setPrivacyConsent,
-    error, handlePayment, isFormValid, getMissingFieldsMessage,
+    error, handlePayment, isFormValid, canSubmit, getMissingFieldsMessage,
+    getSubmitDisabledMessage, checkoutQuote, checkoutQuoteLoading, checkoutQuoteError,
+    isManualCheckout, isCheckoutLocked: Boolean(draftOrder),
     handleCdekSelect, applyDemoPickup, handleNoCdekToggle,
     manualAddress, setManualAddress, dadataToken, isManualAddressFull,
   };

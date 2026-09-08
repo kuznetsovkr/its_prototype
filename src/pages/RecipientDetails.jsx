@@ -14,20 +14,25 @@ import recipientRadioTablet from "../images/order/recipient-radio-tablet.svg";
 import recipientRadioMobile from "../images/order/recipient-radio-mobile.svg";
 
 const MyCdekWidget = lazy(() => import("../components/MyCdekWidget"));
+const priceFormatter = new Intl.NumberFormat("ru-RU");
 
 const RecipientDetails = () => {
   const {
-    navigate, productType, isCustomType, fullNameInput, handleFullNameChange, isPaying,
+    navigate, productType, fullNameInput, handleFullNameChange, isPaying,
     userData, handleInputChange, email, setEmail, isMobileLayout,
     preferredContact, setPreferredContact, orderComment, setOrderComment,
     city, setCity, isCdekPickerOpen, setIsCdekPickerOpen,
     pickupPoint, setPickupPoint, setDeliveryPrice, isNoCdek,
     isCdekPickupSelected, deliveryRecipient, setDeliveryRecipient,
     deliveryComment, setDeliveryComment, privacyConsent, setPrivacyConsent,
-    error, handlePayment, isFormValid, getMissingFieldsMessage,
+    error, handlePayment, canSubmit, getSubmitDisabledMessage,
     handleCdekSelect, applyDemoPickup, handleNoCdekToggle,
     manualAddress, setManualAddress, dadataToken, isManualAddressFull,
+    checkoutQuote, checkoutQuoteLoading, checkoutQuoteError,
+    isManualCheckout, isCheckoutLocked,
   } = useRecipientDetails();
+  const formDisabled = isPaying || isCheckoutLocked;
+  const formatPrice = (value) => `${priceFormatter.format(Number(value))} ₽`;
 
   return (
     <>
@@ -39,7 +44,9 @@ const RecipientDetails = () => {
                 type="button"
                 className="recipientOrderCard__backArrow"
                 onClick={() => navigate(-1)}
+                disabled={isCheckoutLocked}
                 aria-label="Вернуться назад"
+                title={isCheckoutLocked ? "Заказ уже создан. Завершите или повторите оплату" : undefined}
               >
                 <picture className="recipientOrderCard__backIcon">
                   <source media={MEDIA_QUERIES.mobile} srcSet={orderBackIconMobile} />
@@ -70,7 +77,7 @@ const RecipientDetails = () => {
                   placeholder="ФИО"
                   value={fullNameInput}
                   onChange={handleFullNameChange}
-                  disabled={isPaying}
+                  disabled={formDisabled}
                 />
 
                 <div className="recipientOrderForm__phoneField">
@@ -82,7 +89,7 @@ const RecipientDetails = () => {
                     placeholder="Номер телефона"
                     value={userData.phone}
                     onChange={handleInputChange}
-                    disabled={isPaying}
+                    disabled={formDisabled}
                     maxLength={18}
                   />
                 </div>
@@ -94,7 +101,7 @@ const RecipientDetails = () => {
                   placeholder="E-mail"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  disabled={isPaying}
+                  disabled={formDisabled}
                 />
 
                 <input
@@ -103,7 +110,7 @@ const RecipientDetails = () => {
                   placeholder={isMobileLayout ? "Удобный способ связи" : "Удобный способ связи ( Telegram / VK / другое )"}
                   value={preferredContact}
                   onChange={(event) => setPreferredContact(event.target.value)}
-                  disabled={isPaying}
+                  disabled={formDisabled}
                 />
 
                 <textarea
@@ -111,7 +118,7 @@ const RecipientDetails = () => {
                   placeholder="Комментарий / пожелание к заказу"
                   value={orderComment}
                   onChange={(event) => setOrderComment(event.target.value)}
-                  disabled={isPaying}
+                  disabled={formDisabled}
                 />
 
                 <h2 className="recipientOrderForm__heading recipientOrderForm__heading--delivery">
@@ -125,7 +132,7 @@ const RecipientDetails = () => {
                     placeholder={isMobileLayout ? "Санкт - Петербург" : "Санкт-Петербург"}
                     value={city}
                     onChange={(event) => setCity(event.target.value)}
-                    disabled={isPaying}
+                    disabled={formDisabled}
                   />
                 </label>
 
@@ -133,6 +140,7 @@ const RecipientDetails = () => {
                   type="button"
                   className="recipientOrderForm__deliveryMethod"
                   onClick={() => setIsCdekPickerOpen(true)}
+                  disabled={formDisabled}
                 >
                   <span className="recipientOrderForm__radio" aria-hidden="true">
                     <picture className="recipientOrderForm__radioResponsive">
@@ -153,6 +161,7 @@ const RecipientDetails = () => {
                   <button
                     type="button"
                     onClick={() => setIsCdekPickerOpen(true)}
+                    disabled={formDisabled}
                     aria-describedby={
                       !isNoCdek && !isCdekPickupSelected
                         ? "recipient-pickup-validation"
@@ -184,7 +193,7 @@ const RecipientDetails = () => {
                     placeholder="Иванов Иван Иванович"
                     value={deliveryRecipient}
                     onChange={(event) => setDeliveryRecipient(event.target.value)}
-                    disabled={isPaying}
+                    disabled={formDisabled}
                   />
                 </label>
 
@@ -195,15 +204,32 @@ const RecipientDetails = () => {
                     placeholder="Комментарий к доставке"
                     value={deliveryComment}
                     onChange={(event) => setDeliveryComment(event.target.value)}
-                    disabled={isPaying}
+                    disabled={formDisabled}
                   />
                 </label>
+
+                <div className="recipientOrderSummary" aria-live="polite">
+                  {isManualCheckout ? (
+                    <strong>Стоимость рассчитает менеджер после отправки заявки</strong>
+                  ) : checkoutQuoteLoading ? (
+                    <span>Рассчитываем итоговую стоимость…</span>
+                  ) : checkoutQuoteError ? (
+                    <span className="recipientOrderSummary__error">{checkoutQuoteError}</span>
+                  ) : checkoutQuote ? (
+                    <>
+                      <span>Изделие и вышивка: {formatPrice(checkoutQuote.merchandisePrice)}</span>
+                      <span>Доставка: {formatPrice(checkoutQuote.deliveryPrice)}</span>
+                      <strong>Итого: {formatPrice(checkoutQuote.totalPrice)}</strong>
+                    </>
+                  ) : null}
+                </div>
 
                 <label className="recipientOrderForm__consent">
                   <input
                     type="checkbox"
                     checked={privacyConsent}
                     onChange={(event) => setPrivacyConsent(event.target.checked)}
+                    disabled={formDisabled}
                   />
                   <span>
                     Я даю <em>своё согласие на обработку моих персональных данных</em> в соответствии с <em>политикой конфиденциальности</em>
@@ -214,17 +240,23 @@ const RecipientDetails = () => {
               {error && <p className="recipientOrderCard__error" role="alert">{error}</p>}
 
               <div className="recipientOrderNavigation">
-                <button type="button" className="recipientOrderNavigation__back" onClick={() => navigate(-1)}>
+                <button
+                  type="button"
+                  className="recipientOrderNavigation__back"
+                  onClick={() => navigate(-1)}
+                  disabled={isCheckoutLocked}
+                  title={isCheckoutLocked ? "Заказ уже создан. Завершите или повторите оплату" : undefined}
+                >
                   назад
                 </button>
                 <button
                   type="button"
                   className="recipientOrderNavigation__submit"
                   onClick={handlePayment}
-                  disabled={!isFormValid || isPaying}
-                  title={!isFormValid ? getMissingFieldsMessage() : undefined}
+                  disabled={!canSubmit || isPaying}
+                  title={!canSubmit ? getSubmitDisabledMessage() : undefined}
                 >
-                  {isPaying ? "Обрабатываем..." : isCustomType ? "отправить заявку" : (
+                  {isPaying ? "Обрабатываем..." : isManualCheckout ? "отправить заявку" : (
                     <>
                       <span className="recipientOrderNavigation__paymentLabel">к оплате</span>
                       <span className="recipientOrderNavigation__tabletLabel">далее</span>
