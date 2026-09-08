@@ -1,6 +1,6 @@
-import hoodieImg from "../../../images/hoodie.jpg";
-import switshotImg from "../../../images/switshot.jpg";
-import tshirtImg from "../../../images/tshirt.jpg";
+import hoodieImg from "../../../images/hoodie.webp";
+import switshotImg from "../../../images/switshot.webp";
+import tshirtImg from "../../../images/tshirt.webp";
 
 export const isWhite = (color = "") => {
   const value = String(color).trim().toLowerCase();

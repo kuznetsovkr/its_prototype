@@ -3,7 +3,7 @@ import { AddressSuggestions } from "react-dadata";
 import "react-dadata/dist/react-dadata.css";
 import { IS_DEMO_MODE } from "../config/demoMode";
 import { useRecipientDetails } from "../features/order/recipient/useRecipientDetails";
-import figmaTshirtImg from "../images/order/tshirt-black.png";
+import figmaTshirtImg from "../images/order/tshirt-black.webp";
 import recipientBackIcon from "../images/order/recipient-back.svg";
 import orderBackIconTablet from "../images/order/order-back-tablet.svg";
 import orderBackIconMobile from "../images/order/order-back-mobile.svg";

@@ -1,5 +1,5 @@
 import React from "react";
-import figmaTshirtImg from "../../../images/order/tshirt-black.png";
+import figmaTshirtImg from "../../../images/order/tshirt-black.webp";
 import embroideryRadioActive from "../../../images/order/embroidery-radio-active.svg";
 import embroideryRadioActiveMobile from "../../../images/order/embroidery-radio-active-mobile.svg";
 import embroideryRadioActiveTablet from "../../../images/order/embroidery-radio-active-tablet.svg";

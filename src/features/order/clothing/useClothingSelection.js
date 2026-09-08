@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useOrder } from "../../../context/OrderContext";
 import { buildImgSrc } from "../../../utils/url";
-import figmaTshirtImg from "../../../images/order/tshirt-black.png";
+import figmaTshirtImg from "../../../images/order/tshirt-black.webp";
 import { loadClothingCatalog } from "./clothingApi";
 import {
   COLOR_ORDER,
