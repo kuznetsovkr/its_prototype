@@ -1,21 +1,21 @@
 
-@import "base/reset";
-@import "base/variables";
-@import "base/mixins";
-@import "base/breakpoints";
-@import "base/globals";
-@import "base/typography";
+@use "base/reset";
+@use "base/variables";
+@use "base/mixins";
+@use "base/breakpoints";
+@use "base/globals";
+@use "base/typography";
 
-@import "components/clothingSelector";
-@import "components/embroiderySelector";
+@use "components/clothingSelector";
+@use "components/embroiderySelector";
 
-@import "pages/homePage";
-@import "pages/certificatePage";
-@import "pages/adminLogin";
-@import "pages/recipientDetails";
-@import "pages/adminInventory";
-@import "pages/thx";
+@use "pages/homePage";
+@use "pages/certificatePage";
+@use "pages/adminLogin";
+@use "pages/recipientDetails";
+@use "pages/adminInventory";
+@use "pages/thx";
 
 // Shared shell styles intentionally come last so legacy page rules cannot hide or restyle it.
-@import "components/footer";
-@import "components/header";
+@use "components/footer";
+@use "components/header";

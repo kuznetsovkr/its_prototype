@@ -1,8 +1,9 @@
 @use "sass:map";
+@use "variables";
 
 @mixin respond-to($size) {
-  @if map.has-key($breakpoints, $size) {
-    @media (max-width: map.get($breakpoints, $size)) {
+  @if map.has-key(variables.$breakpoints, $size) {
+    @media (max-width: map.get(variables.$breakpoints, $size)) {
       @content;
     }
   }

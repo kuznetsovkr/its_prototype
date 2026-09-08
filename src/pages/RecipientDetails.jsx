@@ -1,4 +1,4 @@
-import MyCdekWidget from "../components/MyCdekWidget";
+import { lazy, Suspense } from "react";
 import { AddressSuggestions } from "react-dadata";
 import "react-dadata/dist/react-dadata.css";
 import { IS_DEMO_MODE } from "../config/demoMode";
@@ -11,6 +11,8 @@ import recipientRadioOuter from "../images/order/recipient-radio-outer.svg";
 import recipientRadioInner from "../images/order/recipient-radio-inner.svg";
 import recipientRadioTablet from "../images/order/recipient-radio-tablet.svg";
 import recipientRadioMobile from "../images/order/recipient-radio-mobile.svg";
+
+const MyCdekWidget = lazy(() => import("../components/MyCdekWidget"));
 
 const RecipientDetails = () => {
   const {
@@ -261,13 +263,15 @@ const RecipientDetails = () => {
                 )}
               </div>
             </div>
-            {!IS_DEMO_MODE && (
-              <MyCdekWidget
-                productType={productType}
-                onAddressSelect={setPickupPoint}
-                onRateSelect={setDeliveryPrice}
-                onCdekSelect={handleCdekSelect}
-              />
+            {!IS_DEMO_MODE && isCdekPickerOpen && (
+              <Suspense fallback={<p className="cdek-map__loading">Загружаем карту…</p>}>
+                <MyCdekWidget
+                  productType={productType}
+                  onAddressSelect={setPickupPoint}
+                  onRateSelect={setDeliveryPrice}
+                  onCdekSelect={handleCdekSelect}
+                />
+              </Suspense>
             )}
             {IS_DEMO_MODE && !isNoCdek && (
               <button type="button" className="demoPickupButton" onClick={applyDemoPickup}>

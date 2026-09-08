@@ -1,22 +1,23 @@
-import React, { useEffect, useLayoutEffect } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import HomePage from './pages/HomePage';
-import CertificatePage from './pages/CertificatePage';
-import OrderPage from './pages/OrderPage'; // Добавьте новый компонент для страницы заказа
-import EmbroideryPage from './pages/EmbroideryPage';
-import RecipientDetails from './pages/RecipientDetails';
-import ThankYouPage from './pages/ThankYouPage';
-import PaymentPage from './pages/PaymentPage';
-import AdminInventory from "./admin/AdminInventory";
 import PageLayout from './components/PageLayout';
-import FakePayment from './pages/FakePayment';
-import PaymentSuccess from './pages/PaymentSuccess';
-import PaymentFail from './pages/PaymentFail';
 import { useOrder } from "./context/OrderContext";
 import RequireAdmin from './components/RequireAdmin';
-import AdminLoginPage from './pages/AdminLoginPage';
+
+const HomePage = lazy(() => import('./pages/HomePage'));
+const CertificatePage = lazy(() => import('./pages/CertificatePage'));
+const OrderPage = lazy(() => import('./pages/OrderPage'));
+const EmbroideryPage = lazy(() => import('./pages/EmbroideryPage'));
+const RecipientDetails = lazy(() => import('./pages/RecipientDetails'));
+const ThankYouPage = lazy(() => import('./pages/ThankYouPage'));
+const PaymentPage = lazy(() => import('./pages/PaymentPage'));
+const AdminInventory = lazy(() => import('./admin/AdminInventory'));
+const FakePayment = lazy(() => import('./pages/FakePayment'));
+const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess'));
+const PaymentFail = lazy(() => import('./pages/PaymentFail'));
+const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'));
 
 const OrderFlowReset = () => {
     const location = useLocation();
@@ -65,29 +66,31 @@ const AppShell = () => {
     const isCertificatePage = pathname === '/certificate';
 
     const routes = (
-        <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/certificate" element={<CertificatePage />} />
-            <Route path="/order" element={<PageLayout><OrderPage /></PageLayout>} />
-            <Route path="/embroidery" element={<PageLayout><EmbroideryPage /></PageLayout>} />
-            <Route path="/recipient" element={<PageLayout><RecipientDetails /></PageLayout>} />
-            <Route path="/thank-you" element={<PageLayout><ThankYouPage /></PageLayout>} />
-            <Route path="/payment" element={<PageLayout><PaymentPage /></PageLayout>} />
-            <Route path="/fake-payment" element={<FakePayment />} />
-            <Route path="/payment-success" element={<PageLayout><PaymentSuccess /></PageLayout>} />
-            <Route path="/payment-fail" element={<PageLayout><PaymentFail /></PageLayout>} />
-            <Route path="/admin" element={<PageLayout><AdminLoginPage /></PageLayout>} />
+        <Suspense fallback={<div className="route-loading" role="status">Загрузка…</div>}>
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/certificate" element={<CertificatePage />} />
+                <Route path="/order" element={<PageLayout><OrderPage /></PageLayout>} />
+                <Route path="/embroidery" element={<PageLayout><EmbroideryPage /></PageLayout>} />
+                <Route path="/recipient" element={<PageLayout><RecipientDetails /></PageLayout>} />
+                <Route path="/thank-you" element={<PageLayout><ThankYouPage /></PageLayout>} />
+                <Route path="/payment" element={<PageLayout><PaymentPage /></PageLayout>} />
+                <Route path="/fake-payment" element={<FakePayment />} />
+                <Route path="/payment-success" element={<PageLayout><PaymentSuccess /></PageLayout>} />
+                <Route path="/payment-fail" element={<PageLayout><PaymentFail /></PageLayout>} />
+                <Route path="/admin" element={<PageLayout><AdminLoginPage /></PageLayout>} />
 
-            {/* Админку можно оставить без layout-а, если она отдельная */}
-            <Route
-              path="/admin/inventory"
-              element={
-                <RequireAdmin>
-                  <PageLayout><AdminInventory /></PageLayout>
-                </RequireAdmin>
-              }
-            />
-        </Routes>
+                {/* Админку можно оставить без layout-а, если она отдельная */}
+                <Route
+                  path="/admin/inventory"
+                  element={
+                    <RequireAdmin>
+                      <PageLayout><AdminInventory /></PageLayout>
+                    </RequireAdmin>
+                  }
+                />
+            </Routes>
+        </Suspense>
     );
 
     return (
@@ -110,5 +113,4 @@ const App = () => {
 };
 
 export default App;
-
 
