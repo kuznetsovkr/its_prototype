@@ -150,7 +150,7 @@ const RecipientDetails = () => {
               total_sum: DEMO_DELIVERY_PRICE,
               currency: "RUB",
             },
-            address: { address: DEMO_PICKUP_POINT },
+            address: { code: "DEMO-PVZ", address: DEMO_PICKUP_POINT },
             addressLabel: DEMO_PICKUP_POINT,
           }
         : null)
@@ -346,7 +346,7 @@ const RecipientDetails = () => {
         total_sum: DEMO_DELIVERY_PRICE,
         currency: "RUB",
       },
-      address: { address: DEMO_PICKUP_POINT },
+      address: { code: "DEMO-PVZ", address: DEMO_PICKUP_POINT },
       addressLabel: DEMO_PICKUP_POINT,
     });
   };
@@ -376,7 +376,15 @@ const RecipientDetails = () => {
     userData.middleName.trim() !== "" &&
     userData.phone.trim() !== "";
 
-  const isDeliveryAddressFilled = isNoCdek ? Boolean(manualAddress?.value && isManualAddressFull) : true;
+  const cdekOfficeCode = String(
+    cdekData?.address?.code || cdekData?.address?.office_code || ""
+  ).trim();
+  const isCdekPickupSelected = Boolean(
+    String(pickupPoint || "").trim() && cdekData?.mode === "office" && cdekOfficeCode
+  );
+  const isDeliveryAddressFilled = isNoCdek
+    ? Boolean(manualAddress?.value && isManualAddressFull)
+    : isCdekPickupSelected;
     
   const isPhoneOk = isRu11(cleanPhone(userData.phone));
   const isFormValid = isUserDataFilled && isDeliveryAddressFilled && isPhoneOk && privacyConsent;
@@ -392,6 +400,8 @@ const RecipientDetails = () => {
       if (!manualAddress?.value || !isManualAddressFull) {
         missing.push("полный адрес до дома");
       }
+    } else if (!isCdekPickupSelected) {
+      missing.push("пункт выдачи СДЭК");
     }
 
     if (!isPhoneOk) missing.push("корректный телефон");
@@ -460,7 +470,7 @@ const RecipientDetails = () => {
         total_sum: DEMO_DELIVERY_PRICE,
         currency: "RUB",
       },
-      address: { address: DEMO_PICKUP_POINT },
+      address: { code: "DEMO-PVZ", address: DEMO_PICKUP_POINT },
       addressLabel: DEMO_PICKUP_POINT,
       goods,
       from: { country_code: "RU", city: "Krasnoyarsk" },
@@ -539,6 +549,10 @@ const RecipientDetails = () => {
 
   async function handlePayment() {
     if (isPaying) return;
+    if (!isFormValid) {
+      setError(getMissingFieldsMessage());
+      return;
+    }
     setError('');
     setIsPaying(true);
 
@@ -777,9 +791,30 @@ const RecipientDetails = () => {
 
                 <label className="recipientOrderForm__group recipientOrderForm__group--pickup">
                   <span>Пункт получения</span>
-                  <button type="button" onClick={() => setIsCdekPickerOpen(true)}>
+                  <button
+                    type="button"
+                    onClick={() => setIsCdekPickerOpen(true)}
+                    aria-describedby={
+                      !isNoCdek && !isCdekPickupSelected
+                        ? "recipient-pickup-validation"
+                        : undefined
+                    }
+                    aria-label={
+                      isCdekPickupSelected
+                        ? `Выбран пункт получения: ${pickupPoint}`
+                        : "Выберите пункт получения СДЭК"
+                    }
+                  >
                     {pickupPoint || "Выберите пункт получения"}
                   </button>
+                  {!isNoCdek && !isCdekPickupSelected && (
+                    <small
+                      className="recipientOrderForm__validation"
+                      id="recipient-pickup-validation"
+                    >
+                      Выберите ПВЗ, чтобы продолжить
+                    </small>
+                  )}
                 </label>
 
                 <label className="recipientOrderForm__group recipientOrderForm__group--recipient">

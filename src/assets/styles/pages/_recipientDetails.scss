@@ -635,6 +635,16 @@
   white-space: nowrap;
 }
 
+.recipientOrderForm__validation {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 10px;
+  color: #a53636;
+  font-size: 0.85em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 .recipientOrderForm__deliveryMethod {
   position: absolute;
   display: flex;
