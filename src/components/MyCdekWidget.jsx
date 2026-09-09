@@ -40,13 +40,6 @@ const FROM_LOCATION = {
   address: "ул. 78-й Добровольческой бригады, 1",
 };
 
-const DEFAULT_CITY = {
-  code: 278,
-  city: "Красноярск",
-  country_code: "RU",
-  postal_code: "660135",
-};
-
 const LOOPBACK_HOSTS = ["localhost", "127.0.0.1", "::1"];
 
 const isLoopbackUrl = (value) => {
@@ -252,7 +245,6 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
           hideDeliveryOptions: { office: false, door: true },
           debug: false,
           goods: [goods],
-          city: DEFAULT_CITY,
           defaultLocation: DEFAULT_CENTER,
           fixBounds: null,
           lang: "rus",
