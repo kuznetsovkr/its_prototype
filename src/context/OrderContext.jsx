@@ -29,7 +29,6 @@ const isSameManualAddress = (a, b) => {
 
 const isSameClothing = (a, b) =>
   (a?.type || "") === (b?.type || "") &&
-  (a?.innerType || "") === (b?.innerType || "") &&
   (a?.color || "") === (b?.color || "") &&
   (a?.size || "") === (b?.size || "");
 
@@ -80,7 +79,6 @@ const normalizeManualAddress = (value, fallback) => {
 const initialState = {
   clothing: {
     type: "",
-    innerType: "",
     color: "",
     size: "",
   },

@@ -6,12 +6,10 @@ import { loadClothingCatalog } from "./clothingApi";
 import {
   COLOR_ORDER,
   CORE_SIZES,
-  INNER_ORDER,
   TYPE_ORDER,
   detectChartKey,
   hasStock,
   normalizeKey,
-  parseTypeLabel,
   uniqBy,
 } from "./clothingCatalog";
 
@@ -23,50 +21,35 @@ export const useClothingSelection = () => {
   const [colorCatalog, setColorCatalog] = useState([]);
   const [inventoryLoaded, setInventoryLoaded] = useState(false);
   const [selectedClothing, setSelectedClothing] = useState(clothing.type || "");
-  const [selectedInnerType, setSelectedInnerType] = useState(clothing.innerType || "");
   const [selectedColor, setSelectedColor] = useState(clothing.color || "");
   const [selectedSize, setSelectedSize] = useState(clothing.size || "");
 
-  const typedInventory = useMemo(
-    () => inventory.map((item) => ({ ...item, parsed: parseTypeLabel(item.productType) })),
-    [inventory]
-  );
-  const inStockInventory = useMemo(() => typedInventory.filter(hasStock), [typedInventory]);
+  const inStockInventory = useMemo(() => inventory.filter(hasStock), [inventory]);
   const sizeOptions = useMemo(() => {
     const supportsXXL = normalizeKey(selectedSize) === "xxl" ||
-      typedInventory.some((item) => normalizeKey(item.size) === "xxl");
+      inventory.some((item) => normalizeKey(item.size) === "xxl");
     return supportsXXL ? [...CORE_SIZES, "XXL"] : CORE_SIZES;
-  }, [typedInventory, selectedSize]);
+  }, [inventory, selectedSize]);
 
   const baseTypeOptions = useMemo(() => {
-    const catalogTypes = clothingTypes.map((item) => parseTypeLabel(item?.name).base).filter(Boolean);
-    const inventoryTypes = typedInventory.map((item) => item.parsed.base).filter(Boolean);
+    const catalogTypes = clothingTypes.map((item) => String(item?.name || "").trim()).filter(Boolean);
+    const inventoryTypes = inventory.map((item) => String(item?.productType || "").trim()).filter(Boolean);
     return uniqBy([...inventoryTypes, ...catalogTypes], normalizeKey)
       .sort((a, b) => TYPE_ORDER[detectChartKey(a)] - TYPE_ORDER[detectChartKey(b)])
       .map((label) => ({
         label,
         isAvailable: inStockInventory.some(
-          (item) => normalizeKey(item.parsed.base) === normalizeKey(label)
+          (item) => normalizeKey(item.productType) === normalizeKey(label)
         ),
       }));
-  }, [clothingTypes, typedInventory, inStockInventory]);
+  }, [clothingTypes, inventory, inStockInventory]);
 
-  const presentInnerOptions = useMemo(() => {
-    const options = new Set(
-      inStockInventory
-        .filter((item) => normalizeKey(item.parsed.base) === normalizeKey(selectedClothing))
-        .map((item) => item.parsed.inner)
-        .filter(Boolean)
-    );
-    return Array.from(options).sort((a, b) => (INNER_ORDER[a] ?? 99) - (INNER_ORDER[b] ?? 99));
-  }, [inStockInventory, selectedClothing]);
-  const needsInner = presentInnerOptions.length > 0;
-
-  const filteredByType = useMemo(() => typedInventory.filter((item) => {
-    if (normalizeKey(item.parsed.base) !== normalizeKey(selectedClothing)) return false;
-    if (!needsInner) return true;
-    return Boolean(selectedInnerType) && item.parsed.inner === selectedInnerType;
-  }), [typedInventory, selectedClothing, needsInner, selectedInnerType]);
+  const filteredByType = useMemo(
+    () => inventory.filter(
+      (item) => normalizeKey(item.productType) === normalizeKey(selectedClothing)
+    ),
+    [inventory, selectedClothing]
+  );
 
   const colorOptions = useMemo(() => {
     const byName = new Map();
@@ -99,7 +82,7 @@ export const useClothingSelection = () => {
   [filteredByType, selectedColor]);
 
   const canProceed = Boolean(
-    selectedClothing && selectedColor && selectedSize && (!needsInner || selectedInnerType) &&
+    selectedClothing && selectedColor && selectedSize &&
     filteredByType.some((item) => hasStock(item) &&
       normalizeKey(item.color) === normalizeKey(selectedColor) && item.size === selectedSize)
   );
@@ -125,30 +108,13 @@ export const useClothingSelection = () => {
       normalizeKey(option.label) === normalizeKey(selectedClothing) && option.isAvailable);
     if (!currentAvailable && selectedClothing !== firstAvailable) {
       setSelectedClothing(firstAvailable);
-      setSelectedInnerType("");
       setSelectedColor("");
       setSelectedSize("");
     }
   }, [inventoryLoaded, baseTypeOptions, selectedClothing]);
 
   useEffect(() => {
-    if (!inventoryLoaded || !selectedClothing) return;
-    if (presentInnerOptions.length && !presentInnerOptions.includes(selectedInnerType)) {
-      setSelectedInnerType(presentInnerOptions[0]);
-      setSelectedColor("");
-      setSelectedSize("");
-    } else if (!presentInnerOptions.length && selectedInnerType) {
-      setSelectedInnerType("");
-    }
-  }, [inventoryLoaded, selectedClothing, presentInnerOptions, selectedInnerType]);
-
-  useEffect(() => {
     if (!inventoryLoaded) return;
-    if (needsInner && !selectedInnerType) {
-      setSelectedColor("");
-      setSelectedSize("");
-      return;
-    }
     const availableColors = colorOptions.filter((option) => option.isAvailable);
     const hasSelected = availableColors.some((option) =>
       normalizeKey(option.label) === normalizeKey(selectedColor));
@@ -159,7 +125,7 @@ export const useClothingSelection = () => {
       if (selectedColor) setSelectedColor("");
       if (selectedSize) setSelectedSize("");
     }
-  }, [inventoryLoaded, selectedInnerType, needsInner, colorOptions, selectedColor, selectedSize]);
+  }, [inventoryLoaded, colorOptions, selectedColor, selectedSize]);
 
   useEffect(() => {
     if (inventoryLoaded && selectedSize && !availableSizes.includes(selectedSize)) setSelectedSize("");
@@ -168,30 +134,27 @@ export const useClothingSelection = () => {
   useEffect(() => {
     const next = {
       type: selectedClothing,
-      innerType: selectedInnerType,
       color: selectedColor,
       size: selectedSize,
     };
     const isSame =
       (clothing.type || "") === (next.type || "") &&
-      (clothing.innerType || "") === (next.innerType || "") &&
       (clothing.color || "") === (next.color || "") &&
       (clothing.size || "") === (next.size || "");
     if (isSame) return;
     setClothing(next);
-  }, [selectedClothing, selectedInnerType, selectedColor, selectedSize, setClothing,
-    clothing.type, clothing.innerType, clothing.color, clothing.size]);
+  }, [selectedClothing, selectedColor, selectedSize, setClothing,
+    clothing.type, clothing.color, clothing.size]);
 
   const previewItem = useMemo(() => {
     const exact = filteredByType.find((item) => hasStock(item) &&
       normalizeKey(item.color) === normalizeKey(selectedColor));
     if (exact) return exact;
     if (!selectedClothing) return null;
-    const sameBase = typedInventory.filter((item) => item.parsed.base === selectedClothing);
-    return (selectedInnerType
-      ? sameBase.find((item) => item.parsed.inner === selectedInnerType)
-      : null) || sameBase[0] || null;
-  }, [filteredByType, selectedColor, selectedClothing, selectedInnerType, typedInventory]);
+    return inventory.find(
+      (item) => normalizeKey(item.productType) === normalizeKey(selectedClothing)
+    ) || null;
+  }, [filteredByType, selectedColor, selectedClothing, inventory]);
   const previewSrc = useMemo(() => buildImgSrc(previewItem?.imageUrl), [previewItem?.imageUrl]);
   const previewAlt = selectedClothing || "Одежда";
   const [stablePreview, setStablePreview] = useState({ src: "", alt: "" });
@@ -221,18 +184,15 @@ export const useClothingSelection = () => {
     previewItem?.price !== "" && Number.isFinite(parsedPrice);
 
   return {
-    selectedClothing, selectedInnerType, selectedColor, selectedSize,
+    selectedClothing, selectedColor, selectedSize,
     setSelectedSize,
-    baseTypeOptions, presentInnerOptions, needsInner, colorOptions, sizeOptions, availableSizes,
+    baseTypeOptions, colorOptions, sizeOptions, availableSizes,
     canProceed,
     displayPreviewSrc: stablePreview.src || figmaTshirtImg,
     displayPreviewAlt: stablePreview.src ? stablePreview.alt || previewAlt : "Чёрная футболка",
     displayPrice: hasPrice ? `${parsedPrice} руб` : "уточняется",
     handleSelectClothing: (value) => {
-      setSelectedClothing(value); setSelectedInnerType(""); setSelectedColor(""); setSelectedSize("");
-    },
-    handleSelectInnerType: (value) => {
-      setSelectedInnerType(value); setSelectedColor(""); setSelectedSize("");
+      setSelectedClothing(value); setSelectedColor(""); setSelectedSize("");
     },
     handleSelectColor: (value) => { setSelectedColor(value); setSelectedSize(""); },
   };

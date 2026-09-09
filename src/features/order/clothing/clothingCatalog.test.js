@@ -1,13 +1,12 @@
 import { describe, expect, test } from "vitest";
-import { hasStock, normalizeInner, parseTypeLabel } from "./clothingCatalog";
+import { hasStock, normalizeKey, uniqBy } from "./clothingCatalog";
 
 describe("clothing catalog rules", () => {
-  test("separates a base type from its lining option", () => {
-    expect(parseTypeLabel("Худи (без начёса)")).toEqual({
-      base: "Худи",
-      inner: "без начёса",
-    });
-    expect(normalizeInner("С НАЧЕСОМ")).toBe("с начёсом");
+  test("deduplicates product type labels without changing them", () => {
+    expect(uniqBy(["Худи", "худи", "Свитшот"], normalizeKey)).toEqual([
+      "Худи",
+      "Свитшот",
+    ]);
   });
 
   test("only positive finite quantity is available", () => {

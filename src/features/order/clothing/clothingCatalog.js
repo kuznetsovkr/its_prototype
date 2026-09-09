@@ -7,27 +7,6 @@ export const isWhite = (color = "") => {
   return ["#fff", "#ffffff", "white", "rgb(255,255,255)"].includes(value);
 };
 
-export const normalizeInner = (value) => {
-  if (!value) return null;
-  const normalized = String(value)
-    .trim()
-    .toLowerCase()
-    .replaceAll("ё", "е")
-    .replace(/\s+/g, " ");
-  if (normalized.includes("с начес")) return "с начёсом";
-  if (normalized.includes("без начес")) return "без начёса";
-  return null;
-};
-
-export const parseTypeLabel = (rawValue) => {
-  const value = String(rawValue ?? "").trim();
-  const match = value.match(/^(.*?)(?:\s*\(([^)]+)\))?\s*$/);
-  return {
-    base: (match?.[1] ?? "").trim(),
-    inner: normalizeInner(match?.[2]),
-  };
-};
-
 export const uniqBy = (items, getKey) => {
   const unique = new Map();
   items.forEach((item) => {
@@ -121,7 +100,6 @@ export const detectChartKey = (baseType) => {
 };
 
 export const TYPE_ORDER = { tshirt: 1, hoodie: 2, svitshot: 3, default: 99 };
-export const INNER_ORDER = { "с начёсом": 1, "без начёса": 2 };
 export const COLOR_ORDER = new Map([
   ["белый", 1], ["white", 1],
   ["чёрный", 2], ["черный", 2], ["black", 2],

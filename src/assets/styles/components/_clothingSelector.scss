@@ -272,13 +272,6 @@
   }
 }
 
-.selectorType--inner {
-  margin-left: 0;
-  width: 100%;
-  box-sizing: border-box;
-  padding-left: 30px;
-}
-
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -744,12 +737,6 @@
         }
       }
 
-      .selectorType--inner {
-        width: 100%;
-        margin-top: 12px;
-        padding-left: 0;
-      }
-
       .selectorGroup--color {
         margin-top: 22px;
       }
@@ -1081,12 +1068,6 @@
         .muted {
           grid-column: 1 / -1;
         }
-      }
-
-      .selectorType--inner {
-        width: 100%;
-        margin-top: 5px;
-        padding-left: 0;
       }
 
       .selectorGroup--color {
@@ -1467,12 +1448,6 @@
         .muted {
           grid-column: 1 / -1;
         }
-      }
-
-      .selectorType--inner {
-        width: 268px;
-        margin-top: 6px;
-        padding-left: 0;
       }
 
       .selectorGroup--color {

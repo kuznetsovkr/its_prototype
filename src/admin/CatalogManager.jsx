@@ -88,7 +88,7 @@ const CatalogManager = ({
                 className="input"
                 type="text"
                 maxLength={120}
-                placeholder="Например, худи с начёсом"
+                placeholder="Например, худи"
                 value={typeName}
                 onChange={(event) => setTypeName(event.target.value)}
               />

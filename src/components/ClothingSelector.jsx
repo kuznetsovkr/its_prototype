@@ -11,11 +11,11 @@ const ClothingSelector = () => {
   const [showSizeModal, setShowSizeModal] = useState(false);
   const [chartKey, setChartKey] = useState("default");
   const {
-    selectedClothing, selectedInnerType, selectedColor, selectedSize,
-    setSelectedSize, baseTypeOptions, presentInnerOptions, needsInner,
+    selectedClothing, selectedColor, selectedSize,
+    setSelectedSize, baseTypeOptions,
     colorOptions, sizeOptions, availableSizes, canProceed,
     displayPreviewSrc, displayPreviewAlt, displayPrice,
-    handleSelectClothing, handleSelectInnerType, handleSelectColor,
+    handleSelectClothing, handleSelectColor,
   } = useClothingSelection();
 
   const openSizeGuide = () => {
@@ -63,24 +63,12 @@ const ClothingSelector = () => {
                   </label>
                 ))}
               </div>
-              {needsInner && (
-                <div className="selectorType selectorType--inner">
-                  {presentInnerOptions.map((inner) => (
-                    <label className={`selectorType__item ${selectedInnerType === inner ? "active" : ""}`} key={inner}>
-                      <input type="radio" name="innerType" value={inner} checked={selectedInnerType === inner} onChange={(event) => handleSelectInnerType(event.target.value)} />
-                      <span className="selectorType__custom"><img src={checkIcon} className="selectorType__check" alt="" aria-hidden="true" /></span>
-                      {inner}
-                    </label>
-                  ))}
-                </div>
-              )}
             </div>
 
             <div className="selectorGroup selectorGroup--color">
               <p className="title">Цвет</p>
               <div className="colorSelector">
-                {!needsInner || selectedInnerType ? (
-                  colorOptions.length > 0 ? colorOptions.map((option) => (
+                {colorOptions.length > 0 ? colorOptions.map((option) => (
                     <button
                       type="button" key={option.label}
                       className={`colorSquare ${normalizeKey(selectedColor) === normalizeKey(option.label) && option.isAvailable ? "active" : ""} ${option.isAvailable ? "" : "is-disabled"}`}
@@ -93,8 +81,7 @@ const ClothingSelector = () => {
                       aria-label={option.isAvailable ? option.label : `${option.label}: нет в наличии`}
                       onClick={() => handleSelectColor(option.label)} disabled={!option.isAvailable}
                     />
-                  )) : <div className="muted">Нет доступных цветов</div>
-                ) : <div className="muted">Сначала выберите вариант («с начёсом» / «без начёса»)</div>}
+                  )) : <div className="muted">Нет доступных цветов</div>}
               </div>
             </div>
 
