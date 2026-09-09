@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../api";
 import { applyAdminAuthResponse } from "../utils/auth";
 
@@ -8,6 +8,7 @@ const AdminLoginPage = () => {
   const navigate = useNavigate();
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -39,31 +40,65 @@ const AdminLoginPage = () => {
   return (
     <section className="admin-login-page" aria-labelledby="admin-login-title">
       <form className="admin-login-card" onSubmit={handleSubmit}>
-        <h1 id="admin-login-title">Вход в админку</h1>
-        <label>
-          <span>Телефон</span>
-          <input
-            type="tel"
-            autoComplete="username"
-            value={phone}
-            onChange={(event) => setPhone(event.target.value)}
-            disabled={isSubmitting}
-          />
-        </label>
-        <label>
-          <span>Пароль</span>
-          <input
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            disabled={isSubmitting}
-          />
-        </label>
+        <div className="admin-login-card__mark" aria-hidden="true">
+          <span>итс</span>
+          <small>admin</small>
+        </div>
+
+        <div className="admin-login-card__heading">
+          <p className="admin-login-card__eyebrow">служебный раздел</p>
+          <h1 id="admin-login-title">вход в админку</h1>
+          <p>Управляйте каталогом и остатками в одном месте.</p>
+        </div>
+
+        <div className="admin-login-card__fields">
+          <label className="admin-login-field">
+            <span>Телефон</span>
+            <input
+              type="tel"
+              inputMode="tel"
+              autoComplete="username"
+              placeholder="+7 999 000-00-00"
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+              disabled={isSubmitting}
+              autoFocus
+            />
+          </label>
+
+          <label className="admin-login-field">
+            <span>Пароль</span>
+            <span className="admin-login-field__password">
+              <input
+                type={isPasswordVisible ? "text" : "password"}
+                autoComplete="current-password"
+                placeholder="Введите пароль"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                disabled={isSubmitting}
+              />
+              <button
+                type="button"
+                className="admin-login-field__toggle"
+                onClick={() => setIsPasswordVisible((visible) => !visible)}
+                aria-label={isPasswordVisible ? "Скрыть пароль" : "Показать пароль"}
+                aria-pressed={isPasswordVisible}
+              >
+                {isPasswordVisible ? "скрыть" : "показать"}
+              </button>
+            </span>
+          </label>
+        </div>
+
         {error && <p className="admin-login-card__error" role="alert">{error}</p>}
-        <button type="submit" disabled={isSubmitting}>
+
+        <button className="admin-login-card__submit" type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Входим…" : "Войти"}
         </button>
+
+        <Link className="admin-login-card__back" to="/">
+          ← Вернуться на сайт
+        </Link>
       </form>
     </section>
   );

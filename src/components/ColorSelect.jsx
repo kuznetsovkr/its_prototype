@@ -47,8 +47,9 @@ export default function ColorSelect({
     const spaceBelow = vh - r.bottom;
     const flip = spaceBelow < popHeight + 12;
     const top = flip ? Math.max(8, r.top - popHeight - 8) : r.bottom + 8;
-    const left = Math.min(r.left, vw - r.width - 8);
-    setMenuRect({ top, left, width: r.width, flip });
+    const width = Math.min(r.width, vw - 16);
+    const left = Math.max(8, Math.min(r.left, vw - width - 8));
+    setMenuRect({ top, left, width, flip });
   };
 
   useEffect(() => {
@@ -135,7 +136,7 @@ export default function ColorSelect({
         <div
           ref={popRef}
           className="color-portal"
-          style={{ position: "fixed", zIndex: 3000, top: menuRect.top, left: menuRect.left}}
+          style={{ position: "fixed", zIndex: 3000, top: menuRect.top, left: menuRect.left, width: menuRect.width }}
         >
           <div className="color-popover is-open" role="listbox" data-flip={menuRect.flip ? "1" : "0"}>
             {!adding && (
@@ -167,7 +168,7 @@ export default function ColorSelect({
                     </button>
                   ))}
                   {filtered.length === 0 && (
-                    <div className="muted" style={{ padding: 8 }}>Ничего не найдено</div>
+                    <div className="color-list__empty">Ничего не найдено</div>
                   )}
                 </div>
 

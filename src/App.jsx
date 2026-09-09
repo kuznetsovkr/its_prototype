@@ -64,6 +64,7 @@ const AppShell = () => {
     const isEmbroideryPage = pathname === '/embroidery';
     const isRecipientPage = pathname === '/recipient';
     const isCertificatePage = pathname === '/certificate';
+    const isAdminPage = pathname.startsWith('/admin');
 
     const routes = (
         <Suspense fallback={<div className="route-loading" role="status">Загрузка…</div>}>
@@ -94,7 +95,7 @@ const AppShell = () => {
     );
 
     return (
-            <div className={`App${isOrderPage ? ' App--order' : ''}${isEmbroideryPage ? ' App--embroidery' : ''}${isRecipientPage ? ' App--recipient' : ''}${isCertificatePage ? ' App--certificate' : ''}`}>
+            <div className={`App${isOrderPage ? ' App--order' : ''}${isEmbroideryPage ? ' App--embroidery' : ''}${isRecipientPage ? ' App--recipient' : ''}${isCertificatePage ? ' App--certificate' : ''}${isAdminPage ? ' App--admin' : ''}`}>
                 {!isHomePage && <Header />}
                 <ScrollToTop />
                 <OrderFlowReset />
@@ -113,4 +114,3 @@ const App = () => {
 };
 
 export default App;
-

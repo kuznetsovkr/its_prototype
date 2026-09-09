@@ -1,12 +1,6 @@
 @use "../../base/breakpoints" as bp;
 
 @media (min-width: bp.$desktop-min) {
-  .home-page {
-    width: 100vw;
-    max-width: none;
-    margin-right: calc(100% - 100vw);
-  }
-
   .home-hero__media::after {
     position: absolute;
     z-index: 1;

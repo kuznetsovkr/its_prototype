@@ -15,6 +15,7 @@ const WarehouseTable = ({
   codeByName,
   onAddColor,
   clothingTypes,
+  emptyMessage = "Ничего не найдено по текущим фильтрам.",
 }) => {
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData]   = useState(null);
@@ -64,11 +65,12 @@ const WarehouseTable = ({
 
   const saveRow = async () => {
     if (!editData) return;
-    await updateItem({
+    const saved = await updateItem({
       ...editData,
       clothingTypeId: editData.clothingTypeId ? Number(editData.clothingTypeId) : null,
       quantity: Number(editData.quantity) || 0,
     });
+    if (!saved) return;
     setEditingId(null);
     setEditData(null);
   };
@@ -84,8 +86,10 @@ const WarehouseTable = ({
               <th>Тип</th>
               <th>Цвет</th>
               <th>Размер</th>
-              <th className="th-sort" onClick={onToggleSortQuantity} role="button" tabIndex={0}>
-                Количество <span className="sort-arrow">{arrow}</span>
+              <th className="th-sort">
+                <button className="table-sort-button" type="button" onClick={onToggleSortQuantity}>
+                  Количество <span className="sort-arrow" aria-hidden="true">{arrow}</span>
+                </button>
               </th>
               <th>Действия</th>
             </tr>
@@ -94,7 +98,7 @@ const WarehouseTable = ({
           <tbody>
             {inventory.length === 0 ? (
               <tr>
-                <td colSpan={7} className="muted">Ничего не найдено по текущим фильтрам</td>
+                <td colSpan={7} className="table-empty">{emptyMessage}</td>
               </tr>
             ) : (
               inventory.map((row) => {
@@ -112,12 +116,12 @@ const WarehouseTable = ({
 
                     <td>
                       {imgUrl ? (
-                        <img className="thumb" src={imgUrl} alt="Превью" width="56" height="56" />
+                        <img className="thumb" src={imgUrl} alt={resolvedTypeName || "Складская позиция"} width="56" height="56" />
                       ) : (
                         <span className="muted">Нет фото</span>
                       )}
                       {isEditing && (
-                        <div className="file-mini" style={{ marginTop: 6 }}>
+                        <div className="file-mini">
                           <input
                             id={`file-${row.id}`}
                             type="file"
@@ -212,14 +216,14 @@ const WarehouseTable = ({
                     <td className="actions-cell">
                       {isEditing ? (
                         <>
-                          <button className="btn btn-outline" onClick={saveRow}>Сохранить</button>
-                          <button className="btn btn-outline" onClick={cancelEditing}>Отмена</button>
-                          <button className="btn btn-danger"  onClick={() => deleteItem(row.id)}>Удалить</button>
+                          <button className="btn btn-primary" type="button" onClick={saveRow}>Сохранить</button>
+                          <button className="btn btn-outline" type="button" onClick={cancelEditing}>Отмена</button>
+                          <button className="btn btn-danger" type="button" onClick={() => deleteItem(row.id)}>Удалить</button>
                         </>
                       ) : (
                         <>
-                          <button className="btn btn-outline" onClick={() => startEditing(row)}>Редактировать</button>
-                          <button className="btn btn-danger"  onClick={() => deleteItem(row.id)}>Удалить</button>
+                          <button className="btn btn-outline" type="button" onClick={() => startEditing(row)}>Редактировать</button>
+                          <button className="btn btn-danger" type="button" onClick={() => deleteItem(row.id)}>Удалить</button>
                         </>
                       )}
                     </td>
