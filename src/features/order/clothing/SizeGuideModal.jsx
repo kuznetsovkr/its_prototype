@@ -1,9 +1,11 @@
+import { createPortal } from "react-dom";
+
 import { SIZE_CHARTS, SIZE_COLUMNS } from "./clothingCatalog";
 
 const SizeGuideModal = ({ chartKey, onChartChange, onClose }) => {
   const chart = SIZE_CHARTS[chartKey] || SIZE_CHARTS.default;
 
-  return (
+  return createPortal(
     <div className="modalOverlay" onClick={onClose}>
       <div className="modalContent" onClick={(event) => event.stopPropagation()}>
         <button type="button" className="modalClose" aria-label="Закрыть таблицу размеров" onClick={onClose}>
@@ -12,8 +14,16 @@ const SizeGuideModal = ({ chartKey, onChartChange, onClose }) => {
           </svg>
         </button>
         <div className="modalHeader">
-          {[["svitshot", "свитшот"], ["hoodie", "худи"], ["tshirt", "футболка"]].map(([key, label]) => (
-            <button key={key} className={chartKey === key ? "active" : ""} onClick={() => onChartChange(key)}>{label}</button>
+          {[["tshirt", "футболка"], ["hoodie", "худи"], ["svitshot", "свитшот"]].map(([key, label]) => (
+            <button
+              type="button"
+              key={key}
+              className={chartKey === key ? "active" : ""}
+              aria-pressed={chartKey === key}
+              onClick={() => onChartChange(key)}
+            >
+              {label}
+            </button>
           ))}
         </div>
         <div className="sizeTable sizeTableGrid">
@@ -34,7 +44,8 @@ const SizeGuideModal = ({ chartKey, onChartChange, onClose }) => {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
