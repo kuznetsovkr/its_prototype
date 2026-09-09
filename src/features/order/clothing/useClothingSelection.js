@@ -4,9 +4,9 @@ import { buildImgSrc } from "../../../utils/url";
 import figmaTshirtImg from "../../../images/order/tshirt-black.webp";
 import { loadClothingCatalog } from "./clothingApi";
 import {
-  COLOR_ORDER,
   CORE_SIZES,
   TYPE_ORDER,
+  buildColorOptions,
   detectChartKey,
   hasStock,
   normalizeKey,
@@ -52,28 +52,7 @@ export const useClothingSelection = () => {
   );
 
   const colorOptions = useMemo(() => {
-    const byName = new Map();
-    const addColor = (label, code, preferLabel = false) => {
-      const normalizedLabel = String(label || "").trim();
-      if (!normalizedLabel) return;
-      const key = normalizeKey(normalizedLabel);
-      const current = byName.get(key);
-      byName.set(key, {
-        label: preferLabel ? normalizedLabel : current?.label || normalizedLabel,
-        code: code || current?.code || "#CCCCCC",
-      });
-    };
-    colorCatalog.forEach((color) => addColor(color?.name, color?.code));
-    filteredByType.forEach((item) => addColor(item.color, item.colorCode, true));
-    return Array.from(byName.values())
-      .map((option) => ({
-        ...option,
-        isAvailable: filteredByType.some(
-          (item) => hasStock(item) && normalizeKey(item.color) === normalizeKey(option.label)
-        ),
-      }))
-      .sort((a, b) => (COLOR_ORDER.get(normalizeKey(a.label)) ?? 99) -
-        (COLOR_ORDER.get(normalizeKey(b.label)) ?? 99));
+    return buildColorOptions(filteredByType, colorCatalog);
   }, [colorCatalog, filteredByType]);
 
   const availableSizes = useMemo(() => filteredByType

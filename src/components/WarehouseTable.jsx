@@ -214,18 +214,20 @@ const WarehouseTable = ({
                     </td>
 
                     <td className="actions-cell">
-                      {isEditing ? (
-                        <>
-                          <button className="btn btn-primary" type="button" onClick={saveRow}>Сохранить</button>
-                          <button className="btn btn-outline" type="button" onClick={cancelEditing}>Отмена</button>
-                          <button className="btn btn-danger" type="button" onClick={() => deleteItem(row.id)}>Удалить</button>
-                        </>
-                      ) : (
-                        <>
-                          <button className="btn btn-outline" type="button" onClick={() => startEditing(row)}>Редактировать</button>
-                          <button className="btn btn-danger" type="button" onClick={() => deleteItem(row.id)}>Удалить</button>
-                        </>
-                      )}
+                      <div className="actions-cell__inner">
+                        {isEditing ? (
+                          <>
+                            <button className="btn btn-primary" type="button" onClick={saveRow}>Сохранить</button>
+                            <button className="btn btn-outline" type="button" onClick={cancelEditing}>Отмена</button>
+                            <button className="btn btn-danger" type="button" onClick={() => deleteItem(row.id)}>Удалить</button>
+                          </>
+                        ) : (
+                          <>
+                            <button className="btn btn-outline" type="button" onClick={() => startEditing(row)}>Редактировать</button>
+                            <button className="btn btn-danger" type="button" onClick={() => deleteItem(row.id)}>Удалить</button>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );

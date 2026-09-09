@@ -621,13 +621,16 @@
 .input-qty { max-width: 110px; }
 
 .actions-cell {
-  display: flex;
   min-width: 258px;
+}
+
+.actions-cell__inner {
+  display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.actions-cell .btn,
+.actions-cell__inner .btn,
 .file-mini .btn {
   min-height: 35px;
   padding: 0 13px;

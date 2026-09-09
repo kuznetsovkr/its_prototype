@@ -107,3 +107,29 @@ export const COLOR_ORDER = new Map([
   ["красный", 4], ["red", 4],
   ["синий", 5], ["blue", 5],
 ]);
+
+export const buildColorOptions = (inventory = [], colorCatalog = []) => {
+  const catalogCodes = new Map(
+    colorCatalog
+      .filter((color) => color?.name)
+      .map((color) => [normalizeKey(color.name), color.code])
+  );
+  const byName = new Map();
+
+  inventory.forEach((item) => {
+    const label = String(item?.color || "").trim();
+    if (!label) return;
+    const key = normalizeKey(label);
+    const current = byName.get(key);
+    byName.set(key, {
+      label: current?.label || label,
+      code: item.colorCode || current?.code || catalogCodes.get(key) || "#CCCCCC",
+      isAvailable: Boolean(current?.isAvailable || hasStock(item)),
+    });
+  });
+
+  return Array.from(byName.values()).sort(
+    (a, b) => (COLOR_ORDER.get(normalizeKey(a.label)) ?? 99) -
+      (COLOR_ORDER.get(normalizeKey(b.label)) ?? 99)
+  );
+};
