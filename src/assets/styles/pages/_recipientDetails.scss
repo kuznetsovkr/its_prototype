@@ -697,6 +697,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 6px 16px;
   margin: 0;
   color: #2b2b2b;
   line-height: 1.2;
@@ -705,6 +706,7 @@
 .recipientOrderSummary strong {
   color: #bc5823;
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .recipientOrderSummary__error {
@@ -851,17 +853,23 @@
 .recipientCdekDialog__surface {
   position: relative;
   z-index: 1;
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
   width: min(960px, calc(100vw - 40px));
   max-height: calc(100dvh - 40px);
   padding: 24px;
-  overflow: auto;
+  overflow: hidden;
+  border: 1px solid rgba(22, 22, 22, 0.12);
   border-radius: 30px;
   background: #f0f0f0;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
   color: #2b2b2b;
 }
 
 .recipientCdekDialog__header {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
@@ -877,6 +885,8 @@
 
 .recipientCdekDialog__header button {
   display: flex;
+  position: relative;
+  flex: 0 0 40px;
   align-items: center;
   justify-content: center;
   width: 40px;
@@ -885,17 +895,76 @@
   border: 0;
   border-radius: 50%;
   background: #161616;
-  color: #fff;
-  font-size: 26px;
-  line-height: 1;
   cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.recipientCdekDialog__header button:hover {
+  background: #bc5823;
+}
+
+.recipientCdekDialog__header button:active {
+  transform: scale(0.95);
+}
+
+.recipientCdekDialog__header button span {
+  position: relative;
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.recipientCdekDialog__header button span::before,
+.recipientCdekDialog__header button span::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 19px;
+  height: 2px;
+  border-radius: 2px;
+  background: #fff;
+  content: '';
+}
+
+.recipientCdekDialog__header button span::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.recipientCdekDialog__header button span::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.recipientCdekDialog__content {
+  min-height: 0;
+  padding-right: 10px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: #2b2b2b transparent;
+  scrollbar-width: thin;
+}
+
+.recipientCdekDialog__content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.recipientCdekDialog__content::-webkit-scrollbar-track {
+  margin-block: 8px;
+  background: transparent;
+}
+
+.recipientCdekDialog__content::-webkit-scrollbar-thumb {
+  border: 1px solid #f0f0f0;
+  border-radius: 999px;
+  background: #2b2b2b;
 }
 
 .recipientCdekDialog__content .mapBox {
+  box-sizing: border-box;
   min-height: 420px;
 }
 
 .recipientCdekDialog__content #cdek-map {
+  box-sizing: border-box;
   border-color: #161616;
 }
 
@@ -911,16 +980,145 @@
 
 .recipientCdekDialog__manualToggle {
   display: flex;
+  box-sizing: border-box;
   align-items: center;
   gap: 10px;
+  min-height: 52px;
   margin-top: 16px;
+  padding: 13px 16px;
+  border: 1px solid rgba(22, 22, 22, 0.18);
+  border-radius: 18px;
+  background: #fff;
+  color: #161616;
   font-size: 16px;
+  line-height: 1.25;
   cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.recipientCdekDialog__manualToggle:hover {
+  border-color: #bc5823;
+}
+
+.recipientCdekDialog__manualToggle.is-active {
+  border-color: #161616;
+  background: #161616;
+  color: #fff;
 }
 
 .recipientCdekDialog__manualToggle input {
-  width: 18px;
-  height: 18px;
+  display: grid;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  border: 1.5px solid #161616;
+  border-radius: 6px;
+  appearance: none;
+  background: #fff;
+  place-content: center;
+}
+
+.recipientCdekDialog__manualToggle input::before {
+  width: 10px;
+  height: 6px;
+  border-bottom: 2px solid #fff;
+  border-left: 2px solid #fff;
+  content: '';
+  transform: translateY(-1px) rotate(-45deg) scale(0);
+  transition: transform 0.15s ease;
+}
+
+.recipientCdekDialog__manualToggle input:checked {
+  border-color: #bc5823;
+  background: #bc5823;
+}
+
+.recipientCdekDialog__manualToggle input:checked::before {
+  transform: translateY(-1px) rotate(-45deg) scale(1);
+}
+
+.recipientCdekDialog__content.is-manual .recipientCdekDialog__manualToggle {
+  margin-top: 0;
+}
+
+.recipientCdekDialog__content .manualAddress {
+  box-sizing: border-box;
+  margin-top: 12px;
+  padding: 18px;
+  border: 1px solid rgba(22, 22, 22, 0.12);
+  border-radius: 20px;
+  background: #fff;
+  color: #2b2b2b;
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.recipientCdekDialog__content .manualAddress .react-dadata__container {
+  position: relative;
+  width: 100%;
+}
+
+.recipientCdekDialog__content .manualAddress .react-dadata__input,
+.recipientCdekDialog__content .manualAddress .manualAddress__input {
+  height: 48px;
+  padding: 0 18px;
+  border: 1px solid #a7a7a7;
+  border-radius: 24px;
+  background: #f4f4f4;
+  font-family: 'Jost', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.recipientCdekDialog__content .manualAddress .react-dadata__input:focus,
+.recipientCdekDialog__content .manualAddress .manualAddress__input:focus {
+  border-color: #161616;
+  box-shadow: 0 0 0 2px rgba(188, 88, 35, 0.16);
+}
+
+.recipientCdekDialog__content .manualAddress .react-dadata__suggestions {
+  z-index: 20;
+  max-height: min(240px, 35dvh);
+  margin-top: 8px;
+  padding: 6px;
+  overflow-y: auto;
+  border: 1px solid rgba(22, 22, 22, 0.14);
+  border-radius: 16px;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+  scrollbar-color: #2b2b2b transparent;
+  scrollbar-width: thin;
+}
+
+.recipientCdekDialog__content .manualAddress .react-dadata__suggestion {
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.recipientCdekDialog__content .manualAddress .react-dadata__suggestion:hover,
+.recipientCdekDialog__content .manualAddress .react-dadata__suggestion--current {
+  background: #f0e5df;
+}
+
+.recipientCdekDialog__content .manualAddress__hint,
+.recipientCdekDialog__content .manualAddress__selected {
+  margin: 10px 2px 0;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.recipientCdekDialog__content .manualAddress__hint {
+  color: #6f6f6f;
+}
+
+.recipientCdekDialog__content .manualAddress__selected {
+  color: #bc5823;
+  font-weight: 500;
 }
 
 @media (min-width: bp.$desktop-min) {
@@ -1153,7 +1351,7 @@
   }
 
   .recipientOrderSummary {
-    top: 950px;
+    top: 978px;
     left: 36px;
     width: 518px;
     min-height: 28px;
@@ -1161,7 +1359,7 @@
   }
 
   .recipientOrderForm__consent {
-    top: 988px;
+    top: 1018px;
     left: 36px;
     width: 518px;
     gap: 10px;
@@ -1438,16 +1636,17 @@
   }
 
   .recipientOrderSummary {
-    top: 594px;
+    top: 612px;
     left: 29px;
     display: grid;
+    gap: 2px;
     width: 236px;
-    font-size: 7px;
-    line-height: 1.05;
+    font-size: 9px;
+    line-height: 1.2;
   }
 
   .recipientOrderForm__consent {
-    top: 620px;
+    top: 640px;
     left: 29px;
     width: 236px;
     gap: 10px;
@@ -1728,16 +1927,17 @@
   }
 
   .recipientOrderSummary {
-    top: 616px;
+    top: 640px;
     left: 20px;
     display: grid;
+    gap: 2px;
     width: 268px;
-    font-size: 8px;
-    line-height: 1.05;
+    font-size: 10px;
+    line-height: 1.2;
   }
 
   .recipientOrderForm__consent {
-    top: 646px;
+    top: 680px;
     left: 20px;
     width: 268px;
     gap: 10px;
@@ -1781,16 +1981,68 @@
   .recipientCdekDialog__surface {
     width: calc(100vw - 20px);
     max-height: calc(100dvh - 20px);
-    padding: 16px;
+    padding: 14px;
     border-radius: 20px;
+  }
+
+  .recipientCdekDialog__header {
+    gap: 12px;
+    margin-bottom: 12px;
   }
 
   .recipientCdekDialog__header h2 {
     font-size: 18px;
   }
 
+  .recipientCdekDialog__header button {
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .recipientCdekDialog__header button span {
+    width: 16px;
+    height: 16px;
+  }
+
+  .recipientCdekDialog__content {
+    padding-right: 6px;
+  }
+
   .recipientCdekDialog__content .mapBox {
-    min-height: 300px;
+    min-height: clamp(280px, 48dvh, 360px);
+  }
+
+  .recipientCdekDialog__manualToggle {
+    align-items: flex-start;
+    min-height: 48px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    font-size: 14px;
+  }
+
+  .recipientCdekDialog__manualToggle input {
+    flex-basis: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .recipientCdekDialog__content .manualAddress {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .recipientCdekDialog__content .manualAddress .react-dadata__input,
+  .recipientCdekDialog__content .manualAddress .manualAddress__input {
+    height: 44px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
+}
+
+@media (max-height: 560px) {
+  .recipientCdekDialog__content .mapBox {
+    min-height: 260px;
   }
 }
 /* stylelint-enable no-descending-specificity */

@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { AddressSuggestions } from "react-dadata";
 import "react-dadata/dist/react-dadata.css";
 import { IS_DEMO_MODE } from "../config/demoMode";
@@ -33,6 +33,27 @@ const RecipientDetails = () => {
   } = useRecipientDetails();
   const formDisabled = isPaying || isCheckoutLocked;
   const formatPrice = (value) => `${priceFormatter.format(Number(value))} ₽`;
+
+  useEffect(() => {
+    if (!isCdekPickerOpen) return undefined;
+
+    const root = document.documentElement;
+    const body = document.body;
+    const previousRootOverflow = root.style.overflow;
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyPaddingRight = body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - root.clientWidth;
+
+    root.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    if (scrollbarWidth > 0) body.style.paddingRight = `${scrollbarWidth}px`;
+
+    return () => {
+      root.style.overflow = previousRootOverflow;
+      body.style.overflow = previousBodyOverflow;
+      body.style.paddingRight = previousBodyPaddingRight;
+    };
+  }, [isCdekPickerOpen]);
 
   return (
     <>
@@ -282,21 +303,25 @@ const RecipientDetails = () => {
         <section className="recipientCdekDialog__surface" role="dialog" aria-modal="true" aria-label="Выбор пункта СДЭК">
           <div className="recipientCdekDialog__header">
             <h2>Выберите пункт получения</h2>
-            <button type="button" onClick={() => setIsCdekPickerOpen(false)} aria-label="Закрыть">×</button>
+            <button type="button" onClick={() => setIsCdekPickerOpen(false)} aria-label="Закрыть">
+              <span aria-hidden="true" />
+            </button>
           </div>
 
-          <div className="blockCDEK recipientCdekDialog__content">
-            <div className="mapBox">
-              <div id="cdek-map">
-                {IS_DEMO_MODE && (
-                  <div className="cdek-map__demo">
-                    <p className="cdek-map__demo-title">CDEK map placeholder (demo mode)</p>
-                    <p className="cdek-map__demo-text">Use the button below to emulate pickup-point selection.</p>
-                  </div>
-                )}
+          <div className={`blockCDEK recipientCdekDialog__content${isNoCdek ? " is-manual" : ""}`}>
+            {!isNoCdek && (
+              <div className="mapBox">
+                <div id="cdek-map">
+                  {IS_DEMO_MODE && (
+                    <div className="cdek-map__demo">
+                      <p className="cdek-map__demo-title">CDEK map placeholder (demo mode)</p>
+                      <p className="cdek-map__demo-text">Use the button below to emulate pickup-point selection.</p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-            {!IS_DEMO_MODE && isCdekPickerOpen && (
+            )}
+            {!IS_DEMO_MODE && isCdekPickerOpen && !isNoCdek && (
               <Suspense fallback={<p className="cdek-map__loading">Загружаем карту…</p>}>
                 <MyCdekWidget
                   productType={productType}
@@ -311,9 +336,9 @@ const RecipientDetails = () => {
                 Select demo pickup point
               </button>
             )}
-            <label className="recipientCdekDialog__manualToggle">
+            <label className={`recipientCdekDialog__manualToggle${isNoCdek ? " is-active" : ""}`}>
               <input type="checkbox" checked={isNoCdek} onChange={handleNoCdekToggle} />
-              В моём городе нет СДЭКа
+              <span>В моём городе нет СДЭКа</span>
             </label>
             {isNoCdek && (
               <div className="manualAddress">
