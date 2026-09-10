@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import api from '../api';
 import { useOrder } from '../context/OrderContext';
 import { getOrderAccessToken, orderAccessConfig } from '../utils/orderAccess';
@@ -8,6 +8,7 @@ import '../assets/styles/pages/_thx.scss';
 
 const ThankYouPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { resetOrder } = useOrder();
   const { orderNumber, manual, cdekNumber: stateCdekNumber } = location.state || {};
   const [cdekNumber, setCdekNumber] = useState(
@@ -16,8 +17,12 @@ const ThankYouPage = () => {
   const [copyState, setCopyState] = useState('idle');
 
   useEffect(() => {
-    if (orderNumber) resetOrder();
-  }, [orderNumber, resetOrder]);
+    if (!orderNumber) {
+      navigate('/order', { replace: true });
+      return;
+    }
+    resetOrder();
+  }, [navigate, orderNumber, resetOrder]);
 
   useEffect(() => {
     if (manual || cdekNumber || !orderNumber) return undefined;
@@ -80,6 +85,10 @@ const ThankYouPage = () => {
       ? 'Не удалось скопировать'
       : 'Скопировать';
 
+  if (!orderNumber) {
+    return <div className="route-loading" role="status">Переходим к оформлению заказа…</div>;
+  }
+
   return (
     <div className="thx">
       <section className="thx__card" aria-labelledby="thx-title">
@@ -120,14 +129,10 @@ const ThankYouPage = () => {
               <span>{manual ? 'ручной расчёт' : 'заказ оплачен'}</span>
             </div>
 
-            {orderNumber ? (
-              <div className="thx__order-row">
-                <span className="thx__order-label">Номер заказа</span>
-                <strong className="thx__order-number">{orderNumber}</strong>
-              </div>
-            ) : (
-              <p className="thx__hint">Номер заказа не найден. Пожалуйста, обратитесь к нам — мы поможем.</p>
-            )}
+            <div className="thx__order-row">
+              <span className="thx__order-label">Номер заказа</span>
+              <strong className="thx__order-number">{orderNumber}</strong>
+            </div>
 
             {!manual && orderNumber && (
               cdekNumber ? (
