@@ -1,17 +1,23 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import api from '../api';
+import { useOrder } from '../context/OrderContext';
 import { getOrderAccessToken, orderAccessConfig } from '../utils/orderAccess';
 import thankYouDog from '../images/home/desktop/questions-dog-on.webp';
 import '../assets/styles/pages/_thx.scss';
 
 const ThankYouPage = () => {
   const location = useLocation();
+  const { resetOrder } = useOrder();
   const { orderNumber, manual, cdekNumber: stateCdekNumber } = location.state || {};
   const [cdekNumber, setCdekNumber] = useState(
     stateCdekNumber || sessionStorage.getItem("pay_cdek_number") || null
   );
   const [copyState, setCopyState] = useState('idle');
+
+  useEffect(() => {
+    if (orderNumber) resetOrder();
+  }, [orderNumber, resetOrder]);
 
   useEffect(() => {
     if (manual || cdekNumber || !orderNumber) return undefined;
