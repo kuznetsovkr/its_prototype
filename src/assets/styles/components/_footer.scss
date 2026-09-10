@@ -19,6 +19,10 @@
   font-family: var(--home-font-body);
 }
 
+.home-footer--internal {
+  margin-top: 10px;
+}
+
 .home-footer button,
 .home-footer a { font-family: inherit; }
 
@@ -263,6 +267,8 @@
     border-radius: 20px;
     background: linear-gradient(to bottom, var(--home-orange) 0 322px, var(--home-ink) 322px 100%);
   }
+
+  .home-footer--internal .home-footer__panel { margin-top: 0; }
 
   .home-footer__desktop-label { display: none; }
   .home-footer__compact-label { display: inline; }
