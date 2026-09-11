@@ -57,22 +57,23 @@
     left: -38.0156vw;
     width: 156.25vw;
     max-width: none;
-    height: 208.3333vw;
-    object-fit: fill;
+    height: auto;
+    object-fit: contain;
   }
 
   .home-hero__subject-picture { z-index: 1; }
 
   .home-hero__subject {
     top: 30px;
-    left: 56%;
-    width: 44%;
+    right: 0;
+    left: auto;
+    width: auto;
     max-width: none;
     height: calc(100% - 30px);
     mix-blend-mode: multiply;
     -webkit-mask-image: linear-gradient(to right, transparent, #000 14%);
     mask-image: linear-gradient(to right, transparent, #000 14%);
-    object-fit: fill;
+    object-fit: contain;
     object-position: center top;
   }
 

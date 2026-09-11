@@ -13,11 +13,12 @@
   .home-hero__background-picture { z-index: 0; }
 
   .home-hero__background {
-    top: -115.7%;
+    top: 0;
     left: -16.91%;
     width: 116.91%;
-    height: 400.84%;
-    object-fit: fill;
+    height: auto;
+    object-fit: contain;
+    transform: translateY(-28.86%);
   }
 
   .home-page .home-hero__background { max-width: none; }
@@ -36,7 +37,7 @@
     clip-path: polygon(43% 0, 43% 4%, 40% 8%, 35% 18%, 27% 30%, 19% 42%, 9% 60%, 0 100%, 100% 100%, 100% 0);
     background-position: center;
     background-repeat: no-repeat;
-    background-size: 100% 100%;
+    background-size: cover;
     position: absolute;
     transform: translateZ(0);
   }
