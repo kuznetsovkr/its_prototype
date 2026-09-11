@@ -5,19 +5,76 @@ import Footer from './components/Footer';
 import PageLayout from './components/PageLayout';
 import { useOrder } from "./context/OrderContext";
 import RequireAdmin from './components/RequireAdmin';
+import RouteLoader from './components/RouteLoader';
 
-const HomePage = lazy(() => import('./pages/HomePage'));
-const CertificatePage = lazy(() => import('./pages/CertificatePage'));
-const OrderPage = lazy(() => import('./pages/OrderPage'));
-const EmbroideryPage = lazy(() => import('./pages/EmbroideryPage'));
-const RecipientDetails = lazy(() => import('./pages/RecipientDetails'));
-const ThankYouPage = lazy(() => import('./pages/ThankYouPage'));
-const PaymentPage = lazy(() => import('./pages/PaymentPage'));
-const AdminInventory = lazy(() => import('./admin/AdminInventory'));
-const FakePayment = lazy(() => import('./pages/FakePayment'));
-const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess'));
-const PaymentFail = lazy(() => import('./pages/PaymentFail'));
-const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'));
+const loadHomePage = () => import('./pages/HomePage');
+const loadCertificatePage = () => import('./pages/CertificatePage');
+const loadOrderPage = () => import('./pages/OrderPage');
+const loadEmbroideryPage = () => import('./pages/EmbroideryPage');
+const loadRecipientDetails = () => import('./pages/RecipientDetails');
+const loadThankYouPage = () => import('./pages/ThankYouPage');
+const loadPaymentPage = () => import('./pages/PaymentPage');
+const loadAdminInventory = () => import('./admin/AdminInventory');
+const loadFakePayment = () => import('./pages/FakePayment');
+const loadPaymentSuccess = () => import('./pages/PaymentSuccess');
+const loadPaymentFail = () => import('./pages/PaymentFail');
+const loadAdminLoginPage = () => import('./pages/AdminLoginPage');
+
+const HomePage = lazy(loadHomePage);
+const CertificatePage = lazy(loadCertificatePage);
+const OrderPage = lazy(loadOrderPage);
+const EmbroideryPage = lazy(loadEmbroideryPage);
+const RecipientDetails = lazy(loadRecipientDetails);
+const ThankYouPage = lazy(loadThankYouPage);
+const PaymentPage = lazy(loadPaymentPage);
+const AdminInventory = lazy(loadAdminInventory);
+const FakePayment = lazy(loadFakePayment);
+const PaymentSuccess = lazy(loadPaymentSuccess);
+const PaymentFail = lazy(loadPaymentFail);
+const AdminLoginPage = lazy(loadAdminLoginPage);
+
+const primaryRouteImports = [
+    loadHomePage,
+    loadCertificatePage,
+    loadOrderPage,
+    loadEmbroideryPage,
+    loadRecipientDetails,
+    loadThankYouPage,
+    loadPaymentPage,
+];
+
+const RoutePreloader = () => {
+    useEffect(() => {
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        const shouldSkip = connection?.saveData || ['slow-2g', '2g'].includes(connection?.effectiveType);
+
+        if (shouldSkip) return undefined;
+
+        let idleCallbackId;
+        const preloadTimer = window.setTimeout(() => {
+            const preload = () => {
+                primaryRouteImports.forEach((loadRoute) => {
+                    loadRoute().catch(() => undefined);
+                });
+            };
+
+            if ('requestIdleCallback' in window) {
+                idleCallbackId = window.requestIdleCallback(preload, { timeout: 2000 });
+            } else {
+                preload();
+            }
+        }, 1200);
+
+        return () => {
+            window.clearTimeout(preloadTimer);
+            if (idleCallbackId !== undefined && 'cancelIdleCallback' in window) {
+                window.cancelIdleCallback(idleCallbackId);
+            }
+        };
+    }, []);
+
+    return null;
+};
 
 const OrderFlowReset = () => {
     const location = useLocation();
@@ -67,7 +124,7 @@ const AppShell = () => {
     const isAdminPage = pathname.startsWith('/admin');
 
     const routes = (
-        <Suspense fallback={<div className="route-loading" role="status">Загрузка…</div>}>
+        <Suspense fallback={<RouteLoader />}>
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/certificate" element={<CertificatePage />} />
@@ -99,6 +156,7 @@ const AppShell = () => {
                 {!isHomePage && <Header />}
                 <ScrollToTop />
                 <OrderFlowReset />
+                <RoutePreloader />
                 {isHomePage ? routes : <main>{routes}</main>}
                 {!isHomePage && <Footer />}
             </div>
