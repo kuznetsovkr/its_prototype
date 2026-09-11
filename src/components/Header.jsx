@@ -1,17 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { siteHeaderAssets } from "../images/home";
 import HomeHeader from "./home/HomeHeader";
-
-const orderFlowPaths = [
-  "/order",
-  "/embroidery",
-  "/recipient",
-  "/payment",
-  "/fake-payment",
-  "/payment-success",
-  "/payment-fail",
-  "/thank-you",
-];
+import { isOrderFlowPath } from "../config/routes";
 
 const Header = ({ onOrder: onOrderOverride, standalone = true }) => {
   const { pathname } = useLocation();
@@ -20,7 +10,7 @@ const Header = ({ onOrder: onOrderOverride, standalone = true }) => {
   const handleOrder = onOrderOverride || (() => navigate("/order"));
   const activeNavigationId = pathname.startsWith("/certificate")
     ? "certificate"
-    : orderFlowPaths.some((path) => pathname.startsWith(path))
+    : isOrderFlowPath(pathname)
       ? "constructor"
       : undefined;
 

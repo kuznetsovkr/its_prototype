@@ -6,6 +6,7 @@ import PageLayout from './components/PageLayout';
 import { useOrder } from "./context/OrderContext";
 import RequireAdmin from './components/RequireAdmin';
 import RouteLoader from './components/RouteLoader';
+import { isOrderFlowPath } from './config/routes';
 
 const loadHomePage = () => import('./pages/HomePage');
 const loadCertificatePage = () => import('./pages/CertificatePage');
@@ -13,12 +14,11 @@ const loadOrderPage = () => import('./pages/OrderPage');
 const loadEmbroideryPage = () => import('./pages/EmbroideryPage');
 const loadRecipientDetails = () => import('./pages/RecipientDetails');
 const loadThankYouPage = () => import('./pages/ThankYouPage');
-const loadPaymentPage = () => import('./pages/PaymentPage');
 const loadAdminInventory = () => import('./admin/AdminInventory');
-const loadFakePayment = () => import('./pages/FakePayment');
 const loadPaymentSuccess = () => import('./pages/PaymentSuccess');
 const loadPaymentFail = () => import('./pages/PaymentFail');
 const loadAdminLoginPage = () => import('./pages/AdminLoginPage');
+const loadNotFoundPage = () => import('./pages/NotFoundPage');
 
 const HomePage = lazy(loadHomePage);
 const CertificatePage = lazy(loadCertificatePage);
@@ -26,12 +26,11 @@ const OrderPage = lazy(loadOrderPage);
 const EmbroideryPage = lazy(loadEmbroideryPage);
 const RecipientDetails = lazy(loadRecipientDetails);
 const ThankYouPage = lazy(loadThankYouPage);
-const PaymentPage = lazy(loadPaymentPage);
 const AdminInventory = lazy(loadAdminInventory);
-const FakePayment = lazy(loadFakePayment);
 const PaymentSuccess = lazy(loadPaymentSuccess);
 const PaymentFail = lazy(loadPaymentFail);
 const AdminLoginPage = lazy(loadAdminLoginPage);
+const NotFoundPage = lazy(loadNotFoundPage);
 
 const primaryRouteImports = [
     loadHomePage,
@@ -40,7 +39,6 @@ const primaryRouteImports = [
     loadEmbroideryPage,
     loadRecipientDetails,
     loadThankYouPage,
-    loadPaymentPage,
 ];
 
 const RoutePreloader = () => {
@@ -81,18 +79,7 @@ const OrderFlowReset = () => {
     const { resetOrder } = useOrder();
 
     useEffect(() => {
-        const allowed = [
-            "/order",
-            "/embroidery",
-            "/recipient",
-            "/payment",
-            "/fake-payment",
-            "/payment-success",
-            "/payment-fail",
-            "/thank-you"
-        ];
-        const isOrderPath = allowed.some((p) => location.pathname.startsWith(p));
-        if (!isOrderPath) {
+        if (!isOrderFlowPath(location.pathname)) {
             resetOrder();
         }
     }, [location.pathname, resetOrder]);
@@ -132,8 +119,6 @@ const AppShell = () => {
                 <Route path="/embroidery" element={<PageLayout><EmbroideryPage /></PageLayout>} />
                 <Route path="/recipient" element={<PageLayout><RecipientDetails /></PageLayout>} />
                 <Route path="/thank-you" element={<PageLayout><ThankYouPage /></PageLayout>} />
-                <Route path="/payment" element={<PageLayout><PaymentPage /></PageLayout>} />
-                <Route path="/fake-payment" element={<FakePayment />} />
                 <Route path="/payment-success" element={<PageLayout><PaymentSuccess /></PageLayout>} />
                 <Route path="/payment-fail" element={<PageLayout><PaymentFail /></PageLayout>} />
                 <Route path="/admin" element={<PageLayout><AdminLoginPage /></PageLayout>} />
@@ -147,6 +132,7 @@ const AppShell = () => {
                     </RequireAdmin>
                   }
                 />
+                <Route path="*" element={<PageLayout><NotFoundPage /></PageLayout>} />
             </Routes>
         </Suspense>
     );

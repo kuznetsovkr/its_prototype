@@ -16,6 +16,7 @@
 @use "pages/recipientDetails";
 @use "pages/adminInventory";
 @use "pages/thx";
+@use "pages/notFound";
 
 // Shared shell styles intentionally come last so legacy page rules cannot hide or restyle it.
 @use "components/footer";
