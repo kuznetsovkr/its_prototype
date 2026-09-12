@@ -8,27 +8,58 @@ const STATUS_MEDIA = {
   confirming: {
     webm: '/media/payment/confirming.webm',
     mp4: '/media/payment/confirming.mp4',
-    gif: '/media/payment/confirming.gif',
+    poster: '/media/payment/confirming-poster.webp',
     alt: 'Подтверждаем оплату…',
   },
   bankPending: {
     webm: '/media/payment/bank_pending.webm',
     mp4: '/media/payment/bank_pending.mp4',
-    gif: '/media/payment/bank_pending.gif',
+    poster: '/media/payment/bank_pending-poster.webp',
     alt: 'Оплата зафиксирована банком, ждём подтверждение…',
   },
   timeout: {
     webm: '/media/payment/timeout.webm',
     mp4: '/media/payment/timeout.mp4',
-    gif: '/media/payment/timeout.gif',
+    poster: '/media/payment/timeout-poster.webp',
     alt: 'Долго не получаем подтверждение…',
   },
   missing: {
     webm: '/media/payment/missing.webm',
     mp4: '/media/payment/missing.mp4',
-    gif: '/media/payment/missing.gif',
+    poster: '/media/payment/missing-poster.webp',
     alt: 'Не найден номер заказа',
   },
+};
+
+const PaymentStatusMedia = ({ media }) => {
+  const [videoFailed, setVideoFailed] = useState(false);
+
+  if (videoFailed) {
+    return (
+      <img
+        className={s.media}
+        src={media.poster}
+        alt={media.alt || 'Статус оплаты'}
+      />
+    );
+  }
+
+  return (
+    <video
+      className={s.media}
+      autoPlay
+      loop
+      muted
+      playsInline
+      preload="auto"
+      poster={media.poster}
+      aria-hidden="true"
+      onError={() => setVideoFailed(true)}
+    >
+      {media.webm && <source src={media.webm} type="video/webm" />}
+      {media.mp4 && <source src={media.mp4} type="video/mp4" />}
+    </video>
+  );
 };
 
 export default function PaymentSuccess() {
@@ -117,28 +148,7 @@ export default function PaymentSuccess() {
     <div className={s.wrap}>
       <div className={s.card}>
         <div className={s.mediaBox} aria-label={media?.alt}>
-          <video
-            key={status}
-            className={s.media}
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            aria-hidden="true"
-          >
-            {media?.webm && <source src={media.webm} type="video/webm" />}
-            {media?.mp4 && <source src={media.mp4} type="video/mp4" />}
-          </video>
-
-          {media?.gif && (
-            <img
-              className={s.mediaFallback}
-              src={media.gif}
-              alt={media.alt || 'Статус оплаты'}
-              loading="lazy"
-            />
-          )}
+          <PaymentStatusMedia key={status} media={media} />
         </div>
 
         <p className={s.message} aria-live="polite">{msg}</p>

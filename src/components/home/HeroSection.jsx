@@ -5,7 +5,9 @@ const HeroSection = ({ assets, onOrder }) => (
     <div className="home-hero__media" aria-hidden="true">
       <ResponsiveAsset
         desktop={assets.background.desktop}
+        desktopAvif={assets.background.desktopAvif}
         tablet={assets.background.tablet}
+        tabletAvif={assets.background.tabletAvif}
         mobile={assets.background.mobile}
         alt=""
         className="home-hero__background"

@@ -29,7 +29,9 @@ const HomePage = () => {
   const heroAssets = {
     background: {
       desktop: homeAssets.desktop.hero.background,
+      desktopAvif: homeAssets.desktop.hero.backgroundAvif,
       tablet: homeAssets.tablet.hero.background,
+      tabletAvif: homeAssets.tablet.hero.backgroundAvif,
       mobile: homeAssets.mobile.hero.background,
     },
     subject: {

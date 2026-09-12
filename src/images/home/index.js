@@ -1,4 +1,5 @@
 import desktopHeroBackground from './desktop/hero-background.webp';
+import desktopHeroBackgroundAvif from './desktop/hero-background.avif';
 import desktopHeroLogoGraphite from './desktop/hero-logo-graphite.png';
 import desktopHeroLogoMilk from './desktop/hero-logo-milk.webp';
 import desktopAboutPhoto from './desktop/about-photo.webp';
@@ -200,6 +201,7 @@ export const homeAssets = {
   desktop: {
     hero: {
       background: desktopHeroBackground,
+      backgroundAvif: desktopHeroBackgroundAvif,
       subject: desktopWorksCard09,
       logoGraphite: desktopHeroLogoGraphite,
       logoMilk: desktopHeroLogoMilk,
@@ -257,6 +259,7 @@ export const homeAssets = {
   tablet: {
     hero: {
       background: tabletHeroBackground,
+      backgroundAvif: desktopHeroBackgroundAvif,
       subject: tabletWorksCompact09,
       logoGraphite: tabletHeroLogoGraphite,
       logoMilk: tabletHeroLogoMilk,
