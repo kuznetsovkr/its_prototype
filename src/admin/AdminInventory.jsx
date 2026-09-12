@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CatalogManager from "./CatalogManager";
+import PricingManager from "./PricingManager";
 import WarehouseTable from "../components/WarehouseTable";
 import ColorSelect from "../components/ColorSelect";
 import api from "../api";
@@ -26,11 +27,13 @@ const AdminInventory = () => {
   const [inventory, setInventory] = useState([]);
   const [colorOptions, setColorOptions] = useState([]);
   const [clothingTypes, setClothingTypes] = useState([]);
+  const [pricingConfig, setPricingConfig] = useState(null);
   const [newItem, setNewItem] = useState(createEmptyItem);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingItem, setIsSavingItem] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSavingPricing, setIsSavingPricing] = useState(false);
   const [notice, setNotice] = useState(null);
   const [filters, setFilters] = useState({ type: ALL_VALUE, color: ALL_VALUE, size: ALL_VALUE });
   const [sort, setSort] = useState({ key: "quantity", dir: "desc" });
@@ -54,29 +57,53 @@ const AdminInventory = () => {
     setColorOptions(Array.isArray(response.data) ? response.data : []);
   }, []);
 
+  const fetchPricingConfig = useCallback(async () => {
+    const response = await api.get("/pricing/config");
+    setPricingConfig(response.data || null);
+  }, []);
+
   const loadAdminData = useCallback(async () => {
     setIsLoading(true);
     try {
-      await Promise.all([fetchInventory(), fetchClothingTypes(), fetchColors()]);
+      await Promise.all([
+        fetchInventory(),
+        fetchClothingTypes(),
+        fetchColors(),
+        fetchPricingConfig(),
+      ]);
     } catch (error) {
       showNotice("error", getErrorMessage(error, "Не удалось загрузить данные админки."));
     } finally {
       setIsLoading(false);
     }
-  }, [fetchColors, fetchClothingTypes, fetchInventory, showNotice]);
+  }, [fetchColors, fetchClothingTypes, fetchInventory, fetchPricingConfig, showNotice]);
 
   useEffect(() => {
     loadAdminData();
   }, [loadAdminData]);
 
-  const addClothingType = async ({ name, price }) => {
+  const addClothingType = async ({ name }) => {
     try {
-      await api.post("/clothing-types", { name, price });
+      await api.post("/clothing-types", { name });
       await fetchClothingTypes();
       showNotice("success", `Тип «${name}» добавлен.`);
     } catch (error) {
       showNotice("error", getErrorMessage(error, "Не удалось добавить тип одежды."));
       throw error;
+    }
+  };
+
+  const savePricingConfig = async (nextConfig) => {
+    setIsSavingPricing(true);
+    try {
+      const response = await api.put("/pricing/config", nextConfig);
+      setPricingConfig(response.data);
+      await Promise.all([fetchInventory(), fetchClothingTypes()]);
+      showNotice("success", "Цены сохранены и уже применяются к новым заказам.");
+    } catch (error) {
+      showNotice("error", getErrorMessage(error, "Не удалось сохранить настройки цен."));
+    } finally {
+      setIsSavingPricing(false);
     }
   };
 
@@ -289,10 +316,16 @@ const AdminInventory = () => {
         onAddColor={addColor}
       />
 
+      <PricingManager
+        config={pricingConfig}
+        isSaving={isSavingPricing}
+        onSave={savePricingConfig}
+      />
+
       <section className="admin-panel admin-inventory" aria-labelledby="admin-inventory-title">
         <div className="admin-panel__heading admin-inventory__heading">
           <div>
-            <p className="admin-panel__eyebrow">02 · наполнение склада</p>
+            <p className="admin-panel__eyebrow">03 · наполнение склада</p>
             <h2 id="admin-inventory-title">Складские позиции</h2>
           </div>
           <button

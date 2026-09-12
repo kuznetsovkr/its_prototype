@@ -7,8 +7,6 @@ const normalizeHex = (value) => {
   return normalized.startsWith("#") ? normalized : `#${normalized}`;
 };
 
-const formatPrice = (price) => `${Number(price || 0).toLocaleString("ru-RU")} ₽`;
-
 const CatalogManager = ({
   clothingTypes,
   colors,
@@ -18,7 +16,6 @@ const CatalogManager = ({
   onAddColor,
 }) => {
   const [typeName, setTypeName] = useState("");
-  const [typePrice, setTypePrice] = useState("");
   const [colorName, setColorName] = useState("");
   const [colorCode, setColorCode] = useState("#BC5823");
   const [pendingAction, setPendingAction] = useState("");
@@ -35,14 +32,12 @@ const CatalogManager = ({
   const submitType = async (event) => {
     event.preventDefault();
     const name = typeName.trim();
-    const price = Number(typePrice);
-    if (!name || !Number.isInteger(price) || price <= 0) return;
+    if (!name) return;
 
     setPendingAction("type");
     try {
-      await onAddClothingType({ name, price });
+      await onAddClothingType({ name });
       setTypeName("");
-      setTypePrice("");
     } finally {
       setPendingAction("");
     }
@@ -81,7 +76,7 @@ const CatalogManager = ({
             <span>{clothingTypes.length}</span>
           </div>
 
-          <form className="admin-directory-form" onSubmit={submitType}>
+          <form className="admin-directory-form admin-directory-form--type" onSubmit={submitType}>
             <label className="field admin-directory-form__name">
               <span className="label">Название</span>
               <input
@@ -93,22 +88,10 @@ const CatalogManager = ({
                 onChange={(event) => setTypeName(event.target.value)}
               />
             </label>
-            <label className="field admin-directory-form__value">
-              <span className="label">Цена, ₽</span>
-              <input
-                className="input"
-                type="number"
-                min="1"
-                step="1"
-                placeholder="5000"
-                value={typePrice}
-                onChange={(event) => setTypePrice(event.target.value.replace(/\D/g, ""))}
-              />
-            </label>
             <button
               className="btn btn-primary admin-directory-form__submit"
               type="submit"
-              disabled={pendingAction === "type" || !typeName.trim() || Number(typePrice) <= 0}
+              disabled={pendingAction === "type" || !typeName.trim()}
             >
               {pendingAction === "type" ? "Сохраняем…" : "Добавить тип"}
             </button>
@@ -121,7 +104,7 @@ const CatalogManager = ({
                 <div className="admin-directory-item" key={type.id}>
                   <div>
                     <strong>{type.name}</strong>
-                    <span>{formatPrice(type.price)}</span>
+                    <span>цены настраиваются ниже</span>
                   </div>
                   <button
                     className="admin-directory-item__remove"
