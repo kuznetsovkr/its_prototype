@@ -6,6 +6,7 @@ import PageLayout from './components/PageLayout';
 import { useOrder } from "./context/OrderContext";
 import RequireAdmin from './components/RequireAdmin';
 import RouteLoader from './components/RouteLoader';
+import SeoMetadata from './components/SeoMetadata';
 import { isOrderFlowPath } from './config/routes';
 
 const loadHomePage = () => import('./pages/HomePage');
@@ -140,6 +141,7 @@ const AppShell = () => {
     return (
             <div className={`App${isOrderPage ? ' App--order' : ''}${isEmbroideryPage ? ' App--embroidery' : ''}${isRecipientPage ? ' App--recipient' : ''}${isCertificatePage ? ' App--certificate' : ''}${isAdminPage ? ' App--admin' : ''}`}>
                 {!isHomePage && <Header />}
+                <SeoMetadata />
                 <ScrollToTop />
                 <OrderFlowReset />
                 <RoutePreloader />
