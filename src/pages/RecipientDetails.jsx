@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { AddressSuggestions } from "react-dadata";
 import "react-dadata/dist/react-dadata.css";
 import { IS_DEMO_MODE } from "../config/demoMode";
@@ -253,7 +254,15 @@ const RecipientDetails = () => {
                     disabled={formDisabled}
                   />
                   <span>
-                    Я даю <em>своё согласие на обработку моих персональных данных</em> в соответствии с <em>политикой конфиденциальности</em>
+                    Я даю <em>своё согласие на обработку моих персональных данных</em> в соответствии с{" "}
+                    <Link
+                      className="recipientOrderForm__legalLink"
+                      to="/privacy"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      политикой конфиденциальности
+                    </Link>
                   </span>
                 </label>
               </div>

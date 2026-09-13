@@ -127,6 +127,6 @@ export const socialLinks = {
 };
 
 export const legalLinks = [
-  { label: "Политика конфиденциальности", href: "#privacy" },
-  { label: "Публичная оферта", href: "#offer" },
+  { label: "Политика конфиденциальности", href: "/privacy" },
+  { label: "Публичная оферта", href: "/offer" },
 ];

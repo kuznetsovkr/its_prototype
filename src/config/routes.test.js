@@ -17,6 +17,11 @@ describe("public application routes", () => {
     expect(PUBLIC_APP_PATHS).not.toContain("/fake-payment");
   });
 
+  it("exposes the legal document placeholders as real pages", () => {
+    expect(PUBLIC_APP_PATHS).toContain("/privacy");
+    expect(PUBLIC_APP_PATHS).toContain("/offer");
+  });
+
   it("normalizes trailing slashes without accepting route prefixes", () => {
     expect(normalizeAppPath("/order///")).toBe("/order");
     expect(isOrderFlowPath("/order/")).toBe(true);

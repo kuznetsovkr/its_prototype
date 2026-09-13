@@ -15,6 +15,18 @@ export const SEO_ROUTES = Object.freeze({
     indexable: false,
     canonical: true,
   }),
+  "/privacy": Object.freeze({
+    title: "Политика конфиденциальности — И так сойдёт",
+    description: "Страница политики конфиденциальности бренда «И так сойдёт». Документ готовится к публикации.",
+    indexable: false,
+    canonical: true,
+  }),
+  "/offer": Object.freeze({
+    title: "Публичная оферта — И так сойдёт",
+    description: "Страница публичной оферты бренда «И так сойдёт». Документ готовится к публикации.",
+    indexable: false,
+    canonical: true,
+  }),
   "/order": Object.freeze({
     title: "Выбор изделия — И так сойдёт",
     description: "Выберите изделие, цвет и размер для индивидуальной вышивки.",

@@ -91,7 +91,11 @@ const HomeFooter = ({ assets, navigationBase = "", onOrder, variant = "home" }) 
       </div>
 
       <div className="home-footer__legal">
-        {legalLinks.map((item) => <a href={item.href} key={item.href}>{item.label}</a>)}
+        {legalLinks.map((item) => (
+          item.href.startsWith("/")
+            ? <Link to={item.href} key={item.href}>{item.label}</Link>
+            : <a href={item.href} key={item.href}>{item.label}</a>
+        ))}
         <span className="home-footer__legal-design">Дизайн сайта — Илья Погудин</span>
         <span className="home-footer__legal-development">
           Разработка сайта<span className="home-footer__compact-label"> — ............. ...............</span>

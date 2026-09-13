@@ -10,6 +10,8 @@ export const ORDER_FLOW_PATHS = [
 export const PUBLIC_APP_PATHS = [
   "/",
   "/certificate",
+  "/privacy",
+  "/offer",
   ...ORDER_FLOW_PATHS,
   "/admin",
   "/admin/inventory",

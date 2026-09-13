@@ -756,6 +756,19 @@
   font-style: normal;
 }
 
+.recipientOrderForm__legalLink {
+  color: #bc5823;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.recipientOrderForm__legalLink:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid #479ceb;
+  outline-offset: 2px;
+}
+
 .recipientOrderNavigation {
   display: grid;
 }

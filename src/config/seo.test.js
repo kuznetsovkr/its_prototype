@@ -46,6 +46,8 @@ describe("SEO configuration", () => {
     expect(sitemap).toContain("<loc>https://its-site.ru/</loc>");
     expect(sitemap).not.toContain("/certificate");
     expect(sitemap).not.toContain("/order");
+    expect(sitemap).not.toContain("/privacy");
+    expect(sitemap).not.toContain("/offer");
   });
 
   it("creates canonicals only for pages that explicitly allow them", () => {
@@ -54,6 +56,10 @@ describe("SEO configuration", () => {
       "https://its-site.ru/certificate"
     );
     expect(getCanonicalUrl("/order", DEFAULT_SITE_URL)).toBeNull();
+    expect(getCanonicalUrl("/privacy", DEFAULT_SITE_URL)).toBe(
+      "https://its-site.ru/privacy"
+    );
+    expect(getRobotsDirective(SEO_ROUTES["/privacy"], true)).toContain("noindex");
   });
 
   it("accepts only a clean HTTPS origin", () => {

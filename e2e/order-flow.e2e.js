@@ -71,3 +71,19 @@ test("прямое открытие страницы благодарности 
   await expect(page).toHaveURL(/\/order$/);
   await expect(page.getByRole("heading", { name: "заказ изделия" })).toBeVisible();
 });
+
+test("юридические ссылки в футере открывают отдельные страницы", async ({ page }) => {
+  await page.goto("/");
+  const footer = page.locator(".home-footer");
+
+  await footer.getByRole("link", { name: "Политика конфиденциальности" }).click();
+  await expect(page).toHaveURL(/\/privacy$/);
+  await expect(page.getByRole("heading", { name: "Политика конфиденциальности" })).toBeVisible();
+  await expect(page.getByText("Документ готовится")).toBeVisible();
+
+  await page.goto("/");
+  await footer.getByRole("link", { name: "Публичная оферта" }).click();
+  await expect(page).toHaveURL(/\/offer$/);
+  await expect(page.getByRole("heading", { name: "Публичная оферта" })).toBeVisible();
+  await expect(page.getByText("Документ готовится")).toBeVisible();
+});

@@ -20,6 +20,7 @@ const loadPaymentSuccess = () => import('./pages/PaymentSuccess');
 const loadPaymentFail = () => import('./pages/PaymentFail');
 const loadAdminLoginPage = () => import('./pages/AdminLoginPage');
 const loadNotFoundPage = () => import('./pages/NotFoundPage');
+const loadLegalPlaceholderPage = () => import('./pages/LegalPlaceholderPage');
 
 const HomePage = lazy(loadHomePage);
 const CertificatePage = lazy(loadCertificatePage);
@@ -32,6 +33,7 @@ const PaymentSuccess = lazy(loadPaymentSuccess);
 const PaymentFail = lazy(loadPaymentFail);
 const AdminLoginPage = lazy(loadAdminLoginPage);
 const NotFoundPage = lazy(loadNotFoundPage);
+const LegalPlaceholderPage = lazy(loadLegalPlaceholderPage);
 
 const primaryRouteImports = [
     loadHomePage,
@@ -116,6 +118,8 @@ const AppShell = () => {
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/certificate" element={<CertificatePage />} />
+                <Route path="/privacy" element={<PageLayout><LegalPlaceholderPage document="privacy" /></PageLayout>} />
+                <Route path="/offer" element={<PageLayout><LegalPlaceholderPage document="offer" /></PageLayout>} />
                 <Route path="/order" element={<PageLayout><OrderPage /></PageLayout>} />
                 <Route path="/embroidery" element={<PageLayout><EmbroideryPage /></PageLayout>} />
                 <Route path="/recipient" element={<PageLayout><RecipientDetails /></PageLayout>} />
