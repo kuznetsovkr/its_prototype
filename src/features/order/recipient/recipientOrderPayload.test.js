@@ -37,6 +37,7 @@ describe("recipient order payload", () => {
         addressLabel: "Красноярск, Мира, 1",
       },
       uploadedImage: [],
+      turnstileToken: "turnstile-response-token",
     });
 
     expect(payload.get("customTextFont")).toBe("Georgia");
@@ -45,5 +46,6 @@ describe("recipient order payload", () => {
     expect(payload.get("preferredContact")).toBe("Telegram");
     expect(payload.get("deliveryComment")).toBe("Позвонить заранее");
     expect(payload.get("comment")).toBe("Комментарий к заказу");
+    expect(payload.get("turnstileToken")).toBe("turnstile-response-token");
   });
 });

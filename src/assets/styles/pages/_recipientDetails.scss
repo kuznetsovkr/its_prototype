@@ -769,6 +769,101 @@
   outline-offset: 2px;
 }
 
+.recipientOrderForm__turnstile {
+  position: absolute;
+  display: grid;
+  box-sizing: border-box;
+  gap: 8px;
+  border: 1px solid rgb(188 88 35 / 24%);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.recipientOrderForm__turnstile[aria-disabled="true"] {
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.recipientOrderForm__turnstileHeader {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.recipientOrderForm__turnstileShield {
+  display: grid;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #161616;
+  color: #fff;
+  place-content: center;
+}
+
+.recipientOrderForm__turnstileShield svg {
+  width: 55%;
+  height: 55%;
+  fill: none;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.2;
+}
+
+.recipientOrderForm__turnstile.is-verified .recipientOrderForm__turnstileShield {
+  background: #bc5823;
+}
+
+.recipientOrderForm__turnstileCopy {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+  line-height: 1.25;
+}
+
+.recipientOrderForm__turnstileCopy strong {
+  font-weight: 600;
+}
+
+.recipientOrderForm__turnstileCopy small {
+  color: #77716b;
+}
+
+.recipientOrderForm__turnstileRetry {
+  flex: 0 0 auto;
+  margin-left: auto;
+  border: 0;
+  border-radius: 999px;
+  background: #f0e7df;
+  color: #bc5823;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.recipientOrderForm__turnstileRetry:hover {
+  background: #bc5823;
+  color: #fff;
+}
+
+.recipientOrderForm__turnstileWidget {
+  width: 100%;
+  min-height: 65px;
+  overflow: hidden;
+}
+
+.recipientOrderForm__turnstileWidget > div,
+.recipientOrderForm__turnstileWidget iframe {
+  max-width: 100%;
+}
+
+.recipientOrderForm__turnstile.is-verified {
+  min-height: 0;
+}
+
+.recipientOrderForm__turnstile.is-verified .recipientOrderForm__turnstileWidget {
+  display: none;
+}
+
 .recipientOrderNavigation {
   display: grid;
 }
@@ -1135,6 +1230,46 @@
 }
 
 @media (min-width: bp.$desktop-min) {
+  .recipientOrderPage.has-turnstile {
+    min-height: 1610px;
+  }
+
+  .recipientOrderPage.has-turnstile .recipientOrderPage__stage {
+    min-height: 1550px;
+  }
+
+  .recipientOrderPage.has-turnstile .recipientOrderCard {
+    height: 1390px;
+  }
+
+  .recipientOrderPage.has-turnstile .recipientOrderCard__preview {
+    height: 1294px;
+  }
+
+  .recipientOrderPage.has-turnstile .recipientOrderForm {
+    height: 1220px;
+  }
+
+  .recipientOrderPage.has-turnstile.is-turnstile-verified {
+    min-height: 1530px;
+  }
+
+  .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderPage__stage {
+    min-height: 1470px;
+  }
+
+  .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderCard {
+    height: 1310px;
+  }
+
+  .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderCard__preview {
+    height: 1214px;
+  }
+
+  .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderForm {
+    height: 1140px;
+  }
+
   .recipientOrderPage {
     width: 100vw;
     min-height: 1452px;
@@ -1389,6 +1524,33 @@
     width: 488px;
   }
 
+  .recipientOrderForm__turnstile {
+    top: 1066px;
+    left: 36px;
+    width: 518px;
+    min-height: 125px;
+    padding: 10px 12px;
+  }
+
+  .recipientOrderForm__turnstileShield {
+    width: 30px;
+    height: 30px;
+  }
+
+  .recipientOrderForm__turnstileCopy {
+    font-size: 12px;
+  }
+
+  .recipientOrderForm__turnstileCopy small {
+    font-size: 10px;
+  }
+
+  .recipientOrderForm__turnstileRetry {
+    min-height: 28px;
+    padding: 0 12px;
+    font-size: 8px;
+  }
+
   .recipientOrderNavigation {
     grid-template-columns: repeat(2, 285px);
     gap: 20px;
@@ -1407,6 +1569,46 @@
 }
 
 @media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
+  .recipientOrderPage.has-turnstile {
+    min-height: 992px;
+  }
+
+  .recipientOrderPage.has-turnstile .recipientOrderPage__stage {
+    min-height: 972px;
+  }
+
+  .recipientOrderPage.has-turnstile .recipientOrderCard {
+    height: 912px;
+  }
+
+  .recipientOrderPage.has-turnstile .recipientOrderCard__preview {
+    height: 852px;
+  }
+
+  .recipientOrderPage.has-turnstile .recipientOrderForm {
+    height: 812px;
+  }
+
+  .recipientOrderPage.has-turnstile.is-turnstile-verified {
+    min-height: 922px;
+  }
+
+  .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderPage__stage {
+    min-height: 902px;
+  }
+
+  .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderCard {
+    height: 842px;
+  }
+
+  .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderCard__preview {
+    height: 782px;
+  }
+
+  .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderForm {
+    height: 742px;
+  }
+
   .App--recipient main > .container > .wrapper {
     padding: 0;
   }
@@ -1677,6 +1879,38 @@
     width: 210px;
   }
 
+  .recipientOrderForm__turnstile {
+    top: 680px;
+    left: 29px;
+    width: 236px;
+    min-height: 115px;
+    padding: 8px;
+    border-radius: 12px;
+  }
+
+  .recipientOrderForm__turnstileHeader {
+    gap: 6px;
+  }
+
+  .recipientOrderForm__turnstileShield {
+    width: 24px;
+    height: 24px;
+  }
+
+  .recipientOrderForm__turnstileCopy {
+    font-size: 8px;
+  }
+
+  .recipientOrderForm__turnstileCopy small {
+    font-size: 7px;
+  }
+
+  .recipientOrderForm__turnstileRetry {
+    min-height: 22px;
+    padding: 0 7px;
+    font-size: 6px;
+  }
+
   .recipientOrderNavigation {
     grid-template-columns: repeat(2, 140px);
     gap: 10px;
@@ -1703,6 +1937,34 @@
 }
 
 @media (max-width: bp.$mobile-max) {
+  .recipientOrderPage.has-turnstile {
+    min-height: 1274px;
+  }
+
+  .recipientOrderPage.has-turnstile .recipientOrderPage__stage,
+  .recipientOrderPage.has-turnstile .recipientOrderCard {
+    min-height: 1261px;
+    height: 1261px;
+  }
+
+  .recipientOrderPage.has-turnstile .recipientOrderForm {
+    height: 862px;
+  }
+
+  .recipientOrderPage.has-turnstile.is-turnstile-verified {
+    min-height: 1202px;
+  }
+
+  .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderPage__stage,
+  .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderCard {
+    min-height: 1189px;
+    height: 1189px;
+  }
+
+  .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderForm {
+    height: 790px;
+  }
+
   .App--recipient main > .container > .wrapper {
     padding: 0;
   }
@@ -1966,6 +2228,38 @@
   .recipientOrderForm__consent > span {
     width: 238px;
     margin-top: 6px;
+  }
+
+  .recipientOrderForm__turnstile {
+    top: 730px;
+    left: 20px;
+    width: 268px;
+    min-height: 115px;
+    padding: 8px;
+    border-radius: 14px;
+  }
+
+  .recipientOrderForm__turnstileHeader {
+    gap: 7px;
+  }
+
+  .recipientOrderForm__turnstileShield {
+    width: 26px;
+    height: 26px;
+  }
+
+  .recipientOrderForm__turnstileCopy {
+    font-size: 9px;
+  }
+
+  .recipientOrderForm__turnstileCopy small {
+    font-size: 8px;
+  }
+
+  .recipientOrderForm__turnstileRetry {
+    min-height: 24px;
+    padding: 0 8px;
+    font-size: 7px;
   }
 
   .recipientOrderNavigation {

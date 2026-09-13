@@ -30,6 +30,7 @@ export default defineConfig({
       ...process.env,
       VITE_ALLOW_INDEXING: "false",
       VITE_DEMO_MODE: "true",
+      VITE_TURNSTILE_E2E: "true",
     },
   },
   projects: [

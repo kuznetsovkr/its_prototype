@@ -30,3 +30,8 @@ export const getCheckoutQuote = async (selection) => {
   const { data } = await api.post("/pricing/checkout", selection);
   return data;
 };
+
+export const getPublicCheckoutConfig = async () => {
+  const { data } = await api.get("/public-config");
+  return data;
+};

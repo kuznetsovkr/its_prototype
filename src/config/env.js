@@ -14,5 +14,6 @@ export const APP_ENV = {
     ""
   ),
   demoMode: firstDefined(import.meta.env.VITE_DEMO_MODE, import.meta.env.REACT_APP_DEMO_MODE, "false"),
+  turnstileE2e: firstDefined(import.meta.env.VITE_TURNSTILE_E2E, "false"),
   isDevelopment: import.meta.env.DEV,
 };

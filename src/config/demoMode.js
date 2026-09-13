@@ -6,3 +6,4 @@ const parseBooleanEnv = (value) =>
   TRUE_VALUES.has(String(value || "").trim().toLowerCase());
 
 export const IS_DEMO_MODE = parseBooleanEnv(APP_ENV.demoMode);
+export const IS_TURNSTILE_E2E = parseBooleanEnv(APP_ENV.turnstileE2e);

@@ -5,7 +5,7 @@ export const buildOrderFormData = ({
   preferredContact, deliveryComment, city, privacyConsent, productType,
   color, size, selectedType, embroideryTypeRu, patronusCount, petFaceCount,
   customText, customTextFont, customOption, pickupPoint, manualAddress, isNoCdek, cdekData,
-  uploadedImage,
+  uploadedImage, turnstileToken,
 }) => {
   const formData = new FormData();
   const recipientFullName = deliveryRecipient.trim() || joinFullName(userData);
@@ -38,6 +38,7 @@ export const buildOrderFormData = ({
     customOption: JSON.stringify(customOption || {}),
     comment,
     deliveryAddress: pickupPoint || manualAddress?.value || "",
+    turnstileToken: turnstileToken || "",
   }).forEach(([key, value]) => formData.append(key, value));
 
   if (!isNoCdek && cdekData) {

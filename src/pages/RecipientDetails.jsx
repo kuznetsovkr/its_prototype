@@ -5,6 +5,7 @@ import "react-dadata/dist/react-dadata.css";
 import { IS_DEMO_MODE } from "../config/demoMode";
 import { MEDIA_QUERIES } from "../config/breakpoints";
 import { useRecipientDetails } from "../features/order/recipient/useRecipientDetails";
+import TurnstilePanel from "../components/TurnstilePanel";
 import figmaTshirtImg from "../images/order/tshirt-black.webp";
 import recipientBackIcon from "../images/order/recipient-back.svg";
 import orderBackIconTablet from "../images/order/order-back-tablet.svg";
@@ -31,8 +32,12 @@ const RecipientDetails = () => {
     manualAddress, setManualAddress, dadataToken, isManualAddressFull,
     checkoutQuote, checkoutQuoteLoading, checkoutQuoteError,
     isManualCheckout, isCheckoutLocked,
+    turnstile,
   } = useRecipientDetails();
   const formDisabled = isPaying || isCheckoutLocked;
+  const turnstileClassName = turnstile.isVisible
+    ? ` has-turnstile${turnstile.token ? " is-turnstile-verified" : ""}`
+    : "";
   const formatPrice = (value) => `${priceFormatter.format(Number(value))} ₽`;
 
   useEffect(() => {
@@ -58,7 +63,7 @@ const RecipientDetails = () => {
 
   return (
     <>
-      <section className="recipientOrderPage" aria-labelledby="recipient-order-title">
+      <section className={`recipientOrderPage${turnstileClassName}`} aria-labelledby="recipient-order-title">
         <div className="recipientOrderPage__stage">
           <div className="recipientOrderCard">
             <div className="recipientOrderCard__preview">
@@ -265,6 +270,8 @@ const RecipientDetails = () => {
                     </Link>
                   </span>
                 </label>
+
+                <TurnstilePanel challenge={turnstile} disabled={formDisabled} />
               </div>
 
               {error && <p className="recipientOrderCard__error" role="alert">{error}</p>}

@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { IS_DEMO_MODE } from "../../../config/demoMode";
+import { IS_DEMO_MODE, IS_TURNSTILE_E2E } from "../../../config/demoMode";
 import { MEDIA_QUERIES } from "../../../config/breakpoints";
 import { APP_ENV } from "../../../config/env";
 import { useOrder } from "../../../context/OrderContext";
@@ -13,6 +13,7 @@ import {
   getPaymentLink,
 } from "./recipientApi";
 import { buildOrderFormData } from "./recipientOrderPayload";
+import { useTurnstileChallenge } from "./useTurnstileChallenge";
 import {
   deriveGoodsPreset,
   formatPhoneNumber,
@@ -137,6 +138,9 @@ export const useRecipientDetails = () => {
   const [checkoutQuoteLoading, setCheckoutQuoteLoading] = useState(false);
   const [checkoutQuoteError, setCheckoutQuoteError] = useState("");
   const [error, setError] = useState("");
+  const turnstile = useTurnstileChallenge({
+    disabled: IS_DEMO_MODE && !IS_TURNSTILE_E2E,
+  });
 
   useLayoutEffect(() => {
         // при переходе на шаг получателя всегда показываем верх страницы
@@ -433,14 +437,17 @@ export const useRecipientDetails = () => {
   const isFormValid = recipientValidation.isValid;
   const getMissingFieldsMessage = () => recipientValidation.message;
   const hasCheckoutTotal = Number.isFinite(Number(checkoutQuote?.totalPrice));
-  const canSubmit = isFormValid && (
-    isManualCheckout || (!checkoutQuoteLoading && !checkoutQuoteError && hasCheckoutTotal)
-  );
+  const canSubmit = isFormValid &&
+    (isManualCheckout || (!checkoutQuoteLoading && !checkoutQuoteError && hasCheckoutTotal)) &&
+    (Boolean(draftOrder) || turnstile.isSatisfied);
   const getSubmitDisabledMessage = () => {
     if (!isFormValid) return getMissingFieldsMessage();
     if (checkoutQuoteLoading) return "Дождитесь итогового расчёта стоимости";
     if (checkoutQuoteError) return checkoutQuoteError;
     if (!isManualCheckout && !hasCheckoutTotal) return "Не удалось рассчитать итоговую стоимость";
+    if (turnstile.status === "loading") return "Дождитесь загрузки проверки защиты";
+    if (turnstile.status === "error") return "Не удалось загрузить проверку защиты";
+    if (!draftOrder && !turnstile.isSatisfied) return "Подтвердите, что заказ отправляет человек";
     return "";
   };
 
@@ -488,7 +495,7 @@ export const useRecipientDetails = () => {
         email, preferredContact, deliveryComment, city, privacyConsent,
         productType, color, size, selectedType, embroideryTypeRu,
         patronusCount, petFaceCount, customText, customTextFont, customOption, pickupPoint,
-        manualAddress, isNoCdek, cdekData, uploadedImage,
+        manualAddress, isNoCdek, cdekData, uploadedImage, turnstileToken: turnstile.token,
       }));
       setOrderId(data.orderId);
       setDraftOrder(data);
@@ -499,6 +506,7 @@ export const useRecipientDetails = () => {
       }
       return data; // { orderId, cdekNumber, ... }
     } catch (err) {
+      turnstile.reset();
       throw new Error(err.message || 'Create failed');
     }
   }
@@ -641,5 +649,6 @@ export const useRecipientDetails = () => {
     isManualCheckout, isCheckoutLocked: Boolean(draftOrder),
     handleCdekSelect, applyDemoPickup, handleNoCdekToggle,
     manualAddress, setManualAddress, dadataToken, isManualAddressFull,
+    turnstile,
   };
 };

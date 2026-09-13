@@ -1,5 +1,23 @@
 import { expect, test } from "@playwright/test";
 
+const TURNSTILE_TEST_SITE_KEY = "1x00000000000000000000AA";
+
+test.beforeEach(async ({ page }) => {
+  await page.route("**/api/public-config", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        turnstile: {
+          enabled: true,
+          siteKey: TURNSTILE_TEST_SITE_KEY,
+          action: "order_create",
+        },
+      }),
+    });
+  });
+});
+
 const startOrder = async (page) => {
   await page.goto("/");
   await page.locator(".home-hero").getByRole("button", { name: "Сделать заказ" }).click();
@@ -41,6 +59,9 @@ test("покупатель проходит основной путь и нач�
 
   await page.getByRole("checkbox", { name: /Я даю своё согласие/ }).check();
   await expect(page.getByText(/Итого:/)).toBeVisible();
+  await expect(page.getByTestId("turnstile-panel")).toHaveClass(/is-verified/, {
+    timeout: 20_000,
+  });
   await expect(submitButton).toBeEnabled();
   await submitButton.click();
 
