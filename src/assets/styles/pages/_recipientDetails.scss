@@ -2243,8 +2243,16 @@
   }
 
   .recipientOrderForm__turnstileShield {
-    width: 26px;
-    height: 26px;
+    width: 32px;
+    height: 32px;
+    line-height: 0;
+    place-items: center;
+  }
+
+  .recipientOrderForm__turnstileShield svg {
+    display: block;
+    width: 18px;
+    height: 20px;
   }
 
   .recipientOrderForm__turnstileCopy {

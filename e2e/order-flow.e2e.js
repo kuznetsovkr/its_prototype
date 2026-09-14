@@ -153,8 +153,12 @@ test("мобильные шаги заказа используют белый �
   await expectSquarePreview(".image-frame", ".clotheImage");
 
   const mediumSize = page.locator('input[name="size"][value="M"]');
+  const mediumSizeItem = page.locator('.sizeSelector__item:has(input[value="M"])');
+  const mediumSizeBox = mediumSizeItem.locator(".sizeSelector__box");
   await expect(mediumSize).toBeEnabled();
-  await page.locator('.sizeSelector__item:has(input[value="M"]) .sizeSelector__box').click();
+  await expect(mediumSizeItem).toHaveCSS("-webkit-tap-highlight-color", "rgba(0, 0, 0, 0)");
+  await expect(mediumSizeBox).toHaveCSS("transition-duration", "0s");
+  await mediumSizeBox.click();
   await page.locator(".orderNavigation .orderActionButton--next").click();
   await expect(page).toHaveURL(/\/embroidery$/);
   await expectWhiteBackground(".embroideryPage");
@@ -162,6 +166,13 @@ test("мобильные шаги заказа используют белый �
     ".embroiderySelectorDesktop__imageFrame",
     ".embroiderySelectorDesktop__imageFrame img",
   );
+  const embroideryFrameBounds = await page
+    .locator(".embroiderySelectorDesktop__imageFrame")
+    .boundingBox();
+  const embroideryImageBounds = await page
+    .locator(".embroiderySelectorDesktop__imageFrame img")
+    .boundingBox();
+  expect(embroideryImageBounds.width / embroideryFrameBounds.width).toBeGreaterThan(1.5);
 
   await continueToRecipient(page);
   await expectWhiteBackground(".recipientOrderPage");
@@ -169,6 +180,21 @@ test("мобильные шаги заказа используют белый �
     ".recipientOrderCard__imageFrame",
     ".recipientOrderCard__imageFrame img",
   );
+
+  const shield = page.locator(".recipientOrderForm__turnstileShield");
+  const shieldIcon = shield.locator("svg");
+  await expect(shield).toBeVisible();
+  const shieldBounds = await shield.boundingBox();
+  const shieldIconBounds = await shieldIcon.boundingBox();
+  expect(shieldBounds.width).toBeGreaterThanOrEqual(32);
+  expect(Math.abs(
+    shieldBounds.x + shieldBounds.width / 2 -
+    (shieldIconBounds.x + shieldIconBounds.width / 2),
+  )).toBeLessThanOrEqual(1);
+  expect(Math.abs(
+    shieldBounds.y + shieldBounds.height / 2 -
+    (shieldIconBounds.y + shieldIconBounds.height / 2),
+  )).toBeLessThanOrEqual(1);
 });
 
 test("mobile text-entry controls use at least a 16px font", async ({ page }, testInfo) => {

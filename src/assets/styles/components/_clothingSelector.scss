@@ -1559,6 +1559,9 @@
           display: block;
           min-width: 0;
           flex: none;
+          -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+          user-select: none;
 
           .sizeSelector__box {
             width: 100%;
@@ -1572,6 +1575,7 @@
             line-height: 1.4;
             color: #4b4b4b;
             text-transform: uppercase;
+            transition: none;
           }
 
           input:checked + .sizeSelector__box {
