@@ -23,6 +23,15 @@
   margin-top: 10px;
 }
 
+@media (min-width: bp.$desktop-min) {
+  .App--order .home-footer--internal .home-footer__panel,
+  .App--embroidery .home-footer--internal .home-footer__panel,
+  .App--recipient .home-footer--internal .home-footer__panel {
+    width: calc(100% - clamp(40px, calc(12.5vw - 120px), 120px));
+    max-width: none;
+  }
+}
+
 .home-footer button,
 .home-footer a { font-family: inherit; }
 
