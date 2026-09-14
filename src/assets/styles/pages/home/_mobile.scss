@@ -305,7 +305,7 @@
     width: 141.24%;
     max-width: none;
     height: 188.32%;
-    object-fit: fill;
+    object-fit: cover;
   }
 
   .home-works__item--2::after {
@@ -324,7 +324,7 @@
     width: 314.73%;
     max-width: none;
     height: 419.64%;
-    object-fit: fill;
+    object-fit: cover;
   }
 
   .home-works__item--3 .home-layered-asset__layer { object-fit: cover; }
@@ -337,10 +337,10 @@
     width: 101%;
     max-width: none;
     height: 274.33%;
-    object-fit: fill;
+    object-fit: cover;
   }
 
-  .home-works__item--5 .home-layered-asset__layer { object-fit: fill; }
+  .home-works__item--5 .home-layered-asset__layer { object-fit: cover; }
 
   .home-works__item--6 .home-layered-asset__layer {
     inset: auto;
@@ -349,7 +349,7 @@
     width: 137.67%;
     max-width: none;
     height: 183.56%;
-    object-fit: fill;
+    object-fit: cover;
   }
 
   .home-works__actions {

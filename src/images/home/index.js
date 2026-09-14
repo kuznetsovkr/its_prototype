@@ -63,20 +63,20 @@ import tabletWorksCompact02 from './desktop/works-card-02-layer-03.webp';
 import tabletWorksCompact05 from './desktop/works-card-05-layer-03.webp';
 import tabletWorksCompact09 from './desktop/works-card-09.webp';
 import tabletWorksCompact01 from './desktop/works-card-01.webp';
-import tabletWorksCompact08 from './tablet/works-compact-08.png';
 import tabletWorksCompact07 from './desktop/works-shared-portrait.webp';
 import tabletWorksCompact06 from './desktop/works-card-06-layer-02.webp';
 import tabletWorksCompact04 from './desktop/works-card-04.webp';
 import tabletWorksExpanded10Layer01 from './desktop/works-card-06-layer-01.png';
 import tabletWorksExpanded10Layer03 from './tablet/works-expanded-10-layer-03.webp';
-import tabletWorksExpanded11 from './desktop/works-card-06-layer-01.png';
 import tabletWorksExpanded12Layer01 from './desktop/works-card-02-layer-01.png';
 import tabletWorksExpanded12Layer03 from './desktop/works-card-06-layer-01.png';
 import tabletWorksExpanded14 from './desktop/works-card-05-layer-01.jpg';
 import tabletWorksExpanded13Layer02 from './tablet/works-expanded-13-layer-02.webp';
-import tabletWorksExpanded17Layer01 from './tablet/works-expanded-17-layer-01.png';
 import tabletWorksExpanded16Layer02 from './tablet/works-expanded-16-layer-02.webp';
 import tabletWorksExpanded15 from './tablet/works-expanded-15.webp';
+import tabletWorksAdditional01 from './tablet/works-additional-01.webp';
+import tabletWorksAdditional08 from './tablet/works-additional-08.webp';
+import tabletWorksAdditional09 from './tablet/works-additional-09.webp';
 import tabletReviewsItem03 from './desktop/reviews-item-03.jpg';
 import tabletReviewsItem02 from './desktop/reviews-item-02.webp';
 import tabletReviewsItem01 from './desktop/reviews-item-01.webp';
@@ -162,15 +162,15 @@ const tabletWorksCompactItems = [
 ];
 
 const additionalWorksItems = [
-  { layers: [tabletWorksExpanded11] },
+  { layers: [tabletWorksAdditional01] },
   { layers: [tabletWorksExpanded12Layer01, tabletWorksCompact07, tabletWorksExpanded12Layer03] },
   { layers: [tabletWorksExpanded10Layer01, tabletWorksCompact06, tabletWorksExpanded10Layer03] },
   { layers: [tabletWorksCompact02, tabletWorksExpanded13Layer02] },
   { layers: [tabletWorksExpanded15] },
   { layers: [tabletWorksExpanded14] },
   { layers: [tabletWorksCompact02, tabletWorksExpanded16Layer02] },
-  { layers: [tabletWorksExpanded17Layer01, tabletWorksCompact08] },
-  { layers: [tabletWorksExpanded12Layer01] },
+  { layers: [tabletWorksAdditional08] },
+  { layers: [tabletWorksAdditional09] },
 ];
 
 const tabletSocialItems = [
