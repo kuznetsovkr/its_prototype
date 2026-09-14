@@ -3,11 +3,11 @@ import { useOrder } from "../../../context/OrderContext";
 import { buildImgSrc } from "../../../utils/url";
 import { loadClothingCatalog } from "./clothingApi";
 import {
-  TYPE_ORDER,
   buildColorOptions,
   buildSizeOptions,
-  detectChartKey,
   hasStock,
+  hasSizeGuide,
+  isOrderableProfile,
   normalizeKey,
   uniqBy,
 } from "./clothingCatalog";
@@ -26,17 +26,46 @@ export const useClothingSelection = () => {
   const inStockInventory = useMemo(() => inventory.filter(hasStock), [inventory]);
 
   const baseTypeOptions = useMemo(() => {
-    const catalogTypes = clothingTypes.map((item) => String(item?.name || "").trim()).filter(Boolean);
-    const inventoryTypes = inventory.map((item) => String(item?.productType || "").trim()).filter(Boolean);
-    return uniqBy([...inventoryTypes, ...catalogTypes], normalizeKey)
-      .sort((a, b) => TYPE_ORDER[detectChartKey(a)] - TYPE_ORDER[detectChartKey(b)])
-      .map((label) => ({
-        label,
-        isAvailable: inStockInventory.some(
-          (item) => normalizeKey(item.productType) === normalizeKey(label)
+    const catalogOptions = clothingTypes
+      .filter((item) => String(item?.name || "").trim())
+      .map((profile) => ({ label: String(profile.name).trim(), profile }));
+    const inventoryOptions = inventory
+      .filter((item) => String(item?.productType || "").trim())
+      .map((item) => ({
+        label: String(item.productType).trim(),
+        profile: item.clothingType || null,
+      }));
+    return uniqBy([...catalogOptions, ...inventoryOptions], (option) => normalizeKey(option.label))
+      .sort((a, b) =>
+        Number(a.profile?.displayOrder ?? 10_000) - Number(b.profile?.displayOrder ?? 10_000) ||
+        a.label.localeCompare(b.label, "ru")
+      )
+      .map((option) => ({
+        ...option,
+        isAvailable: isOrderableProfile(option.profile) && inStockInventory.some(
+          (item) => normalizeKey(item.productType) === normalizeKey(option.label)
         ),
+        disabledReason: isOrderableProfile(option.profile)
+          ? "Нет в наличии"
+          : "Параметры изделия пока не настроены",
       }));
   }, [clothingTypes, inventory, inStockInventory]);
+
+  const selectedTypeProfile = useMemo(
+    () => baseTypeOptions.find((option) =>
+      normalizeKey(option.label) === normalizeKey(selectedClothing))?.profile || null,
+    [baseTypeOptions, selectedClothing]
+  );
+
+  const sizeGuideOptions = useMemo(() => uniqBy(
+    baseTypeOptions
+      .filter((option) => hasSizeGuide(option.profile?.sizeGuideKey))
+      .map((option) => ({
+        key: option.profile.sizeGuideKey,
+        label: option.label,
+      })),
+    (option) => option.key
+  ), [baseTypeOptions]);
 
   const filteredByType = useMemo(
     () => inventory.filter(
@@ -117,15 +146,17 @@ export const useClothingSelection = () => {
       type: selectedClothing,
       color: selectedColor,
       size: selectedSize,
+      profile: selectedTypeProfile,
     };
     const isSame =
       (clothing.type || "") === (next.type || "") &&
       (clothing.color || "") === (next.color || "") &&
-      (clothing.size || "") === (next.size || "");
+      (clothing.size || "") === (next.size || "") &&
+      JSON.stringify(clothing.profile ?? null) === JSON.stringify(next.profile ?? null);
     if (isSame) return;
     setClothing(next);
-  }, [selectedClothing, selectedColor, selectedSize, setClothing,
-    clothing.type, clothing.color, clothing.size]);
+  }, [selectedClothing, selectedColor, selectedSize, selectedTypeProfile, setClothing,
+    clothing.type, clothing.color, clothing.size, clothing.profile]);
 
   const previewItem = useMemo(() => {
     const exact = filteredByType.find((item) => hasStock(item) &&
@@ -176,6 +207,7 @@ export const useClothingSelection = () => {
     selectedClothing, selectedColor, selectedSize,
     setSelectedSize,
     baseTypeOptions, colorOptions, sizeOptions, availableSizes,
+    selectedTypeProfile, sizeGuideOptions,
     canProceed,
     isPreviewLoading: !inventoryLoaded,
     displayPreviewSrc: stablePreview.src || previewSrc || clothing.previewSrc || "",

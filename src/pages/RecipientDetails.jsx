@@ -19,7 +19,7 @@ const priceFormatter = new Intl.NumberFormat("ru-RU");
 
 const RecipientDetails = () => {
   const {
-    navigate, productType, clothingPreviewSrc, clothingPreviewAlt,
+      navigate, clothingProfile, clothingPreviewSrc, clothingPreviewAlt,
     fullNameInput, handleFullNameChange, isPaying,
     userData, handleInputChange, email, setEmail, isMobileLayout,
     preferredContact, setPreferredContact, orderComment, setOrderComment,
@@ -346,7 +346,7 @@ const RecipientDetails = () => {
             {!IS_DEMO_MODE && isCdekPickerOpen && !isNoCdek && (
               <Suspense fallback={<p className="cdek-map__loading">Загружаем карту…</p>}>
                 <MyCdekWidget
-                  productType={productType}
+                    clothingProfile={clothingProfile}
                   onAddressSelect={setPickupPoint}
                   onRateSelect={setDeliveryPrice}
                   onCdekSelect={handleCdekSelect}

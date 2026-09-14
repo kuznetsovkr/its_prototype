@@ -85,8 +85,8 @@ const AdminInventory = () => {
   const addClothingType = async ({ name }) => {
     try {
       await api.post("/clothing-types", { name });
-      await fetchClothingTypes();
-      showNotice("success", `Тип «${name}» добавлен.`);
+      await Promise.all([fetchClothingTypes(), fetchPricingConfig()]);
+      showNotice("success", `Тип «${name}» добавлен. Заполните его цены и профиль ниже.`);
     } catch (error) {
       showNotice("error", getErrorMessage(error, "Не удалось добавить тип одежды."));
       throw error;
@@ -112,7 +112,7 @@ const AdminInventory = () => {
 
     try {
       await api.delete(`/clothing-types/${type.id}`);
-      await fetchClothingTypes();
+      await Promise.all([fetchClothingTypes(), fetchPricingConfig()]);
       showNotice("success", `Тип «${type.name}» удалён.`);
     } catch (error) {
       showNotice("error", getErrorMessage(error, "Не удалось удалить тип одежды."));

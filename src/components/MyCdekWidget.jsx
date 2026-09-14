@@ -1,44 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import CDEKWidget from "@cdek-it/widget";
-import { API_BASE } from "../api";
+import api, { API_BASE } from "../api";
 import { APP_ENV } from "../config/env";
 
-const FIXED_TARIFF_CODE = 136;
-const DEFAULT_CENTER = [92.868, 56.0106];
-const DEFAULT_ZOOM = 10;
 const INFO_POPUP_KEY = "info";
-
-const detectClothingKey = (base) => {
-  const raw = String(base || "").toLowerCase();
-  if (raw.includes("худи") || raw.includes("hoodie") || raw.includes("hudi")) return "hoodie";
-  if (raw.includes("свитшот") || raw.includes("свит") || raw.includes("sweatshirt") || raw.includes("svitshot")) return "svitshot";
-  if (raw.includes("футбол") || raw.includes("t-shirt") || raw.includes("tshirt") || raw.includes("tee")) return "tshirt";
-  return "hoodie";
-};
-
-const resolveProductName = (productType) => {
-  if (!productType) return "";
-  if (typeof productType === "string") return productType;
-  if (typeof productType === "object") {
-    return productType.name || productType.type || "";
-  }
-  return "";
-};
-
-const GOODS_PRESETS = {
-  hoodie: { width: 35, height: 35, length: 7, weight: 0.8 },
-  svitshot: { width: 35, height: 35, length: 7, weight: 0.8 },
-  tshirt: { width: 30, height: 20, length: 3, weight: 0.3 },
-  default: { width: 35, height: 35, length: 7, weight: 0.8 },
-};
-
-const FROM_LOCATION = {
-  country_code: "RU",
-  city: "Красноярск",
-  postal_code: 660135,
-  code: 278,
-  address: "ул. 78-й Добровольческой бригады, 1",
-};
 
 const LOOPBACK_HOSTS = ["localhost", "127.0.0.1", "::1"];
 
@@ -134,7 +99,7 @@ const formatAddressLabel = (address) => {
   );
 };
 
-const normalizeTariff = (tariff, fallbackCode = FIXED_TARIFF_CODE) => {
+const normalizeTariff = (tariff, fallbackCode) => {
   if (!tariff) {
     return {
       tariff_code: fallbackCode,
@@ -179,7 +144,7 @@ const closeInfoPopup = (widgetInstance) => {
   }
 };
 
-const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType }) => {
+const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingProfile }) => {
   const servicePath = resolveServicePath();
   const ymapsKey = String(APP_ENV.ymapsKey)
     .trim()
@@ -188,14 +153,30 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
   const addressRef = useRef(onAddressSelect);
   const rateRef = useRef(onRateSelect);
   const cdekRef = useRef(onCdekSelect);
-  const autoTariffRef = useRef(normalizeTariff(null));
+  const autoTariffRef = useRef(null);
   const hasLoggedMapErrorRef = useRef(false);
+  const [cdekConfig, setCdekConfig] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    api.get("/public-config")
+      .then(({ data }) => {
+        if (!data?.cdek) throw new Error("CDEK config is missing");
+        if (active) setCdekConfig(data.cdek);
+      })
+      .catch((error) => {
+        if (active) setMapErrorMessage("Не удалось загрузить настройки карты СДЭК.");
+        console.error("[CDEK] Public config error:", error);
+      });
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => { addressRef.current = onAddressSelect; }, [onAddressSelect]);
   useEffect(() => { rateRef.current = onRateSelect; }, [onRateSelect]);
   useEffect(() => { cdekRef.current = onCdekSelect; }, [onCdekSelect]);
 
   useEffect(() => {
+    if (!cdekConfig) return undefined;
     let instance;
     const unsubscribeWidgetListeners = [];
 
@@ -224,20 +205,41 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         return;
       }
 
-      clearMapErrorMessage();
+      const tariffCode = Number(cdekConfig?.tariffCode);
+      const defaultLocation = cdekConfig?.defaultLocation;
+      const defaultZoom = Number(cdekConfig?.defaultZoom);
+      const from = cdekConfig?.from;
+      const packageProfile = clothingProfile?.package;
+      const packageWeight = Number(packageProfile?.weight);
+      if (
+        !Number.isInteger(tariffCode) || tariffCode <= 0 ||
+        !Array.isArray(defaultLocation) || defaultLocation.length !== 2 ||
+        defaultLocation.some((value) => !Number.isFinite(Number(value))) ||
+        !Number.isFinite(defaultZoom) || !from?.code ||
+        [packageProfile?.width, packageProfile?.height, packageProfile?.length, packageWeight]
+          .some((value) => !Number.isFinite(Number(value)) || Number(value) <= 0)
+      ) {
+        reportMapError(new Error("Incomplete CDEK or clothing profile configuration"));
+        return;
+      }
 
-      const typeName = resolveProductName(productType);
-      const goodsKey = detectClothingKey(typeName);
-      const goods = GOODS_PRESETS[goodsKey] || GOODS_PRESETS.default;
+      clearMapErrorMessage();
+      const goods = {
+        width: Number(packageProfile.width),
+        height: Number(packageProfile.height),
+        length: Number(packageProfile.length),
+        weight: packageWeight / 1000,
+      };
       const goodsForApi = {
         ...goods,
-        weight_grams: Math.round((goods.weight || 0) * 1000),
+        weight_grams: packageWeight,
       };
+      autoTariffRef.current = normalizeTariff(null, tariffCode);
 
       try {
         instance = new CDEKWidget({
           root: "cdek-map",
-          from: FROM_LOCATION,
+          from,
           apiKey: ymapsKey,
           canChoose: true,
           servicePath,
@@ -245,13 +247,16 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
           hideDeliveryOptions: { office: false, door: true },
           debug: false,
           goods: [goods],
-          defaultLocation: DEFAULT_CENTER,
+          defaultLocation: defaultLocation.map(Number),
           fixBounds: null,
           lang: "rus",
           currency: "RUB",
-          tariffs: { office: [FIXED_TARIFF_CODE], door: [] },
+          tariffs: { office: [tariffCode], door: [] },
           onChoose(mode, selectedTariff, address) {
-            const normalizedTariff = normalizeTariff(selectedTariff || autoTariffRef.current);
+            const normalizedTariff = normalizeTariff(
+              selectedTariff || autoTariffRef.current,
+              tariffCode
+            );
             autoTariffRef.current = normalizedTariff;
 
             const addressLabel = formatAddressLabel(address);
@@ -264,7 +269,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
               address,
               addressLabel,
               goods: [goodsForApi],
-              from: FROM_LOCATION,
+              from,
             });
 
             closeInfoPopup(instance);
@@ -288,7 +293,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         if (!Array.isArray(tariffsForOffice) || tariffsForOffice.length === 0) return;
 
         const targetTariff =
-          tariffsForOffice.find((tariff) => Number(tariff?.tariff_code) === FIXED_TARIFF_CODE) ||
+          tariffsForOffice.find((tariff) => Number(tariff?.tariff_code) === tariffCode) ||
           tariffsForOffice[0];
         if (!targetTariff) return;
 
@@ -311,7 +316,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
         autoSelectTariff();
       }
 
-      instance.updateLocation(DEFAULT_CENTER, DEFAULT_ZOOM).catch(() => {});
+      instance.updateLocation(defaultLocation.map(Number), defaultZoom).catch(() => {});
       requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
     }, 0);
 
@@ -323,7 +328,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, productType
       });
       try { instance?.destroy?.(); } catch {}
     };
-  }, [servicePath, ymapsKey, productType]);
+  }, [servicePath, ymapsKey, clothingProfile, cdekConfig]);
 
   return null;
 };

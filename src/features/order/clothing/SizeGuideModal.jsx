@@ -2,7 +2,7 @@ import { createPortal } from "react-dom";
 
 import { SIZE_CHARTS, SIZE_COLUMNS } from "./clothingCatalog";
 
-const SizeGuideModal = ({ chartKey, onChartChange, onClose }) => {
+const SizeGuideModal = ({ chartKey, options = [], onChartChange, onClose }) => {
   const chart = SIZE_CHARTS[chartKey] || SIZE_CHARTS.default;
   const hasSizeGuide = chart.rows.length > 0;
 
@@ -15,7 +15,7 @@ const SizeGuideModal = ({ chartKey, onChartChange, onClose }) => {
           </svg>
         </button>
         <div className="modalHeader">
-          {[["tshirt", "футболка"], ["hoodie", "худи"], ["svitshot", "свитшот"]].map(([key, label]) => (
+          {options.map(({ key, label }) => (
             <button
               type="button"
               key={key}

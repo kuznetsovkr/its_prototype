@@ -31,6 +31,7 @@ const isSameClothing = (a, b) =>
   (a?.type || "") === (b?.type || "") &&
   (a?.color || "") === (b?.color || "") &&
   (a?.size || "") === (b?.size || "") &&
+  JSON.stringify(a?.profile ?? null) === JSON.stringify(b?.profile ?? null) &&
   (a?.previewSrc || "") === (b?.previewSrc || "") &&
   (a?.previewAlt || "") === (b?.previewAlt || "");
 
@@ -83,6 +84,7 @@ const initialState = {
     type: "",
     color: "",
     size: "",
+    profile: null,
     previewSrc: "",
     previewAlt: "",
   },

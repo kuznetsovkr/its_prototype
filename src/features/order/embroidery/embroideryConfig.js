@@ -24,27 +24,6 @@ export const UPLOAD_INSTRUCTIONS = [
 
 export const MAX_UPLOAD_MB = 5;
 export const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
-export const DEMO_PRICE_MATRIX = {
-  Patronus: { tshirt: 8500, svitshot: 9500, hoodie: 10000 },
-  Car: { tshirt: 6500, svitshot: 8000, hoodie: 8500 },
-  petFace: { tshirt: 6000, svitshot: 7000, hoodie: 8000 },
-};
-
-export const detectClothingKey = (baseType) => {
-  const raw = String(baseType || "").toLowerCase();
-  const name = `${raw} ${raw
-    .replace(/худи/g, "hudi")
-    .replace(/свитшот/g, "svitshot")
-    .replace(/свит/g, "svit")
-    .replace(/футбол/g, "futbol")}`;
-  if (name.includes("hudi") || name.includes("hoodie")) return "hoodie";
-  if (name.includes("svitshot") || name.includes("sweatshirt")) return "svitshot";
-  if (["t-shirt", "tshirt", "tee", "futbol", "футбол"].some((part) => name.includes(part))) {
-    return "tshirt";
-  }
-  return "tshirt";
-};
-
 export const isSameFiles = (left = [], right = []) =>
   left === right || (Array.isArray(left) && Array.isArray(right) && left.length === right.length &&
     left.every((file, index) => file === right[index]));

@@ -104,7 +104,7 @@ const CatalogManager = ({
                 <div className="admin-directory-item" key={type.id}>
                   <div>
                     <strong>{type.name}</strong>
-                    <span>цены настраиваются ниже</span>
+                    <span>{type.price ? `от ${type.price} ₽` : "нужно заполнить профиль ниже"}</span>
                   </div>
                   <button
                     className="admin-directory-item__remove"

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import checkIcon from "../images/Vector.svg";
 import orderBackMobile from "../images/order/order-back-mobile.svg";
-import { detectChartKey, isWhite, normalizeKey } from "../features/order/clothing/clothingCatalog";
+import { isWhite, normalizeKey } from "../features/order/clothing/clothingCatalog";
 import SizeGuideModal from "../features/order/clothing/SizeGuideModal";
 import { useClothingSelection } from "../features/order/clothing/useClothingSelection";
 
@@ -15,11 +15,12 @@ const ClothingSelector = () => {
     setSelectedSize, baseTypeOptions,
     colorOptions, sizeOptions, availableSizes, canProceed,
     displayPreviewSrc, displayPreviewAlt, displayPrice, isPreviewLoading,
+    selectedTypeProfile, sizeGuideOptions,
     handleSelectClothing, handleSelectColor,
   } = useClothingSelection();
 
   const openSizeGuide = () => {
-    setChartKey(detectChartKey(selectedClothing));
+    setChartKey(selectedTypeProfile?.sizeGuideKey || "default");
     setShowSizeModal(true);
   };
 
@@ -56,7 +57,7 @@ const ClothingSelector = () => {
                   <label
                     className={`selectorType__item ${normalizeKey(selectedClothing) === normalizeKey(option.label) ? "active" : ""} ${option.isAvailable ? "" : "is-disabled"}`}
                     key={option.label}
-                    title={option.isAvailable ? "" : "Нет в наличии"}
+                    title={option.isAvailable ? "" : option.disabledReason}
                   >
                     <input
                       type="radio" name="clothing" value={option.label}
@@ -118,7 +119,14 @@ const ClothingSelector = () => {
         </div>
       </div>
 
-      {showSizeModal && <SizeGuideModal chartKey={chartKey} onChartChange={setChartKey} onClose={() => setShowSizeModal(false)} />}
+      {showSizeModal && (
+        <SizeGuideModal
+          chartKey={chartKey}
+          options={sizeGuideOptions}
+          onChartChange={setChartKey}
+          onClose={() => setShowSizeModal(false)}
+        />
+      )}
     </>
   );
 };

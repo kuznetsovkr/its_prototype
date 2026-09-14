@@ -1,5 +1,12 @@
 import { describe, expect, test } from "vitest";
-import { buildColorOptions, buildSizeOptions, hasStock, normalizeKey, uniqBy } from "./clothingCatalog";
+import {
+  buildColorOptions,
+  buildSizeOptions,
+  hasStock,
+  isOrderableProfile,
+  normalizeKey,
+  uniqBy,
+} from "./clothingCatalog";
 
 describe("clothing catalog rules", () => {
   test("deduplicates product type labels without changing them", () => {
@@ -41,5 +48,16 @@ describe("clothing catalog rules", () => {
       { size: "s" },
       { size: "XL" },
     ])).toEqual(["S", "XL", "3XL", "ONE SIZE"]);
+  });
+
+  test("requires an explicit complete server profile before an item can be ordered", () => {
+    const configured = {
+      patronusLimit: 5,
+      prices: { Patronus: 10000, Car: 8500, petFace: 8000 },
+      package: { width: 35, height: 35, length: 7, weight: 800 },
+    };
+    expect(isOrderableProfile(configured)).toBe(true);
+    expect(isOrderableProfile({ ...configured, prices: { ...configured.prices, Car: null } })).toBe(false);
+    expect(isOrderableProfile(null)).toBe(false);
   });
 });

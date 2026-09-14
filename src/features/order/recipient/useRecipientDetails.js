@@ -15,7 +15,6 @@ import {
 import { buildOrderFormData } from "./recipientOrderPayload";
 import { useTurnstileChallenge } from "./useTurnstileChallenge";
 import {
-  deriveGoodsPreset,
   formatPhoneNumber,
   hasFullManualAddress,
   joinFullName,
@@ -468,7 +467,15 @@ export const useRecipientDetails = () => {
   };
 
   const applyDemoPickup = () => {
-    const goods = [deriveGoodsPreset(productType)];
+    const packageProfile = clothing.profile?.package || {};
+    const packageWeight = Number(packageProfile.weight || 0);
+    const goods = [{
+      width: Number(packageProfile.width || 0),
+      height: Number(packageProfile.height || 0),
+      length: Number(packageProfile.length || 0),
+      weight: packageWeight / 1000,
+      weight_grams: packageWeight,
+    }];
     const payload = {
       mode: "office",
       tariff: {
@@ -637,7 +644,7 @@ export const useRecipientDetails = () => {
 
 
   return {
-    navigate, productType, isCustomType,
+    navigate, productType, clothingProfile: clothing.profile, isCustomType,
     clothingPreviewSrc: clothing.previewSrc || "",
     clothingPreviewAlt: clothing.previewAlt || clothing.type || "Одежда",
     fullNameInput, handleFullNameChange, isPaying,

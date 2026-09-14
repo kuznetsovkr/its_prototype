@@ -384,6 +384,67 @@
   gap: 20px;
 }
 
+.admin-pricing__profiles {
+  margin-top: 16px;
+  padding: 26px;
+  border-radius: 28px;
+  background: #fff;
+}
+
+.admin-pricing__profiles-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 20px;
+}
+
+.admin-pricing__profiles-heading h3,
+.admin-profile-card h4 {
+  margin: 0;
+  color: var(--admin-ink);
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.admin-pricing__profiles-heading p {
+  margin: 0;
+  color: var(--admin-muted);
+  font-size: 13px;
+}
+
+.admin-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-profile-card {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #e7e2dc;
+  border-radius: 22px;
+  background: #faf8f5;
+}
+
+.admin-profile-card__heading { margin-bottom: 18px; }
+
+.admin-profile-card__heading span {
+  display: block;
+  overflow: hidden;
+  margin-top: 5px;
+  color: var(--admin-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-profile-card__fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
 .admin-pricing__extras p {
   margin: 7px 0 0;
   color: var(--admin-muted);
@@ -855,6 +916,7 @@
 
   .admin-catalog__grid { grid-template-columns: 1fr; }
   .admin-pricing__grid { grid-template-columns: 1fr; }
+  .admin-profile-grid { grid-template-columns: 1fr; }
   .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .form-card__upload { grid-column: auto; }
 }
@@ -916,6 +978,10 @@
   .filters-grid { grid-template-columns: 1fr; }
 
   .admin-pricing__extras { grid-template-columns: 1fr; padding: 20px 16px; border-radius: 22px; }
+  .admin-pricing__profiles { padding: 20px 16px; border-radius: 22px; }
+  .admin-pricing__profiles-heading { align-items: flex-start; flex-direction: column; }
+  .admin-profile-card { padding: 18px 14px; }
+  .admin-profile-card__fields { grid-template-columns: 1fr; }
   .admin-price-card { padding: 20px 16px; border-radius: 22px; }
   .admin-pricing__actions .btn { width: 100%; }
 

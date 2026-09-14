@@ -4,8 +4,6 @@ import { IS_DEMO_MODE } from "../../../config/demoMode";
 import { useOrder } from "../../../context/OrderContext";
 import { getEmbroideryPrices } from "./embroideryApi";
 import {
-  DEMO_PRICE_MATRIX,
-  detectClothingKey,
   isSameFiles,
   isSameOptions,
   selectUploadFiles,
@@ -34,9 +32,10 @@ export const useEmbroiderySelection = () => {
   const [priceError, setPriceError] = useState("");
 
   const selectedClothing = location.state?.selectedClothing;
-  const clothingKey = detectClothingKey(clothing.type || selectedClothing);
-  const patronusLimit = clothingKey === "tshirt" ? 1 : 5;
-  const patronusLimitText = clothingKey === "tshirt" ? "на футболке не более 1" : "не более 5";
+  const configuredPatronusLimit = Number(clothing.profile?.patronusLimit);
+  const patronusLimit = Number.isInteger(configuredPatronusLimit) && configuredPatronusLimit > 0
+    ? Math.min(configuredPatronusLimit, 5)
+    : 5;
   const isCustomType = selectedType === "custom";
 
   useEffect(() => {
@@ -45,10 +44,11 @@ export const useEmbroiderySelection = () => {
 
   useEffect(() => {
     if (IS_DEMO_MODE) {
+      const prices = clothing.profile?.prices || {};
       setServerPrices({
-        Patronus: DEMO_PRICE_MATRIX.Patronus[clothingKey] + Math.max(0, patronusCount - 1) * 5000,
-        Car: DEMO_PRICE_MATRIX.Car[clothingKey],
-        petFace: DEMO_PRICE_MATRIX.petFace[clothingKey] + Math.max(0, petFaceCount - 1) * 2000,
+        Patronus: Number(prices.Patronus) + Math.max(0, patronusCount - 1) * 5000,
+        Car: Number(prices.Car),
+        petFace: Number(prices.petFace) + Math.max(0, petFaceCount - 1) * 2000,
       });
       setPriceLoading(false);
       setPriceError("");
@@ -85,7 +85,7 @@ export const useEmbroiderySelection = () => {
       }
     });
     return () => { cancelled = true; };
-  }, [clothing.type, clothing.color, clothing.size, selectedClothing, clothingKey,
+  }, [clothing.type, clothing.color, clothing.size, clothing.profile, selectedClothing,
     patronusCount, petFaceCount]);
 
   const calcPrice = useCallback((type) => {
@@ -234,7 +234,7 @@ export const useEmbroiderySelection = () => {
     selectedType, customText, setCustomText, uploadedImage, setUploadedImage,
     comment, setComment, error, patronusCount, setPatronusCount,
     petFaceCount, setPetFaceCount, customOption, setCustomOption,
-    customTextFont, setCustomTextFont, patronusLimit, patronusLimitText,
+    customTextFont, setCustomTextFont, patronusLimit,
     isCustomType, hasFiles, canProceed, disabledHint, priceError,
     desktopPriceLabel: isCustomType
       ? "Цена рассчитает менеджер"

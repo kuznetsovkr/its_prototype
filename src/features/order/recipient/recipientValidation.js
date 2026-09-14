@@ -71,14 +71,3 @@ export const validateRecipient = ({
       : `Пожалуйста, заполните ${prefix.length ? `${prefix.join(", ")} и ${last}` : last}`,
   };
 };
-
-export const deriveGoodsPreset = (productType) => {
-  const name = String(typeof productType === "object"
-    ? productType?.name || productType?.type || ""
-    : productType || "").toLowerCase();
-  let preset = { width: 35, height: 35, length: 7, weight: 0.8 };
-  if (["t-shirt", "tshirt", "tee"].some((part) => name.includes(part))) {
-    preset = { width: 30, height: 20, length: 3, weight: 0.3 };
-  }
-  return { ...preset, weight_grams: Math.round(preset.weight * 1000) };
-};

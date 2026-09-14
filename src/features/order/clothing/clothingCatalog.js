@@ -93,22 +93,18 @@ export const SIZE_CHARTS = {
   },
 };
 
-export const detectChartKey = (baseType) => {
-  const raw = String(baseType || "").toLowerCase();
-  const name = `${raw} ${raw
-    .replace(/худи/g, "hudi")
-    .replace(/свитшот/g, "svitshot")
-    .replace(/свит/g, "svit")
-    .replace(/футбол/g, "futbol")}`;
-  if (name.includes("hudi") || name.includes("hoodie")) return "hoodie";
-  if (name.includes("svitshot") || name.includes("sweatshirt")) return "svitshot";
-  if (["t-shirt", "tshirt", "tee", "futbol"].some((part) => name.includes(part))) {
-    return "tshirt";
-  }
-  return "default";
-};
+export const hasSizeGuide = (key) => Boolean(key && SIZE_CHARTS[key]?.rows?.length);
 
-export const TYPE_ORDER = { tshirt: 1, hoodie: 2, svitshot: 3, default: 99 };
+export const isOrderableProfile = (profile) => {
+  if (!profile) return false;
+  const prices = ["Patronus", "Car", "petFace"].map((key) => Number(profile.prices?.[key]));
+  const packageValues = ["width", "height", "length", "weight"]
+    .map((key) => Number(profile.package?.[key]));
+  const patronusLimit = Number(profile.patronusLimit);
+  return prices.every((value) => Number.isInteger(value) && value > 0) &&
+    packageValues.every((value) => Number.isInteger(value) && value > 0) &&
+    Number.isInteger(patronusLimit) && patronusLimit >= 1 && patronusLimit <= 5;
+};
 export const COLOR_ORDER = new Map([
   ["белый", 1], ["white", 1],
   ["чёрный", 2], ["черный", 2], ["black", 2],
