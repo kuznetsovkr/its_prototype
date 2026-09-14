@@ -6,7 +6,6 @@ import { IS_DEMO_MODE } from "../config/demoMode";
 import { MEDIA_QUERIES } from "../config/breakpoints";
 import { useRecipientDetails } from "../features/order/recipient/useRecipientDetails";
 import TurnstilePanel from "../components/TurnstilePanel";
-import figmaTshirtImg from "../images/order/tshirt-black.webp";
 import recipientBackIcon from "../images/order/recipient-back.svg";
 import orderBackIconTablet from "../images/order/order-back-tablet.svg";
 import orderBackIconMobile from "../images/order/order-back-mobile.svg";
@@ -88,11 +87,13 @@ const RecipientDetails = () => {
               </h1>
 
               <div className="recipientOrderCard__imageFrame">
-                <img
-                  className={clothingPreviewSrc ? "is-product-preview" : "is-fallback-preview"}
-                  src={clothingPreviewSrc || figmaTshirtImg}
-                  alt={clothingPreviewSrc ? clothingPreviewAlt : "Чёрная футболка"}
-                />
+                {clothingPreviewSrc ? (
+                  <img className="is-product-preview" src={clothingPreviewSrc} alt={clothingPreviewAlt} />
+                ) : (
+                  <div className="orderProductPlaceholder" role="img" aria-label="Изображение товара не загружено">
+                    <span>изображение не загружено</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -184,7 +185,7 @@ const RecipientDetails = () => {
                   </span>
                   <span className="recipientOrderForm__deliveryMethodText">
                     <strong>СДЭК — </strong>
-                    Доставка до пункта выдачи заказов <span>от 4 дней, от 450 р</span>
+                    Доставка до пункта выдачи заказов <span>срок и стоимость — после выбора ПВЗ</span>
                   </span>
                 </button>
 

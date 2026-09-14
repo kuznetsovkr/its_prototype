@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import checkIcon from "../images/Vector.svg";
 import orderBackMobile from "../images/order/order-back-mobile.svg";
-import { CORE_SIZES, detectChartKey, isWhite, normalizeKey } from "../features/order/clothing/clothingCatalog";
+import { detectChartKey, isWhite, normalizeKey } from "../features/order/clothing/clothingCatalog";
 import SizeGuideModal from "../features/order/clothing/SizeGuideModal";
 import { useClothingSelection } from "../features/order/clothing/useClothingSelection";
 
@@ -14,7 +14,7 @@ const ClothingSelector = () => {
     selectedClothing, selectedColor, selectedSize,
     setSelectedSize, baseTypeOptions,
     colorOptions, sizeOptions, availableSizes, canProceed,
-    displayPreviewSrc, displayPreviewAlt, displayPrice,
+    displayPreviewSrc, displayPreviewAlt, displayPrice, isPreviewLoading,
     handleSelectClothing, handleSelectColor,
   } = useClothingSelection();
 
@@ -34,7 +34,13 @@ const ClothingSelector = () => {
           <div className="image-wrapper">
             <div className="image-frame">
               <div className="image-stack" aria-live="polite">
-                <img src={displayPreviewSrc} alt={displayPreviewAlt} className="clotheImage" draggable="false" />
+                {displayPreviewSrc ? (
+                  <img src={displayPreviewSrc} alt={displayPreviewAlt} className="clotheImage" draggable="false" />
+                ) : (
+                  <div className="orderProductPlaceholder" role="img" aria-label="Изображение товара не загружено">
+                    <span>{isPreviewLoading ? "загружаем изображение" : "изображение не загружено"}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -90,7 +96,7 @@ const ClothingSelector = () => {
                 <p className="title">Размер</p>
                 <div className="tableSize" onClick={openSizeGuide}>Таблица размеров</div>
               </div>
-              <div className={`sizeSelector${sizeOptions.length > CORE_SIZES.length ? " sizeSelector--six" : ""}`}>
+              <div className={`sizeSelector${sizeOptions.length > 5 ? " sizeSelector--six" : ""}`}>
                 {sizeOptions.map((size) => {
                   const isAvailable = availableSizes.includes(size);
                   return (

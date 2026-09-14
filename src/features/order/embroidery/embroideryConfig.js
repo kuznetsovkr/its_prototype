@@ -5,6 +5,14 @@ export const EMBROIDERY_TYPES = [
   { value: "custom", label: "другая", hasExample: false },
 ];
 
+export const CUSTOM_TEXT_FONTS = [
+  "Arial",
+  "Courier New",
+  "Georgia",
+  "Times New Roman",
+  "Comic Sans MS",
+];
+
 export const UPLOAD_INSTRUCTIONS = [
   "Отправьте, пожалуйста, фото вашего питомца:",
   "1. Одно из фото должно быть мордочкой животного, которую Вы бы хотели видеть на эскизе.",

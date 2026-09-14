@@ -119,6 +119,13 @@ test("прямое открытие страницы благодарности 
   await expect(page.getByRole("heading", { name: "заказ изделия" })).toBeVisible();
 });
 
+test("прямое открытие шага вышивки возвращает к выбору изделия", async ({ page }) => {
+  await page.goto("/embroidery");
+
+  await expect(page).toHaveURL(/\/order$/);
+  await expect(page.getByRole("heading", { name: "заказ изделия" })).toBeVisible();
+});
+
 test("юридические ссылки в футере открывают отдельные страницы", async ({ page }) => {
   await page.goto("/");
   const footer = page.locator(".home-footer");
@@ -252,7 +259,9 @@ test("mobile text-entry controls use at least a 16px font", async ({ page }, tes
   await expectSafeFontSizes();
 
   await startOrder(page);
+  await page.getByRole("button", { name: "надпись", exact: true }).click();
   await expectSafeFontSizes();
+  await page.getByRole("button", { name: "изображение", exact: true }).click();
 
   await continueToRecipient(page);
   await expectSafeFontSizes();

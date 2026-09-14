@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { buildColorOptions, hasStock, normalizeKey, uniqBy } from "./clothingCatalog";
+import { buildColorOptions, buildSizeOptions, hasStock, normalizeKey, uniqBy } from "./clothingCatalog";
 
 describe("clothing catalog rules", () => {
   test("deduplicates product type labels without changing them", () => {
@@ -31,5 +31,15 @@ describe("clothing catalog rules", () => {
       { label: "Чёрный", code: "#202022", isAvailable: true },
       { label: "Синий", code: "#065EA7", isAvailable: false },
     ]);
+  });
+
+  test("builds the size list from inventory without dropping custom sizes", () => {
+    expect(buildSizeOptions([
+      { size: "3XL" },
+      { size: "S" },
+      { size: "ONE SIZE" },
+      { size: "s" },
+      { size: "XL" },
+    ])).toEqual(["S", "XL", "3XL", "ONE SIZE"]);
   });
 });

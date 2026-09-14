@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useOrder } from "../../../context/OrderContext";
 import { buildImgSrc } from "../../../utils/url";
-import figmaTshirtImg from "../../../images/order/tshirt-black.webp";
 import { loadClothingCatalog } from "./clothingApi";
 import {
-  CORE_SIZES,
   TYPE_ORDER,
   buildColorOptions,
+  buildSizeOptions,
   detectChartKey,
   hasStock,
   normalizeKey,
@@ -25,11 +24,6 @@ export const useClothingSelection = () => {
   const [selectedSize, setSelectedSize] = useState(clothing.size || "");
 
   const inStockInventory = useMemo(() => inventory.filter(hasStock), [inventory]);
-  const sizeOptions = useMemo(() => {
-    const supportsXXL = normalizeKey(selectedSize) === "xxl" ||
-      inventory.some((item) => normalizeKey(item.size) === "xxl");
-    return supportsXXL ? [...CORE_SIZES, "XXL"] : CORE_SIZES;
-  }, [inventory, selectedSize]);
 
   const baseTypeOptions = useMemo(() => {
     const catalogTypes = clothingTypes.map((item) => String(item?.name || "").trim()).filter(Boolean);
@@ -49,6 +43,11 @@ export const useClothingSelection = () => {
       (item) => normalizeKey(item.productType) === normalizeKey(selectedClothing)
     ),
     [inventory, selectedClothing]
+  );
+
+  const sizeOptions = useMemo(
+    () => buildSizeOptions(filteredByType),
+    [filteredByType]
   );
 
   const colorOptions = useMemo(() => {
@@ -76,7 +75,10 @@ export const useClothingSelection = () => {
         setColorCatalog(catalog.colors);
         setInventoryLoaded(true);
       })
-      .catch((error) => console.error("Error loading inventory:", error));
+      .catch((error) => {
+        console.error("Error loading inventory:", error);
+        if (!cancelled) setInventoryLoaded(true);
+      });
     return () => { cancelled = true; };
   }, []);
 
@@ -175,10 +177,9 @@ export const useClothingSelection = () => {
     setSelectedSize,
     baseTypeOptions, colorOptions, sizeOptions, availableSizes,
     canProceed,
-    displayPreviewSrc: stablePreview.src || previewSrc || clothing.previewSrc || figmaTshirtImg,
-    displayPreviewAlt: stablePreview.src || previewSrc || clothing.previewSrc
-      ? stablePreview.alt || previewAlt || clothing.previewAlt
-      : "Чёрная футболка",
+    isPreviewLoading: !inventoryLoaded,
+    displayPreviewSrc: stablePreview.src || previewSrc || clothing.previewSrc || "",
+    displayPreviewAlt: stablePreview.alt || previewAlt || clothing.previewAlt || "Одежда",
     displayPrice: hasPrice ? `${parsedPrice} руб` : "уточняется",
     handleSelectClothing: (value) => {
       setSelectedClothing(value); setSelectedColor(""); setSelectedSize("");

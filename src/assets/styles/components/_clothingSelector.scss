@@ -197,6 +197,25 @@
   pointer-events: none;
 }
 
+.orderProductPlaceholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  border: 1px dashed rgb(18 19 25 / 18%);
+  border-radius: inherit;
+  background: #f3f1ef;
+  font-family: 'Jost', sans-serif;
+  font-size: clamp(12px, 1vw, 16px);
+  font-weight: 500;
+  line-height: 1.3;
+  color: #76716d;
+  text-align: center;
+  text-transform: lowercase;
+}
+
 .confirmButton {
   border-radius: 20px;
   width: clamp(350px, 20vw, 525px);
@@ -528,6 +547,20 @@
   }
 }
 
+.sizeTableGrid--empty {
+  min-height: 220px;
+  justify-content: center;
+}
+
+.sizeTable__empty {
+  max-width: 360px;
+  font-family: 'Jost', sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+  color: #76716d;
+  text-align: center;
+}
+
 /* Order redesign: the supplied Figma frame covers desktop only. */
 .orderPage {
   width: 100%;
@@ -836,7 +869,7 @@
 
       .sizeSelector {
         display: flex;
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
         gap: 10px;
 
         .sizeSelector__item {

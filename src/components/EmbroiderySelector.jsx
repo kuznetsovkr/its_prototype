@@ -2,17 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IS_DEMO_MODE } from "../config/demoMode";
 import EmbroideryDesktop from "../features/order/embroidery/EmbroideryDesktop";
-import EmbroideryLegacy from "../features/order/embroidery/EmbroideryLegacy";
 import { useEmbroiderySelection } from "../features/order/embroidery/useEmbroiderySelection";
 
 const EmbroiderySelector = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  const textareaRef = useRef(null);
   const selection = useEmbroiderySelection();
   const {
     selectedType, setCustomText, setUploadedImage,
-    comment, customOption, setCustomOption, canProceed, handleSelectType,
+    customOption, setCustomOption, canProceed, handleSelectType, hasClothingSelection,
   } = selection;
   const [desktopTab, setDesktopTab] = useState(
     selectedType === "custom" && customOption.text ? "text" : "image"
@@ -25,12 +23,10 @@ const EmbroiderySelector = () => {
   }, [selectedType, customOption.text]);
 
   useEffect(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.style.height = "auto";
-      textarea.style.height = `${textarea.scrollHeight}px`;
+    if (!hasClothingSelection) {
+      navigate("/order", { replace: true });
     }
-  }, [comment]);
+  }, [hasClothingSelection, navigate]);
 
   const handleNext = () => {
     if (canProceed) navigate("/recipient");
@@ -87,6 +83,8 @@ const EmbroiderySelector = () => {
     navigate(-1);
   };
 
+  if (!hasClothingSelection) return null;
+
   return (
     <>
       <EmbroideryDesktop
@@ -101,7 +99,6 @@ const EmbroiderySelector = () => {
         onBack={handleDesktopBack}
         onNext={handleDesktopNext}
       />
-      <EmbroideryLegacy selection={selection} navigate={navigate} textareaRef={textareaRef} />
     </>
   );
 };

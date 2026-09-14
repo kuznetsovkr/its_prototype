@@ -4,6 +4,7 @@ import { SIZE_CHARTS, SIZE_COLUMNS } from "./clothingCatalog";
 
 const SizeGuideModal = ({ chartKey, onChartChange, onClose }) => {
   const chart = SIZE_CHARTS[chartKey] || SIZE_CHARTS.default;
+  const hasSizeGuide = chart.rows.length > 0;
 
   return createPortal(
     <div className="modalOverlay" onClick={onClose}>
@@ -26,22 +27,30 @@ const SizeGuideModal = ({ chartKey, onChartChange, onClose }) => {
             </button>
           ))}
         </div>
-        <div className="sizeTable sizeTableGrid">
-          <div className="sizeTable__table">
-            <table>
-              <thead><tr>{SIZE_COLUMNS.map((column) => <th key={column}>{column}</th>)}</tr></thead>
-              <tbody>
-                {chart.rows.map((row) => (
-                  <tr key={row[0]}>{row.map((cell, index) => <td key={`${row[0]}-${index}`}>{cell}</td>)}</tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="sizeTable__illustration">
-            <div className="sizeTable__placeholder">
-              <img className="sizeTable__img" src={chart.image} alt={chart.title} />
+        <div className={`sizeTable sizeTableGrid${hasSizeGuide ? "" : " sizeTableGrid--empty"}`}>
+          {hasSizeGuide ? (
+            <>
+              <div className="sizeTable__table">
+                <table>
+                  <thead><tr>{SIZE_COLUMNS.map((column) => <th key={column}>{column}</th>)}</tr></thead>
+                  <tbody>
+                    {chart.rows.map((row) => (
+                      <tr key={row[0]}>{row.map((cell, index) => <td key={`${row[0]}-${index}`}>{cell}</td>)}</tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="sizeTable__illustration">
+                <div className="sizeTable__placeholder">
+                  <img className="sizeTable__img" src={chart.image} alt={chart.title} />
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="sizeTable__empty">
+              Таблица размеров для этого изделия пока не добавлена.
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>,

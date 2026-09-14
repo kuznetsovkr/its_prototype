@@ -228,6 +228,7 @@ export const useEmbroiderySelection = () => {
   };
 
   return {
+    hasClothingSelection: Boolean(clothing.type && clothing.color && clothing.size),
     clothingPreviewSrc: clothing.previewSrc || "",
     clothingPreviewAlt: clothing.previewAlt || clothing.type || "Одежда",
     selectedType, customText, setCustomText, uploadedImage, setUploadedImage,

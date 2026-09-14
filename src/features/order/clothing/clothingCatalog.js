@@ -23,7 +23,23 @@ export const hasStock = (item) => {
 
 export const normalizeKey = (value) => String(value || "").trim().toLowerCase();
 
-export const CORE_SIZES = ["XS", "S", "M", "L", "XL"];
+const SIZE_SORT_ORDER = new Map(
+  ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"].map(
+    (size, index) => [normalizeKey(size), index]
+  )
+);
+
+export const buildSizeOptions = (inventory = []) => uniqBy(
+  inventory.map((item) => String(item?.size || "").trim()).filter(Boolean),
+  normalizeKey
+).sort((left, right) => {
+  const leftOrder = SIZE_SORT_ORDER.get(normalizeKey(left));
+  const rightOrder = SIZE_SORT_ORDER.get(normalizeKey(right));
+  if (leftOrder !== undefined || rightOrder !== undefined) {
+    return (leftOrder ?? Number.MAX_SAFE_INTEGER) - (rightOrder ?? Number.MAX_SAFE_INTEGER);
+  }
+  return left.localeCompare(right, "ru", { numeric: true, sensitivity: "base" });
+});
 
 export const SIZE_COLUMNS = [
   "Размер",
@@ -72,15 +88,8 @@ export const SIZE_CHARTS = {
   },
   default: {
     title: "изделие",
-    image: tshirtImg,
-    rows: [
-      ["XS", "54", "67", "17", "24"],
-      ["S", "56", "69", "17,5", "24,5"],
-      ["M", "58", "73", "18", "25"],
-      ["L", "60", "75", "18,5", "25,5"],
-      ["XL", "62", "77", "19", "26"],
-      ["XXL", "64", "79", "19,5", "26,5"],
-    ],
+    image: null,
+    rows: [],
   },
 };
 

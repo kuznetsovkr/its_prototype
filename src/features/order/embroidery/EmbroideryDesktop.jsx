@@ -1,6 +1,5 @@
 import React from "react";
 import { MEDIA_QUERIES } from "../../../config/breakpoints";
-import figmaTshirtImg from "../../../images/order/tshirt-black.webp";
 import embroideryRadioActive from "../../../images/order/embroidery-radio-active.svg";
 import embroideryRadioActiveMobile from "../../../images/order/embroidery-radio-active-mobile.svg";
 import embroideryRadioActiveTablet from "../../../images/order/embroidery-radio-active-tablet.svg";
@@ -14,6 +13,7 @@ import orderBackIcon from "../../../images/order/order-back.svg";
 import orderBackIconMobile from "../../../images/order/order-back-mobile.svg";
 import orderBackIconTablet from "../../../images/order/order-back-tablet.svg";
 import {
+  CUSTOM_TEXT_FONTS,
   EMBROIDERY_TYPES as desktopEmbroideryTypes,
   MAX_UPLOAD_MB as MAX_MB,
   UPLOAD_INSTRUCTIONS as uploadInstructions,
@@ -90,11 +90,13 @@ const EmbroideryDesktop = ({
           </h1>
 
           <div className="embroiderySelectorDesktop__imageFrame">
-            <img
-              className={clothingPreviewSrc ? "is-product-preview" : "is-fallback-preview"}
-              src={clothingPreviewSrc || figmaTshirtImg}
-              alt={clothingPreviewSrc ? clothingPreviewAlt : "Чёрная футболка"}
-            />
+            {clothingPreviewSrc ? (
+              <img className="is-product-preview" src={clothingPreviewSrc} alt={clothingPreviewAlt} />
+            ) : (
+              <div className="orderProductPlaceholder" role="img" aria-label="Изображение товара не загружено">
+                <span>изображение не загружено</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -274,11 +276,7 @@ const EmbroideryDesktop = ({
                     value={customTextFont}
                     onChange={(event) => setCustomTextFont(event.target.value)}
                   >
-                    <option value="Arial">Arial</option>
-                    <option value="Courier New">Courier New</option>
-                    <option value="Georgia">Georgia</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                    <option value="Comic Sans MS">Comic Sans MS</option>
+                    {CUSTOM_TEXT_FONTS.map((font) => <option value={font} key={font}>{font}</option>)}
                   </select>
                 </label>
 
