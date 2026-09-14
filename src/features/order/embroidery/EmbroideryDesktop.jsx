@@ -32,6 +32,7 @@ const EmbroideryDesktop = ({
   onNext: handleDesktopNext,
 }) => {
   const {
+    clothingPreviewSrc, clothingPreviewAlt,
     selectedType, customText, setCustomText, uploadedImage, comment, setComment,
     error, patronusCount, setPatronusCount, petFaceCount, setPetFaceCount,
     customTextFont, setCustomTextFont, patronusLimit, hasFiles,
@@ -89,7 +90,11 @@ const EmbroideryDesktop = ({
           </h1>
 
           <div className="embroiderySelectorDesktop__imageFrame">
-            <img src={figmaTshirtImg} alt="Чёрная футболка" />
+            <img
+              className={clothingPreviewSrc ? "is-product-preview" : "is-fallback-preview"}
+              src={clothingPreviewSrc || figmaTshirtImg}
+              alt={clothingPreviewSrc ? clothingPreviewAlt : "Чёрная футболка"}
+            />
           </div>
         </div>
 

@@ -30,7 +30,9 @@ const isSameManualAddress = (a, b) => {
 const isSameClothing = (a, b) =>
   (a?.type || "") === (b?.type || "") &&
   (a?.color || "") === (b?.color || "") &&
-  (a?.size || "") === (b?.size || "");
+  (a?.size || "") === (b?.size || "") &&
+  (a?.previewSrc || "") === (b?.previewSrc || "") &&
+  (a?.previewAlt || "") === (b?.previewAlt || "");
 
 const isSameEmbroidery = (a, b) =>
   (a?.type || "") === (b?.type || "") &&
@@ -81,6 +83,8 @@ const initialState = {
     type: "",
     color: "",
     size: "",
+    previewSrc: "",
+    previewAlt: "",
   },
   embroidery: {
     type: "Patronus",

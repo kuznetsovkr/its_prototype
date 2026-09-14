@@ -1,3 +1,7 @@
+import demoHoodieImage from "../images/hoodie.webp";
+import demoSweatshirtImage from "../images/switshot.webp";
+import demoTshirtImage from "../images/tshirt.webp";
+
 export const DEMO_INVENTORY = [
   {
     id: "demo-hoodie-black-m",
@@ -6,6 +10,7 @@ export const DEMO_INVENTORY = [
     colorCode: "#1F1F1F",
     size: "M",
     quantity: 8,
+    imageUrl: demoHoodieImage,
   },
   {
     id: "demo-hoodie-black-l",
@@ -14,6 +19,7 @@ export const DEMO_INVENTORY = [
     colorCode: "#1F1F1F",
     size: "L",
     quantity: 6,
+    imageUrl: demoHoodieImage,
   },
   {
     id: "demo-hoodie-white-m",
@@ -22,6 +28,7 @@ export const DEMO_INVENTORY = [
     colorCode: "#FFFFFF",
     size: "M",
     quantity: 5,
+    imageUrl: demoHoodieImage,
   },
   {
     id: "demo-sweatshirt-gray-s",
@@ -30,6 +37,7 @@ export const DEMO_INVENTORY = [
     colorCode: "#949494",
     size: "S",
     quantity: 7,
+    imageUrl: demoSweatshirtImage,
   },
   {
     id: "demo-sweatshirt-gray-m",
@@ -38,6 +46,7 @@ export const DEMO_INVENTORY = [
     colorCode: "#949494",
     size: "M",
     quantity: 7,
+    imageUrl: demoSweatshirtImage,
   },
   {
     id: "demo-tshirt-blue-m",
@@ -46,6 +55,7 @@ export const DEMO_INVENTORY = [
     colorCode: "#1F4AB8",
     size: "M",
     quantity: 10,
+    imageUrl: demoTshirtImage,
   },
   {
     id: "demo-tshirt-blue-xl",
@@ -54,6 +64,7 @@ export const DEMO_INVENTORY = [
     colorCode: "#1F4AB8",
     size: "XL",
     quantity: 5,
+    imageUrl: demoTshirtImage,
   },
   {
     id: "demo-tshirt-beige-l",
@@ -62,6 +73,7 @@ export const DEMO_INVENTORY = [
     colorCode: "#DCCCB2",
     size: "L",
     quantity: 4,
+    imageUrl: demoTshirtImage,
   },
 ];
 

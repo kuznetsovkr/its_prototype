@@ -86,6 +86,32 @@ test("выбор изделия сохраняется при возврате �
   await expect(page.locator(".orderNavigation .orderActionButton--next")).toBeEnabled();
 });
 
+test("выбранное превью изделия сохраняется на следующих шагах", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium", "Проверка мобильного пути заказа");
+
+  await page.goto("/order");
+  const hoodieOption = page.locator('.selectorType__item:has(input[value="Hoodie"])');
+  await hoodieOption.click();
+  await expect(page.locator('input[name="clothing"][value="Hoodie"]')).toBeChecked();
+
+  const mediumSize = page.locator('input[name="size"][value="M"]');
+  await expect(mediumSize).toBeEnabled();
+  await page.locator('.sizeSelector__item:has(input[value="M"]) .sizeSelector__box').click();
+
+  const clothingPreview = page.locator(".clotheImage");
+  await expect(clothingPreview).toHaveAttribute("src", /hoodie.*\.webp/i);
+  const selectedPreviewSrc = await clothingPreview.getAttribute("src");
+
+  await page.locator(".orderNavigation .orderActionButton--next").click();
+  await expect(page).toHaveURL(/\/embroidery$/);
+  await expect(page.locator(".embroiderySelectorDesktop__imageFrame img"))
+    .toHaveAttribute("src", selectedPreviewSrc);
+
+  await continueToRecipient(page);
+  await expect(page.locator(".recipientOrderCard__imageFrame img"))
+    .toHaveAttribute("src", selectedPreviewSrc);
+});
+
 test("прямое открытие страницы благодарности возвращает к оформлению", async ({ page }) => {
   await page.goto("/thank-you");
 
@@ -172,7 +198,9 @@ test("мобильные шаги заказа используют белый �
   const embroideryImageBounds = await page
     .locator(".embroiderySelectorDesktop__imageFrame img")
     .boundingBox();
-  expect(embroideryImageBounds.width / embroideryFrameBounds.width).toBeGreaterThan(1.5);
+  expect(Math.abs(embroideryImageBounds.width - embroideryFrameBounds.width)).toBeLessThanOrEqual(1);
+  await expect(page.locator(".embroiderySelectorDesktop__imageFrame img"))
+    .toHaveClass(/is-product-preview/);
 
   await continueToRecipient(page);
   await expectWhiteBackground(".recipientOrderPage");

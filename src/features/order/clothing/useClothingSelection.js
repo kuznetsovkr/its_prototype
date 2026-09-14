@@ -158,6 +158,14 @@ export const useClothingSelection = () => {
     return () => { cancelled = true; };
   }, [previewSrc, previewAlt, stablePreview.src, stablePreview.alt]);
 
+  useEffect(() => {
+    if (!inventoryLoaded) return;
+    setClothing({
+      previewSrc: previewSrc || "",
+      previewAlt: previewSrc ? previewAlt : "",
+    });
+  }, [inventoryLoaded, previewSrc, previewAlt, setClothing]);
+
   const parsedPrice = Number(previewItem?.price);
   const hasPrice = previewItem?.price !== null && previewItem?.price !== undefined &&
     previewItem?.price !== "" && Number.isFinite(parsedPrice);
@@ -167,8 +175,10 @@ export const useClothingSelection = () => {
     setSelectedSize,
     baseTypeOptions, colorOptions, sizeOptions, availableSizes,
     canProceed,
-    displayPreviewSrc: stablePreview.src || figmaTshirtImg,
-    displayPreviewAlt: stablePreview.src ? stablePreview.alt || previewAlt : "Чёрная футболка",
+    displayPreviewSrc: stablePreview.src || previewSrc || clothing.previewSrc || figmaTshirtImg,
+    displayPreviewAlt: stablePreview.src || previewSrc || clothing.previewSrc
+      ? stablePreview.alt || previewAlt || clothing.previewAlt
+      : "Чёрная футболка",
     displayPrice: hasPrice ? `${parsedPrice} руб` : "уточняется",
     handleSelectClothing: (value) => {
       setSelectedClothing(value); setSelectedColor(""); setSelectedSize("");

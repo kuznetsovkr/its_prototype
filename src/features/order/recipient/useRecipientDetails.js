@@ -637,7 +637,10 @@ export const useRecipientDetails = () => {
 
 
   return {
-    navigate, productType, isCustomType, fullNameInput, handleFullNameChange, isPaying,
+    navigate, productType, isCustomType,
+    clothingPreviewSrc: clothing.previewSrc || "",
+    clothingPreviewAlt: clothing.previewAlt || clothing.type || "Одежда",
+    fullNameInput, handleFullNameChange, isPaying,
     userData, handleInputChange, email, setEmail, isMobileLayout,
     preferredContact, setPreferredContact, orderComment, setOrderComment,
     city, setCity, isCdekPickerOpen, setIsCdekPickerOpen,

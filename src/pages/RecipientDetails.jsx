@@ -20,7 +20,8 @@ const priceFormatter = new Intl.NumberFormat("ru-RU");
 
 const RecipientDetails = () => {
   const {
-    navigate, productType, fullNameInput, handleFullNameChange, isPaying,
+    navigate, productType, clothingPreviewSrc, clothingPreviewAlt,
+    fullNameInput, handleFullNameChange, isPaying,
     userData, handleInputChange, email, setEmail, isMobileLayout,
     preferredContact, setPreferredContact, orderComment, setOrderComment,
     city, setCity, isCdekPickerOpen, setIsCdekPickerOpen,
@@ -87,7 +88,11 @@ const RecipientDetails = () => {
               </h1>
 
               <div className="recipientOrderCard__imageFrame">
-                <img src={figmaTshirtImg} alt="Чёрная футболка" />
+                <img
+                  className={clothingPreviewSrc ? "is-product-preview" : "is-fallback-preview"}
+                  src={clothingPreviewSrc || figmaTshirtImg}
+                  alt={clothingPreviewSrc ? clothingPreviewAlt : "Чёрная футболка"}
+                />
               </div>
             </div>
 

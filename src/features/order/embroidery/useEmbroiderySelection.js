@@ -228,6 +228,8 @@ export const useEmbroiderySelection = () => {
   };
 
   return {
+    clothingPreviewSrc: clothing.previewSrc || "",
+    clothingPreviewAlt: clothing.previewAlt || clothing.type || "Одежда",
     selectedType, customText, setCustomText, uploadedImage, setUploadedImage,
     comment, setComment, error, patronusCount, setPatronusCount,
     petFaceCount, setPetFaceCount, customOption, setCustomOption,
