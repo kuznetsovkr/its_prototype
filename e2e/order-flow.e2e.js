@@ -170,3 +170,36 @@ test("мобильные шаги заказа используют белый �
     ".recipientOrderCard__imageFrame img",
   );
 });
+
+test("mobile text-entry controls use at least a 16px font", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium", "Mobile Safari regression check");
+
+  const textControlSelector = [
+    "textarea",
+    "select",
+    'input:not([type="button"]):not([type="checkbox"]):not([type="color"]):not([type="file"]):not([type="hidden"]):not([type="image"]):not([type="radio"]):not([type="range"]):not([type="reset"]):not([type="submit"])',
+  ].join(", ");
+
+  const expectSafeFontSizes = async () => {
+    const controls = page.locator(textControlSelector);
+    await expect(controls.first()).toBeAttached();
+
+    const undersizedControls = await controls.evaluateAll((elements) => elements
+      .map((element) => ({
+        control: `${element.tagName.toLowerCase()}[type="${element.getAttribute("type") || "default"}"]`,
+        fontSize: Number.parseFloat(window.getComputedStyle(element).fontSize),
+      }))
+      .filter(({ fontSize }) => fontSize < 16));
+
+    expect(undersizedControls).toEqual([]);
+  };
+
+  await page.goto("/admin");
+  await expectSafeFontSizes();
+
+  await startOrder(page);
+  await expectSafeFontSizes();
+
+  await continueToRecipient(page);
+  await expectSafeFontSizes();
+});

@@ -22,3 +22,6 @@
 // Shared shell styles intentionally come last so legacy page rules cannot hide or restyle it.
 @use "components/footer";
 @use "components/header";
+
+// Keep this last: it is a mobile Safari safeguard for every project-owned form.
+@use "base/mobileFormControls";
