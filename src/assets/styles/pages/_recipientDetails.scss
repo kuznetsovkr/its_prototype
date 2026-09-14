@@ -1938,13 +1938,13 @@
 
 @media (max-width: bp.$mobile-max) {
   .recipientOrderPage.has-turnstile {
-    min-height: 1274px;
+    min-height: 1306px;
   }
 
   .recipientOrderPage.has-turnstile .recipientOrderPage__stage,
   .recipientOrderPage.has-turnstile .recipientOrderCard {
-    min-height: 1261px;
-    height: 1261px;
+    min-height: 1293px;
+    height: 1293px;
   }
 
   .recipientOrderPage.has-turnstile .recipientOrderForm {
@@ -1952,13 +1952,13 @@
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified {
-    min-height: 1202px;
+    min-height: 1234px;
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderPage__stage,
   .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderCard {
-    min-height: 1189px;
-    height: 1189px;
+    min-height: 1221px;
+    height: 1221px;
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderForm {
@@ -1974,11 +1974,11 @@
     left: 50%;
     width: 320px;
     max-width: 100vw;
-    min-height: 1136px;
+    min-height: 1168px;
     margin: 0;
     padding: 10px 3px 3px;
     box-sizing: border-box;
-    background: #161616;
+    background: #fff;
     transform: translateX(-50%);
   }
 
@@ -1987,7 +1987,7 @@
     align-items: flex-start;
     justify-content: center;
     width: 100%;
-    min-height: 1123px;
+    min-height: 1155px;
     padding: 0;
     border-radius: 20px;
     background: #fff;
@@ -1996,7 +1996,7 @@
   .recipientOrderCard {
     display: block;
     width: 314px;
-    height: 1123px;
+    height: 1155px;
     border-radius: 20px;
     background: #fff;
   }
@@ -2004,7 +2004,7 @@
   .recipientOrderCard__preview {
     position: relative;
     width: 314px;
-    height: 319px;
+    height: 351px;
   }
 
   .recipientOrderCard__backArrow {
@@ -2048,20 +2048,19 @@
     top: 71px;
     left: 22px;
     width: 270px;
-    height: 238px;
+    height: 270px;
     overflow: hidden;
   }
 
   .recipientOrderCard__imageFrame img {
-    position: absolute;
-    top: -57.429px;
-    left: 0;
+    position: static;
     display: block;
-    width: 270px;
-    height: 360.832px;
-    max-width: none;
-    max-height: none;
-    object-fit: fill;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
   }
 
   .recipientOrderCard__controls {

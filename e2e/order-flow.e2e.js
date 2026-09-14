@@ -132,3 +132,41 @@ test("дополнительные примеры работ раскрываю�
   await expect(works).not.toHaveClass(/is-expanded/);
   await expect(items).toHaveCount(initialCount);
 });
+
+test("мобильные шаги заказа используют белый фон и квадратное превью", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium", "Проверка только мобильной вёрстки");
+
+  const expectWhiteBackground = async (selector) => {
+    await expect(page.locator(selector)).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  };
+  const expectSquarePreview = async (selector, imageSelector) => {
+    const preview = page.locator(selector);
+    await expect(preview).toBeVisible();
+    const bounds = await preview.boundingBox();
+    expect(Math.abs(bounds.width - bounds.height)).toBeLessThanOrEqual(1);
+    await expect(page.locator(imageSelector)).toHaveCSS("object-fit", "contain");
+  };
+
+  await page.goto("/order");
+  await expect(page.locator(".clotheImage")).toBeVisible();
+  await expectWhiteBackground(".orderPage");
+  await expectSquarePreview(".image-frame", ".clotheImage");
+
+  const mediumSize = page.locator('input[name="size"][value="M"]');
+  await expect(mediumSize).toBeEnabled();
+  await page.locator('.sizeSelector__item:has(input[value="M"]) .sizeSelector__box').click();
+  await page.locator(".orderNavigation .orderActionButton--next").click();
+  await expect(page).toHaveURL(/\/embroidery$/);
+  await expectWhiteBackground(".embroideryPage");
+  await expectSquarePreview(
+    ".embroiderySelectorDesktop__imageFrame",
+    ".embroiderySelectorDesktop__imageFrame img",
+  );
+
+  await continueToRecipient(page);
+  await expectWhiteBackground(".recipientOrderPage");
+  await expectSquarePreview(
+    ".recipientOrderCard__imageFrame",
+    ".recipientOrderCard__imageFrame img",
+  );
+});

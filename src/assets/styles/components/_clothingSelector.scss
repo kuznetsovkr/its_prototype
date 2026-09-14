@@ -1277,11 +1277,11 @@
     left: 50%;
     width: 320px;
     max-width: 100vw;
-    min-height: 830px;
+    min-height: 862px;
     margin: 0 0 10px;
     padding: 10px 3px;
     box-sizing: border-box;
-    background: #161616;
+    background: #fff;
     transform: translateX(-50%);
   }
 
@@ -1290,7 +1290,7 @@
     align-items: flex-start;
     justify-content: center;
     width: 100%;
-    min-height: 810px;
+    min-height: 842px;
     padding: 0;
     box-sizing: border-box;
     border-radius: 20px;
@@ -1308,7 +1308,7 @@
     width: 314px;
     max-width: 100%;
     height: auto;
-    min-height: 810px;
+    min-height: 842px;
     padding: 0 0 20px;
     box-sizing: border-box;
     border-radius: 20px;
@@ -1318,8 +1318,8 @@
       position: relative;
       width: 314px;
       max-width: 100%;
-      height: 319px;
-      min-height: 319px;
+      height: 351px;
+      min-height: 351px;
       flex: none;
       align-self: auto;
       overflow: visible;
@@ -1372,18 +1372,18 @@
         left: 22px;
         display: block;
         width: 270px;
-        height: 238px;
+        height: 270px;
         overflow: hidden;
 
         .image-frame {
           position: relative;
           display: block;
           width: 270px;
-          height: 238px;
+          height: 270px;
           min-height: 0;
           max-height: none;
           overflow: hidden;
-          aspect-ratio: auto;
+          aspect-ratio: 1;
           background: transparent;
         }
 
@@ -1392,19 +1392,18 @@
           inset: 0;
           display: block;
           width: 270px;
-          height: 238px;
+          height: 270px;
         }
 
         .clotheImage {
-          position: absolute;
-          top: -57.43px;
-          left: 0;
+          position: static;
           display: block;
-          width: 270px;
-          height: 360.83px;
-          max-width: none;
-          max-height: none;
-          object-fit: fill;
+          width: 100%;
+          height: 100%;
+          max-width: 100%;
+          max-height: 100%;
+          object-fit: contain;
+          object-position: center;
         }
       }
     }
