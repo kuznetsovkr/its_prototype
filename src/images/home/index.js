@@ -161,8 +161,7 @@ const tabletWorksCompactItems = [
   { layers: [tabletWorksCompact07] },
 ];
 
-const tabletWorksExpandedItems = [
-  ...tabletWorksCompactItems,
+const additionalWorksItems = [
   { layers: [tabletWorksExpanded11] },
   { layers: [tabletWorksExpanded12Layer01, tabletWorksCompact07, tabletWorksExpanded12Layer03] },
   { layers: [tabletWorksExpanded10Layer01, tabletWorksCompact06, tabletWorksExpanded10Layer03] },
@@ -220,6 +219,7 @@ export const homeAssets = {
     },
     works: {
       items: desktopWorksItems,
+      additionalItems: additionalWorksItems,
       headingStickers: [desktopWorksHeadingSticker, desktopWorksHeadingSticker],
       headingAvatar: desktopWorksHeadingAvatar,
     },
@@ -278,7 +278,7 @@ export const homeAssets = {
     },
     works: {
       compactItems: tabletWorksCompactItems,
-      expandedItems: tabletWorksExpandedItems,
+      additionalItems: additionalWorksItems,
     },
     reviews: {
       items: [tabletReviewsItem01, tabletReviewsItem02, tabletReviewsItem03],
@@ -325,6 +325,7 @@ export const homeAssets = {
     },
     works: {
       items: mobileWorksItems,
+      additionalItems: additionalWorksItems,
     },
     reviews: {
       items: [mobileReviewsItem01, mobileReviewsItem02],

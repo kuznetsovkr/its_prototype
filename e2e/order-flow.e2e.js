@@ -108,3 +108,27 @@ test("юридические ссылки в футере открывают о�
   await expect(page.getByRole("heading", { name: "Публичная оферта" })).toBeVisible();
   await expect(page.getByText("Документ готовится")).toBeVisible();
 });
+
+test("дополнительные примеры работ раскрываются и сворачиваются", async ({ page }, testInfo) => {
+  await page.goto("/");
+  const works = page.locator(".home-works");
+  const items = works.locator(".home-works__item");
+  const moreButton = works.locator(".home-works__more");
+  const initialCount = testInfo.project.name === "mobile-chromium" ? 6 : 9;
+
+  await expect(items).toHaveCount(initialCount);
+  await expect(moreButton).toHaveAttribute("aria-expanded", "false");
+
+  await moreButton.click();
+  await expect(works).toHaveClass(/is-expanded/);
+  await expect(items).toHaveCount(initialCount + 9);
+  await expect(works.locator(".home-works__item--additional")).toHaveCount(9);
+  await expect(moreButton).toHaveAttribute("aria-expanded", "true");
+  await expect.poll(() => page.evaluate(
+    () => document.documentElement.scrollWidth <= document.documentElement.clientWidth
+  )).toBe(true);
+
+  await moreButton.click();
+  await expect(works).not.toHaveClass(/is-expanded/);
+  await expect(items).toHaveCount(initialCount);
+});

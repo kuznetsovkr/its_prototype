@@ -268,6 +268,9 @@
     padding: 30px;
   }
 
+  .home-works.is-expanded .home-works__surface { height: 1230px; }
+  .home-works.is-expanded .home-works__inner { height: 1170px; }
+
   .home-works__heading { margin-bottom: 20px; }
   .home-works__avatar,
   .home-works__sticker { display: none; }

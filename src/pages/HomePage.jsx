@@ -57,10 +57,12 @@ const HomePage = () => {
   };
 
   const worksAssets = {
-    desktopItems: homeAssets.desktop.works.items,
-    compactItems: homeAssets.tablet.works.compactItems,
-    expandedItems: homeAssets.tablet.works.expandedItems,
-    mobileItems: homeAssets.mobile.works.items,
+    initialItems: breakpoint === "desktop"
+      ? homeAssets.desktop.works.items
+      : breakpoint === "tablet"
+        ? homeAssets.tablet.works.compactItems
+        : homeAssets.mobile.works.items,
+    additionalItems: currentAssets.works.additionalItems,
     headingAvatar: breakpoint === "desktop" ? homeAssets.desktop.works.headingAvatar : null,
     headingStickers: breakpoint === "desktop" ? homeAssets.desktop.works.headingStickers : [],
   };
