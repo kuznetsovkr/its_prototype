@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useLayoutEffect } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -7,7 +7,7 @@ import { useOrder } from "./context/OrderContext";
 import RequireAdmin from './components/RequireAdmin';
 import RouteLoader from './components/RouteLoader';
 import SeoMetadata from './components/SeoMetadata';
-import { isOrderFlowPath } from './config/routes';
+import { isOrderFlowPath, isOrderStepPath } from './config/routes';
 
 const loadHomePage = () => import('./pages/HomePage');
 const loadCertificatePage = () => import('./pages/CertificatePage');
@@ -92,8 +92,14 @@ const OrderFlowReset = () => {
 
 const ScrollToTop = () => {
     const { pathname } = useLocation();
+    const previousPathname = useRef(null);
 
     useLayoutEffect(() => {
+        const previous = previousPathname.current;
+        previousPathname.current = pathname;
+
+        if (isOrderStepPath(previous) && isOrderStepPath(pathname)) return;
+
         window.scrollTo({ top: 0, left: 0, behavior: "auto" });
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;

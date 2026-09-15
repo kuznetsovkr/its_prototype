@@ -252,7 +252,11 @@ const RecipientDetails = () => {
                     <>
                       <span>Изделие и вышивка: {formatPrice(checkoutQuote.merchandisePrice)}</span>
                       <span>Доставка: {formatPrice(checkoutQuote.deliveryPrice)}</span>
-                      <strong>Итого: {formatPrice(checkoutQuote.totalPrice)}</strong>
+                      <strong>
+                        {checkoutQuote.paymentTestMode
+                          ? `К оплате: ${formatPrice(checkoutQuote.paymentAmount)} (тест)`
+                          : `Итого: ${formatPrice(checkoutQuote.totalPrice)}`}
+                      </strong>
                     </>
                   ) : null}
                 </div>
@@ -301,7 +305,11 @@ const RecipientDetails = () => {
                 >
                   {isPaying ? "Обрабатываем..." : isManualCheckout ? "отправить заявку" : (
                     <>
-                      <span className="recipientOrderNavigation__paymentLabel">к оплате</span>
+                      <span className="recipientOrderNavigation__paymentLabel">
+                        {checkoutQuote?.paymentTestMode
+                          ? `к оплате ${formatPrice(checkoutQuote.paymentAmount)}`
+                          : "к оплате"}
+                      </span>
                       <span className="recipientOrderNavigation__tabletLabel">далее</span>
                     </>
                   )}

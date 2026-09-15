@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   ORDER_FLOW_PATHS,
+  ORDER_STEP_PATHS,
   PUBLIC_APP_PATHS,
   isOrderFlowPath,
+  isOrderStepPath,
   normalizeAppPath,
 } from "./routes";
 
@@ -10,6 +12,12 @@ describe("public application routes", () => {
   it("keeps the real payment result routes in the order flow", () => {
     expect(ORDER_FLOW_PATHS).toContain("/payment-success");
     expect(ORDER_FLOW_PATHS).toContain("/payment-fail");
+  });
+
+  it("distinguishes editable order steps from payment result routes", () => {
+    expect(ORDER_STEP_PATHS).toEqual(["/order", "/embroidery", "/recipient"]);
+    expect(isOrderStepPath("/embroidery/")).toBe(true);
+    expect(isOrderStepPath("/payment-success")).toBe(false);
   });
 
   it("does not expose retired payment simulators", () => {

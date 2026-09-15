@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IS_DEMO_MODE, IS_TURNSTILE_E2E } from "../../../config/demoMode";
 import { MEDIA_QUERIES } from "../../../config/breakpoints";
@@ -141,11 +141,6 @@ export const useRecipientDetails = () => {
     disabled: IS_DEMO_MODE && !IS_TURNSTILE_E2E,
   });
 
-  useLayoutEffect(() => {
-        // при переходе на шаг получателя всегда показываем верх страницы
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-  }, []);
-  
   // Dadata
   const [isNoCdek, setIsNoCdek] = useState(Boolean(recipientState.isNoCdek));
   const dadataToken = APP_ENV.dadataToken;
@@ -561,6 +556,8 @@ export const useRecipientDetails = () => {
         merchandisePrice,
         deliveryPrice: confirmedDeliveryPrice,
         totalPrice,
+        paymentAmount,
+        paymentTestMode,
       } = activeDraft;
       setOrderId(oid);
 
@@ -570,6 +567,8 @@ export const useRecipientDetails = () => {
           merchandisePrice,
           deliveryPrice: confirmedDeliveryPrice,
           totalPrice,
+          paymentAmount,
+          paymentTestMode,
         });
       }
 

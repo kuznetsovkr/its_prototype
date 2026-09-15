@@ -166,6 +166,29 @@ test("дополнительные примеры работ раскрываю�
   await expect(items).toHaveCount(initialCount);
 });
 
+test("order steps preserve the current scroll position", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium", "Mobile order navigation regression check");
+
+  await page.goto("/order");
+  await page.locator('.sizeSelector__item:has(input[value="M"]) .sizeSelector__box').click();
+  const clothingNext = page.locator(".orderNavigation .orderActionButton--next");
+  await expect(clothingNext).toBeEnabled();
+
+  await page.evaluate(() => window.scrollTo(0, 300));
+  const clothingScrollPosition = await page.evaluate(() => window.scrollY);
+  await clothingNext.evaluate((button) => button.click());
+  await expect(page).toHaveURL(/\/embroidery$/);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(clothingScrollPosition);
+
+  const embroideryNext = page.locator(".embroiderySelectorDesktop__navigation .is-next");
+  await expect(embroideryNext).toBeEnabled();
+  await page.evaluate(() => window.scrollTo(0, 300));
+  const embroideryScrollPosition = await page.evaluate(() => window.scrollY);
+  await embroideryNext.evaluate((button) => button.click());
+  await expect(page).toHaveURL(/\/recipient$/);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(embroideryScrollPosition);
+});
+
 test("мобильные шаги заказа используют белый фон и квадратное превью", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile-chromium", "Проверка только мобильной вёрстки");
 
