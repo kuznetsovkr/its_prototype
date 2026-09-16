@@ -610,6 +610,50 @@
   height: 100%;
 }
 
+.recipientOrderForm__noMiddleName {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  color: #777;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.recipientOrderForm__noMiddleName input {
+  display: grid;
+  flex: 0 0 auto;
+  margin: 0;
+  border: 1px solid #bc5823;
+  border-radius: 3px;
+  appearance: none;
+  place-content: center;
+  background: #fff;
+  cursor: pointer;
+}
+
+.recipientOrderForm__noMiddleName input::before {
+  width: 60%;
+  height: 35%;
+  border-bottom: 1px solid #fff;
+  border-left: 1px solid #fff;
+  content: '';
+  transform: rotate(-45deg) scale(0);
+}
+
+.recipientOrderForm__noMiddleName input:checked {
+  background: #bc5823;
+}
+
+.recipientOrderForm__noMiddleName input:checked::before {
+  transform: rotate(-45deg) scale(1);
+}
+
+.recipientOrderForm__noMiddleName input:disabled {
+  cursor: default;
+  opacity: .55;
+}
+
 .recipientOrderForm__group {
   position: absolute;
   display: block;
@@ -1526,6 +1570,19 @@
     top: 76px;
   }
 
+  .recipientOrderForm__noMiddleName {
+    top: 58px;
+    right: 48px;
+    gap: 6px;
+    font-size: 11px;
+    line-height: 14px;
+  }
+
+  .recipientOrderForm__noMiddleName input {
+    width: 14px;
+    height: 14px;
+  }
+
   .recipientOrderForm__phoneField {
     top: 150px;
   }
@@ -1869,6 +1926,19 @@
 
   .recipientOrderForm__field--fullName {
     top: 53px;
+  }
+
+  .recipientOrderForm__noMiddleName {
+    top: 41px;
+    right: 30px;
+    gap: 4px;
+    font-size: 8px;
+    line-height: 12px;
+  }
+
+  .recipientOrderForm__noMiddleName input {
+    width: 12px;
+    height: 12px;
   }
 
   .recipientOrderForm__phoneField {
@@ -2221,6 +2291,19 @@
 
   .recipientOrderForm__field--fullName {
     top: 58px;
+  }
+
+  .recipientOrderForm__noMiddleName {
+    top: 46px;
+    right: 25px;
+    gap: 4px;
+    font-size: 10px;
+    line-height: 12px;
+  }
+
+  .recipientOrderForm__noMiddleName input {
+    width: 12px;
+    height: 12px;
   }
 
   .recipientOrderForm__phoneField {

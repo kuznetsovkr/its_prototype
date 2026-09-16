@@ -357,3 +357,27 @@ test("restored draft explains that upload files must be selected again", async (
   await expect(page.locator(".embroideryRestoreNotice"))
     .toContainText("Загрузите фотографии повторно");
 });
+
+test("recipient can explicitly place an order without a middle name", async ({ page }) => {
+  await startOrder(page);
+  await continueToRecipient(page);
+
+  const fullName = page.locator(".recipientOrderForm__field--fullName");
+  const noMiddleName = page.getByRole("checkbox", { name: "У меня нет отчества" });
+  await fullName.fill("Иванов Иван");
+  await noMiddleName.check();
+  await page.getByPlaceholder("Номер телефона").fill("+7 999 123-45-67");
+  await page.getByRole("checkbox", { name: /Я даю своё согласие/ }).check();
+
+  const submitButton = page.locator(".recipientOrderNavigation__submit");
+  await expect(page.getByTestId("turnstile-panel")).toHaveClass(/is-verified/, {
+    timeout: 20_000,
+  });
+  await expect(submitButton).toBeEnabled();
+
+  await page.reload();
+  await expect(noMiddleName).toBeChecked();
+  await expect(fullName).toHaveValue("Иванов Иван");
+  await expect(page.locator(".recipientOrderForm__group--recipient input"))
+    .toHaveValue("Иванов Иван");
+});

@@ -40,6 +40,7 @@ export const hasFullManualAddress = (manualAddress) => {
 
 export const validateRecipient = ({
   userData,
+  hasNoMiddleName = false,
   isNoCdek,
   manualAddress,
   isCdekPickupSelected,
@@ -48,7 +49,7 @@ export const validateRecipient = ({
   const missing = [];
   if (!userData.lastName.trim()) missing.push("фамилию");
   if (!userData.firstName.trim()) missing.push("имя");
-  if (!userData.middleName.trim()) missing.push("отчество");
+  if (!hasNoMiddleName && !userData.middleName.trim()) missing.push("отчество");
   if (!userData.phone.trim()) missing.push("телефон");
 
   if (isNoCdek) {

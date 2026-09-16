@@ -30,4 +30,20 @@ describe("recipient validation", () => {
     expect(invalid.isValid).toBe(false);
     expect(invalid.message).toContain("пункт выдачи СДЭК");
   });
+
+  test("allows a recipient without a middle name only after explicit confirmation", () => {
+    const withoutMiddleName = {
+      ...validData,
+      userData: { ...validData.userData, middleName: "" },
+    };
+
+    const unconfirmed = validateRecipient(withoutMiddleName);
+    expect(unconfirmed.isValid).toBe(false);
+    expect(unconfirmed.message).toContain("отчество");
+
+    expect(validateRecipient({
+      ...withoutMiddleName,
+      hasNoMiddleName: true,
+    })).toEqual({ isValid: true, message: "" });
+  });
 });

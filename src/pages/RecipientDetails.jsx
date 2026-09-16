@@ -21,6 +21,7 @@ const RecipientDetails = () => {
   const {
       navigate, clothingProfile, clothingPreviewSrc, clothingPreviewAlt,
     fullNameInput, handleFullNameChange, isPaying,
+    hasNoMiddleName, handleNoMiddleNameToggle,
     userData, handleInputChange, email, setEmail, isMobileLayout,
     preferredContact, setPreferredContact, orderComment, setOrderComment,
     city, setCity, isCdekPickerOpen, setIsCdekPickerOpen,
@@ -107,11 +108,21 @@ const RecipientDetails = () => {
                   className="recipientOrderForm__field recipientOrderForm__field--fullName"
                   type="text"
                   autoComplete="name"
-                  placeholder="ФИО"
+                  placeholder={hasNoMiddleName ? "Фамилия Имя" : "ФИО"}
                   value={fullNameInput}
                   onChange={handleFullNameChange}
                   disabled={formDisabled}
                 />
+
+                <label className="recipientOrderForm__noMiddleName">
+                  <input
+                    type="checkbox"
+                    checked={hasNoMiddleName}
+                    onChange={handleNoMiddleNameToggle}
+                    disabled={formDisabled}
+                  />
+                  <span>У меня нет отчества</span>
+                </label>
 
                 <div className="recipientOrderForm__phoneField">
                   <input
@@ -219,11 +230,13 @@ const RecipientDetails = () => {
                 </label>
 
                 <label className="recipientOrderForm__group recipientOrderForm__group--recipient">
-                  <span>Получатель (ФИО полностью)</span>
+                  <span>
+                    {hasNoMiddleName ? "Получатель (фамилия и имя)" : "Получатель (ФИО полностью)"}
+                  </span>
                   <input
                     type="text"
                     autoComplete="name"
-                    placeholder="Иванов Иван Иванович"
+                    placeholder={hasNoMiddleName ? "Иванов Иван" : "Иванов Иван Иванович"}
                     value={deliveryRecipient}
                     onChange={(event) => setDeliveryRecipient(event.target.value)}
                     disabled={formDisabled}

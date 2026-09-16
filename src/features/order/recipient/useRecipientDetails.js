@@ -74,6 +74,9 @@ export const useRecipientDetails = () => {
   const [fullNameInput, setFullNameInput] = useState(() => joinFullName(
     recipientState.userData || (IS_DEMO_MODE ? DEMO_RECIPIENT_DATA : {})
   ));
+  const [hasNoMiddleName, setHasNoMiddleName] = useState(
+    Boolean(recipientState.hasNoMiddleName)
+  );
   const [email, setEmail] = useState(recipientState.email || "");
   const [preferredContact, setPreferredContact] = useState(recipientState.preferredContact || "");
   const [orderComment, setOrderComment] = useState(recipientState.orderComment || comment || "");
@@ -170,6 +173,7 @@ export const useRecipientDetails = () => {
   const isRecipientSame = useMemo(() => {
     const stored = {
       userData: recipientState.userData,
+      hasNoMiddleName: Boolean(recipientState.hasNoMiddleName),
       pickupPoint: recipientState.pickupPoint,
       deliveryPrice: recipientState.deliveryPrice ?? null,
       manualAddressValue: recipientState.manualAddress?.value || "",
@@ -188,6 +192,7 @@ export const useRecipientDetails = () => {
     };
     const local = {
       userData,
+      hasNoMiddleName,
       pickupPoint,
       deliveryPrice: deliveryPrice ?? null,
       manualAddressValue: manualAddress?.value || "",
@@ -211,6 +216,7 @@ export const useRecipientDetails = () => {
       (local.userData.phone || "") === (stored.userData?.phone || "");
     return (
       sameUser &&
+      local.hasNoMiddleName === stored.hasNoMiddleName &&
       local.pickupPoint === stored.pickupPoint &&
       local.deliveryPrice === stored.deliveryPrice &&
       local.manualAddressValue === stored.manualAddressValue &&
@@ -229,6 +235,7 @@ export const useRecipientDetails = () => {
     );
   }, [
     userData,
+    hasNoMiddleName,
     pickupPoint,
     deliveryPrice,
     manualAddress?.value,
@@ -252,6 +259,7 @@ export const useRecipientDetails = () => {
     if (isRecipientSame) return;
     setRecipient({
       userData,
+      hasNoMiddleName,
       pickupPoint,
       deliveryPrice,
       manualAddress: manualAddressNormalized,
@@ -267,6 +275,7 @@ export const useRecipientDetails = () => {
     });
   }, [
     userData,
+    hasNoMiddleName,
     pickupPoint,
     deliveryPrice,
     manualAddress?.value,
@@ -340,9 +349,27 @@ export const useRecipientDetails = () => {
 
   const handleFullNameChange = (event) => {
     const value = event.target.value;
+    const parsedName = splitFullName(value);
+    if (hasNoMiddleName && parsedName.middleName) {
+      setHasNoMiddleName(false);
+    }
     setDeliveryRecipient((current) => (!current || current === fullNameInput ? value : current));
     setFullNameInput(value);
-    setUserData((current) => ({ ...current, ...splitFullName(value) }));
+    setUserData((current) => ({ ...current, ...parsedName }));
+  };
+
+  const handleNoMiddleNameToggle = (event) => {
+    const checked = event.target.checked;
+    setHasNoMiddleName(checked);
+    if (!checked) return;
+
+    const nextUserData = { ...userData, middleName: "" };
+    const nextFullName = joinFullName(nextUserData);
+    setUserData(nextUserData);
+    setFullNameInput(nextFullName);
+    setDeliveryRecipient((current) => (
+      !current || current === fullNameInput ? nextFullName : current
+    ));
   };
 
   const cdekOfficeCode = String(
@@ -423,6 +450,7 @@ export const useRecipientDetails = () => {
 
   const recipientValidation = validateRecipient({
     userData,
+    hasNoMiddleName,
     isNoCdek,
     manualAddress,
     isCdekPickupSelected,
@@ -647,6 +675,7 @@ export const useRecipientDetails = () => {
     clothingPreviewSrc: clothing.previewSrc || "",
     clothingPreviewAlt: clothing.previewAlt || clothing.type || "Одежда",
     fullNameInput, handleFullNameChange, isPaying,
+    hasNoMiddleName, handleNoMiddleNameToggle,
     userData, handleInputChange, email, setEmail, isMobileLayout,
     preferredContact, setPreferredContact, orderComment, setOrderComment,
     city, setCity, isCdekPickerOpen, setIsCdekPickerOpen,
