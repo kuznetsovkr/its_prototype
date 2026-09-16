@@ -330,9 +330,14 @@ const RecipientDetails = () => {
           onClick={() => setIsCdekPickerOpen(false)}
           aria-label="Закрыть выбор пункта получения"
         />
-        <section className="recipientCdekDialog__surface" role="dialog" aria-modal="true" aria-label="Выбор пункта СДЭК">
+        <section
+          className={`recipientCdekDialog__surface${isNoCdek ? " is-manual" : ""}`}
+          role="dialog"
+          aria-modal="true"
+          aria-label={isNoCdek ? "Указание адреса ручной доставки" : "Выбор пункта СДЭК"}
+        >
           <div className="recipientCdekDialog__header">
-            <h2>Выберите пункт получения</h2>
+            <h2>{isNoCdek ? "Укажите адрес доставки" : "Выберите пункт получения"}</h2>
             <button type="button" onClick={() => setIsCdekPickerOpen(false)} aria-label="Закрыть">
               <span aria-hidden="true" />
             </button>
@@ -372,11 +377,21 @@ const RecipientDetails = () => {
             </label>
             {isNoCdek && (
               <div className="manualAddress">
+                <div className="manualAddress__intro">
+                  <span>ручное оформление</span>
+                  <h3>Куда нужно доставить заказ?</h3>
+                  <p>
+                    Начните вводить адрес и выберите вариант с номером дома. Менеджер уточнит способ,
+                    срок и стоимость доставки после отправки заявки.
+                  </p>
+                </div>
+                <span className="manualAddress__label">Адрес с номером дома</span>
                 {IS_DEMO_MODE ? (
                   <input
                     type="text"
                     className="manualAddress__input"
                     placeholder="Введите адрес доставки"
+                    aria-label="Адрес ручной доставки"
                     value={manualAddress?.value || ""}
                     onChange={(event) => {
                       const value = event.target.value;
@@ -391,14 +406,23 @@ const RecipientDetails = () => {
                     token={dadataToken}
                     value={manualAddress}
                     onChange={setManualAddress}
-                    inputProps={{ placeholder: "Введите свой адрес" }}
+                    inputProps={{
+                      placeholder: "Например, Красноярск, улица Мира, 10",
+                      "aria-label": "Адрес ручной доставки",
+                    }}
                   />
                 )}
                 {!IS_DEMO_MODE && !isManualAddressFull && (
-                  <p className="manualAddress__hint">Пожалуйста, выберите подсказку с указанием дома.</p>
+                  <p className="manualAddress__hint">Выберите подходящую подсказку с указанным номером дома.</p>
                 )}
                 {manualAddress?.value && (
-                  <p className="manualAddress__selected">Вы выбрали: {manualAddress.value}</p>
+                  <div className={`manualAddress__selected${isManualAddressFull ? " is-complete" : ""}`}>
+                    <span aria-hidden="true">{isManualAddressFull ? "✓" : "!"}</span>
+                    <p>
+                      <small>{isManualAddressFull ? "Адрес выбран" : "Уточните номер дома"}</small>
+                      <strong>{manualAddress.value}</strong>
+                    </p>
+                  </div>
                 )}
               </div>
             )}

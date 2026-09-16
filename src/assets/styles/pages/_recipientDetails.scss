@@ -986,6 +986,10 @@
   color: #2b2b2b;
 }
 
+.recipientCdekDialog__surface.is-manual {
+  width: min(720px, calc(100vw - 40px));
+}
+
 .recipientCdekDialog__header {
   display: flex;
   flex: 0 0 auto;
@@ -1161,6 +1165,10 @@
   margin-top: 0;
 }
 
+.recipientCdekDialog__content.is-manual {
+  padding-right: 6px;
+}
+
 .recipientCdekDialog__content .manualAddress {
   box-sizing: border-box;
   margin-top: 12px;
@@ -1172,6 +1180,46 @@
   font-family: 'Jost', sans-serif;
   font-size: 14px;
   line-height: 1.35;
+}
+
+.recipientCdekDialog__content .manualAddress__intro {
+  margin-bottom: 20px;
+}
+
+.recipientCdekDialog__content .manualAddress__intro > span {
+  display: block;
+  margin-bottom: 6px;
+  color: #bc5823;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.recipientCdekDialog__content .manualAddress__intro h3 {
+  margin: 0 0 8px;
+  color: #161616;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.recipientCdekDialog__content .manualAddress__intro p {
+  max-width: 570px;
+  margin: 0;
+  color: #6f6f6f;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.recipientCdekDialog__content .manualAddress__label {
+  display: block;
+  margin: 0 2px 8px;
+  color: #161616;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .recipientCdekDialog__content .manualAddress .react-dadata__container {
@@ -1198,8 +1246,9 @@
 }
 
 .recipientCdekDialog__content .manualAddress .react-dadata__suggestions {
+  position: static;
   z-index: 20;
-  max-height: min(240px, 35dvh);
+  max-height: min(260px, 34dvh);
   margin-top: 8px;
   padding: 6px;
   overflow-y: auto;
@@ -1236,8 +1285,65 @@
 }
 
 .recipientCdekDialog__content .manualAddress__selected {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(188, 88, 35, 0.3);
+  border-radius: 14px;
+  background: #fff8f4;
   color: #bc5823;
+}
+
+.recipientCdekDialog__content .manualAddress__selected > span {
+  display: grid;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #bc5823;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  place-items: center;
+}
+
+.recipientCdekDialog__content .manualAddress__selected p {
+  min-width: 0;
+  margin: 0;
+}
+
+.recipientCdekDialog__content .manualAddress__selected small,
+.recipientCdekDialog__content .manualAddress__selected strong {
+  display: block;
+}
+
+.recipientCdekDialog__content .manualAddress__selected small {
+  margin-bottom: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.recipientCdekDialog__content .manualAddress__selected strong {
+  overflow-wrap: anywhere;
+  color: #2b2b2b;
+  font-size: 14px;
   font-weight: 500;
+  line-height: 1.35;
+}
+
+.recipientCdekDialog__content .manualAddress__selected.is-complete {
+  border-color: rgba(38, 112, 70, 0.28);
+  background: #f2f8f4;
+  color: #267046;
+}
+
+.recipientCdekDialog__content .manualAddress__selected.is-complete > span {
+  background: #267046;
 }
 
 @media (min-width: bp.$desktop-min) {
@@ -2310,6 +2416,10 @@
     border-radius: 20px;
   }
 
+  .recipientCdekDialog__surface.is-manual {
+    width: calc(100vw - 20px);
+  }
+
   .recipientCdekDialog__header {
     gap: 12px;
     margin-bottom: 12px;
@@ -2353,15 +2463,45 @@
   }
 
   .recipientCdekDialog__content .manualAddress {
-    padding: 14px;
+    margin-top: 10px;
+    padding: 16px 14px;
     border-radius: 16px;
+  }
+
+  .recipientCdekDialog__content .manualAddress__intro {
+    margin-bottom: 16px;
+  }
+
+  .recipientCdekDialog__content .manualAddress__intro h3 {
+    font-size: 19px;
+  }
+
+  .recipientCdekDialog__content .manualAddress__intro p {
+    font-size: 14px;
   }
 
   .recipientCdekDialog__content .manualAddress .react-dadata__input,
   .recipientCdekDialog__content .manualAddress .manualAddress__input {
-    height: 44px;
+    min-height: 48px;
+    height: auto;
     padding: 0 14px;
-    font-size: 14px;
+    font-size: 16px;
+  }
+
+  .recipientCdekDialog__content .manualAddress .react-dadata__suggestions {
+    max-height: min(230px, 32dvh);
+    padding: 4px;
+    border-radius: 14px;
+  }
+
+  .recipientCdekDialog__content .manualAddress .react-dadata__suggestion {
+    padding: 11px 10px;
+    font-size: 16px;
+  }
+
+  .recipientCdekDialog__content .manualAddress__selected {
+    margin-inline: 0;
+    padding: 11px 12px;
   }
 }
 
