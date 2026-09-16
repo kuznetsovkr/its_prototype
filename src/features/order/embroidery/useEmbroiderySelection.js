@@ -14,7 +14,12 @@ const emptyCustomOption = () => ({ image: false, text: false });
 
 export const useEmbroiderySelection = () => {
   const location = useLocation();
-  const { order, setEmbroidery } = useOrder();
+  const {
+    order,
+    setEmbroidery,
+    missingUploadFiles,
+    dismissMissingUploadFiles,
+  } = useOrder();
   const { clothing, embroidery } = order;
   const previousTypeRef = useRef(null);
   const skipExternalSyncRef = useRef(false);
@@ -245,5 +250,6 @@ export const useEmbroiderySelection = () => {
     },
     customPriceNote: "стоимость рассчитает менеджер",
     handleSelectType, handleFileChange, handleFileDragOver, handleFileDrop, handleRemoveImage,
+    missingUploadFiles, dismissMissingUploadFiles,
   };
 };

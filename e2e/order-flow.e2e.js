@@ -310,3 +310,50 @@ test("mobile text-entry controls use at least a 16px font", async ({ page }, tes
   await continueToRecipient(page);
   await expectSafeFontSizes();
 });
+
+test("order draft survives reloads and temporarily leaving the order flow", async ({ page }) => {
+  await page.goto("/order");
+  await page.locator('.selectorType__item:has(input[value="Hoodie"])').click();
+  await page.locator('.sizeSelector__item:has(input[value="M"]) .sizeSelector__box').click();
+  await page.locator(".orderNavigation .orderActionButton--next").click();
+  await expect(page).toHaveURL(/\/embroidery$/);
+
+  await page.locator(".embroideryDesktopTabs button").nth(1).click();
+  const embroideryText = page.locator(".embroideryDesktopDetails textarea").first();
+  await embroideryText.fill("Тестовая надпись");
+  await expect.poll(() => page.evaluate(() => {
+    const draft = JSON.parse(sessionStorage.getItem("its_order_draft_v1"));
+    return draft?.order?.embroidery?.customText;
+  })).toBe("Тестовая надпись");
+
+  await page.reload();
+  await expect(page).toHaveURL(/\/embroidery$/);
+  await expect(embroideryText).toHaveValue("Тестовая надпись");
+  await expect(page.locator(".embroiderySelectorDesktop__imageFrame img"))
+    .toHaveAttribute("src", /hoodie.*\.webp/i);
+
+  await page.goto("/certificate");
+  await page.goto("/");
+  await page.locator(".home-hero button").click();
+  await expect(page).toHaveURL(/\/order$/);
+  await expect(page.locator('input[name="clothing"][value="Hoodie"]')).toBeChecked();
+  await expect(page.locator('input[name="size"][value="M"]')).toBeChecked();
+});
+
+test("restored draft explains that upload files must be selected again", async ({ page }) => {
+  await startOrder(page);
+  await page.evaluate(() => {
+    const draft = JSON.parse(sessionStorage.getItem("its_order_draft_v1"));
+    draft.uploadFiles = [{
+      name: "pet-photo.jpg",
+      size: 1024,
+      lastModified: Date.now(),
+    }];
+    sessionStorage.setItem("its_order_draft_v1", JSON.stringify(draft));
+  });
+
+  await page.reload();
+  await expect(page.locator(".embroideryRestoreNotice")).toBeVisible();
+  await expect(page.locator(".embroideryRestoreNotice"))
+    .toContainText("Загрузите фотографии повторно");
+});

@@ -1,4 +1,14 @@
-import { createContext, useContext, useMemo, useState, useCallback } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+const ORDER_DRAFT_STORAGE_KEY = "its_order_draft_v1";
+const ORDER_DRAFT_VERSION = 1;
 
 const fileSignature = (file) => {
   if (!file) return "";
@@ -119,10 +129,123 @@ const initialState = {
   },
 };
 
+const createInitialState = () => ({
+  clothing: { ...initialState.clothing },
+  embroidery: {
+    ...initialState.embroidery,
+    uploadedImage: [],
+    customOption: { ...initialState.embroidery.customOption },
+  },
+  recipient: {
+    ...initialState.recipient,
+    userData: { ...initialState.recipient.userData },
+  },
+});
+
+const normalizeUploadMetadata = (files) => {
+  if (!Array.isArray(files)) return [];
+
+  return files
+    .map((file) => ({
+      name: String(file?.name || "").slice(0, 255),
+      size: Math.max(0, Number(file?.size || 0)),
+      lastModified: Math.max(0, Number(file?.lastModified || 0)),
+    }))
+    .filter((file) => file.name);
+};
+
+const restoreOrderDraft = () => {
+  const emptyDraft = { order: createInitialState(), missingUploadFiles: [] };
+  if (typeof window === "undefined") return emptyDraft;
+
+  try {
+    const rawDraft = window.sessionStorage.getItem(ORDER_DRAFT_STORAGE_KEY);
+    if (!rawDraft) return emptyDraft;
+
+    const draft = JSON.parse(rawDraft);
+    if (draft?.version !== ORDER_DRAFT_VERSION || !draft.order) return emptyDraft;
+
+    const storedOrder = draft.order;
+    return {
+      order: {
+        clothing: {
+          ...initialState.clothing,
+          ...(storedOrder.clothing || {}),
+        },
+        embroidery: {
+          ...initialState.embroidery,
+          ...(storedOrder.embroidery || {}),
+          uploadedImage: [],
+          customOption: {
+            ...initialState.embroidery.customOption,
+            ...(storedOrder.embroidery?.customOption || {}),
+          },
+        },
+        recipient: {
+          ...initialState.recipient,
+          ...(storedOrder.recipient || {}),
+          userData: {
+            ...initialState.recipient.userData,
+            ...(storedOrder.recipient?.userData || {}),
+          },
+          manualAddress: normalizeManualAddress(storedOrder.recipient?.manualAddress, null),
+        },
+      },
+      missingUploadFiles: normalizeUploadMetadata(draft.uploadFiles),
+    };
+  } catch {
+    window.sessionStorage.removeItem(ORDER_DRAFT_STORAGE_KEY);
+    return emptyDraft;
+  }
+};
+
+const createOrderDraft = (order, missingUploadFiles) => {
+  const currentFiles = normalizeUploadMetadata(order.embroidery.uploadedImage);
+
+  return {
+    version: ORDER_DRAFT_VERSION,
+    order: {
+      ...order,
+      embroidery: {
+        ...order.embroidery,
+        uploadedImage: [],
+      },
+    },
+    uploadFiles: currentFiles.length > 0 ? currentFiles : missingUploadFiles,
+  };
+};
+
 const OrderContext = createContext(null);
 
 export const OrderProvider = ({ children }) => {
-  const [order, setOrder] = useState(initialState);
+  const restoredDraft = useMemo(restoreOrderDraft, []);
+  const [order, setOrder] = useState(restoredDraft.order);
+  const [missingUploadFiles, setMissingUploadFiles] = useState(
+    restoredDraft.missingUploadFiles
+  );
+
+  useEffect(() => {
+    try {
+      window.sessionStorage.setItem(
+        ORDER_DRAFT_STORAGE_KEY,
+        JSON.stringify(createOrderDraft(order, missingUploadFiles))
+      );
+    } catch {
+      // sessionStorage may be unavailable or full. The in-memory order still works.
+    }
+  }, [order, missingUploadFiles]);
+
+  useEffect(() => {
+    if (order.embroidery.uploadedImage.length === 0) return undefined;
+
+    const warnBeforeFileLoss = (event) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", warnBeforeFileLoss);
+    return () => window.removeEventListener("beforeunload", warnBeforeFileLoss);
+  }, [order.embroidery.uploadedImage.length]);
 
   const setClothing = useCallback((payload) => {
     setOrder((prev) => {
@@ -133,6 +256,10 @@ export const OrderProvider = ({ children }) => {
   }, []);
 
   const setEmbroidery = useCallback((payload) => {
+    if (Array.isArray(payload?.uploadedImage) && payload.uploadedImage.length > 0) {
+      setMissingUploadFiles([]);
+    }
+
     setOrder((prev) => {
       const next = {
         ...prev.embroidery,
@@ -165,7 +292,19 @@ export const OrderProvider = ({ children }) => {
     });
   }, []);
 
-  const resetOrder = useCallback(() => setOrder(initialState), []);
+  const dismissMissingUploadFiles = useCallback(() => {
+    setMissingUploadFiles([]);
+  }, []);
+
+  const resetOrder = useCallback(() => {
+    setMissingUploadFiles([]);
+    setOrder(createInitialState());
+    try {
+      window.sessionStorage.removeItem(ORDER_DRAFT_STORAGE_KEY);
+    } catch {
+      // The order state is reset even when browser storage is unavailable.
+    }
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -174,8 +313,18 @@ export const OrderProvider = ({ children }) => {
       setEmbroidery,
       setRecipient,
       resetOrder,
+      missingUploadFiles,
+      dismissMissingUploadFiles,
     }),
-    [order, setClothing, setEmbroidery, setRecipient, resetOrder]
+    [
+      order,
+      setClothing,
+      setEmbroidery,
+      setRecipient,
+      resetOrder,
+      missingUploadFiles,
+      dismissMissingUploadFiles,
+    ]
   );
 
   return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>;

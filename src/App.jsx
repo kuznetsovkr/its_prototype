@@ -3,11 +3,10 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import Header from './components/Header';
 import Footer from './components/Footer';
 import PageLayout from './components/PageLayout';
-import { useOrder } from "./context/OrderContext";
 import RequireAdmin from './components/RequireAdmin';
 import RouteLoader from './components/RouteLoader';
 import SeoMetadata from './components/SeoMetadata';
-import { isOrderFlowPath, isOrderStepPath } from './config/routes';
+import { isOrderStepPath } from './config/routes';
 
 const loadHomePage = () => import('./pages/HomePage');
 const loadCertificatePage = () => import('./pages/CertificatePage');
@@ -77,19 +76,6 @@ const RoutePreloader = () => {
     return null;
 };
 
-const OrderFlowReset = () => {
-    const location = useLocation();
-    const { resetOrder } = useOrder();
-
-    useEffect(() => {
-        if (!isOrderFlowPath(location.pathname)) {
-            resetOrder();
-        }
-    }, [location.pathname, resetOrder]);
-
-    return null;
-};
-
 const ScrollToTop = () => {
     const { pathname } = useLocation();
     const previousPathname = useRef(null);
@@ -153,7 +139,6 @@ const AppShell = () => {
                 {!isHomePage && <Header />}
                 <SeoMetadata />
                 <ScrollToTop />
-                <OrderFlowReset />
                 <RoutePreloader />
                 {isHomePage ? routes : <main>{routes}</main>}
                 {!isHomePage && <Footer />}

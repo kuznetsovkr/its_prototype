@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import { useOrder } from '../context/OrderContext';
 import {
   clearOrderAccessToken,
   getOrderAccessToken,
@@ -10,6 +11,7 @@ import s from './PaymentFail.module.scss';
 
 export default function PaymentFail() {
   const navigate = useNavigate();
+  const { resetOrder } = useOrder();
   const [isRetrying, setIsRetrying] = useState(false);
   const [error, setError] = useState('');
   const orderId = sessionStorage.getItem('pay_order_id');
@@ -51,6 +53,7 @@ export default function PaymentFail() {
   };
 
   const startNewOrder = () => {
+    resetOrder();
     clearOrderAccessToken(orderId);
     sessionStorage.removeItem('pay_order_id');
     sessionStorage.removeItem('pay_cdek_number');

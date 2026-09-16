@@ -38,6 +38,7 @@ const EmbroideryDesktop = ({
     customTextFont, setCustomTextFont, patronusLimit, hasFiles,
     canProceed, disabledHint, priceError, desktopPriceLabel, handleFileChange,
     handleFileDragOver, handleFileDrop, handleRemoveImage,
+    missingUploadFiles, dismissMissingUploadFiles,
   } = selection;
 
   const renderDesktopCounter = (value, setValue, limit) => (
@@ -67,6 +68,24 @@ const EmbroideryDesktop = ({
       <div
         className={`embroiderySelectorDesktop${isUploadStage ? " embroiderySelectorDesktop--upload" : ""}`}
       >
+        {missingUploadFiles.length > 0 && (
+          <div className="embroideryRestoreNotice" role="alert">
+            <div>
+              <strong>Загрузите фотографии повторно</strong>
+              <p>
+                Остальные данные заказа восстановлены, но браузер не может сохранить
+                выбранные файлы после обновления страницы.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={dismissMissingUploadFiles}
+              aria-label="Закрыть уведомление"
+            >
+              ×
+            </button>
+          </div>
+        )}
         <div
           className="embroiderySelectorDesktop__preview"
           onDragOver={isUploadStage ? handleFileDragOver : undefined}

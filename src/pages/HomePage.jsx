@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useOrder } from "../context/OrderContext";
 import { homeAssets, siteFooterAssets } from "../images/home";
 import Header from "../components/Header";
 import AboutSection from "../components/home/AboutSection";
@@ -17,14 +16,12 @@ import useHomeBreakpoint from "../components/home/useHomeBreakpoint";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { resetOrder } = useOrder();
   const breakpoint = useHomeBreakpoint();
   const currentAssets = homeAssets[breakpoint];
 
   const handleOrder = useCallback(() => {
-    resetOrder();
     navigate("/order");
-  }, [navigate, resetOrder]);
+  }, [navigate]);
 
   const heroAssets = {
     background: {
