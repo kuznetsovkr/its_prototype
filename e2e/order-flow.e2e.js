@@ -3,6 +3,27 @@ import { expect, test } from "@playwright/test";
 const TURNSTILE_TEST_SITE_KEY = "1x00000000000000000000AA";
 
 test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    let nextWidgetId = 0;
+    const widgets = new Map();
+    const verify = (widgetId) => {
+      queueMicrotask(() => {
+        widgets.get(widgetId)?.callback?.(`e2e-turnstile-token-${widgetId}`);
+      });
+    };
+
+    window.turnstile = {
+      render: (_container, options) => {
+        const widgetId = ++nextWidgetId;
+        widgets.set(widgetId, options);
+        verify(widgetId);
+        return widgetId;
+      },
+      remove: (widgetId) => widgets.delete(widgetId),
+      reset: (widgetId) => verify(widgetId),
+    };
+  });
+
   await page.route("**/api/public-config", async (route) => {
     await route.fulfill({
       status: 200,
