@@ -27,17 +27,17 @@
 
   .home-hero__desktop-subject {
     z-index: 3;
-    top: -19px;
-    right: auto;
+    top: clamp(0px, calc(225px - 12.5vw), 65px);
+    right: clamp(-80px, -3vw, -40px);
     bottom: auto;
-    left: 904px;
-    width: 850px;
-    height: 1133px;
+    left: auto;
+    width: clamp(480px, calc(71.154vw - 430.77px), 850px);
+    height: auto;
+    aspect-ratio: 2 / 3;
     display: block;
-    clip-path: polygon(43% 0, 43% 4%, 40% 8%, 35% 18%, 27% 30%, 19% 42%, 9% 60%, 0 100%, 100% 100%, 100% 0);
-    background-position: center;
+    background-position: center top;
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: contain;
     position: absolute;
     transform: translateZ(0);
   }

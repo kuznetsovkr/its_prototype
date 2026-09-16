@@ -1,5 +1,6 @@
 import desktopHeroBackground from './desktop/hero-background.webp';
 import desktopHeroBackgroundAvif from './desktop/hero-background.avif';
+import desktopHeroSubject from './desktop/hero-subject.webp';
 import desktopHeroLogoGraphite from './desktop/hero-logo-graphite.png';
 import desktopHeroLogoMilk from './desktop/hero-logo-milk.webp';
 import desktopAboutPhoto from './desktop/about-photo.webp';
@@ -48,6 +49,7 @@ import desktopFooterTelegramInternal from './desktop/footer-telegram-internal.sv
 import desktopFooterVkInternal from './desktop/footer-vk-internal.svg';
 import desktopFooterInstagramInternal from './desktop/footer-instagram-internal.svg';
 import tabletHeroBackground from './desktop/hero-background.webp';
+import tabletHeroSubject from './tablet/hero-subject.webp';
 import tabletHeroLogoGraphite from './desktop/hero-logo-graphite.png';
 import tabletHeroLogoMilk from './desktop/hero-logo-milk.webp';
 import tabletAboutPhoto from './mobile/about-photo-layer-02.webp';
@@ -201,7 +203,7 @@ export const homeAssets = {
     hero: {
       background: desktopHeroBackground,
       backgroundAvif: desktopHeroBackgroundAvif,
-      subject: desktopWorksCard09,
+      subject: desktopHeroSubject,
       logoGraphite: desktopHeroLogoGraphite,
       logoMilk: desktopHeroLogoMilk,
     },
@@ -260,7 +262,7 @@ export const homeAssets = {
     hero: {
       background: tabletHeroBackground,
       backgroundAvif: desktopHeroBackgroundAvif,
-      subject: tabletWorksCompact09,
+      subject: tabletHeroSubject,
       logoGraphite: tabletHeroLogoGraphite,
       logoMilk: tabletHeroLogoMilk,
     },
