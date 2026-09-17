@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import api from '../api';
 import { useOrder } from '../context/OrderContext';
-import { getOrderAccessToken, orderAccessConfig } from '../utils/orderAccess';
 import thankYouDog from '../images/home/desktop/questions-dog-on.webp';
 import '../assets/styles/pages/_thx.scss';
 
@@ -11,9 +9,7 @@ const ThankYouPage = () => {
   const navigate = useNavigate();
   const { resetOrder } = useOrder();
   const { orderNumber, manual, cdekNumber: stateCdekNumber } = location.state || {};
-  const [cdekNumber, setCdekNumber] = useState(
-    stateCdekNumber || sessionStorage.getItem("pay_cdek_number") || null
-  );
+  const cdekNumber = stateCdekNumber || null;
   const [copyState, setCopyState] = useState('idle');
 
   useEffect(() => {
@@ -23,45 +19,6 @@ const ThankYouPage = () => {
     }
     resetOrder();
   }, [navigate, orderNumber, resetOrder]);
-
-  useEffect(() => {
-    if (manual || cdekNumber || !orderNumber) return undefined;
-    const orderToken = getOrderAccessToken(orderNumber);
-    if (!orderToken) return undefined;
-
-    let attempts = 0;
-    let stopped = false;
-    const loadShipmentNumber = async () => {
-      attempts += 1;
-      try {
-        const { data } = await api.get(
-          `/orders/${encodeURIComponent(orderNumber)}`,
-          orderAccessConfig(orderNumber, orderToken)
-        );
-        if (data?.cdekNumber && !stopped) {
-          const value = String(data.cdekNumber);
-          sessionStorage.setItem("pay_cdek_number", value);
-          setCdekNumber(value);
-        }
-      } catch {
-        // Фоновое обновление номера не должно мешать странице благодарности.
-      }
-    };
-
-    loadShipmentNumber();
-    const timer = setInterval(() => {
-      if (attempts >= 20 || stopped) {
-        clearInterval(timer);
-        return;
-      }
-      loadShipmentNumber();
-    }, 3000);
-
-    return () => {
-      stopped = true;
-      clearInterval(timer);
-    };
-  }, [cdekNumber, manual, orderNumber]);
 
   useEffect(() => {
     if (copyState === 'idle') return undefined;
@@ -151,7 +108,9 @@ const ThankYouPage = () => {
               ) : (
                 <div className="thx__order-row">
                   <span className="thx__order-label">Трек-номер СДЭК</span>
-                  <span className="thx__pending"><i aria-hidden="true" />готовим отправление</span>
+                  <span className="thx__pending">
+                    <i aria-hidden="true" />пришлём после изготовления
+                  </span>
                 </div>
               )
             )}

@@ -109,6 +109,8 @@ export default function PaymentSuccess() {
           finalizedRef.current = true;
           if (data.cdekNumber) {
             sessionStorage.setItem('pay_cdek_number', String(data.cdekNumber));
+          } else {
+            sessionStorage.removeItem('pay_cdek_number');
           }
           navigate('/thank-you', {
             state: { orderNumber: orderId, cdekNumber: data.cdekNumber || null },

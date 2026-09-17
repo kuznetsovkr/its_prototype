@@ -531,6 +531,7 @@ export const useRecipientDetails = () => {
       setDraftOrder(data);
       storeOrderAccessToken(data.orderId, data.orderToken);
       sessionStorage.setItem("pay_order_id", String(data.orderId));
+      sessionStorage.removeItem("pay_cdek_number");
       if (data?.cdekNumber) {
         sessionStorage.setItem("pay_cdek_number", String(data.cdekNumber));
       }
