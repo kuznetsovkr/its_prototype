@@ -558,6 +558,15 @@
 .home-accordion__panel[hidden] { display: none; }
 .home-accordion__content { padding: 22px 40px 28px; font-size: 20px; line-height: 1.4; text-align: center; }
 
+.home-faq__accordion .home-accordion__panel:not([hidden]) {
+  animation: home-faq-panel-enter 500ms ease-out both;
+}
+
+@keyframes home-faq-panel-enter {
+  from { opacity: 0; transform: translateY(-14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .home-questions { padding-bottom: 41px; }
 .home-questions__surface { min-height: 486px; overflow: visible; }
 
@@ -614,6 +623,7 @@
   .home-page .home-hero__order { animation: none; opacity: 1; }
   .home-page .home-about__photo-slide.is-entering { animation: none; }
   .home-page .home-works__item { scale: 1; }
+  .home-page .home-faq__accordion .home-accordion__panel:not([hidden]) { animation: none; }
 
   .home-page .home-about__surface,
   .home-page .home-works__surface,
