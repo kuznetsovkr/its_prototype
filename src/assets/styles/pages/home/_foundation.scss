@@ -507,6 +507,12 @@
   margin-top: 44px;
   grid-template-columns: 330px 1fr;
   gap: 20px;
+  animation: home-customers-content-enter 500ms ease-out both;
+}
+
+@keyframes home-customers-content-enter {
+  from { opacity: 0; translate: 0 28px; }
+  to { opacity: 1; translate: 0 0; }
 }
 
 .home-customers__photo,
@@ -624,6 +630,7 @@
   .home-page .home-about__photo-slide.is-entering { animation: none; }
   .home-page .home-works__item { scale: 1; }
   .home-page .home-faq__accordion .home-accordion__panel:not([hidden]) { animation: none; }
+  .home-page .home-customers__content { animation: none; }
 
   .home-page .home-about__surface,
   .home-page .home-works__surface,
