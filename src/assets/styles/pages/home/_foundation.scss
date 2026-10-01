@@ -327,7 +327,15 @@
   gap: 10px;
 }
 
-.home-works__item { min-width: 0; min-height: 0; margin: 0; overflow: hidden; border-radius: 30px; }
+.home-works__item {
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 30px;
+  scale: var(--home-work-scroll-scale, 1);
+  transform-origin: center;
+}
 .home-works__item--1,
 .home-works__item--5 { grid-row: span 2; }
 .home-works__item--6 { grid-column: span 2; }
@@ -574,6 +582,7 @@
   .home-page .home-hero__subtitle,
   .home-page .home-hero__order { animation: none; opacity: 1; }
   .home-page .home-about__photo-slide.is-entering { animation: none; }
+  .home-page .home-works__item { scale: 1; }
 
   .home-page *,
   .home-page *::before,

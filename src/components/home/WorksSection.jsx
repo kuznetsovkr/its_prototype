@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { HomeButton } from "./primitives";
 import LayeredAsset from "./LayeredAsset";
+import useWorksScrollZoom from "./useWorksScrollZoom";
 
 const workLabels = [
   "Вышивка кота на голубом изделии",
@@ -20,12 +21,14 @@ const WorksSection = ({ assets, breakpoint, onOrder }) => {
   const additionalItems = assets.additionalItems || [];
   const canExpand = additionalItems.length > 0;
   const items = isExpanded ? [...initialItems, ...additionalItems] : initialItems;
+  const sectionRef = useWorksScrollZoom({ itemCount: items.length, breakpoint });
 
   return (
     <section
       className={`home-section home-works home-works--${breakpoint}${isExpanded ? " is-expanded" : ""}`}
       id="works"
       aria-labelledby="home-works-title"
+      ref={sectionRef}
     >
       <div className="home-section__surface home-works__surface">
         <div className="home-section__inner home-works__inner">
