@@ -1,8 +1,10 @@
 import { customerTabs } from "../../data/homeContent";
 import ResponsiveAsset from "./ResponsiveAsset";
 import { HomeTabs } from "./primitives";
+import useScrollZoom from "./useScrollZoom";
 
 const CustomersSection = ({ assets }) => {
+  const sectionRef = useScrollZoom();
   const tabs = customerTabs.map((tab) => {
     const photo = tab.id === "delivery" && assets.delivery.tablet
       ? assets.delivery
@@ -32,7 +34,7 @@ const CustomersSection = ({ assets }) => {
   });
 
   return (
-    <section className="home-section home-customers" id="customers" aria-labelledby="home-customers-title">
+    <section className="home-section home-customers" id="customers" aria-labelledby="home-customers-title" ref={sectionRef}>
       <div className="home-section__surface home-customers__surface">
         <div className="home-section__inner home-customers__inner">
           <h2 className="home-section__title" id="home-customers-title">клиентам</h2>

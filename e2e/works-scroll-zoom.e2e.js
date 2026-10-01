@@ -10,9 +10,14 @@ const viewports = [
 
 const scrollCardToProgress = async (page, index, offset) => {
   await page.evaluate(({ cardIndex, scrollOffset }) => {
+    const section = document.querySelector(".home-works");
     const card = document.querySelectorAll(".home-works__item")[cardIndex];
-    const rect = card.getBoundingClientRect();
-    const layoutTop = rect.top + window.scrollY - (card.offsetHeight - rect.height) / 2;
+    let layoutTop = section.getBoundingClientRect().top + window.scrollY;
+    let element = card;
+    while (element && element !== section) {
+      layoutTop += element.offsetTop;
+      element = element.offsetParent;
+    }
     window.scrollTo({ top: layoutTop - window.innerHeight + scrollOffset, behavior: "instant" });
   }, { cardIndex: index, scrollOffset: offset });
 };

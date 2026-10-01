@@ -15,6 +15,19 @@ const zoomProfiles = [
 
 const clamp = (value) => Math.min(1, Math.max(0, value));
 
+const getLayoutTop = (card, section) => {
+  let top = 0;
+  let element = card;
+
+  // Offset positions stay stable while the gallery's parent layers are scaled.
+  while (element && element !== section) {
+    top += element.offsetTop;
+    element = element.offsetParent;
+  }
+
+  return top;
+};
+
 const useWorksScrollZoom = ({ itemCount, breakpoint }) => {
   const sectionRef = useRef(null);
 
@@ -27,6 +40,7 @@ const useWorksScrollZoom = ({ itemCount, breakpoint }) => {
     const distanceFactor = breakpoint === "mobile" ? 0.6 : breakpoint === "tablet" ? 0.8 : 1;
     const delayFactor = breakpoint === "mobile" ? 0.5 : breakpoint === "tablet" ? 0.75 : 1;
     const lastScales = Array(cards.length);
+    let lastSectionScale;
     let frame = 0;
 
     const getStartScale = (index) => {
@@ -45,12 +59,19 @@ const useWorksScrollZoom = ({ itemCount, breakpoint }) => {
 
     const update = () => {
       frame = 0;
+      const sectionRect = section.getBoundingClientRect();
+      const sectionProgress = clamp((window.innerHeight - sectionRect.top) / 560);
+      const sectionScale = reducedMotion.matches ? 1 : 0.8 + 0.2 * sectionProgress;
+      if (sectionScale !== lastSectionScale) {
+        section.style.setProperty("--home-scroll-zoom-scale", String(sectionScale));
+        lastSectionScale = sectionScale;
+      }
+
       if (reducedMotion.matches) {
         applyScales(cards.map(() => 1));
         return;
       }
 
-      const sectionRect = section.getBoundingClientRect();
       if (sectionRect.top > window.innerHeight + 800) {
         applyScales(cards.map((_, index) => getStartScale(index)));
         return;
@@ -62,8 +83,7 @@ const useWorksScrollZoom = ({ itemCount, breakpoint }) => {
 
       const scales = cards.map((card, index) => {
         const profile = zoomProfiles[index % zoomProfiles.length];
-        const rect = card.getBoundingClientRect();
-        const layoutTop = rect.top - (card.offsetHeight - rect.height) / 2;
+        const layoutTop = sectionRect.top + getLayoutTop(card, section);
         const progress = clamp((window.innerHeight - layoutTop - profile.delay * delayFactor) / (profile.distance * distanceFactor));
         const start = getStartScale(index);
         return start + (1 - start) * progress;
@@ -85,6 +105,7 @@ const useWorksScrollZoom = ({ itemCount, breakpoint }) => {
       window.removeEventListener("scroll", scheduleUpdate);
       window.removeEventListener("resize", scheduleUpdate);
       reducedMotion.removeEventListener("change", scheduleUpdate);
+      section.style.removeProperty("--home-scroll-zoom-scale");
       cards.forEach((card) => card.style.removeProperty("--home-work-scroll-scale"));
     };
   }, [itemCount, breakpoint]);

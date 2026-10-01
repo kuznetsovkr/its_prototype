@@ -1,37 +1,42 @@
 import LayeredAsset from "./LayeredAsset";
 import { HomeButton, ReviewsCarousel } from "./primitives";
+import useScrollZoom from "./useScrollZoom";
 
-const ReviewsSection = ({ assets, breakpoint, onOrder }) => (
-  <section className="home-section home-reviews" id="reviews" aria-labelledby="home-reviews-title">
-    <div className="home-section__surface home-reviews__surface">
-      <div className="home-section__inner home-reviews__inner">
-        <h2 className="home-section__title" id="home-reviews-title">отзывы</h2>
-        <ReviewsCarousel
-          className="home-reviews__carousel"
-          reviews={assets.items}
-          nextIcon={assets.nextArrow}
-          previousIcon={assets.previousArrow}
-          showControls={breakpoint === "desktop"}
-          showDots={breakpoint === "desktop"}
-          renderReview={(review, index) => (
-            <LayeredAsset
-              className="home-reviews__card"
-              layers={review.layers || [review]}
-              label={`Отзыв клиента ${index + 1}`}
-            />
-          )}
-        />
-        <HomeButton
-          className="home-reviews__all"
-          onClick={onOrder}
-          variant="dark"
-          size="medium"
-        >
-          Сделать заказ
-        </HomeButton>
+const ReviewsSection = ({ assets, breakpoint, onOrder }) => {
+  const sectionRef = useScrollZoom();
+
+  return (
+    <section className="home-section home-reviews" id="reviews" aria-labelledby="home-reviews-title" ref={sectionRef}>
+      <div className="home-section__surface home-reviews__surface">
+        <div className="home-section__inner home-reviews__inner">
+          <h2 className="home-section__title" id="home-reviews-title">отзывы</h2>
+          <ReviewsCarousel
+            className="home-reviews__carousel"
+            reviews={assets.items}
+            nextIcon={assets.nextArrow}
+            previousIcon={assets.previousArrow}
+            showControls={breakpoint === "desktop"}
+            showDots={breakpoint === "desktop"}
+            renderReview={(review, index) => (
+              <LayeredAsset
+                className="home-reviews__card"
+                layers={review.layers || [review]}
+                label={`Отзыв клиента ${index + 1}`}
+              />
+            )}
+          />
+          <HomeButton
+            className="home-reviews__all"
+            onClick={onOrder}
+            variant="dark"
+            size="medium"
+          >
+            Сделать заказ
+          </HomeButton>
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export default ReviewsSection;

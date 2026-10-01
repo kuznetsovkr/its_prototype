@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import useScrollZoom from "./useScrollZoom";
 
 const AboutSection = ({ photos, onOrder }) => {
+  const sectionRef = useScrollZoom();
   const photoRef = useRef(null);
   const [photoChangeCount, setPhotoChangeCount] = useState(0);
 
@@ -40,7 +42,7 @@ const AboutSection = ({ photos, onOrder }) => {
   const activePhoto = photoChangeCount % photos.length;
 
   return (
-    <section className="home-section home-about" id="about" aria-labelledby="home-about-title">
+    <section className="home-section home-about" id="about" aria-labelledby="home-about-title" ref={sectionRef}>
       <div className="home-section__surface home-about__surface">
         <div className="home-about__card">
           <div className="home-about__copy">

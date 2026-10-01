@@ -109,6 +109,11 @@
 
   .home-about { height: 614px; min-height: 614px; padding-top: 0; }
 
+  // The brand block is already visible below the mobile hero on first paint.
+  .home-page .home-about__surface,
+  .home-page .home-about__card,
+  .home-page .home-about__photo { scale: 1; }
+
   .home-about::before {
     position: absolute;
     z-index: 3;
