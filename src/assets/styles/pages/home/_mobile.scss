@@ -99,6 +99,14 @@
     transform: translateX(-50%);
   }
 
+  .home-hero__subtitle,
+  .home-hero__order { animation-name: home-hero-entrance-mobile; }
+
+  @keyframes home-hero-entrance-mobile {
+    from { opacity: 0; transform: translateX(-50%) scale(0.5); }
+    to { opacity: 1; transform: translateX(-50%) scale(1); }
+  }
+
   .home-about { height: 614px; min-height: 614px; padding-top: 0; }
 
   .home-about::before {

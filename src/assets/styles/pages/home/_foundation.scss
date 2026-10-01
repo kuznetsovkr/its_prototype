@@ -166,6 +166,17 @@
 
 .home-hero__order { width: 364px; height: 54px; }
 
+.home-hero__subtitle,
+.home-hero__order {
+  animation: home-hero-entrance 1s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  transform-origin: center;
+}
+
+@keyframes home-hero-entrance {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 .home-about__surface { min-height: 781px; padding: 80px 0 83px; border-radius: 60px; }
 
 .home-about__card {
@@ -535,6 +546,9 @@
 .home-social__actions .home-button { width: 200px; }
 
 @media (prefers-reduced-motion: reduce) {
+  .home-page .home-hero__subtitle,
+  .home-page .home-hero__order { animation: none; opacity: 1; }
+
   .home-page *,
   .home-page *::before,
   .home-page *::after {
