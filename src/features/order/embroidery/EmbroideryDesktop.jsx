@@ -18,6 +18,7 @@ import {
   MAX_UPLOAD_MB as MAX_MB,
   UPLOAD_INSTRUCTIONS as uploadInstructions,
 } from "./embroideryConfig";
+import { MAX_PET_FACE_COUNT } from "./embroideryLimits";
 
 const EmbroideryDesktop = ({
   selection,
@@ -34,7 +35,7 @@ const EmbroideryDesktop = ({
   const {
     clothingPreviewSrc, clothingPreviewAlt,
     selectedType, customText, setCustomText, uploadedImage, comment, setComment,
-    error, patronusCount, setPatronusCount, petFaceCount, setPetFaceCount,
+    error, countError, patronusCount, setPatronusCount, petFaceCount, setPetFaceCount,
     customTextFont, setCustomTextFont, patronusLimit, hasFiles,
     canProceed, disabledHint, priceError, desktopPriceLabel, handleFileChange,
     handleFileDragOver, handleFileDrop, handleRemoveImage,
@@ -52,7 +53,7 @@ const EmbroideryDesktop = ({
         <span>−</span>
       </button>
       <span className="embroideryDesktopCounter__value">{value} шт</span>
-      <button type="button" className="embroideryDesktopCounter__button" onClick={() => setValue((current) => Math.min(limit, current + 1))} aria-label="Увеличить количество">
+      <button type="button" className="embroideryDesktopCounter__button" onClick={() => setValue((current) => Math.min(limit, current + 1))} aria-label="Увеличить количество" disabled={value >= limit} title={value >= limit ? `Не более ${limit} шт` : undefined}>
         <picture className="embroideryDesktopCounter__icon">
           <source media={MEDIA_QUERIES.mobile} srcSet={embroideryCounterMobile} />
           <source media={MEDIA_QUERIES.tabletMax} srcSet={embroideryCounterTablet} />
@@ -155,6 +156,10 @@ const EmbroideryDesktop = ({
                         value={option.value}
                         checked={selectedType === option.value}
                         onChange={(event) => handleDesktopType(event.target.value)}
+                        onClick={() => {
+                          if (selectedType === option.value) handleDesktopType("");
+                        }}
+                        title={selectedType === option.value ? "Нажмите ещё раз, чтобы сбросить выбор" : undefined}
                       />
                       <picture className="embroideryDesktopChoice__radio">
                         <source
@@ -191,7 +196,7 @@ const EmbroideryDesktop = ({
                     {option.value === "Patronus" && selectedType === "Patronus" &&
                       renderDesktopCounter(patronusCount, setPatronusCount, patronusLimit)}
                     {option.value === "petFace" && selectedType === "petFace" &&
-                      renderDesktopCounter(petFaceCount, setPetFaceCount, 5)}
+                      renderDesktopCounter(petFaceCount, setPetFaceCount, MAX_PET_FACE_COUNT)}
                   </React.Fragment>
                 ))}
               </div>
@@ -310,8 +315,9 @@ const EmbroideryDesktop = ({
               </div>
             )}
 
-            <p className="embroiderySelectorDesktop__price">{desktopPriceLabel}</p>
-            {priceError && <p className="embroideryUploadStage__error" role="alert">{priceError}</p>}
+            {selectedType && <p className="embroiderySelectorDesktop__price">{desktopPriceLabel}</p>}
+            {countError && <p className="embroideryUploadStage__error" role="alert">{countError}</p>}
+            {selectedType && priceError && <p className="embroideryUploadStage__error" role="alert">{priceError}</p>}
           </section>
 
           <div className="embroiderySelectorDesktop__navigation">
@@ -322,6 +328,7 @@ const EmbroideryDesktop = ({
               type="button"
               className="is-next"
               onClick={handleDesktopNext}
+              disabled={!selectedType}
               title={!canProceed ? disabledHint : undefined}
             >
               далее

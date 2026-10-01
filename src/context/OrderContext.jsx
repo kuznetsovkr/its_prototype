@@ -47,6 +47,7 @@ const isSameClothing = (a, b) =>
 
 const isSameEmbroidery = (a, b) =>
   (a?.type || "") === (b?.type || "") &&
+  Boolean(a?.typeSelectionExplicit) === Boolean(b?.typeSelectionExplicit) &&
   (a?.customText || "") === (b?.customText || "") &&
   (a?.customTextFont || "") === (b?.customTextFont || "") &&
   (a?.comment || "") === (b?.comment || "") &&
@@ -100,14 +101,15 @@ const initialState = {
     previewAlt: "",
   },
   embroidery: {
-    type: "Patronus",
+    type: "",
+    typeSelectionExplicit: false,
     customText: "",
     customTextFont: "Arial",
     comment: "",
     uploadedImage: [],
     patronusCount: 1,
     petFaceCount: 1,
-    price: 0,
+    price: null,
     customOption: {
       image: false,
       text: false,
@@ -168,6 +170,15 @@ const restoreOrderDraft = () => {
     if (draft?.version !== ORDER_DRAFT_VERSION || !draft.order) return emptyDraft;
 
     const storedOrder = draft.order;
+    const storedEmbroidery = storedOrder.embroidery || {};
+    // Older drafts defaulted to Patronus without a user selection. Do not restore that
+    // implicit choice as a visible price; preserve drafts with evidence of a real choice.
+    const hasSelectedType = storedEmbroidery.typeSelectionExplicit === true ||
+      (storedEmbroidery.typeSelectionExplicit === undefined && Boolean(storedEmbroidery.type) &&
+        (storedEmbroidery.type !== "Patronus" ||
+          Number(storedEmbroidery.patronusCount) > 1 ||
+          Boolean(draft.uploadFiles?.length) ||
+          Boolean(storedOrder.recipient?.userData?.firstName)));
     return {
       order: {
         clothing: {
@@ -176,7 +187,10 @@ const restoreOrderDraft = () => {
         },
         embroidery: {
           ...initialState.embroidery,
-          ...(storedOrder.embroidery || {}),
+          ...storedEmbroidery,
+          type: hasSelectedType ? storedEmbroidery.type : "",
+          typeSelectionExplicit: hasSelectedType,
+          price: null,
           uploadedImage: [],
           customOption: {
             ...initialState.embroidery.customOption,

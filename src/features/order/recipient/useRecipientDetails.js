@@ -5,6 +5,7 @@ import { MEDIA_QUERIES } from "../../../config/breakpoints";
 import { APP_ENV } from "../../../config/env";
 import { useOrder } from "../../../context/OrderContext";
 import { buildDemoCdekNumber, buildDemoOrderId } from "../../../mocks/demoData";
+import { getEmbroideryCountError, getPatronusLimit } from "../embroidery/embroideryLimits";
 import { getOrderAccessToken, storeOrderAccessToken } from "../../../utils/orderAccess";
 import {
   confirmOrder,
@@ -460,14 +461,22 @@ export const useRecipientDetails = () => {
     isCdekPickupSelected,
     privacyConsent,
   });
+  const embroideryCountError = getEmbroideryCountError({
+    type: selectedType,
+    patronusCount,
+    petFaceCount,
+    patronusLimit: getPatronusLimit(clothing.profile),
+  });
   const isFormValid = recipientValidation.isValid;
   const getMissingFieldsMessage = () => recipientValidation.message;
   const hasCheckoutTotal = Number.isFinite(Number(checkoutQuote?.totalPrice));
-  const canSubmit = isFormValid &&
+  const canSubmit = isFormValid && Boolean(selectedType) && !embroideryCountError &&
     (isManualCheckout || (!checkoutQuoteLoading && !checkoutQuoteError && hasCheckoutTotal)) &&
     (Boolean(draftOrder) || turnstile.isSatisfied);
   const getSubmitDisabledMessage = () => {
+    if (!selectedType) return "Выберите тип вышивки";
     if (!isFormValid) return getMissingFieldsMessage();
+    if (embroideryCountError) return embroideryCountError;
     if (checkoutQuoteLoading) return "Дождитесь итогового расчёта стоимости";
     if (checkoutQuoteError) return checkoutQuoteError;
     if (!isManualCheckout && !hasCheckoutTotal) return "Не удалось рассчитать итоговую стоимость";

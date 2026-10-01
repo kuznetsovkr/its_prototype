@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { IS_DEMO_MODE } from "../../../config/demoMode";
 import { useOrder } from "../../../context/OrderContext";
 import { getEmbroideryPrices } from "./embroideryApi";
+import { getEmbroideryCountError, getPatronusLimit } from "./embroideryLimits";
 import {
   isSameFiles,
   isSameOptions,
@@ -21,14 +22,18 @@ export const useEmbroiderySelection = () => {
     dismissMissingUploadFiles,
   } = useOrder();
   const { clothing, embroidery } = order;
+  const selectedClothing = location.state?.selectedClothing;
+  const patronusLimit = getPatronusLimit(clothing.profile);
   const previousTypeRef = useRef(null);
   const skipExternalSyncRef = useRef(false);
-  const [selectedType, setSelectedType] = useState(embroidery.type || "Patronus");
+  const [selectedType, setSelectedType] = useState(embroidery.type || "");
   const [customText, setCustomText] = useState(embroidery.customText || "");
   const [uploadedImage, setUploadedImage] = useState(embroidery.uploadedImage || []);
   const [comment, setComment] = useState(embroidery.comment || "");
   const [error, setError] = useState("");
-  const [patronusCount, setPatronusCount] = useState(embroidery.patronusCount || 1);
+  const [patronusCount, setPatronusCount] = useState(
+    Math.min(Math.max(1, embroidery.patronusCount || 1), patronusLimit)
+  );
   const [petFaceCount, setPetFaceCount] = useState(embroidery.petFaceCount || 1);
   const [customOption, setCustomOption] = useState(embroidery.customOption || emptyCustomOption());
   const [customTextFont, setCustomTextFont] = useState(embroidery.customTextFont || "Arial");
@@ -36,12 +41,10 @@ export const useEmbroiderySelection = () => {
   const [priceLoading, setPriceLoading] = useState(!IS_DEMO_MODE);
   const [priceError, setPriceError] = useState("");
 
-  const selectedClothing = location.state?.selectedClothing;
-  const configuredPatronusLimit = Number(clothing.profile?.patronusLimit);
-  const patronusLimit = Number.isInteger(configuredPatronusLimit) && configuredPatronusLimit > 0
-    ? Math.min(configuredPatronusLimit, 5)
-    : 5;
   const isCustomType = selectedType === "custom";
+  const priceRequestKey = JSON.stringify([
+    clothing.type || selectedClothing, clothing.color, clothing.size, patronusCount, petFaceCount,
+  ]);
 
   useEffect(() => {
     setPatronusCount((current) => Math.min(Math.max(1, current), patronusLimit));
@@ -49,12 +52,6 @@ export const useEmbroiderySelection = () => {
 
   useEffect(() => {
     if (IS_DEMO_MODE) {
-      const prices = clothing.profile?.prices || {};
-      setServerPrices({
-        Patronus: Number(prices.Patronus) + Math.max(0, patronusCount - 1) * 5000,
-        Car: Number(prices.Car),
-        petFace: Number(prices.petFace) + Math.max(0, petFaceCount - 1) * 2000,
-      });
       setPriceLoading(false);
       setPriceError("");
       return undefined;
@@ -79,7 +76,7 @@ export const useEmbroiderySelection = () => {
       petFaceCount,
     }).then((prices) => {
       if (!cancelled) {
-        setServerPrices(prices);
+        setServerPrices({ key: priceRequestKey, prices });
         setPriceLoading(false);
       }
     }).catch((requestError) => {
@@ -91,28 +88,42 @@ export const useEmbroiderySelection = () => {
     });
     return () => { cancelled = true; };
   }, [clothing.type, clothing.color, clothing.size, clothing.profile, selectedClothing,
-    patronusCount, petFaceCount]);
+    patronusCount, petFaceCount, priceRequestKey]);
 
   const calcPrice = useCallback((type) => {
-    const value = serverPrices?.[type];
-    return Number.isFinite(Number(value)) ? Number(value) : null;
-  }, [serverPrices]);
+    if (!type) return null;
+    const prices = IS_DEMO_MODE ? clothing.profile?.prices :
+      serverPrices?.key === priceRequestKey ? serverPrices.prices : null;
+    const basePrice = prices?.[type];
+    if (basePrice == null || !Number.isFinite(Number(basePrice))) return null;
+    if (IS_DEMO_MODE && type === "Patronus") {
+      return Number(basePrice) + Math.max(0, patronusCount - 1) * 5000;
+    }
+    if (IS_DEMO_MODE && type === "petFace") {
+      return Number(basePrice) + Math.max(0, petFaceCount - 1) * 2000;
+    }
+    return Number(basePrice);
+  }, [clothing.profile, patronusCount, petFaceCount, priceRequestKey, serverPrices]);
 
   const selectedPrice = calcPrice(selectedType);
+  const countError = getEmbroideryCountError({
+    type: selectedType, patronusCount, petFaceCount, patronusLimit,
+  });
   const hasFiles = uploadedImage.length > 0;
   const hasCustomText = customText.trim().length > 0;
   const mustUpload = isCustomType && customOption.image;
   const mustText = isCustomType && customOption.text;
   const mustSelectCustom = isCustomType ? customOption.image || customOption.text : true;
   const customIsValid = mustSelectCustom && (!mustUpload || hasFiles) && (!mustText || hasCustomText);
-  const canProceed = IS_DEMO_MODE
+  const canProceed = !countError && (IS_DEMO_MODE
     ? Boolean(selectedType && (isCustomType || selectedPrice != null))
     : isCustomType
       ? customIsValid
-      : Boolean(selectedType && hasFiles && selectedPrice != null && !priceLoading);
+      : Boolean(selectedType && hasFiles && selectedPrice != null && !priceLoading));
 
-  let disabledHint = "";
-  if (!IS_DEMO_MODE) {
+  let disabledHint = countError || "";
+  if (!selectedType) disabledHint = "Выберите тип вышивки";
+  else if (!countError && !IS_DEMO_MODE) {
     if (priceLoading) disabledHint = "Дождитесь расчёта стоимости";
     else if (priceError) disabledHint = priceError;
     else if (!isCustomType && !hasFiles) disabledHint = "Загрузите хотя бы одно изображение";
@@ -147,6 +158,7 @@ export const useEmbroiderySelection = () => {
   useEffect(() => {
     const nextEmbroidery = {
       type: selectedType,
+      typeSelectionExplicit: Boolean(selectedType),
       customText,
       customTextFont,
       comment,
@@ -158,7 +170,8 @@ export const useEmbroiderySelection = () => {
     };
     const currentOption = embroidery.customOption || emptyCustomOption();
     const sameState =
-      (embroidery.type || "Patronus") === nextEmbroidery.type &&
+      (embroidery.type || "") === nextEmbroidery.type &&
+      Boolean(embroidery.typeSelectionExplicit) === nextEmbroidery.typeSelectionExplicit &&
       (embroidery.customText || "") === nextEmbroidery.customText &&
       (embroidery.customTextFont || "Arial") === nextEmbroidery.customTextFont &&
       (embroidery.comment || "") === nextEmbroidery.comment &&
@@ -172,14 +185,14 @@ export const useEmbroiderySelection = () => {
       setEmbroidery(nextEmbroidery);
     }
   }, [selectedType, customText, customTextFont, comment, uploadedImage, patronusCount,
-    petFaceCount, customOption, embroidery.type, embroidery.customText,
+    petFaceCount, customOption, embroidery.type, embroidery.typeSelectionExplicit, embroidery.customText,
     embroidery.customTextFont, embroidery.comment, embroidery.uploadedImage,
     embroidery.patronusCount, embroidery.petFaceCount, embroidery.customOption,
     embroidery.price, setEmbroidery, calcPrice]);
 
   useEffect(() => {
     const next = {
-      type: embroidery.type || "Patronus",
+      type: embroidery.type || "",
       customText: embroidery.customText || "",
       uploadedImage: embroidery.uploadedImage || [],
       comment: embroidery.comment || "",
@@ -237,11 +250,11 @@ export const useEmbroiderySelection = () => {
     clothingPreviewSrc: clothing.previewSrc || "",
     clothingPreviewAlt: clothing.previewAlt || clothing.type || "Одежда",
     selectedType, customText, setCustomText, uploadedImage, setUploadedImage,
-    comment, setComment, error, patronusCount, setPatronusCount,
+    comment, setComment, error, countError, patronusCount, setPatronusCount,
     petFaceCount, setPetFaceCount, customOption, setCustomOption,
     customTextFont, setCustomTextFont, patronusLimit,
     isCustomType, hasFiles, canProceed, disabledHint, priceError,
-    desktopPriceLabel: isCustomType
+    desktopPriceLabel: !selectedType ? "" : isCustomType
       ? "Цена рассчитает менеджер"
       : selectedPrice == null ? "Цена рассчитывается…" : `Цена: ${priceFormatter.format(selectedPrice)} руб`,
     priceLabel: (type) => {

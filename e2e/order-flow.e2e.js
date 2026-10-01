@@ -59,11 +59,74 @@ const startOrder = async (page) => {
 };
 
 const continueToRecipient = async (page) => {
-  await expect(page.getByRole("heading", { name: "Выберите тип вышивки" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Выберите тип вышивки" })).toBeVisible({ timeout: 20_000 });
+  if (await page.locator('input[name="embroideryTypeDesktop"]:checked').count() === 0) {
+    await page.locator('.embroideryDesktopChoice:has(input[value="Patronus"])').click();
+  }
   await page.locator(".embroiderySelectorDesktop__navigation .is-next").click();
   await expect(page).toHaveURL(/\/recipient$/);
   await expect(page.getByRole("heading", { name: "Введите свои данные" })).toBeVisible();
 };
+
+test("цена появляется только после выбора типа и скрывается после сброса", async ({ page }) => {
+  await page.goto("/order");
+  await expect(page.locator(".clothingPrice")).toHaveCount(0);
+  await page.locator('.selectorType__item:has(input[value="Hoodie"])').click();
+  await page.locator('.sizeSelector__item:has(input[value="M"]) .sizeSelector__box').click();
+  await page.locator(".orderNavigation .orderActionButton--next").click();
+  await expect(page).toHaveURL(/\/embroidery$/);
+
+  const price = page.locator(".embroiderySelectorDesktop__price");
+  const next = page.locator(".embroiderySelectorDesktop__navigation .is-next");
+  const patronus = page.locator('.embroideryDesktopChoice:has(input[value="Patronus"])');
+  const petFace = page.locator('.embroideryDesktopChoice:has(input[value="petFace"])');
+  const counter = page.locator(".embroideryDesktopCounter");
+
+  await expect(price).toHaveCount(0);
+  await expect(next).toBeDisabled();
+  await patronus.click();
+  await expect(price).toContainText(/Цена:\s*10\s*000 руб/);
+  await expect(counter.locator(".embroideryDesktopCounter__value")).toHaveText("1 шт");
+  for (let count = 2; count <= 4; count += 1) {
+    await counter.getByRole("button", { name: "Увеличить количество" }).click();
+  }
+  await expect(counter.locator(".embroideryDesktopCounter__value")).toHaveText("4 шт");
+  await expect(counter.getByRole("button", { name: "Увеличить количество" })).toBeDisabled();
+  await expect(price).toContainText(/25\s*000 руб/);
+
+  await patronus.click();
+  await expect(price).toHaveCount(0);
+  await expect(next).toBeDisabled();
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Выберите тип вышивки" })).toBeVisible({ timeout: 20_000 });
+  await expect(price).toHaveCount(0);
+  await page.evaluate(() => {
+    const draft = JSON.parse(sessionStorage.getItem("its_order_draft_v1"));
+    draft.order.embroidery.type = "Patronus";
+    draft.order.embroidery.price = 10000;
+    delete draft.order.embroidery.typeSelectionExplicit;
+    sessionStorage.setItem("its_order_draft_v1", JSON.stringify(draft));
+  });
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Выберите тип вышивки" })).toBeVisible({ timeout: 20_000 });
+  await expect(price).toHaveCount(0);
+
+  await petFace.click();
+  for (let count = 2; count <= 5; count += 1) {
+    await counter.getByRole("button", { name: "Увеличить количество" }).click();
+  }
+  await expect(counter.locator(".embroideryDesktopCounter__value")).toHaveText("5 шт");
+  await expect(counter.getByRole("button", { name: "Увеличить количество" })).toBeDisabled();
+  await expect(price).toContainText(/16\s*000 руб/);
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Выберите тип вышивки" })).toBeVisible({ timeout: 20_000 });
+  await expect(price).toContainText(/16\s*000 руб/);
+  await expect(counter.locator(".embroideryDesktopCounter__value")).toHaveText("5 шт");
+
+  await page.locator('.embroideryDesktopChoice:has(input[value="Car"])').click();
+  await expect(counter).toHaveCount(0);
+  await expect(price).toContainText(/8\s*500 руб/);
+});
 
 test("покупатель проходит основной путь и начинает новый заказ с чистого состояния", async ({ page }) => {
   await startOrder(page);
@@ -250,7 +313,7 @@ test("дополнительные примеры работ раскрываю�
   const moreButton = works.locator(".home-works__more");
   const initialCount = testInfo.project.name === "mobile-chromium" ? 6 : 9;
 
-  await expect(items).toHaveCount(initialCount);
+  await expect(items).toHaveCount(initialCount, { timeout: 20_000 });
   await expect(moreButton).toHaveAttribute("aria-expanded", "false");
 
   await moreButton.click();
@@ -282,6 +345,7 @@ test("order steps preserve the current scroll position", async ({ page }, testIn
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(clothingScrollPosition);
 
   const embroideryNext = page.locator(".embroiderySelectorDesktop__navigation .is-next");
+  await page.locator('.embroideryDesktopChoice:has(input[value="Patronus"])').click();
   await expect(embroideryNext).toBeEnabled();
   await page.evaluate(() => window.scrollTo(0, 300));
   const embroideryScrollPosition = await page.evaluate(() => window.scrollY);

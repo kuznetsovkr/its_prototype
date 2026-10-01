@@ -2,6 +2,7 @@ import api from "../../../api";
 import { IS_DEMO_MODE } from "../../../config/demoMode";
 import { DEMO_INVENTORY } from "../../../mocks/demoData";
 import { normalizeKey, uniqBy } from "./clothingCatalog";
+import { MAX_PATRONUS_COUNT } from "../embroidery/embroideryLimits";
 
 const DEMO_CLOTHING_TYPES = [
   {
@@ -13,14 +14,14 @@ const DEMO_CLOTHING_TYPES = [
   },
   {
     id: "demo-hoodie", name: "Hoodie", code: "hoodie", displayOrder: 20,
-    sizeGuideKey: "hoodie", patronusLimit: 5,
+    sizeGuideKey: "hoodie", patronusLimit: MAX_PATRONUS_COUNT,
     prices: { Patronus: 10000, Car: 8500, petFace: 8000 },
     package: { width: 35, height: 35, length: 7, weight: 800 },
     price: 8000,
   },
   {
     id: "demo-svitshot", name: "Sweatshirt", code: "svitshot", displayOrder: 30,
-    sizeGuideKey: "svitshot", patronusLimit: 5,
+    sizeGuideKey: "svitshot", patronusLimit: MAX_PATRONUS_COUNT,
     prices: { Patronus: 9500, Car: 8000, petFace: 7000 },
     package: { width: 35, height: 35, length: 7, weight: 800 },
     price: 7000,

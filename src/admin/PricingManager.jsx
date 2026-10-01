@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { MAX_PATRONUS_COUNT } from "../features/order/embroidery/embroideryLimits";
 
 const EMBROIDERY_ROWS = [
   { key: "Patronus", label: "Патронусы" },
@@ -42,7 +43,7 @@ const PricingManager = ({ config, isSaving, onSave }) => {
         packageValues.every((value) => Number.isInteger(value) && value > 0) &&
         Number.isInteger(Number(type.displayOrder)) && Number(type.displayOrder) > 0 &&
         Number.isInteger(Number(type.patronusLimit)) &&
-        Number(type.patronusLimit) >= 1 && Number(type.patronusLimit) <= 5;
+        Number(type.patronusLimit) >= 1 && Number(type.patronusLimit) <= MAX_PATRONUS_COUNT;
     });
     const additionalPrices = [
       Number(draft.additional?.Patronus),
@@ -175,7 +176,7 @@ const PricingManager = ({ config, isSaving, onSave }) => {
                     </label>
                     <label className="field">
                       <span className="label">Макс. патронусов</span>
-                      <input className="input" type="number" min="1" max="5" value={type.patronusLimit ?? ""}
+                      <input className="input" type="number" min="1" max={MAX_PATRONUS_COUNT} value={type.patronusLimit ?? ""}
                         onChange={(event) => changeProfile(type.id, "patronusLimit", onlyDigits(event.target.value))} />
                     </label>
                     {[

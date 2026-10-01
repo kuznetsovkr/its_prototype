@@ -199,10 +199,6 @@ export const useClothingSelection = () => {
     });
   }, [inventoryLoaded, previewSrc, previewAlt, setClothing]);
 
-  const parsedPrice = Number(previewItem?.price);
-  const hasPrice = previewItem?.price !== null && previewItem?.price !== undefined &&
-    previewItem?.price !== "" && Number.isFinite(parsedPrice);
-
   return {
     selectedClothing, selectedColor, selectedSize,
     setSelectedSize,
@@ -212,7 +208,6 @@ export const useClothingSelection = () => {
     isPreviewLoading: !inventoryLoaded,
     displayPreviewSrc: stablePreview.src || previewSrc || clothing.previewSrc || "",
     displayPreviewAlt: stablePreview.alt || previewAlt || clothing.previewAlt || "Одежда",
-    displayPrice: hasPrice ? `${parsedPrice} руб` : "уточняется",
     handleSelectClothing: (value) => {
       setSelectedClothing(value); setSelectedColor(""); setSelectedSize("");
     },

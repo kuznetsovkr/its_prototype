@@ -60,6 +60,7 @@ const EmbroiderySelector = () => {
   };
 
   const handleDesktopNext = () => {
+    if (!selectedType) return;
     if (desktopTab === "image" && !desktopDetailsOpen && !IS_DEMO_MODE) {
       if (selectedType === "custom" && !customOption.image) {
         setCustomOption({ image: true, text: false });

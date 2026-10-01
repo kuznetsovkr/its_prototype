@@ -1,6 +1,7 @@
 import hoodieImg from "../../../images/hoodie.webp";
 import switshotImg from "../../../images/switshot.webp";
 import tshirtImg from "../../../images/tshirt.webp";
+import { MAX_PATRONUS_COUNT } from "../embroidery/embroideryLimits";
 
 export const isWhite = (color = "") => {
   const value = String(color).trim().toLowerCase();
@@ -103,7 +104,7 @@ export const isOrderableProfile = (profile) => {
   const patronusLimit = Number(profile.patronusLimit);
   return prices.every((value) => Number.isInteger(value) && value > 0) &&
     packageValues.every((value) => Number.isInteger(value) && value > 0) &&
-    Number.isInteger(patronusLimit) && patronusLimit >= 1 && patronusLimit <= 5;
+    Number.isInteger(patronusLimit) && patronusLimit >= 1 && patronusLimit <= MAX_PATRONUS_COUNT;
 };
 export const COLOR_ORDER = new Map([
   ["белый", 1], ["white", 1],

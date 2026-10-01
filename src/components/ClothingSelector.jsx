@@ -14,7 +14,7 @@ const ClothingSelector = () => {
     selectedClothing, selectedColor, selectedSize,
     setSelectedSize, baseTypeOptions,
     colorOptions, sizeOptions, availableSizes, canProceed,
-    displayPreviewSrc, displayPreviewAlt, displayPrice, isPreviewLoading,
+    displayPreviewSrc, displayPreviewAlt, isPreviewLoading,
     selectedTypeProfile, sizeGuideOptions,
     handleSelectClothing, handleSelectColor,
   } = useClothingSelection();
@@ -109,7 +109,6 @@ const ClothingSelector = () => {
                 })}
               </div>
             </div>
-            <p className="clothingPrice">Цена: {displayPrice}</p>
           </div>
 
           <div className="orderNavigation">

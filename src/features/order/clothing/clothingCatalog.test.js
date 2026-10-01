@@ -52,11 +52,12 @@ describe("clothing catalog rules", () => {
 
   test("requires an explicit complete server profile before an item can be ordered", () => {
     const configured = {
-      patronusLimit: 5,
+      patronusLimit: 4,
       prices: { Patronus: 10000, Car: 8500, petFace: 8000 },
       package: { width: 35, height: 35, length: 7, weight: 800 },
     };
     expect(isOrderableProfile(configured)).toBe(true);
+    expect(isOrderableProfile({ ...configured, patronusLimit: 5 })).toBe(false);
     expect(isOrderableProfile({ ...configured, prices: { ...configured.prices, Car: null } })).toBe(false);
     expect(isOrderableProfile(null)).toBe(false);
   });

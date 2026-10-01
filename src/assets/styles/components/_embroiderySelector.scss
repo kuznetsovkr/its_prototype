@@ -105,6 +105,11 @@
   }
 }
 
+.embroideryDesktopCounter__button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 @media (max-width: bp.$tablet-max) {
   .App--embroidery {
     overflow-x: clip;
