@@ -240,6 +240,7 @@ export const useEmbroiderySelection = () => {
   }, [selectedType]);
 
   const handleSelectType = (type) => {
+    if (type !== selectedType) setError("");
     setSelectedType(type);
     setPatronusCount(1);
     setPetFaceCount(1);

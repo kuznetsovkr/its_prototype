@@ -16,7 +16,7 @@ import {
   CUSTOM_TEXT_FONTS,
   EMBROIDERY_TYPES as desktopEmbroideryTypes,
   MAX_UPLOAD_MB as MAX_MB,
-  UPLOAD_INSTRUCTIONS as uploadInstructions,
+  getUploadInstructions,
 } from "./embroideryConfig";
 import { MAX_PET_FACE_COUNT } from "./embroideryLimits";
 
@@ -249,7 +249,7 @@ const EmbroideryDesktop = ({
                       )}
                     </div>
                   ) : (
-                    uploadInstructions.map((instruction) => (
+                    getUploadInstructions(selectedType).map((instruction) => (
                       <p key={instruction}>{instruction}</p>
                     ))
                   )}
