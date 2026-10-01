@@ -598,8 +598,20 @@
 .home-questions__dog { object-fit: contain; }
 .home-questions__dog--1-picture { bottom: -35px; left: 22%; width: 316px; height: 316px; }
 .home-questions__dog--1 { width: 100%; height: 100%; }
-.home-questions__dog--2-picture { top: -36px; right: 21%; width: 300px; height: 300px; }
+.home-questions__dog--2-picture { --home-dog-float-delay: -1s; top: -36px; right: 21%; width: 300px; height: 300px; }
 .home-questions__dog--2 { width: 100%; height: 100%; }
+
+.home-questions__dog--1-picture,
+.home-questions__dog--2-picture {
+  --home-dog-float-distance: 25px;
+  animation: home-questions-dog-float 2s ease-in-out infinite;
+  animation-delay: var(--home-dog-float-delay, 0s);
+}
+
+@keyframes home-questions-dog-float {
+  0%, 100% { translate: 0 calc(-1 * var(--home-dog-float-distance)); }
+  50% { translate: 0 var(--home-dog-float-distance); }
+}
 
 .home-social { padding-top: 0; padding-bottom: 40px; }
 .home-social__surface { min-height: 684px; padding: 80px 0; }
@@ -631,6 +643,8 @@
   .home-page .home-works__item { scale: 1; }
   .home-page .home-faq__accordion .home-accordion__panel:not([hidden]) { animation: none; }
   .home-page .home-customers__content { animation: none; }
+  .home-page .home-questions__dog--1-picture,
+  .home-page .home-questions__dog--2-picture { animation: none; translate: 0 0; }
 
   .home-page .home-about__surface,
   .home-page .home-works__surface,

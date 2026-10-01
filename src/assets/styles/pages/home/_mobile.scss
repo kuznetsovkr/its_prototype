@@ -683,6 +683,7 @@
   }
 
   .home-questions__dog--1-picture {
+    --home-dog-float-distance: 10px;
     top: -21px;
     left: calc(50% - 186px);
     display: flex;
@@ -702,6 +703,7 @@
   }
 
   .home-questions__dog--2-picture {
+    --home-dog-float-distance: 10px;
     top: -67px;
     left: calc(50% - 70px);
     display: flex;
