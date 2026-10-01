@@ -1,14 +1,14 @@
-import { joinFullName, normalizePhoneDigits } from "./recipientValidation";
+import { normalizePhoneDigits } from "./recipientValidation";
 
 export const buildOrderFormData = ({
-  userData, deliveryRecipient, orderComment, embroideryComment, email,
-  preferredContact, deliveryComment, city, privacyConsent, productType,
+  userData, deliveryRecipient, recipientPhone, orderComment, embroideryComment, email,
+  preferredContact, deliveryComment, privacyConsent, productType,
   color, size, selectedType, embroideryTypeRu, patronusCount, petFaceCount,
   customText, customTextFont, customOption, pickupPoint, manualAddress, isNoCdek, cdekData,
   uploadedImage, turnstileToken,
 }) => {
   const formData = new FormData();
-  const recipientFullName = deliveryRecipient.trim() || joinFullName(userData);
+  const recipientFullName = deliveryRecipient.trim();
   const comment = orderComment.trim() || String(embroideryComment || "").trim();
   const productTypeName = typeof productType === "object"
     ? productType.name ?? productType.type ?? String(productType)
@@ -19,12 +19,13 @@ export const buildOrderFormData = ({
     lastName: userData.lastName || "",
     middleName: userData.middleName || "",
     phone: userData.phone || "",
-    recipientPhoneDigits: normalizePhoneDigits(userData.phone),
+    recipientPhoneDigits: deliveryRecipient.trim() || String(recipientPhone || "").trim()
+      ? normalizePhoneDigits(recipientPhone)
+      : "",
     recipientFullName,
     email: email.trim(),
     preferredContact: preferredContact.trim(),
     deliveryComment: deliveryComment.trim(),
-    deliveryCity: city.trim(),
     privacyConsent: String(privacyConsent),
     productType: productTypeName,
     color: color || "",

@@ -97,6 +97,86 @@ test("покупатель проходит основной путь и нач�
   await expect(page.locator(".orderNavigation .orderActionButton--next")).toBeDisabled();
 });
 
+test("другой получатель требует телефон, а выбор ПВЗ не требует поля города", async ({ page }, testInfo) => {
+  await startOrder(page);
+  await continueToRecipient(page);
+
+  const submitButton = page.locator(".recipientOrderNavigation__submit");
+  const recipientName = page.locator(".recipientOrderForm__group--recipient input");
+  const recipientPhone = page.getByRole("textbox", { name: "Телефон другого получателя" });
+
+  await expect(page.getByText("Город", { exact: true })).toHaveCount(0);
+  await page.getByPlaceholder("ФИО").fill("Иванов Иван Иванович");
+  await page.getByPlaceholder("Номер телефона").fill("+7 999 123-45-67");
+  await page.locator(".recipientOrderForm__deliveryMethod").click();
+  await page.getByRole("button", { name: "Select demo pickup point" }).click();
+  await page.getByRole("checkbox", { name: /Я даю своё согласие/ }).check();
+  await expect(page.getByTestId("turnstile-panel")).toHaveClass(/is-verified/, { timeout: 20_000 });
+
+  await expect(recipientName).toHaveValue("");
+  await expect(recipientPhone).toHaveValue("");
+  await expect(submitButton).toBeEnabled();
+
+  await recipientName.fill("Петров Пётр Петрович");
+  await expect(submitButton).toBeDisabled();
+  await expect(page.getByText("Укажите корректный телефон получателя")).toBeVisible();
+
+  await recipientPhone.fill("89123456789");
+  await expect(recipientPhone).toHaveValue("+7 (912) 345-67-89");
+  await expect(submitButton).toBeEnabled();
+
+  const expectFormSpacing = async () => {
+    const [nameBox, phoneBox, commentBox, consentBox, turnstileBox] = await Promise.all([
+      recipientName.boundingBox(),
+      recipientPhone.boundingBox(),
+      page.locator(".recipientOrderForm__group--deliveryComment input").boundingBox(),
+      page.locator(".recipientOrderForm__consent").boundingBox(),
+      page.getByTestId("turnstile-panel").boundingBox(),
+    ]);
+    expect(phoneBox.y).toBeGreaterThan(nameBox.y + nameBox.height);
+    expect(commentBox.y).toBeGreaterThan(phoneBox.y + phoneBox.height);
+    expect(turnstileBox.y - (consentBox.y + consentBox.height)).toBeGreaterThanOrEqual(25);
+  };
+  await expectFormSpacing();
+  if (testInfo.project.name === "desktop-chromium") {
+    await page.setViewportSize({ width: 820, height: 1180 });
+    await expectFormSpacing();
+  }
+
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Введите свои данные" })).toBeVisible({ timeout: 20_000 });
+  await expect(recipientName).toHaveValue("Петров Пётр Петрович");
+  await expect(recipientPhone).toHaveValue("+7 (912) 345-67-89");
+
+  await recipientPhone.fill("");
+  await recipientName.fill("");
+  await expect(recipientPhone).toHaveValue("");
+  await expect(submitButton).toBeEnabled();
+});
+
+test("мобильная шапка сохраняет корзину и центр логотипа без избранного", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium", "Проверка мобильной шапки");
+
+  await page.goto("/");
+  const header = page.locator(".home-header").first();
+  const logo = header.locator(".home-header__logo");
+  const bag = header.getByRole("button", { name: "Перейти к заказу" }).first();
+  await expect(header.getByRole("button", { name: "Избранное" })).toHaveCount(0);
+  await expect(bag).toBeVisible();
+
+  const [headerBox, logoBox, bagBox] = await Promise.all([
+    header.boundingBox(),
+    logo.boundingBox(),
+    bag.boundingBox(),
+  ]);
+  expect(Math.abs((logoBox.x + logoBox.width / 2) - (headerBox.x + headerBox.width / 2)))
+    .toBeLessThan(2);
+  expect(headerBox.x + headerBox.width - (bagBox.x + bagBox.width)).toBeLessThanOrEqual(25);
+
+  await bag.click();
+  await expect(page).toHaveURL(/\/order$/);
+});
+
 test("выбор изделия сохраняется при возврате с шага вышивки", async ({ page }) => {
   await startOrder(page);
 
@@ -376,8 +456,9 @@ test("recipient can explicitly place an order without a middle name", async ({ p
   await expect(submitButton).toBeEnabled();
 
   await page.reload();
+  await expect(page.getByRole("heading", { name: "Введите свои данные" })).toBeVisible({ timeout: 20_000 });
   await expect(noMiddleName).toBeChecked();
   await expect(fullName).toHaveValue("Иванов Иван");
   await expect(page.locator(".recipientOrderForm__group--recipient input"))
-    .toHaveValue("Иванов Иван");
+    .toHaveValue("");
 });

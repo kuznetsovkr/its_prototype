@@ -46,4 +46,15 @@ describe("recipient validation", () => {
       hasNoMiddleName: true,
     })).toEqual({ isValid: true, message: "" });
   });
+
+  test("requires a valid phone and name together for another recipient", () => {
+    expect(validateRecipient({ ...validData, deliveryRecipient: "Петров Пётр", recipientPhone: "" }).message)
+      .toContain("телефон другого получателя");
+    expect(validateRecipient({ ...validData, deliveryRecipient: "", recipientPhone: "89001234567" }).message)
+      .toContain("ФИО другого получателя");
+    expect(validateRecipient({ ...validData, deliveryRecipient: "Петров Пётр", recipientPhone: "123" }).isValid)
+      .toBe(false);
+    expect(validateRecipient({ ...validData, deliveryRecipient: "Петров Пётр", recipientPhone: "89001234567" }).isValid)
+      .toBe(true);
+  });
 });

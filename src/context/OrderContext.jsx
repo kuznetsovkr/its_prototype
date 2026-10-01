@@ -66,8 +66,8 @@ const isSameRecipient = (a, b) =>
   (a?.email || "") === (b?.email || "") &&
   (a?.preferredContact || "") === (b?.preferredContact || "") &&
   (a?.orderComment || "") === (b?.orderComment || "") &&
-  (a?.city || "") === (b?.city || "") &&
   (a?.deliveryRecipient || "") === (b?.deliveryRecipient || "") &&
+  (a?.recipientPhone || "") === (b?.recipientPhone || "") &&
   (a?.deliveryComment || "") === (b?.deliveryComment || "") &&
   Boolean(a?.privacyConsent) === Boolean(b?.privacyConsent) &&
   (a?.pickupPoint || "") === (b?.pickupPoint || "") &&
@@ -119,8 +119,8 @@ const initialState = {
     email: "",
     preferredContact: "",
     orderComment: "",
-    city: "",
     deliveryRecipient: "",
+    recipientPhone: "",
     deliveryComment: "",
     privacyConsent: false,
     pickupPoint: "",

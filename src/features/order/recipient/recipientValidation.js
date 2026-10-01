@@ -40,6 +40,8 @@ export const hasFullManualAddress = (manualAddress) => {
 
 export const validateRecipient = ({
   userData,
+  deliveryRecipient = "",
+  recipientPhone = "",
   hasNoMiddleName = false,
   isNoCdek,
   manualAddress,
@@ -61,6 +63,12 @@ export const validateRecipient = ({
   const phoneDigits = cleanPhone(userData.phone);
   const isPhoneValid = phoneDigits.length === 11 && phoneDigits.startsWith("7");
   if (!isPhoneValid) missing.push("корректный телефон");
+  const hasOtherRecipient = Boolean(deliveryRecipient.trim() || recipientPhone.trim());
+  if (hasOtherRecipient && !deliveryRecipient.trim()) missing.push("ФИО другого получателя");
+  if (hasOtherRecipient) {
+    const otherPhoneDigits = normalizePhoneDigits(recipientPhone);
+    if (!/^7\d{10}$/.test(otherPhoneDigits)) missing.push("корректный телефон другого получателя");
+  }
   if (!privacyConsent) missing.push("согласие на обработку данных");
 
   const last = missing.at(-1);

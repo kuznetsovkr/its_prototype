@@ -80,12 +80,13 @@ export const useRecipientDetails = () => {
   const [email, setEmail] = useState(recipientState.email || "");
   const [preferredContact, setPreferredContact] = useState(recipientState.preferredContact || "");
   const [orderComment, setOrderComment] = useState(recipientState.orderComment || comment || "");
-  const [city, setCity] = useState(recipientState.city || "");
   const [deliveryRecipient, setDeliveryRecipient] = useState(
-    recipientState.deliveryRecipient || joinFullName(
-      recipientState.userData || (IS_DEMO_MODE ? DEMO_RECIPIENT_DATA : {})
-    )
+    recipientState.deliveryRecipient && (
+      recipientState.recipientPhone ||
+      recipientState.deliveryRecipient !== joinFullName(recipientState.userData)
+    ) ? recipientState.deliveryRecipient : ""
   );
+  const [recipientPhone, setRecipientPhone] = useState(recipientState.recipientPhone || "");
   const [deliveryComment, setDeliveryComment] = useState(recipientState.deliveryComment || "");
   const [privacyConsent, setPrivacyConsent] = useState(Boolean(recipientState.privacyConsent));
   const [isCdekPickerOpen, setIsCdekPickerOpen] = useState(false);
@@ -185,8 +186,8 @@ export const useRecipientDetails = () => {
       email: recipientState.email || "",
       preferredContact: recipientState.preferredContact || "",
       orderComment: recipientState.orderComment || "",
-      city: recipientState.city || "",
       deliveryRecipient: recipientState.deliveryRecipient || "",
+      recipientPhone: recipientState.recipientPhone || "",
       deliveryComment: recipientState.deliveryComment || "",
       privacyConsent: Boolean(recipientState.privacyConsent),
     };
@@ -204,8 +205,8 @@ export const useRecipientDetails = () => {
       email,
       preferredContact,
       orderComment,
-      city,
       deliveryRecipient,
+      recipientPhone,
       deliveryComment,
       privacyConsent,
     };
@@ -228,8 +229,8 @@ export const useRecipientDetails = () => {
       local.email === stored.email &&
       local.preferredContact === stored.preferredContact &&
       local.orderComment === stored.orderComment &&
-      local.city === stored.city &&
       local.deliveryRecipient === stored.deliveryRecipient &&
+      local.recipientPhone === stored.recipientPhone &&
       local.deliveryComment === stored.deliveryComment &&
       local.privacyConsent === stored.privacyConsent
     );
@@ -247,8 +248,8 @@ export const useRecipientDetails = () => {
     email,
     preferredContact,
     orderComment,
-    city,
     deliveryRecipient,
+    recipientPhone,
     deliveryComment,
     privacyConsent,
     recipientState,
@@ -268,8 +269,8 @@ export const useRecipientDetails = () => {
       email,
       preferredContact,
       orderComment,
-      city,
       deliveryRecipient,
+      recipientPhone,
       deliveryComment,
       privacyConsent,
     });
@@ -288,8 +289,8 @@ export const useRecipientDetails = () => {
     email,
     preferredContact,
     orderComment,
-    city,
     deliveryRecipient,
+    recipientPhone,
     deliveryComment,
     privacyConsent,
     setRecipient,
@@ -347,13 +348,17 @@ export const useRecipientDetails = () => {
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleRecipientPhoneChange = (event) => {
+    const value = event.target.value;
+    setRecipientPhone(/\d/.test(value) ? formatPhoneNumber(value) : "");
+  };
+
   const handleFullNameChange = (event) => {
     const value = event.target.value;
     const parsedName = splitFullName(value);
     if (hasNoMiddleName && parsedName.middleName) {
       setHasNoMiddleName(false);
     }
-    setDeliveryRecipient((current) => (!current || current === fullNameInput ? value : current));
     setFullNameInput(value);
     setUserData((current) => ({ ...current, ...parsedName }));
   };
@@ -367,9 +372,6 @@ export const useRecipientDetails = () => {
     const nextFullName = joinFullName(nextUserData);
     setUserData(nextUserData);
     setFullNameInput(nextFullName);
-    setDeliveryRecipient((current) => (
-      !current || current === fullNameInput ? nextFullName : current
-    ));
   };
 
   const cdekOfficeCode = String(
@@ -450,6 +452,8 @@ export const useRecipientDetails = () => {
 
   const recipientValidation = validateRecipient({
     userData,
+    deliveryRecipient,
+    recipientPhone,
     hasNoMiddleName,
     isNoCdek,
     manualAddress,
@@ -485,7 +489,6 @@ export const useRecipientDetails = () => {
     setCdekData(payload || null);
     setIsNoCdek(false);
     setManualAddress(null);
-    setCity((current) => current || payload?.address?.city || payload?.address?.location?.city || "");
     setIsCdekPickerOpen(false);
   };
 
@@ -521,8 +524,8 @@ export const useRecipientDetails = () => {
     if (draftOrder?.orderId && draftOrder?.orderToken) return draftOrder;
     try {
       const data = await createOrder(buildOrderFormData({
-        userData, deliveryRecipient, orderComment, embroideryComment: comment,
-        email, preferredContact, deliveryComment, city, privacyConsent,
+        userData, deliveryRecipient, recipientPhone, orderComment, embroideryComment: comment,
+        email, preferredContact, deliveryComment, privacyConsent,
         productType, color, size, selectedType, embroideryTypeRu,
         patronusCount, petFaceCount, customText, customTextFont, customOption, pickupPoint,
         manualAddress, isNoCdek, cdekData, uploadedImage, turnstileToken: turnstile.token,
@@ -679,9 +682,9 @@ export const useRecipientDetails = () => {
     hasNoMiddleName, handleNoMiddleNameToggle,
     userData, handleInputChange, email, setEmail, isMobileLayout,
     preferredContact, setPreferredContact, orderComment, setOrderComment,
-    city, setCity, isCdekPickerOpen, setIsCdekPickerOpen,
+    isCdekPickerOpen, setIsCdekPickerOpen,
     pickupPoint, setPickupPoint, setDeliveryPrice, isNoCdek,
-    isCdekPickupSelected, deliveryRecipient, setDeliveryRecipient,
+    isCdekPickupSelected, deliveryRecipient, setDeliveryRecipient, recipientPhone, handleRecipientPhoneChange,
     deliveryComment, setDeliveryComment, privacyConsent, setPrivacyConsent,
     error, handlePayment, isFormValid, canSubmit, getMissingFieldsMessage,
     getSubmitDisabledMessage, checkoutQuote, checkoutQuoteLoading, checkoutQuoteError,

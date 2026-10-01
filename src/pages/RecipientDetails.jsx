@@ -5,6 +5,7 @@ import "react-dadata/dist/react-dadata.css";
 import { IS_DEMO_MODE } from "../config/demoMode";
 import { MEDIA_QUERIES } from "../config/breakpoints";
 import { useRecipientDetails } from "../features/order/recipient/useRecipientDetails";
+import { normalizePhoneDigits } from "../features/order/recipient/recipientValidation";
 import TurnstilePanel from "../components/TurnstilePanel";
 import recipientBackIcon from "../images/order/recipient-back.svg";
 import orderBackIconTablet from "../images/order/order-back-tablet.svg";
@@ -24,9 +25,10 @@ const RecipientDetails = () => {
     hasNoMiddleName, handleNoMiddleNameToggle,
     userData, handleInputChange, email, setEmail, isMobileLayout,
     preferredContact, setPreferredContact, orderComment, setOrderComment,
-    city, setCity, isCdekPickerOpen, setIsCdekPickerOpen,
+    isCdekPickerOpen, setIsCdekPickerOpen,
     pickupPoint, setPickupPoint, setDeliveryPrice, isNoCdek,
     isCdekPickupSelected, deliveryRecipient, setDeliveryRecipient,
+    recipientPhone, handleRecipientPhoneChange,
     deliveryComment, setDeliveryComment, privacyConsent, setPrivacyConsent,
     error, handlePayment, canSubmit, getSubmitDisabledMessage,
     handleCdekSelect, applyDemoPickup, handleNoCdekToggle,
@@ -40,6 +42,8 @@ const RecipientDetails = () => {
     ? ` has-turnstile${turnstile.token ? " is-turnstile-verified" : ""}`
     : "";
   const formatPrice = (value) => `${priceFormatter.format(Number(value))} ₽`;
+  const recipientPhoneInvalid = Boolean(deliveryRecipient.trim()) &&
+    !/^7\d{10}$/.test(normalizePhoneDigits(recipientPhone));
 
   useEffect(() => {
     if (!isCdekPickerOpen) return undefined;
@@ -169,17 +173,6 @@ const RecipientDetails = () => {
                   Доставка
                 </h2>
 
-                <label className="recipientOrderForm__group recipientOrderForm__group--city">
-                  <span>Город</span>
-                  <input
-                    type="text"
-                    placeholder={isMobileLayout ? "Санкт - Петербург" : "Санкт-Петербург"}
-                    value={city}
-                    onChange={(event) => setCity(event.target.value)}
-                    disabled={formDisabled}
-                  />
-                </label>
-
                 <button
                   type="button"
                   className="recipientOrderForm__deliveryMethod"
@@ -231,16 +224,37 @@ const RecipientDetails = () => {
 
                 <label className="recipientOrderForm__group recipientOrderForm__group--recipient">
                   <span>
-                    {hasNoMiddleName ? "Получатель (фамилия и имя)" : "Получатель (ФИО полностью)"}
+                    Другой получатель (ФИО, если отличается)
                   </span>
                   <input
                     type="text"
-                    autoComplete="name"
-                    placeholder={hasNoMiddleName ? "Иванов Иван" : "Иванов Иван Иванович"}
+                    autoComplete="shipping name"
+                    placeholder="Иванов Иван Иванович"
                     value={deliveryRecipient}
                     onChange={(event) => setDeliveryRecipient(event.target.value)}
                     disabled={formDisabled}
                   />
+                </label>
+
+                <label className="recipientOrderForm__group recipientOrderForm__group--recipientPhone">
+                  <span>Телефон другого получателя</span>
+                  <input
+                    type="tel"
+                    autoComplete="shipping tel"
+                    placeholder="+7 (999) 123-45-67"
+                    value={recipientPhone}
+                    onChange={handleRecipientPhoneChange}
+                    disabled={formDisabled}
+                    maxLength={18}
+                    required={Boolean(deliveryRecipient.trim())}
+                    aria-invalid={recipientPhoneInvalid}
+                    aria-describedby={recipientPhoneInvalid ? "recipient-phone-validation" : undefined}
+                  />
+                  {recipientPhoneInvalid && (
+                    <small className="recipientOrderForm__validation" id="recipient-phone-validation">
+                      Укажите корректный телефон получателя
+                    </small>
+                  )}
                 </label>
 
                 <label className="recipientOrderForm__group recipientOrderForm__group--deliveryComment">
