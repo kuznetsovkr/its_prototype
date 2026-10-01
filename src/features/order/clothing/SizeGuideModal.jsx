@@ -1,19 +1,12 @@
-import { createPortal } from "react-dom";
-
+import OrderModal from "../shared/OrderModal";
 import { SIZE_CHARTS, SIZE_COLUMNS } from "./clothingCatalog";
 
-const SizeGuideModal = ({ chartKey, options = [], onChartChange, onClose }) => {
+const SizeGuideModal = ({ chartKey, options = [], onChartChange, onClose, returnFocusTo }) => {
   const chart = SIZE_CHARTS[chartKey] || SIZE_CHARTS.default;
   const hasSizeGuide = chart.rows.length > 0;
 
-  return createPortal(
-    <div className="modalOverlay" onClick={onClose}>
-      <div className="modalContent" onClick={(event) => event.stopPropagation()}>
-        <button type="button" className="modalClose" aria-label="Закрыть таблицу размеров" onClick={onClose}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
-            <path d="M16.5 0.5L0.5 16.5M16.5 16.5L0.5 0.5" stroke="#433F3C" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
+  return (
+    <OrderModal label="Таблица размеров" closeLabel="Закрыть таблицу размеров" onClose={onClose} returnFocusTo={returnFocusTo}>
         <div className="modalHeader">
           {options.map(({ key, label }) => (
             <button
@@ -52,9 +45,7 @@ const SizeGuideModal = ({ chartKey, options = [], onChartChange, onClose }) => {
             </div>
           )}
         </div>
-      </div>
-    </div>,
-    document.body
+    </OrderModal>
   );
 };
 

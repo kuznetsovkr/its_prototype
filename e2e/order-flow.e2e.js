@@ -61,12 +61,68 @@ const startOrder = async (page) => {
 const continueToRecipient = async (page) => {
   await expect(page.getByRole("heading", { name: "Выберите тип вышивки" })).toBeVisible({ timeout: 20_000 });
   if (await page.locator('input[name="embroideryTypeDesktop"]:checked').count() === 0) {
-    await page.locator('.embroideryDesktopChoice:has(input[value="Patronus"])').click();
+    await page.locator('.embroideryDesktopChoice:has(input[value="Patronus"]) .embroideryDesktopChoice__select').click();
   }
   await page.locator(".embroiderySelectorDesktop__navigation .is-next").click();
   await expect(page).toHaveURL(/\/recipient$/);
   await expect(page.getByRole("heading", { name: "Введите свои данные" })).toBeVisible();
 };
+
+test("примеры работ открываются с клавиатуры и закрываются без изменения выбора", async ({ page }) => {
+  await startOrder(page);
+
+  const choice = page.locator('.embroideryDesktopChoice:has(input[value="Patronus"])');
+  const trigger = choice.getByRole("button", { name: "пример работы" });
+  const dialog = page.getByRole("dialog", { name: "Примеры работ" });
+  const close = dialog.getByRole("button", { name: "Закрыть окно" });
+
+  await trigger.focus();
+  await page.keyboard.press("Enter");
+  await expect(dialog).toBeVisible();
+  await expect(close).toBeFocused();
+  await expect(dialog.locator("img")).toHaveCount(5);
+  await expect.poll(() => dialog.locator("img").evaluateAll((images) =>
+    images.every((image) => image.complete && image.naturalWidth > 0))).toBe(true);
+  const modalBox = await dialog.boundingBox();
+  const viewportWidth = await page.evaluate(() => window.innerWidth);
+  expect(modalBox.x).toBeGreaterThanOrEqual(0);
+  expect(modalBox.x + modalBox.width).toBeLessThanOrEqual(viewportWidth + 1);
+  for (const image of await dialog.locator("img").all()) {
+    const box = await image.boundingBox();
+    expect(Math.abs(box.width - box.height)).toBeLessThanOrEqual(2);
+  }
+  await expect(choice.locator("input")).not.toBeChecked();
+  await expect(page.locator("body")).toHaveCSS("overflow", "hidden");
+
+  await page.keyboard.press("Tab");
+  await expect(close).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe("");
+
+  await trigger.click();
+  await close.click();
+  await expect(dialog).toHaveCount(0);
+
+  await trigger.click();
+  await page.locator(".modalOverlay").click({ position: { x: 5, y: 5 } });
+  await expect(dialog).toHaveCount(0);
+});
+
+test("таблица размеров использует общую модалку и возвращает фокус", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium", "Таблица размеров скрыта на мобильном макете");
+  await page.goto("/order");
+  const trigger = page.getByRole("button", { name: "Таблица размеров" });
+  await trigger.focus();
+  await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog", { name: "Таблица размеров" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Закрыть таблицу размеров" })).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+});
 
 test("цена появляется только после выбора типа и скрывается после сброса", async ({ page }) => {
   await page.goto("/order");
@@ -78,8 +134,8 @@ test("цена появляется только после выбора тип�
 
   const price = page.locator(".embroiderySelectorDesktop__price");
   const next = page.locator(".embroiderySelectorDesktop__navigation .is-next");
-  const patronus = page.locator('.embroideryDesktopChoice:has(input[value="Patronus"])');
-  const petFace = page.locator('.embroideryDesktopChoice:has(input[value="petFace"])');
+  const patronus = page.locator('.embroideryDesktopChoice:has(input[value="Patronus"]) .embroideryDesktopChoice__select');
+  const petFace = page.locator('.embroideryDesktopChoice:has(input[value="petFace"]) .embroideryDesktopChoice__select');
   const counter = page.locator(".embroideryDesktopCounter");
 
   await expect(price).toHaveCount(0);
@@ -123,7 +179,7 @@ test("цена появляется только после выбора тип�
   await expect(price).toContainText(/16\s*000 руб/);
   await expect(counter.locator(".embroideryDesktopCounter__value")).toHaveText("5 шт");
 
-  await page.locator('.embroideryDesktopChoice:has(input[value="Car"])').click();
+  await page.locator('.embroideryDesktopChoice:has(input[value="Car"]) .embroideryDesktopChoice__select').click();
   await expect(counter).toHaveCount(0);
   await expect(price).toContainText(/8\s*500 руб/);
 });
@@ -345,7 +401,7 @@ test("order steps preserve the current scroll position", async ({ page }, testIn
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(clothingScrollPosition);
 
   const embroideryNext = page.locator(".embroiderySelectorDesktop__navigation .is-next");
-  await page.locator('.embroideryDesktopChoice:has(input[value="Patronus"])').click();
+  await page.locator('.embroideryDesktopChoice:has(input[value="Patronus"]) .embroideryDesktopChoice__select').click();
   await expect(embroideryNext).toBeEnabled();
   await page.evaluate(() => window.scrollTo(0, 300));
   const embroideryScrollPosition = await page.evaluate(() => window.scrollY);

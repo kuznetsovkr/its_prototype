@@ -31,6 +31,7 @@ const EmbroideryDesktop = ({
   onTypeSelect: handleDesktopType,
   onBack: handleDesktopBack,
   onNext: handleDesktopNext,
+  onOpenExamples,
 }) => {
   const {
     clothingPreviewSrc, clothingPreviewAlt,
@@ -149,7 +150,8 @@ const EmbroideryDesktop = ({
               <div className="embroideryDesktopChoices">
                 {desktopEmbroideryTypes.map((option) => (
                   <React.Fragment key={option.value}>
-                    <label className="embroideryDesktopChoice">
+                    <div className="embroideryDesktopChoice">
+                      <label className="embroideryDesktopChoice__select">
                       <input
                         type="radio"
                         name="embroideryTypeDesktop"
@@ -183,15 +185,18 @@ const EmbroideryDesktop = ({
                         />
                       </picture>
                       <span className="embroideryDesktopChoice__label">{option.label}</span>
+                      </label>
                       {option.hasExample && (
-                        <span className="embroideryDesktopChoice__example">пример работы</span>
+                        <button type="button" className="embroideryDesktopChoice__example" onClick={onOpenExamples} aria-haspopup="dialog">
+                          пример работы
+                        </button>
                       )}
                       {option.value === "custom" && (
                         <span className="embroideryDesktopChoice__note">
                           ( стоимость рассчитает менеджер )
                         </span>
                       )}
-                    </label>
+                    </div>
 
                     {option.value === "Patronus" && selectedType === "Patronus" &&
                       renderDesktopCounter(patronusCount, setPatronusCount, patronusLimit)}

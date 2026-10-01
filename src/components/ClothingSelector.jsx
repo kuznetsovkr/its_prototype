@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import checkIcon from "../images/Vector.svg";
 import orderBackMobile from "../images/order/order-back-mobile.svg";
@@ -9,6 +9,7 @@ import { useClothingSelection } from "../features/order/clothing/useClothingSele
 const ClothingSelector = () => {
   const navigate = useNavigate();
   const [showSizeModal, setShowSizeModal] = useState(false);
+  const sizeGuideTriggerRef = useRef(null);
   const [chartKey, setChartKey] = useState("default");
   const {
     selectedClothing, selectedColor, selectedSize,
@@ -19,7 +20,8 @@ const ClothingSelector = () => {
     handleSelectClothing, handleSelectColor,
   } = useClothingSelection();
 
-  const openSizeGuide = () => {
+  const openSizeGuide = (event) => {
+    sizeGuideTriggerRef.current = event.currentTarget;
     setChartKey(selectedTypeProfile?.sizeGuideKey || "default");
     setShowSizeModal(true);
   };
@@ -95,7 +97,7 @@ const ClothingSelector = () => {
             <div className="selectorGroup selectorGroup--size">
               <div className="selectorGroup__heading">
                 <p className="title">Размер</p>
-                <div className="tableSize" onClick={openSizeGuide}>Таблица размеров</div>
+                <button type="button" className="tableSize" onClick={openSizeGuide}>Таблица размеров</button>
               </div>
               <div className={`sizeSelector${sizeOptions.length > 5 ? " sizeSelector--six" : ""}`}>
                 {sizeOptions.map((size) => {
@@ -124,6 +126,7 @@ const ClothingSelector = () => {
           options={sizeGuideOptions}
           onChartChange={setChartKey}
           onClose={() => setShowSizeModal(false)}
+          returnFocusTo={sizeGuideTriggerRef.current}
         />
       )}
     </>

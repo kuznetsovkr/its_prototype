@@ -2,11 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IS_DEMO_MODE } from "../config/demoMode";
 import EmbroideryDesktop from "../features/order/embroidery/EmbroideryDesktop";
+import WorkExamplesModal from "../features/order/embroidery/WorkExamplesModal";
 import { useEmbroiderySelection } from "../features/order/embroidery/useEmbroiderySelection";
 
 const EmbroiderySelector = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const examplesTriggerRef = useRef(null);
   const selection = useEmbroiderySelection();
   const {
     selectedType, setCustomText, setUploadedImage,
@@ -16,6 +18,7 @@ const EmbroiderySelector = () => {
     selectedType === "custom" && customOption.text ? "text" : "image"
   );
   const [desktopDetailsOpen, setDesktopDetailsOpen] = useState(false);
+  const [showWorkExamples, setShowWorkExamples] = useState(false);
 
   useEffect(() => {
     const nextTab = selectedType === "custom" && customOption.text ? "text" : "image";
@@ -99,7 +102,12 @@ const EmbroiderySelector = () => {
         onTypeSelect={handleDesktopType}
         onBack={handleDesktopBack}
         onNext={handleDesktopNext}
+        onOpenExamples={(event) => {
+          examplesTriggerRef.current = event.currentTarget;
+          setShowWorkExamples(true);
+        }}
       />
+      {showWorkExamples && <WorkExamplesModal onClose={() => setShowWorkExamples(false)} returnFocusTo={examplesTriggerRef.current} />}
     </>
   );
 };

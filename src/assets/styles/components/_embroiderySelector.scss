@@ -1,5 +1,29 @@
 @use "../base/breakpoints" as bp;
 
+.embroideryDesktopChoice__select {
+  position: relative;
+  display: flex;
+  height: 100%;
+  align-items: center;
+  cursor: pointer;
+}
+
+button.embroideryDesktopChoice__example {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  line-height: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid #bc5823;
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
 .embroiderySelectorDesktop {
   display: none;
 }

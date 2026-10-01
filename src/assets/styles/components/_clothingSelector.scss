@@ -179,6 +179,10 @@
 
       .tableSize {
         cursor: pointer;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        text-align: left;
         margin-top: 20px;
         font-family: 'Raleway', sans-serif;
         font-weight: 400;
@@ -187,6 +191,11 @@
         text-decoration-thickness: 1px;
         text-decoration-skip-ink: none;
         color: rgba(18, 19, 25, 0.8);
+
+        &:focus-visible {
+          outline: 2px solid #bc5823;
+          outline-offset: 3px;
+        }
       }
     }
   }
@@ -408,6 +417,12 @@
 .modalClose:hover {
   background: rgba(18, 19, 25, 0.06);
 }
+
+.modalClose:focus-visible {
+  outline: 2px solid #bc5823;
+  outline-offset: 2px;
+}
+
 
 .sizeTable {
   table {
