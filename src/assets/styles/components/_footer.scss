@@ -61,6 +61,11 @@
   transform: translateX(-50%);
 }
 
+@keyframes home-footer-glow-pulse {
+  0%, 100% { scale: 0.92; opacity: 0.65; }
+  50% { scale: 1.08; opacity: 1; }
+}
+
 .home-footer__glow {
   position: absolute;
   top: -250px;
@@ -70,6 +75,12 @@
   max-width: none;
   height: 709px;
   transform: none;
+  animation: home-footer-glow-pulse 2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-footer__glow { animation: none; opacity: 1; scale: 1; }
 }
 
 .home-footer__illustration-picture {
