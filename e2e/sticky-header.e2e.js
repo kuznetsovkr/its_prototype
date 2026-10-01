@@ -47,20 +47,27 @@ for (const viewport of viewports) {
   });
 }
 
-test("шапка внутренней страницы сохраняет место в потоке и прилипает при прокрутке", async ({ page }, testInfo) => {
-  await page.goto("/certificate");
+for (const viewport of viewports) {
+  test(`шапка внутренних страниц уходит при прокрутке: ${viewport.name}`, async ({ page }, testInfo) => {
+    test.skip(
+      viewport.name === "mobile"
+        ? testInfo.project.name !== "mobile-chromium"
+        : testInfo.project.name !== "desktop-chromium",
+      "Проверяем ширину в соответствующем браузерном режиме",
+    );
 
-  const header = page.locator(".home-header--standalone");
-  const initialTop = (await header.boundingBox()).y;
-  const stickyTop = testInfo.project.name === "mobile-chromium" ? 0 : 10;
-  if (stickyTop === 0) {
-    expect(initialTop).toBe(0);
-  } else {
-    expect(initialTop).toBeGreaterThan(stickyTop);
-  }
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await page.goto("/certificate");
 
-  await page.evaluate(() => window.scrollTo(0, 800));
-  expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
-  await expect.poll(async () => (await header.boundingBox()).y).toBeCloseTo(stickyTop, 0);
-  await expect(header).toBeInViewport();
-});
+    const header = page.locator(".home-header--standalone");
+    const initialTop = (await header.boundingBox()).y;
+    expect(initialTop).toBeGreaterThanOrEqual(0);
+    await expect(header).toHaveCSS("position", "relative");
+
+    await page.evaluate(() => window.scrollTo(0, 800));
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
+    await expect.poll(async () => (await header.boundingBox()).y).toBeLessThan(0);
+    await expect(header).not.toBeInViewport();
+    await expect(header).not.toHaveClass(/home-header--scrolled/);
+  });
+}

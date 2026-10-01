@@ -43,12 +43,14 @@ const HomeHeader = ({
   const previousLocationKeyRef = useRef(locationKey);
 
   useEffect(() => {
+    if (standalone) return undefined;
+
     const updateScrolled = () => setIsScrolled(window.scrollY > 40);
 
     updateScrolled();
     window.addEventListener("scroll", updateScrolled, { passive: true });
     return () => window.removeEventListener("scroll", updateScrolled);
-  }, []);
+  }, [standalone]);
 
   useEffect(() => {
     if (previousLocationKeyRef.current === locationKey) return;
