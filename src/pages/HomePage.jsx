@@ -42,16 +42,10 @@ const HomePage = () => {
     },
   };
 
-  const aboutAssets = {
-    primary: {
-      desktop: homeAssets.desktop.about.photo,
-      tablet: homeAssets.tablet.about.photo,
-      mobile: homeAssets.mobile.about.photoLayers[0],
-    },
-    overlay: {
-      mobile: homeAssets.mobile.about.photoLayers[1],
-    },
-  };
+  const aboutPhotos = [
+    { kind: "woman", src: homeAssets.mobile.about.photoLayers[1] },
+    { kind: "dog", src: homeAssets.desktop.about.photo },
+  ];
 
   const worksAssets = {
     initialItems: breakpoint === "desktop"
@@ -95,7 +89,7 @@ const HomePage = () => {
       <Header onOrder={handleOrder} standalone={false} />
       <main className="home-main">
         <HeroSection assets={heroAssets} onOrder={handleOrder} />
-        <AboutSection assets={aboutAssets} onOrder={handleOrder} />
+        <AboutSection photos={aboutPhotos} onOrder={handleOrder} />
 
         <ProcessSection
           assets={{

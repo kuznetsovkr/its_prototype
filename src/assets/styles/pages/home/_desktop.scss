@@ -61,22 +61,9 @@
 
   .home-about__order { height: 54px; }
 
-  .home-about__photo,
-  .home-about__photo-image-picture {
+  .home-about__photo {
     display: block;
     overflow: hidden;
-  }
-
-  .home-page .home-about__photo-overlay { display: none; }
-
-  .home-about__photo-image {
-    position: absolute;
-    top: -56.61%;
-    left: 0;
-    width: 100%;
-    max-width: none;
-    height: 206.15%;
-    object-fit: fill;
   }
 
   .home-process__visual {

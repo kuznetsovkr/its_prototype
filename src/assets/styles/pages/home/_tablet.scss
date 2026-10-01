@@ -125,19 +125,15 @@
   .home-about__text p + p { margin-top: 5px; }
   .home-about__order { height: 36px; margin-top: auto; }
 
-  .home-about__photo,
-  .home-about__photo-image-picture {
+  .home-about__photo {
     height: 100%;
     border-radius: 20px;
   }
 
-  .home-about__photo-image {
+  .home-about__photo-slide--woman .home-about__photo-image {
     top: -5.26%;
     left: 0.08%;
     width: 113.55%;
-    max-width: none;
-    height: 168.86%;
-    object-fit: fill;
   }
 
   .home-process__surface { height: 862px; min-height: 0; padding: 30px; }
