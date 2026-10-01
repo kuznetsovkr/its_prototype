@@ -9,7 +9,7 @@
   --home-dark: #1d1d1d;
   --home-font-body: "Jost", "Arial", sans-serif;
 
-  position: absolute;
+  position: fixed;
   z-index: 20;
   top: 70px;
   left: 50%;
@@ -118,8 +118,8 @@
 .home-header__menu { display: none; }
 
 .home-header.home-header--standalone {
-  position: relative;
-  top: auto;
+  position: sticky;
+  top: 10px;
   left: auto;
   flex: 0 0 auto;
   margin: 30px auto 24px;
@@ -164,7 +164,7 @@
   }
 
   .home-header.home-header--standalone {
-    top: auto;
+    top: 10px;
     margin: 10px auto;
   }
 }
@@ -172,8 +172,8 @@
 @media (max-width: bp.$mobile-max) {
   .home-header,
   .home-header.home-header--standalone {
-    position: relative;
-    top: auto;
+    position: sticky;
+    top: 0;
     left: auto;
     width: 100%;
     height: 66px;
@@ -429,6 +429,11 @@
     text-transform: uppercase;
     white-space: nowrap;
   }
+}
+
+.home-header--scrolled .home-header__link,
+.home-header--scrolled .home-header__order {
+  box-shadow: 0 0 0 1px var(--home-white);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -34,12 +34,21 @@ const HomeHeader = ({
   standalone = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const headerRef = useRef(null);
   const menuRef = useRef(null);
   const triggerRef = useRef(null);
   const shouldRestoreTriggerFocusRef = useRef(true);
   const { key: locationKey } = useLocation();
   const previousLocationKeyRef = useRef(locationKey);
+
+  useEffect(() => {
+    const updateScrolled = () => setIsScrolled(window.scrollY > 40);
+
+    updateScrolled();
+    window.addEventListener("scroll", updateScrolled, { passive: true });
+    return () => window.removeEventListener("scroll", updateScrolled);
+  }, []);
 
   useEffect(() => {
     if (previousLocationKeyRef.current === locationKey) return;
@@ -245,7 +254,7 @@ const HomeHeader = ({
 
   return (
     <header
-      className={`home-header${standalone ? " home-header--standalone" : ""}${isOpen ? " home-header--menu-open" : ""}`}
+      className={`home-header${standalone ? " home-header--standalone" : ""}${isScrolled ? " home-header--scrolled" : ""}${isOpen ? " home-header--menu-open" : ""}`}
       ref={headerRef}
     >
       <div className="home-header__bar">
