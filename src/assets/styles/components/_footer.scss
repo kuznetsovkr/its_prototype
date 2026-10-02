@@ -79,14 +79,12 @@
   transform-origin: center;
 }
 
+// The home page caps all images at 100%; keep the glow at its shared asset width.
+.home-page .home-footer__glow { max-width: none; }
+
 @media (min-width: bp.$tablet-min) {
   // The gray glow is intended for the dark footer; make it visible on orange.
   .home-footer--home .home-footer__glow { filter: brightness(0) invert(1); }
-}
-
-@media (min-width: bp.$desktop-min) {
-  // Keep the halo centered on the illustration instead of below it.
-  .home-footer--home .home-footer__glow-picture { top: 100px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

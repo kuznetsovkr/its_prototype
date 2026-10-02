@@ -54,24 +54,46 @@ for (const viewport of viewports) {
   });
 }
 
-test("orange footer glow is centered on the illustration without changing the dark footer", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "desktop-chromium", "Desktop and tablet widths are checked in Chromium");
+test("home footer glow uses the same centered geometry as the dark footer", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium", "All widths are checked in Chromium");
+  await page.emulateMedia({ reducedMotion: "reduce" });
 
-  for (const width of [1440, 1024]) {
+  for (const [width, expectedGlowWidth] of [[1440, 992], [1024, 900], [390, 625]]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
 
-    await expect(page.locator(".home-footer__glow")).toHaveCSS("filter", "brightness(0) invert(1)");
-
-    const offset = await page.locator(".home-footer").evaluate((footer) => {
-      const glow = footer.querySelector(".home-footer__glow-picture").getBoundingClientRect();
-      const illustration = footer.querySelector(".home-footer__illustration-picture").getBoundingClientRect();
-      return Math.abs(glow.top + glow.height / 2 - illustration.top - illustration.height / 2);
+    const homeGlow = page.locator(".home-footer__glow");
+    await expect(homeGlow).toHaveCSS("filter", width >= 768 ? "brightness(0) invert(1)" : "none");
+    const homeGeometry = await page.locator(".home-footer").evaluate((footer) => {
+      const panel = footer.querySelector(".home-footer__panel").getBoundingClientRect();
+      const picture = footer.querySelector(".home-footer__glow-picture").getBoundingClientRect();
+      const glow = footer.querySelector(".home-footer__glow").getBoundingClientRect();
+      return {
+        pictureTop: picture.top - panel.top,
+        pictureCenterX: picture.left + picture.width / 2,
+        glowCenterX: glow.left + glow.width / 2,
+        glowWidth: glow.width,
+      };
     });
-    expect(offset).toBeLessThan(20);
+    expect(homeGeometry.glowWidth).toBeCloseTo(expectedGlowWidth, 0);
+    expect(homeGeometry.glowCenterX).toBeCloseTo(homeGeometry.pictureCenterX, 0);
 
     await page.goto("/certificate");
     await expect(page.locator(".home-footer__glow")).toHaveCSS("filter", "none");
+    const internalGeometry = await page.locator(".home-footer").evaluate((footer) => {
+      const panel = footer.querySelector(".home-footer__panel").getBoundingClientRect();
+      const picture = footer.querySelector(".home-footer__glow-picture").getBoundingClientRect();
+      const glow = footer.querySelector(".home-footer__glow").getBoundingClientRect();
+      return {
+        pictureTop: picture.top - panel.top,
+        pictureCenterX: picture.left + picture.width / 2,
+        glowCenterX: glow.left + glow.width / 2,
+        glowWidth: glow.width,
+      };
+    });
+    expect(homeGeometry.pictureTop).toBeCloseTo(internalGeometry.pictureTop, 0);
+    expect(homeGeometry.glowWidth).toBeCloseTo(internalGeometry.glowWidth, 0);
+    expect(internalGeometry.glowCenterX).toBeCloseTo(internalGeometry.pictureCenterX, 0);
   }
 });
 
