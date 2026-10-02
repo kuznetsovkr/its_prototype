@@ -79,6 +79,16 @@
   transform-origin: center;
 }
 
+@media (min-width: bp.$tablet-min) {
+  // The gray glow is intended for the dark footer; make it visible on orange.
+  .home-footer--home .home-footer__glow { filter: brightness(0) invert(1); }
+}
+
+@media (min-width: bp.$desktop-min) {
+  // Keep the halo centered on the illustration instead of below it.
+  .home-footer--home .home-footer__glow-picture { top: 100px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .home-footer__glow { animation: none; opacity: 1; scale: 1; }
 }

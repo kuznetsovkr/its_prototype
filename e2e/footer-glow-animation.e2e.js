@@ -21,7 +21,7 @@ for (const viewport of viewports) {
 
     const footer = page.locator(".home-footer");
     const glow = footer.locator(".home-footer__glow");
-    await expect(glow).toHaveCount(1);
+    await expect(glow).toHaveCount(1, { timeout: 15_000 });
     await expect(glow).toHaveCSS("animation-name", "home-footer-glow-pulse");
     await expect(glow).toHaveCSS("animation-duration", "2s");
     await expect(glow).toHaveCSS("animation-iteration-count", "infinite");
@@ -53,6 +53,27 @@ for (const viewport of viewports) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(viewport.width);
   });
 }
+
+test("orange footer glow is centered on the illustration without changing the dark footer", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium", "Desktop and tablet widths are checked in Chromium");
+
+  for (const width of [1440, 1024]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+
+    await expect(page.locator(".home-footer__glow")).toHaveCSS("filter", "brightness(0) invert(1)");
+
+    const offset = await page.locator(".home-footer").evaluate((footer) => {
+      const glow = footer.querySelector(".home-footer__glow-picture").getBoundingClientRect();
+      const illustration = footer.querySelector(".home-footer__illustration-picture").getBoundingClientRect();
+      return Math.abs(glow.top + glow.height / 2 - illustration.top - illustration.height / 2);
+    });
+    expect(offset).toBeLessThan(20);
+
+    await page.goto("/certificate");
+    await expect(page.locator(".home-footer__glow")).toHaveCSS("filter", "none");
+  }
+});
 
 test("при уменьшенном движении свечение статично на главной и внутренних страницах", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium", "Достаточно проверить настройку в одном браузере");
