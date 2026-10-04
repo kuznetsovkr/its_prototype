@@ -1,4 +1,5 @@
 @use "../base/breakpoints" as bp;
+@use "../base/compactScale" as scale;
 @use "../base/variables" as vars;
 
 .embroideryDesktopChoice__select {
@@ -19,10 +20,14 @@ button.embroideryDesktopChoice__example {
   cursor: pointer;
 
   &:focus-visible {
-    outline: 2px solid #bc5823;
-    outline-offset: 3px;
-    border-radius: 2px;
+    outline: scale.px(2) solid #bc5823;
+    outline-offset: scale.px(3);
+    border-radius: scale.px(2);
   }
+}
+
+.embroideryPage {
+  @include scale.container;
 }
 
 .embroiderySelectorDesktop {
@@ -99,7 +104,8 @@ button.embroideryDesktopChoice__example {
 
 @media (max-width: bp.$mobile-max) {
   .embroideryRestoreNotice {
-    top: 68px;
+    // Keep native alert sizing, but clear the scaled mobile header.
+    top: scale.px(68);
     right: 10px;
     left: 10px;
     width: auto;
@@ -142,10 +148,11 @@ button.embroideryDesktopChoice__example {
 
   .embroideryPage {
     position: relative;
-    left: 50%;
+    left: auto;
     margin: 0;
+    margin-left: calc(50% - 50vw);
     box-sizing: border-box;
-    transform: translateX(-50%);
+    transform: none;
   }
 
   .embroideryPage .orderBlock--embroidery {
@@ -159,7 +166,7 @@ button.embroideryDesktopChoice__example {
   }
 
   .embroideryDesktopDetails {
-    padding-right: 2px;
+    padding-right: scale.px(2);
     overflow-y: auto;
     color: #2b2b2b;
     scrollbar-width: thin;
@@ -179,7 +186,7 @@ button.embroideryDesktopChoice__example {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 40px;
+    border-radius: scale.px(40);
     background: #161616;
     font-weight: 600;
     color: #fff;
@@ -188,8 +195,8 @@ button.embroideryDesktopChoice__example {
 
     input {
       position: absolute;
-      width: 1px;
-      height: 1px;
+      width: scale.px(1);
+      height: scale.px(1);
       overflow: hidden;
       opacity: 0;
     }
@@ -210,7 +217,7 @@ button.embroideryDesktopChoice__example {
     textarea,
     select {
       width: 100%;
-      border: 1px solid #d2d2d2;
+      border: scale.px(1) solid #d2d2d2;
       outline: 0;
       background: #fff;
       font: inherit;
@@ -257,10 +264,10 @@ button.embroideryDesktopChoice__example {
   }
 
   .embroideryPage {
-    width: 320px;
+    width: scale.px(320);
     max-width: 100vw;
-    min-height: 803px;
-    padding: 10px 3px;
+    min-height: scale.px(803);
+    padding: scale.px(10) scale.px(3);
     background: #fff;
   }
 
@@ -269,34 +276,34 @@ button.embroideryDesktopChoice__example {
     align-items: flex-start;
     justify-content: center;
     width: 100%;
-    min-height: 783px;
+    min-height: scale.px(783);
     padding: 0;
-    border-radius: 20px;
+    border-radius: scale.px(20);
     background: #fff;
   }
 
   .embroideryPage .embroiderySelectorDesktop {
     display: block;
-    width: 314px;
-    min-height: 783px;
-    border-radius: 20px;
+    width: scale.px(314);
+    min-height: scale.px(783);
+    border-radius: scale.px(20);
     background: #fff;
   }
 
   .embroiderySelectorDesktop__preview {
     position: relative;
-    width: 314px;
-    height: 351px;
+    width: scale.px(314);
+    height: scale.px(351);
   }
 
   .embroiderySelectorDesktop__arrow {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: scale.px(20);
+    left: scale.px(20);
     z-index: 2;
     display: block;
-    width: 40px;
-    height: 40px;
+    width: scale.px(40);
+    height: scale.px(40);
     padding: 0;
     border: 0;
     background: transparent;
@@ -304,19 +311,19 @@ button.embroideryDesktopChoice__example {
   }
 
   .embroiderySelectorDesktop__arrowIcon {
-    width: 40px;
-    height: 40px;
+    width: scale.px(40);
+    height: scale.px(40);
   }
 
   .embroiderySelectorDesktop__title {
     position: absolute;
-    top: 27px;
-    left: 7px;
-    width: 300px;
-    height: 24px;
+    top: scale.px(27);
+    left: scale.px(7);
+    width: scale.px(300);
+    height: scale.px(24);
     margin: 0;
     font-family: 'Jost', sans-serif;
-    font-size: 24px;
+    font-size: scale.px(24);
     font-weight: 400;
     line-height: 1;
     color: #0c0c0c;
@@ -327,10 +334,10 @@ button.embroideryDesktopChoice__example {
 
   .embroiderySelectorDesktop__imageFrame {
     position: absolute;
-    top: 71px;
-    left: 22px;
-    width: 270px;
-    height: 270px;
+    top: scale.px(71);
+    left: scale.px(22);
+    width: scale.px(270);
+    height: scale.px(270);
     overflow: hidden;
 
     img {
@@ -347,24 +354,24 @@ button.embroideryDesktopChoice__example {
   }
 
   .embroiderySelectorDesktop__controls {
-    width: 314px;
+    width: scale.px(314);
   }
 
   .embroiderySelectorDesktop__panel {
     position: relative;
-    width: 308px;
-    height: 352px;
-    margin-left: 3px;
-    padding: 30px 20px;
+    width: scale.px(308);
+    height: scale.px(352);
+    margin-left: scale.px(3);
+    padding: scale.px(30) scale.px(20);
     overflow: hidden;
-    border-radius: 30px;
+    border-radius: scale.px(30);
     background: #f0f0f0;
 
     h2 {
-      height: 16px;
+      height: scale.px(16);
       margin: 0;
       font-family: 'Jost', sans-serif;
-      font-size: 16px;
+      font-size: scale.px(16);
       font-weight: 500;
       line-height: 1;
       color: #2b2b2b;
@@ -374,23 +381,23 @@ button.embroideryDesktopChoice__example {
 
   .embroideryDesktopTabs {
     display: grid;
-    grid-template-columns: repeat(2, 130px);
-    gap: 8px;
-    height: 40px;
-    margin-top: 20px;
+    grid-template-columns: repeat(2, scale.px(130));
+    gap: scale.px(8);
+    height: scale.px(40);
+    margin-top: scale.px(20);
 
     button {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 130px;
-      height: 40px;
-      padding: 0 12px;
+      width: scale.px(130);
+      height: scale.px(40);
+      padding: 0 scale.px(12);
       border: 0;
-      border-radius: 40px;
+      border-radius: scale.px(40);
       background: #fff;
       font-family: 'Jost', sans-serif;
-      font-size: 12px;
+      font-size: scale.px(12);
       font-weight: 600;
       line-height: 1.4;
       color: #4b4b4b;
@@ -408,25 +415,25 @@ button.embroideryDesktopChoice__example {
   .embroideryDesktopChoices {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    margin-top: 20px;
-    margin-left: -4px;
+    gap: scale.px(16);
+    margin-top: scale.px(20);
+    margin-left: scale.px(-4);
   }
 
   .embroideryDesktopChoice__radio {
     display: block;
-    width: 20px;
-    height: 20px;
-    flex: 0 0 20px;
+    width: scale.px(20);
+    height: scale.px(20);
+    flex: 0 0 scale.px(20);
   }
 
   .embroideryDesktopChoice {
     position: relative;
     display: flex;
     align-items: center;
-    height: 20px;
+    height: scale.px(20);
     font-family: 'Jost', sans-serif;
-    font-size: 10px;
+    font-size: scale.px(10);
     font-weight: 600;
     line-height: 1.4;
     color: #161616;
@@ -435,26 +442,26 @@ button.embroideryDesktopChoice__example {
 
     input {
       position: absolute;
-      width: 1px;
-      height: 1px;
+      width: scale.px(1);
+      height: scale.px(1);
       overflow: hidden;
       opacity: 0;
     }
 
     input:focus-visible + .embroideryDesktopChoice__radio {
       border-radius: 50%;
-      outline: 2px solid #bc5823;
-      outline-offset: 2px;
+      outline: scale.px(2) solid #bc5823;
+      outline-offset: scale.px(2);
     }
   }
 
   .embroideryDesktopChoice__label {
-    margin-left: 7px;
+    margin-left: scale.px(7);
     white-space: nowrap;
   }
 
   .embroideryDesktopChoice__example {
-    margin-left: 7px;
+    margin-left: scale.px(7);
     color: #bc5823;
     text-decoration: underline;
     text-decoration-skip-ink: none;
@@ -462,8 +469,8 @@ button.embroideryDesktopChoice__example {
   }
 
   .embroideryDesktopChoice__note {
-    margin-left: 7px;
-    font-size: 10px;
+    margin-left: scale.px(7);
+    font-size: scale.px(10);
     font-weight: 400;
     line-height: 1.4;
     color: #4b4b4b;
@@ -474,7 +481,7 @@ button.embroideryDesktopChoice__example {
   .embroideryDesktopCounter {
     display: flex;
     align-items: center;
-    height: 20px;
+    height: scale.px(20);
     font-family: 'Jost', sans-serif;
     color: #161616;
   }
@@ -484,9 +491,9 @@ button.embroideryDesktopChoice__example {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
-    flex: 0 0 20px;
+    width: scale.px(20);
+    height: scale.px(20);
+    flex: 0 0 scale.px(20);
     padding: 0;
     border: 0;
     background: transparent;
@@ -496,16 +503,16 @@ button.embroideryDesktopChoice__example {
     span {
       position: relative;
       z-index: 1;
-      font-size: 10px;
+      font-size: scale.px(10);
       font-weight: 600;
       line-height: 1;
     }
   }
 
   .embroideryDesktopCounter__value {
-    width: 24px;
-    margin: 0 7px;
-    font-size: 10px;
+    width: scale.px(24);
+    margin: 0 scale.px(7);
+    font-size: scale.px(10);
     font-weight: 600;
     line-height: 1.4;
     text-align: center;
@@ -514,8 +521,8 @@ button.embroideryDesktopChoice__example {
   }
 
   .embroideryDesktopCounter__limit {
-    margin-left: 7px;
-    font-size: 10px;
+    margin-left: scale.px(7);
+    font-size: scale.px(10);
     font-weight: 400;
     line-height: 1.4;
     color: #4b4b4b;
@@ -524,11 +531,11 @@ button.embroideryDesktopChoice__example {
 
   .embroiderySelectorDesktop__price {
     position: absolute;
-    bottom: 30px;
-    left: 20px;
+    bottom: scale.px(30);
+    left: scale.px(20);
     margin: 0;
     font-family: 'Jost', sans-serif;
-    font-size: 12px;
+    font-size: scale.px(12);
     font-weight: 500;
     line-height: 1;
     color: #a7a7a7;
@@ -536,19 +543,19 @@ button.embroideryDesktopChoice__example {
 
   .embroiderySelectorDesktop__navigation {
     display: block;
-    width: 274px;
-    height: 40px;
-    margin: 20px 20px 0;
+    width: scale.px(274);
+    height: scale.px(40);
+    margin: scale.px(20) scale.px(20) 0;
 
     button {
       align-items: center;
       justify-content: center;
-      width: 274px;
-      height: 40px;
-      padding: 0 20px;
-      border-radius: 40px;
+      width: scale.px(274);
+      height: scale.px(40);
+      padding: 0 scale.px(20);
+      border-radius: scale.px(40);
       font-family: 'Jost', sans-serif;
-      font-size: 12px;
+      font-size: scale.px(12);
       font-weight: 600;
       line-height: 1.4;
       text-align: center;
@@ -562,85 +569,85 @@ button.embroideryDesktopChoice__example {
 
     .is-next {
       display: flex;
-      border: 1px solid #0c0c0c;
+      border: scale.px(1) solid #0c0c0c;
       background: #0c0c0c;
       color: #fff;
     }
   }
 
   .embroideryDesktopDetails {
-    max-height: 172px;
-    margin-top: 12px;
-    font-size: 10px;
+    max-height: scale.px(172);
+    margin-top: scale.px(12);
+    font-size: scale.px(10);
   }
 
   .embroideryDesktopDetails__return {
-    font-size: 10px;
+    font-size: scale.px(10);
   }
 
   .embroideryDesktopDetails__upload {
-    width: 180px;
-    height: 32px;
-    margin-top: 8px;
-    font-size: 9px;
+    width: scale.px(180);
+    height: scale.px(32);
+    margin-top: scale.px(8);
+    font-size: scale.px(9);
   }
 
   .embroideryDesktopDetails__hint,
   .embroideryDesktopDetails__error {
-    margin: 5px 0 0;
-    font-size: 8px;
+    margin: scale.px(5) 0 0;
+    font-size: scale.px(8);
     line-height: 1.3;
   }
 
   .embroideryDesktopDetails__field {
-    gap: 3px;
-    margin-top: 6px;
+    gap: scale.px(3);
+    margin-top: scale.px(6);
 
     > span {
-      font-size: 9px;
+      font-size: scale.px(9);
       font-weight: 500;
     }
 
     textarea,
     select {
-      min-height: 30px;
-      padding: 5px 7px;
-      border-radius: 9px;
-      font-size: 9px;
+      min-height: scale.px(30);
+      padding: scale.px(5) scale.px(7);
+      border-radius: scale.px(9);
+      @include scale.control-font(9);
     }
 
     textarea {
-      height: 36px;
+      height: scale.px(36);
     }
   }
 
   .embroideryDesktopDetails__files {
-    gap: 3px;
-    max-height: 42px;
-    margin: 5px 0 0;
+    gap: scale.px(3);
+    max-height: scale.px(42);
+    margin: scale.px(5) 0 0;
 
     li {
-      min-height: 20px;
-      padding: 2px 6px;
-      border-radius: 10px;
-      font-size: 9px;
+      min-height: scale.px(20);
+      padding: scale.px(2) scale.px(6);
+      border-radius: scale.px(10);
+      font-size: scale.px(9);
     }
 
     button {
-      width: 18px;
-      height: 18px;
-      flex: 0 0 18px;
-      font-size: 14px;
+      width: scale.px(18);
+      height: scale.px(18);
+      flex: 0 0 scale.px(18);
+      font-size: scale.px(14);
     }
   }
 }
 
 @media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
   .embroideryPage {
-    width: 640px;
+    width: scale.px(640);
     max-width: 100vw;
-    min-height: 516px;
-    padding: 10px;
+    min-height: scale.px(516);
+    padding: scale.px(10);
     background: #fff;
   }
 
@@ -649,37 +656,37 @@ button.embroideryDesktopChoice__example {
     align-items: flex-start;
     justify-content: center;
     width: 100%;
-    min-height: 496px;
-    padding: 30px;
-    border-radius: 20px;
+    min-height: scale.px(496);
+    padding: scale.px(30);
+    border-radius: scale.px(20);
     background: vars.$order-stage-background;
   }
 
   .embroideryPage .embroiderySelectorDesktop {
     display: grid;
-    grid-template-columns: 240px 290px;
+    grid-template-columns: scale.px(240) scale.px(290);
     align-items: start;
-    width: 560px;
-    height: 436px;
-    padding: 30px 30px 30px 0;
-    border-radius: 20px;
+    width: scale.px(560);
+    height: scale.px(436);
+    padding: scale.px(30) scale.px(30) scale.px(30) 0;
+    border-radius: scale.px(20);
     background: #fff;
   }
 
   .embroiderySelectorDesktop__preview {
     position: relative;
-    width: 240px;
-    height: 376px;
+    width: scale.px(240);
+    height: scale.px(376);
   }
 
   .embroiderySelectorDesktop__arrow {
     position: absolute;
-    top: -6px;
-    left: 24px;
+    top: scale.px(-6);
+    left: scale.px(24);
     z-index: 2;
     display: block;
-    width: 32px;
-    height: 32px;
+    width: scale.px(32);
+    height: scale.px(32);
     padding: 0;
     border: 0;
     background: transparent;
@@ -687,19 +694,19 @@ button.embroideryDesktopChoice__example {
   }
 
   .embroiderySelectorDesktop__arrowIcon {
-    width: 32px;
-    height: 32px;
+    width: scale.px(32);
+    height: scale.px(32);
   }
 
   .embroiderySelectorDesktop__title {
     position: absolute;
     top: 0;
-    left: 69px;
-    width: 103px;
-    height: 16px;
+    left: scale.px(69);
+    width: scale.px(103);
+    height: scale.px(16);
     margin: 0;
     font-family: 'Jost', sans-serif;
-    font-size: 16px;
+    font-size: scale.px(16);
     font-weight: 400;
     line-height: 1;
     color: #d0d0d0;
@@ -709,19 +716,19 @@ button.embroideryDesktopChoice__example {
 
   .embroiderySelectorDesktop__imageFrame {
     position: absolute;
-    top: 44px;
-    left: 8px;
-    width: 225px;
-    height: 198px;
+    top: scale.px(44);
+    left: scale.px(8);
+    width: scale.px(225);
+    height: scale.px(198);
     overflow: hidden;
 
     img {
       position: absolute;
-      top: -47.777px;
+      top: scale.px(-47.777);
       left: 0;
       display: block;
-      width: 225px;
-      height: 300.188px;
+      width: scale.px(225);
+      height: scale.px(300.188);
       max-width: none;
       max-height: none;
       object-fit: fill;
@@ -729,23 +736,23 @@ button.embroideryDesktopChoice__example {
   }
 
   .embroiderySelectorDesktop__controls {
-    width: 290px;
+    width: scale.px(290);
   }
 
   .embroiderySelectorDesktop__panel {
     position: relative;
-    width: 290px;
-    height: 336px;
-    padding: 24px 25px;
+    width: scale.px(290);
+    height: scale.px(336);
+    padding: scale.px(24) scale.px(25);
     overflow: hidden;
-    border-radius: 20px;
+    border-radius: scale.px(20);
     background: #f0f0f0;
 
     h2 {
-      height: 17px;
+      height: scale.px(17);
       margin: 0;
       font-family: 'Jost', sans-serif;
-      font-size: 12px;
+      font-size: scale.px(12);
       font-weight: 600;
       line-height: 1.4;
       color: #2b2b2b;
@@ -755,23 +762,23 @@ button.embroideryDesktopChoice__example {
 
   .embroideryDesktopTabs {
     display: grid;
-    grid-template-columns: repeat(2, 100px);
-    gap: 5px;
-    height: 28px;
-    margin-top: 10px;
+    grid-template-columns: repeat(2, scale.px(100));
+    gap: scale.px(5);
+    height: scale.px(28);
+    margin-top: scale.px(10);
 
     button {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 100px;
-      height: 28px;
-      padding: 0 8px;
+      width: scale.px(100);
+      height: scale.px(28);
+      padding: 0 scale.px(8);
       border: 0;
-      border-radius: 40px;
+      border-radius: scale.px(40);
       background: #fff;
       font-family: 'Jost', sans-serif;
-      font-size: 8px;
+      font-size: scale.px(8);
       font-weight: 600;
       line-height: 1.4;
       color: #4b4b4b;
@@ -789,24 +796,24 @@ button.embroideryDesktopChoice__example {
   .embroideryDesktopChoices {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    margin-top: 16px;
+    gap: scale.px(16);
+    margin-top: scale.px(16);
   }
 
   .embroideryDesktopChoice__radio {
     display: block;
-    width: 24px;
-    height: 24px;
-    flex: 0 0 24px;
+    width: scale.px(24);
+    height: scale.px(24);
+    flex: 0 0 scale.px(24);
   }
 
   .embroideryDesktopChoice {
     position: relative;
     display: flex;
     align-items: center;
-    height: 24px;
+    height: scale.px(24);
     font-family: 'Jost', sans-serif;
-    font-size: 8px;
+    font-size: scale.px(8);
     font-weight: 600;
     line-height: 1.4;
     color: #161616;
@@ -815,26 +822,26 @@ button.embroideryDesktopChoice__example {
 
     input {
       position: absolute;
-      width: 1px;
-      height: 1px;
+      width: scale.px(1);
+      height: scale.px(1);
       overflow: hidden;
       opacity: 0;
     }
 
     input:focus-visible + .embroideryDesktopChoice__radio {
       border-radius: 50%;
-      outline: 2px solid #bc5823;
-      outline-offset: 2px;
+      outline: scale.px(2) solid #bc5823;
+      outline-offset: scale.px(2);
     }
   }
 
   .embroideryDesktopChoice__label {
-    margin-left: 10px;
+    margin-left: scale.px(10);
     white-space: nowrap;
   }
 
   .embroideryDesktopChoice__example {
-    margin-left: 10px;
+    margin-left: scale.px(10);
     color: #bc5823;
     text-decoration: underline;
     text-decoration-skip-ink: none;
@@ -842,8 +849,8 @@ button.embroideryDesktopChoice__example {
   }
 
   .embroideryDesktopChoice__note {
-    margin-left: 10px;
-    font-size: 8px;
+    margin-left: scale.px(10);
+    font-size: scale.px(8);
     font-weight: 400;
     line-height: 1.4;
     color: #4b4b4b;
@@ -854,7 +861,7 @@ button.embroideryDesktopChoice__example {
   .embroideryDesktopCounter {
     display: flex;
     align-items: center;
-    height: 24px;
+    height: scale.px(24);
     font-family: 'Jost', sans-serif;
     color: #161616;
   }
@@ -864,9 +871,9 @@ button.embroideryDesktopChoice__example {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
-    flex: 0 0 24px;
+    width: scale.px(24);
+    height: scale.px(24);
+    flex: 0 0 scale.px(24);
     padding: 0;
     border: 0;
     background: transparent;
@@ -876,16 +883,16 @@ button.embroideryDesktopChoice__example {
     span {
       position: relative;
       z-index: 1;
-      font-size: 12px;
+      font-size: scale.px(12);
       font-weight: 600;
       line-height: 1.4;
     }
   }
 
   .embroideryDesktopCounter__value {
-    width: 19px;
-    margin: 0 10px;
-    font-size: 8px;
+    width: scale.px(19);
+    margin: 0 scale.px(10);
+    font-size: scale.px(8);
     font-weight: 600;
     line-height: 1.4;
     text-align: center;
@@ -894,8 +901,8 @@ button.embroideryDesktopChoice__example {
   }
 
   .embroideryDesktopCounter__limit {
-    margin-left: 10px;
-    font-size: 8px;
+    margin-left: scale.px(10);
+    font-size: scale.px(8);
     font-weight: 400;
     line-height: 1.4;
     color: #4b4b4b;
@@ -904,11 +911,11 @@ button.embroideryDesktopChoice__example {
 
   .embroiderySelectorDesktop__price {
     position: absolute;
-    bottom: 24px;
-    left: 25px;
+    bottom: scale.px(24);
+    left: scale.px(25);
     margin: 0;
     font-family: 'Jost', sans-serif;
-    font-size: 12px;
+    font-size: scale.px(12);
     font-weight: 500;
     line-height: 1;
     color: #a7a7a7;
@@ -916,22 +923,22 @@ button.embroideryDesktopChoice__example {
 
   .embroiderySelectorDesktop__navigation {
     display: grid;
-    grid-template-columns: repeat(2, 140px);
-    gap: 10px;
-    width: 290px;
-    height: 28px;
-    margin-top: 12px;
+    grid-template-columns: repeat(2, scale.px(140));
+    gap: scale.px(10);
+    width: scale.px(290);
+    height: scale.px(28);
+    margin-top: scale.px(12);
 
     button {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 140px;
-      height: 28px;
-      padding: 0 12px;
-      border-radius: 40px;
+      width: scale.px(140);
+      height: scale.px(28);
+      padding: 0 scale.px(12);
+      border-radius: scale.px(40);
       font-family: 'Jost', sans-serif;
-      font-size: 8px;
+      font-size: scale.px(8);
       font-weight: 600;
       line-height: 1.4;
       text-align: center;
@@ -940,81 +947,81 @@ button.embroideryDesktopChoice__example {
     }
 
     .is-back {
-      border: 1px solid #4b4b4b;
+      border: scale.px(1) solid #4b4b4b;
       background: #fff;
       color: #4b4b4b;
     }
 
     .is-next {
-      border: 1px solid #161616;
+      border: scale.px(1) solid #161616;
       background: #161616;
       color: #fff;
     }
   }
 
   .embroideryDesktopDetails {
-    max-height: 188px;
-    margin-top: 10px;
-    font-size: 8px;
+    max-height: scale.px(188);
+    margin-top: scale.px(10);
+    font-size: scale.px(8);
   }
 
   .embroideryDesktopDetails__return {
-    font-size: 8px;
+    font-size: scale.px(8);
   }
 
   .embroideryDesktopDetails__upload {
-    width: 150px;
-    height: 28px;
-    margin-top: 7px;
-    font-size: 8px;
+    width: scale.px(150);
+    height: scale.px(28);
+    margin-top: scale.px(7);
+    font-size: scale.px(8);
   }
 
   .embroideryDesktopDetails__hint,
   .embroideryDesktopDetails__error {
-    margin: 4px 0 0;
-    font-size: 7px;
+    margin: scale.px(4) 0 0;
+    font-size: scale.px(7);
     line-height: 1.3;
   }
 
   .embroideryDesktopDetails__field {
-    gap: 3px;
-    margin-top: 5px;
+    gap: scale.px(3);
+    margin-top: scale.px(5);
 
     > span {
-      font-size: 8px;
+      font-size: scale.px(8);
       font-weight: 500;
     }
 
     textarea,
     select {
-      min-height: 27px;
-      padding: 4px 6px;
-      border-radius: 8px;
-      font-size: 8px;
+      min-height: scale.px(27);
+      padding: scale.px(4) scale.px(6);
+      border-radius: scale.px(8);
+      @include scale.control-font(8);
     }
 
     textarea {
-      height: 32px;
+      height: scale.px(32);
     }
   }
 
   .embroideryDesktopDetails__files {
-    gap: 3px;
-    max-height: 38px;
-    margin: 4px 0 0;
+    gap: scale.px(3);
+    max-height: scale.px(38);
+    margin: scale.px(4) 0 0;
 
     li {
-      min-height: 18px;
-      padding: 2px 5px;
-      border-radius: 9px;
-      font-size: 8px;
+      min-height: scale.px(18);
+      padding: scale.px(2) scale.px(5);
+      border-radius: scale.px(9);
+      font-size: scale.px(8);
     }
 
     button {
-      width: 16px;
-      height: 16px;
-      flex: 0 0 16px;
-      font-size: 12px;
+      width: scale.px(16);
+      height: scale.px(16);
+      flex: 0 0 scale.px(16);
+      font-size: scale.px(12);
     }
   }
 }
@@ -1026,9 +1033,9 @@ button.embroideryDesktopChoice__example {
 
   .embroideryPage {
     width: 100vw;
-    min-height: 900px;
+    min-height: scale.px(900);
     margin-left: calc(50% - 50vw);
-    padding: 0 clamp(20px, calc(6.25vw - 60px), 60px) 60px;
+    padding: 0 clamp(scale.px(20), calc(6.25vw - scale.px(60)), scale.px(60)) scale.px(60);
     box-sizing: border-box;
     background: #fff;
   }
@@ -1038,10 +1045,10 @@ button.embroideryDesktopChoice__example {
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 840px;
-    padding: 80px 0;
+    min-height: scale.px(840);
+    padding: scale.px(80) 0;
     box-sizing: border-box;
-    border-radius: 60px;
+    border-radius: scale.px(60);
     background: vars.$order-stage-background;
   }
 
@@ -1052,31 +1059,31 @@ button.embroideryDesktopChoice__example {
 
   .embroideryPage .embroiderySelectorDesktop {
     display: grid;
-    grid-template-columns: 562px 590px;
+    grid-template-columns: scale.px(562) scale.px(590);
     align-items: start;
     justify-content: start;
-    width: 1200px;
-    min-height: 680px;
-    padding: 48px 48px 48px 0;
+    width: scale.px(1200);
+    min-height: scale.px(680);
+    padding: scale.px(48) scale.px(48) scale.px(48) 0;
     box-sizing: border-box;
-    border-radius: 30px;
+    border-radius: scale.px(30);
     background: #fff;
   }
 
   .embroiderySelectorDesktop__preview {
     position: relative;
-    width: 562px;
-    height: 584px;
+    width: scale.px(562);
+    height: scale.px(584);
   }
 
   .embroiderySelectorDesktop__arrow {
     position: absolute;
-    top: 6px;
-    left: 45px;
+    top: scale.px(6);
+    left: scale.px(45);
     z-index: 2;
     display: block;
-    width: 40px;
-    height: 40px;
+    width: scale.px(40);
+    height: scale.px(40);
     padding: 0;
     border: 0;
     background: transparent;
@@ -1084,21 +1091,21 @@ button.embroideryDesktopChoice__example {
 
     img {
       display: block;
-      width: 40px;
-      height: 40px;
+      width: scale.px(40);
+      height: scale.px(40);
     }
   }
 
   .embroiderySelectorDesktop__title {
     position: absolute;
-    top: 10px;
-    left: 180px;
+    top: scale.px(10);
+    left: scale.px(180);
     z-index: 1;
-    width: 206px;
-    height: 32px;
+    width: scale.px(206);
+    height: scale.px(32);
     margin: 0;
     font-family: 'Jost', sans-serif;
-    font-size: 32px;
+    font-size: scale.px(32);
     font-weight: 400;
     line-height: 1;
     color: #d0d0d0;
@@ -1108,20 +1115,20 @@ button.embroideryDesktopChoice__example {
 
   .embroiderySelectorDesktop__imageFrame {
     position: absolute;
-    top: 34px;
-    left: -5px;
+    top: scale.px(34);
+    left: scale.px(-5);
     display: block;
-    width: 567px;
-    height: 499px;
+    width: scale.px(567);
+    height: scale.px(499);
     overflow: hidden;
 
     img {
       position: absolute;
-      top: -120.409px;
+      top: scale.px(-120.409);
       left: 0;
       display: block;
-      width: 567px;
-      height: 756.534px;
+      width: scale.px(567);
+      height: scale.px(756.534);
       max-width: none;
       max-height: none;
       object-fit: fill;
@@ -1129,24 +1136,24 @@ button.embroideryDesktopChoice__example {
   }
 
   .embroiderySelectorDesktop__controls {
-    width: 590px;
+    width: scale.px(590);
   }
 
   .embroiderySelectorDesktop__panel {
     position: relative;
-    width: 590px;
-    height: 510px;
-    padding: 36px;
+    width: scale.px(590);
+    height: scale.px(510);
+    padding: scale.px(36);
     box-sizing: border-box;
     overflow: hidden;
-    border-radius: 30px;
+    border-radius: scale.px(30);
     background: #f0f0f0;
 
     h2 {
-      height: 20px;
+      height: scale.px(20);
       margin: 0;
       font-family: 'Jost', sans-serif;
-      font-size: 20px;
+      font-size: scale.px(20);
       font-weight: 500;
       line-height: 1;
       color: #2b2b2b;
@@ -1155,23 +1162,23 @@ button.embroideryDesktopChoice__example {
 
   .embroideryDesktopTabs {
     display: grid;
-    grid-template-columns: repeat(2, 200px);
-    gap: 10px;
-    height: 54px;
-    margin-top: 20px;
+    grid-template-columns: repeat(2, scale.px(200));
+    gap: scale.px(10);
+    height: scale.px(54);
+    margin-top: scale.px(20);
 
     button {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 200px;
-      height: 54px;
-      padding: 0 20px;
+      width: scale.px(200);
+      height: scale.px(54);
+      padding: 0 scale.px(20);
       border: 0;
-      border-radius: 40px;
+      border-radius: scale.px(40);
       background: #fff;
       font-family: 'Jost', sans-serif;
-      font-size: 13px;
+      font-size: scale.px(13);
       font-weight: 600;
       line-height: 1.4;
       color: #4b4b4b;
@@ -1189,23 +1196,23 @@ button.embroideryDesktopChoice__example {
   .embroideryDesktopChoices {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    margin-top: 20px;
+    gap: scale.px(16);
+    margin-top: scale.px(20);
   }
 
   .embroideryDesktopChoice__radio {
     display: block;
-    width: 32px;
-    height: 32px;
-    flex: 0 0 32px;
+    width: scale.px(32);
+    height: scale.px(32);
+    flex: 0 0 scale.px(32);
   }
 
   .embroideryDesktopChoice {
     display: flex;
     align-items: center;
-    height: 32px;
+    height: scale.px(32);
     font-family: 'Jost', sans-serif;
-    font-size: 13px;
+    font-size: scale.px(13);
     font-weight: 600;
     line-height: 1.4;
     color: #2b2b2b;
@@ -1214,26 +1221,26 @@ button.embroideryDesktopChoice__example {
 
     input {
       position: absolute;
-      width: 1px;
-      height: 1px;
+      width: scale.px(1);
+      height: scale.px(1);
       overflow: hidden;
       opacity: 0;
     }
 
     input:focus-visible + .embroideryDesktopChoice__radio {
-      outline: 2px solid #cc7d54;
-      outline-offset: 2px;
+      outline: scale.px(2) solid #cc7d54;
+      outline-offset: scale.px(2);
       border-radius: 50%;
     }
   }
 
   .embroideryDesktopChoice__label {
-    margin-left: 10px;
+    margin-left: scale.px(10);
     white-space: nowrap;
   }
 
   .embroideryDesktopChoice__example {
-    margin-left: 16px;
+    margin-left: scale.px(16);
     color: #cc7d54;
     text-decoration: underline;
     text-decoration-skip-ink: none;
@@ -1241,8 +1248,8 @@ button.embroideryDesktopChoice__example {
   }
 
   .embroideryDesktopChoice__note {
-    margin-left: 10px;
-    font-size: 10px;
+    margin-left: scale.px(10);
+    font-size: scale.px(10);
     font-weight: 400;
     line-height: 1.4;
     color: #4b4b4b;
@@ -1253,7 +1260,7 @@ button.embroideryDesktopChoice__example {
   .embroideryDesktopCounter {
     display: flex;
     align-items: center;
-    height: 32px;
+    height: scale.px(32);
     font-family: 'Jost', sans-serif;
     color: #2b2b2b;
   }
@@ -1263,9 +1270,9 @@ button.embroideryDesktopChoice__example {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    flex: 0 0 32px;
+    width: scale.px(32);
+    height: scale.px(32);
+    flex: 0 0 scale.px(32);
     padding: 0;
     border: 0;
     background: transparent;
@@ -1276,23 +1283,23 @@ button.embroideryDesktopChoice__example {
       position: absolute;
       inset: 0;
       display: block;
-      width: 32px;
-      height: 32px;
+      width: scale.px(32);
+      height: scale.px(32);
     }
 
     span {
       position: relative;
       z-index: 1;
-      font-size: 20px;
+      font-size: scale.px(20);
       font-weight: 400;
       line-height: 1;
     }
   }
 
   .embroideryDesktopCounter__value {
-    width: 31px;
-    margin: 0 10px;
-    font-size: 13px;
+    width: scale.px(31);
+    margin: 0 scale.px(10);
+    font-size: scale.px(13);
     font-weight: 600;
     line-height: 1.4;
     text-align: center;
@@ -1301,8 +1308,8 @@ button.embroideryDesktopChoice__example {
   }
 
   .embroideryDesktopCounter__limit {
-    margin-left: 10px;
-    font-size: 10px;
+    margin-left: scale.px(10);
+    font-size: scale.px(10);
     font-weight: 400;
     line-height: 1.4;
     color: #4b4b4b;
@@ -1311,11 +1318,11 @@ button.embroideryDesktopChoice__example {
 
   .embroiderySelectorDesktop__price {
     position: absolute;
-    bottom: 36px;
-    left: 36px;
+    bottom: scale.px(36);
+    left: scale.px(36);
     margin: 0;
     font-family: 'Jost', sans-serif;
-    font-size: 20px;
+    font-size: scale.px(20);
     font-weight: 500;
     line-height: 1;
     color: #a7a7a7;
@@ -1323,22 +1330,22 @@ button.embroideryDesktopChoice__example {
 
   .embroiderySelectorDesktop__navigation {
     display: grid;
-    grid-template-columns: repeat(2, 285px);
-    gap: 20px;
-    width: 590px;
-    height: 54px;
-    margin-top: 20px;
+    grid-template-columns: repeat(2, scale.px(285));
+    gap: scale.px(20);
+    width: scale.px(590);
+    height: scale.px(54);
+    margin-top: scale.px(20);
 
     button {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 285px;
-      height: 54px;
-      padding: 0 62px;
-      border-radius: 40px;
+      width: scale.px(285);
+      height: scale.px(54);
+      padding: 0 scale.px(62);
+      border-radius: scale.px(40);
       font-family: 'Jost', sans-serif;
-      font-size: 13px;
+      font-size: scale.px(13);
       font-weight: 600;
       line-height: 1.4;
       text-align: center;
@@ -1347,22 +1354,22 @@ button.embroideryDesktopChoice__example {
     }
 
     .is-back {
-      border: 1px solid #4b4b4b;
+      border: scale.px(1) solid #4b4b4b;
       background: #fff;
       color: #4b4b4b;
     }
 
     .is-next {
-      border: 1px solid #161616;
+      border: scale.px(1) solid #161616;
       background: #161616;
       color: #fff;
     }
   }
 
   .embroideryDesktopDetails {
-    max-height: 272px;
-    margin-top: 16px;
-    padding-right: 4px;
+    max-height: scale.px(272);
+    margin-top: scale.px(16);
+    padding-right: scale.px(4);
     overflow-y: auto;
     font-family: 'Jost', sans-serif;
     color: #2b2b2b;
@@ -1374,7 +1381,7 @@ button.embroideryDesktopChoice__example {
     border: 0;
     background: transparent;
     font: inherit;
-    font-size: 12px;
+    font-size: scale.px(12);
     color: #cc7d54;
     text-decoration: underline;
     cursor: pointer;
@@ -1384,12 +1391,12 @@ button.embroideryDesktopChoice__example {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 220px;
-    height: 44px;
-    margin-top: 12px;
-    border-radius: 40px;
+    width: scale.px(220);
+    height: scale.px(44);
+    margin-top: scale.px(12);
+    border-radius: scale.px(40);
     background: #161616;
-    font-size: 12px;
+    font-size: scale.px(12);
     font-weight: 600;
     color: #fff;
     text-transform: uppercase;
@@ -1397,8 +1404,8 @@ button.embroideryDesktopChoice__example {
 
     input {
       position: absolute;
-      width: 1px;
-      height: 1px;
+      width: scale.px(1);
+      height: scale.px(1);
       overflow: hidden;
       opacity: 0;
     }
@@ -1406,8 +1413,8 @@ button.embroideryDesktopChoice__example {
 
   .embroideryDesktopDetails__hint,
   .embroideryDesktopDetails__error {
-    margin: 7px 0 0;
-    font-size: 10px;
+    margin: scale.px(7) 0 0;
+    font-size: scale.px(10);
     line-height: 1.35;
     color: #4b4b4b;
   }
@@ -1418,39 +1425,39 @@ button.embroideryDesktopChoice__example {
 
   .embroideryDesktopDetails__field {
     display: grid;
-    gap: 5px;
-    margin-top: 10px;
+    gap: scale.px(5);
+    margin-top: scale.px(10);
 
     > span {
-      font-size: 12px;
+      font-size: scale.px(12);
       font-weight: 500;
     }
 
     textarea,
     select {
       width: 100%;
-      min-height: 38px;
-      padding: 8px 10px;
-      border: 1px solid #d2d2d2;
-      border-radius: 12px;
+      min-height: scale.px(38);
+      padding: scale.px(8) scale.px(10);
+      border: scale.px(1) solid #d2d2d2;
+      border-radius: scale.px(12);
       outline: 0;
       background: #fff;
       font: inherit;
-      font-size: 12px;
+      @include scale.control-font(12);
       color: #2b2b2b;
     }
 
     textarea {
-      height: 48px;
+      height: scale.px(48);
       resize: vertical;
     }
   }
 
   .embroideryDesktopDetails__files {
     display: grid;
-    gap: 4px;
-    max-height: 54px;
-    margin: 8px 0 0;
+    gap: scale.px(4);
+    max-height: scale.px(54);
+    margin: scale.px(8) 0 0;
     padding: 0;
     overflow-y: auto;
     list-style: none;
@@ -1459,11 +1466,11 @@ button.embroideryDesktopChoice__example {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      min-height: 24px;
-      padding: 2px 8px;
-      border-radius: 12px;
+      min-height: scale.px(24);
+      padding: scale.px(2) scale.px(8);
+      border-radius: scale.px(12);
       background: #fff;
-      font-size: 11px;
+      font-size: scale.px(11);
     }
 
     li > span {
@@ -1473,20 +1480,20 @@ button.embroideryDesktopChoice__example {
     }
 
     button {
-      width: 20px;
-      height: 20px;
-      flex: 0 0 20px;
+      width: scale.px(20);
+      height: scale.px(20);
+      flex: 0 0 scale.px(20);
       padding: 0;
       border: 0;
       background: transparent;
-      font-size: 16px;
+      font-size: scale.px(16);
       line-height: 1;
       cursor: pointer;
     }
   }
 
   .embroideryDesktopDetails--text {
-    margin-top: 14px;
+    margin-top: scale.px(14);
   }
 }
 
@@ -1506,13 +1513,13 @@ button.embroideryDesktopChoice__example {
 .embroideryUploadStage__instructions {
   overflow: hidden;
   background: #fff;
-  font-size: 12px;
+  font-size: scale.px(12);
   color: #4b4b4b;
 }
 
 .embroideryUploadStage__instructionText {
   height: 100%;
-  padding-right: 15px;
+  padding-right: scale.px(15);
   box-sizing: border-box;
   overflow-y: auto;
   overscroll-behavior-y: contain;
@@ -1523,8 +1530,8 @@ button.embroideryDesktopChoice__example {
   &::-webkit-scrollbar-thumb { border-radius: 5px; background: #4b4b4b; }
 
   &:focus-visible {
-    outline: 2px solid #cc7d54;
-    outline-offset: -2px;
+    outline: scale.px(2) solid #cc7d54;
+    outline-offset: scale.px(-2);
   }
 
   > p {
@@ -1548,7 +1555,7 @@ button.embroideryDesktopChoice__example {
 }
 
 .embroideryUploadStage__upload {
-  border-radius: 40px;
+  border-radius: scale.px(40);
   background: #161616;
   font-weight: 600;
   color: #fff;
@@ -1557,8 +1564,8 @@ button.embroideryDesktopChoice__example {
 
 .embroideryUploadStage__fileInput {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  width: scale.px(1);
+  height: scale.px(1);
   padding: 0;
   overflow: hidden;
   clip-path: inset(50%);
@@ -1568,7 +1575,7 @@ button.embroideryDesktopChoice__example {
 
 .embroideryUploadStage__dropzone {
   border: 0;
-  border-radius: 40px;
+  border-radius: scale.px(40);
   background: #fff;
   font-weight: 500;
   color: #b1b1b1;
@@ -1576,9 +1583,9 @@ button.embroideryDesktopChoice__example {
 
 .embroideryUploadStage__rules {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
+  width: scale.px(1);
+  height: scale.px(1);
+  margin: scale.px(-1);
   padding: 0;
   overflow: hidden;
   clip-path: inset(50%);
@@ -1598,8 +1605,8 @@ button.embroideryDesktopChoice__example {
 
 .embroideryUploadStage__files {
   display: grid;
-  gap: 4px;
-  margin: 7px 0 0;
+  gap: scale.px(4);
+  margin: scale.px(7) 0 0;
   padding: 0;
   overflow-y: auto;
   list-style: none;
@@ -1609,9 +1616,9 @@ button.embroideryDesktopChoice__example {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 22px;
-    padding: 2px 8px;
-    border-radius: 11px;
+    min-height: scale.px(22);
+    padding: scale.px(2) scale.px(8);
+    border-radius: scale.px(11);
     background: #f0f0f0;
   }
 
@@ -1622,9 +1629,9 @@ button.embroideryDesktopChoice__example {
   }
 
   button {
-    width: 20px;
-    height: 20px;
-    flex: 0 0 20px;
+    width: scale.px(20);
+    height: scale.px(20);
+    flex: 0 0 scale.px(20);
     padding: 0;
     border: 0;
     background: transparent;
@@ -1636,14 +1643,14 @@ button.embroideryDesktopChoice__example {
 
 .embroideryUploadStage__comment {
   display: grid;
-  gap: 4px;
-  margin-top: 7px;
+  gap: scale.px(4);
+  margin-top: scale.px(7);
 
   textarea {
     width: 100%;
     box-sizing: border-box;
     resize: none;
-    border: 1px solid #d2d2d2;
+    border: scale.px(1) solid #d2d2d2;
     outline: 0;
     background: #fff;
     font: inherit;
@@ -1656,237 +1663,237 @@ button.embroideryDesktopChoice__example {
 }
 
 .embroideryUploadStage__error {
-  margin: 6px 0 0;
+  margin: scale.px(6) 0 0;
   color: #a53636;
 }
 
 @media (max-width: bp.$mobile-max) {
   .embroideryPage .embroiderySelectorDesktop--upload {
-    min-height: 947px;
+    min-height: scale.px(947);
   }
 
   .embroiderySelectorDesktop--upload {
     .embroiderySelectorDesktop__panel {
-      height: 516px;
+      height: scale.px(516);
     }
 
     .embroiderySelectorDesktop__price {
-      bottom: 20px;
+      bottom: scale.px(20);
     }
   }
 
   .embroideryUploadStage__instructions {
-    top: 58px;
-    left: 20px;
-    width: 268px;
-    height: 304px;
-    padding: 14px 15px;
-    border-radius: 20px;
+    top: scale.px(58);
+    left: scale.px(20);
+    width: scale.px(268);
+    height: scale.px(304);
+    padding: scale.px(14) scale.px(15);
+    border-radius: scale.px(20);
     font-weight: 500;
     line-height: 1.2;
   }
 
   .embroideryUploadStage__instructions.is-status {
-    padding: 14px 15px;
+    padding: scale.px(14) scale.px(15);
   }
 
   .embroideryUploadStage__upload {
-    top: 374px;
-    left: 20px;
-    width: 268px;
-    height: 40px;
-    font-size: 12px;
+    top: scale.px(374);
+    left: scale.px(20);
+    width: scale.px(268);
+    height: scale.px(40);
+    font-size: scale.px(12);
     line-height: 1.4;
   }
 
   .embroideryUploadStage__dropzone {
-    top: 426px;
-    left: 20px;
-    width: 268px;
-    height: 36px;
-    padding: 0 15px;
-    font-size: 10px;
+    top: scale.px(426);
+    left: scale.px(20);
+    width: scale.px(268);
+    height: scale.px(36);
+    padding: 0 scale.px(15);
+    font-size: scale.px(10);
     line-height: 1;
   }
 
   .embroideryUploadStage__files {
-    max-height: 88px;
-    font-size: 9px;
+    max-height: scale.px(88);
+    font-size: scale.px(9);
 
     li {
-      min-height: 20px;
-      padding: 1px 6px;
+      min-height: scale.px(20);
+      padding: scale.px(1) scale.px(6);
     }
 
     button {
-      width: 18px;
-      height: 18px;
-      flex-basis: 18px;
-      font-size: 14px;
+      width: scale.px(18);
+      height: scale.px(18);
+      flex-basis: scale.px(18);
+      font-size: scale.px(14);
     }
   }
 
   .embroideryUploadStage__comment {
-    font-size: 9px;
+    font-size: scale.px(9);
 
     textarea {
-      height: 54px;
-      padding: 5px 7px;
-      border-radius: 9px;
-      font-size: 9px;
+      height: scale.px(54);
+      padding: scale.px(5) scale.px(7);
+      border-radius: scale.px(9);
+      @include scale.control-font(9);
     }
   }
 
   .embroideryUploadStage__error {
-    font-size: 9px;
+    font-size: scale.px(9);
     line-height: 1.25;
   }
 }
 
 @media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
   .embroideryPage .embroiderySelectorDesktop--upload {
-    height: 484px;
+    height: scale.px(484);
   }
 
   .embroiderySelectorDesktop--upload {
     .embroiderySelectorDesktop__preview {
-      height: 424px;
+      height: scale.px(424);
     }
 
     .embroiderySelectorDesktop__panel {
-      height: 384px;
+      height: scale.px(384);
     }
 
     .embroiderySelectorDesktop__price {
-      bottom: 25px;
+      bottom: scale.px(25);
     }
   }
 
   .embroideryUploadStage__instructions {
-    top: 51px;
-    left: 25px;
-    width: 240px;
-    height: 184px;
-    padding: 11px;
-    border-radius: 15px;
+    top: scale.px(51);
+    left: scale.px(25);
+    width: scale.px(240);
+    height: scale.px(184);
+    padding: scale.px(11);
+    border-radius: scale.px(15);
     font-weight: 400;
     line-height: 1.3;
     letter-spacing: .01em;
   }
 
   .embroideryUploadStage__instructions.is-status {
-    padding: 10px 11px;
+    padding: scale.px(10) scale.px(11);
   }
 
   .embroideryUploadStage__upload {
-    top: 245px;
-    left: 25px;
-    width: 240px;
-    height: 36px;
-    font-size: 8px;
+    top: scale.px(245);
+    left: scale.px(25);
+    width: scale.px(240);
+    height: scale.px(36);
+    font-size: scale.px(8);
     line-height: 1.4;
   }
 
   .embroideryUploadStage__dropzone {
-    top: 291px;
-    left: 25px;
-    width: 240px;
-    height: 36px;
-    padding: 0 26px;
-    font-size: 8px;
+    top: scale.px(291);
+    left: scale.px(25);
+    width: scale.px(240);
+    height: scale.px(36);
+    padding: 0 scale.px(26);
+    font-size: scale.px(8);
     font-weight: 400;
     line-height: 1;
   }
 
   .embroideryUploadStage__files {
-    max-height: 58px;
-    font-size: 7px;
+    max-height: scale.px(58);
+    font-size: scale.px(7);
 
     li {
-      min-height: 17px;
-      padding: 1px 5px;
-      border-radius: 8px;
+      min-height: scale.px(17);
+      padding: scale.px(1) scale.px(5);
+      border-radius: scale.px(8);
     }
 
     button {
-      width: 15px;
-      height: 15px;
-      flex-basis: 15px;
-      font-size: 11px;
+      width: scale.px(15);
+      height: scale.px(15);
+      flex-basis: scale.px(15);
+      font-size: scale.px(11);
     }
   }
 
   .embroideryUploadStage__comment {
-    font-size: 7px;
+    font-size: scale.px(7);
 
     textarea {
-      height: 43px;
-      padding: 4px 6px;
-      border-radius: 8px;
-      font-size: 7px;
+      height: scale.px(43);
+      padding: scale.px(4) scale.px(6);
+      border-radius: scale.px(8);
+      @include scale.control-font(7);
     }
   }
 
   .embroideryUploadStage__error {
-    font-size: 7px;
+    font-size: scale.px(7);
     line-height: 1.2;
   }
 }
 
 @media (min-width: bp.$desktop-min) {
   .embroideryUploadStage__instructions {
-    top: 72px;
-    left: 36px;
-    width: 518px;
-    height: 236px;
-    padding: 26px 17px 21px 35px;
-    border-radius: 40px;
+    top: scale.px(72);
+    left: scale.px(36);
+    width: scale.px(518);
+    height: scale.px(236);
+    padding: scale.px(26) scale.px(17) scale.px(21) scale.px(35);
+    border-radius: scale.px(40);
     font-weight: 500;
     line-height: 1.3;
     letter-spacing: .01em;
   }
 
   .embroideryUploadStage__instructions.is-status {
-    padding: 18px 24px;
+    padding: scale.px(18) scale.px(24);
   }
 
   .embroideryUploadStage__upload {
-    top: 318px;
-    left: 36px;
-    width: 518px;
-    height: 56px;
-    font-size: 13px;
+    top: scale.px(318);
+    left: scale.px(36);
+    width: scale.px(518);
+    height: scale.px(56);
+    font-size: scale.px(13);
     line-height: 1.4;
   }
 
   .embroideryUploadStage__dropzone {
-    top: 384px;
-    left: 36px;
-    width: 518px;
-    height: 50px;
-    padding: 0 60px;
-    font-size: 12px;
+    top: scale.px(384);
+    left: scale.px(36);
+    width: scale.px(518);
+    height: scale.px(50);
+    padding: 0 scale.px(60);
+    font-size: scale.px(12);
     line-height: 1;
   }
 
   .embroideryUploadStage__files {
-    max-height: 76px;
-    font-size: 10px;
+    max-height: scale.px(76);
+    font-size: scale.px(10);
   }
 
   .embroideryUploadStage__comment {
-    font-size: 10px;
+    font-size: scale.px(10);
 
     textarea {
-      height: 52px;
-      padding: 7px 9px;
-      border-radius: 10px;
-      font-size: 10px;
+      height: scale.px(52);
+      padding: scale.px(7) scale.px(9);
+      border-radius: scale.px(10);
+      @include scale.control-font(10);
     }
   }
 
   .embroideryUploadStage__error {
-    font-size: 10px;
+    font-size: scale.px(10);
     line-height: 1.3;
   }
 }

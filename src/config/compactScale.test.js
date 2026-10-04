@@ -34,4 +34,11 @@ describe("compact layout design pixels", () => {
     expect(() => compile(".sample { width: scale.px(300px); }"))
       .toThrow("expects a unitless number of design pixels");
   });
+
+  it("exposes scalable form typography to the mobile 16px safeguard", () => {
+    const css = compile(".sample { @include scale.control-font(10); }");
+    expect(css).toContain("--mobile-control-font-size: calc(10 * var(--compact-layout-pixel, 1px))");
+    expect(css).toContain("font-size: calc(10 * var(--compact-layout-pixel, 1px))");
+    expect(css).not.toContain("scale.px(");
+  });
 });

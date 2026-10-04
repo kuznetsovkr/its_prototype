@@ -1,4 +1,5 @@
 @use "../base/breakpoints" as bp;
+@use "../base/compactScale" as scale;
 @use "../base/variables" as vars;
 
 .orderBlock {
@@ -6,7 +7,7 @@
   display: flex;
   flex-direction: row;
   justify-content: center;
-  margin-top: 10px;
+  margin-top: scale.px(10);
 }
 
 .blockClothingSelector {
@@ -14,17 +15,17 @@
   flex-direction: row;
   justify-content: center;
   align-items: flex-start;
-  gap: clamp(50px, 4.31vw, 75px);
+  gap: clamp(scale.px(50), 4.31vw, scale.px(75));
   width: 100%;
   height: auto;
-  min-height: clamp(600px, calc(100dvh - var(--header-h) - var(--footer-h)), 1008px);
+  min-height: clamp(scale.px(600), calc(100dvh - var(--header-h) - var(--footer-h)), scale.px(1008));
 
   /* left column: product image */
   .clothing-block {
-    flex: 0 0 clamp(530px, 20vw, 765px);
-    width: clamp(530px, 20vw, 765px);
-    border: 0.25px solid #121319;
-    border-radius: 20px;
+    flex: 0 0 clamp(scale.px(530), 20vw, scale.px(765));
+    width: clamp(scale.px(530), 20vw, scale.px(765));
+    border: scale.px(0.25) solid #121319;
+    border-radius: scale.px(20);
     background: #faf8f6;
     overflow: hidden;
     align-self: flex-start;
@@ -79,35 +80,35 @@
 
   /* right column: selectors */
   .blockSelection {
-    width: clamp(350px, 20vw, 525px);
-    flex: 0 0 clamp(350px, 20vw, 525px);
+    width: clamp(scale.px(350), 20vw, scale.px(525));
+    flex: 0 0 clamp(scale.px(350), 20vw, scale.px(525));
     display: flex;
     flex-direction: column;
-    gap: min(1.5vw, 60px);
+    gap: min(1.5vw, scale.px(60));
 
     .title {
       font-family: 'RightGrotesk', sans-serif;
       font-weight: 500;
-      font-size: clamp(36px, 2vw, 54px);
+      font-size: clamp(scale.px(36), 2vw, scale.px(54));
       color: #440a18;
-      margin-bottom: 20px;
+      margin-bottom: scale.px(20);
     }
 
     .selectorGroup {
       .selectorType {
         display: flex;
         flex-direction: column;
-        gap: clamp(10px, 0.5vw, 15px);
+        gap: clamp(scale.px(10), 0.5vw, scale.px(15));
 
         .selectorType__item {
           display: flex;
           align-items: center;
-          gap: clamp(10px, 0.5vw, 15px);
+          gap: clamp(scale.px(10), 0.5vw, scale.px(15));
           cursor: pointer;
           text-transform: lowercase;
           font-family: 'Raleway', sans-serif;
           font-weight: 400;
-          font-size: clamp(20px, 1vw, 30px);
+          font-size: clamp(scale.px(20), 1vw, scale.px(30));
           color: #121319;
 
           input {
@@ -115,25 +116,25 @@
           }
 
           .selectorType__custom {
-            width: clamp(26px, 1vw, 39px);
-            height: clamp(26px, 1vw, 39px);
-            border: 2px solid #440a18;
-            border-radius: 10px;
+            width: clamp(scale.px(26), 1vw, scale.px(39));
+            height: clamp(scale.px(26), 1vw, scale.px(39));
+            border: scale.px(2) solid #440a18;
+            border-radius: scale.px(10);
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background-color 0.5s ease-in-out;
 
             .selectorType__check {
-              width: clamp(16px, 1vw, 24px);
-              height: clamp(16px, 1vw, 24px);
+              width: clamp(scale.px(16), 1vw, scale.px(24));
+              height: clamp(scale.px(16), 1vw, scale.px(24));
               display: none;
             }
           }
 
           input:checked + .selectorType__custom {
             background-color: #440a18;
-            border: 2px solid transparent;
+            border: scale.px(2) solid transparent;
 
             .selectorType__check {
               display: block;
@@ -144,7 +145,7 @@
 
       .sizeSelector {
         display: flex;
-        gap: clamp(8px, 0.7vw, 12px);
+        gap: clamp(scale.px(8), 0.7vw, scale.px(12));
         flex-wrap: wrap;
 
         .sizeSelector__item {
@@ -156,23 +157,23 @@
           }
 
           .sizeSelector__box {
-            width: clamp(48px, 2vw, 72px);
-            height: clamp(46px, 2vw, 69px);
-            border: 1px solid #121319;
-            border-radius: 10px;
+            width: clamp(scale.px(48), 2vw, scale.px(72));
+            height: clamp(scale.px(46), 2vw, scale.px(69));
+            border: scale.px(1) solid #121319;
+            border-radius: scale.px(10);
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Raleway', sans-serif;
             font-weight: 400;
-            font-size: clamp(24px, 1vw, 36px);
+            font-size: clamp(scale.px(24), 1vw, scale.px(36));
             color: #121319;
             transition: all 0.2s ease-in-out;
           }
 
           input:checked + .sizeSelector__box {
             background-color: #440a18;
-            border: 1px solid transparent;
+            border: scale.px(1) solid transparent;
             color: white;
           }
         }
@@ -184,18 +185,18 @@
         border: 0;
         background: transparent;
         text-align: left;
-        margin-top: 20px;
+        margin-top: scale.px(20);
         font-family: 'Raleway', sans-serif;
         font-weight: 400;
-        font-size: clamp(20px, 1vw, 30px);
+        font-size: clamp(scale.px(20), 1vw, scale.px(30));
         text-decoration: underline;
-        text-decoration-thickness: 1px;
+        text-decoration-thickness: scale.px(1);
         text-decoration-skip-ink: none;
         color: rgba(18, 19, 25, 0.8);
 
         &:focus-visible {
-          outline: 2px solid #bc5823;
-          outline-offset: 3px;
+          outline: scale.px(2) solid #bc5823;
+          outline-offset: scale.px(3);
         }
       }
     }
@@ -212,13 +213,13 @@
   place-items: center;
   width: 100%;
   height: 100%;
-  padding: 24px;
+  padding: scale.px(24);
   box-sizing: border-box;
-  border: 1px dashed rgb(18 19 25 / 18%);
+  border: scale.px(1) dashed rgb(18 19 25 / 18%);
   border-radius: inherit;
   background: #f3f1ef;
   font-family: 'Jost', sans-serif;
-  font-size: clamp(12px, 1vw, 16px);
+  font-size: clamp(scale.px(12), 1vw, scale.px(16));
   font-weight: 500;
   line-height: 1.3;
   color: #76716d;
@@ -227,13 +228,13 @@
 }
 
 .confirmButton {
-  border-radius: 20px;
-  width: clamp(350px, 20vw, 525px);
-  height: clamp(68px, 3vw, 102px);
+  border-radius: scale.px(20);
+  width: clamp(scale.px(350), 20vw, scale.px(525));
+  height: clamp(scale.px(68), 3vw, scale.px(102));
   background: #440a18;
   font-family: 'Raleway', sans-serif;
   font-weight: 500;
-  font-size: clamp(24px, 1vw, 36px);
+  font-size: clamp(scale.px(24), 1vw, scale.px(36));
   color: #fff;
   border: none;
   cursor: pointer;
@@ -247,14 +248,14 @@
   .blockClothingSelector {
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: scale.px(10);
 
     .clothing-block {
       width: 100%;
-      max-width: 520px;
+      max-width: scale.px(520);
       flex: 0 0 auto;
-      border: 0.25px solid #121319;
-      border-radius: 16px;
+      border: scale.px(0.25) solid #121319;
+      border-radius: scale.px(16);
 
       .image-wrapper {
         align-items: center;
@@ -279,7 +280,7 @@
       flex-direction: row;
       flex-wrap: wrap;
       justify-content: space-around;
-      gap: 20px;
+      gap: scale.px(20);
     }
   }
 }
@@ -457,15 +458,15 @@
 .colorSelector {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: scale.px(10);
 }
 
 .colorSquare {
-  width: 44px;
-  height: 44px;
+  width: scale.px(44);
+  height: scale.px(44);
   padding: 0;
-  border-radius: 12px;
-  border: 1px solid rgba(18, 19, 25, 0.15);
+  border-radius: scale.px(12);
+  border: scale.px(1) solid rgba(18, 19, 25, 0.15);
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -483,18 +484,18 @@
 }
 
 .colorSquare:hover {
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 scale.px(3) scale.px(10) rgba(0, 0, 0, 0.08);
   border-color: rgba(18, 19, 25, 0.3);
 }
 
 .colorSquare.active {
-  outline: 2px solid var(--brand);
-  outline-offset: 2px;
+  outline: scale.px(2) solid var(--brand);
+  outline-offset: scale.px(2);
 }
 
 .colorSquare__check {
-  width: 24px;
-  height: 24px;
+  width: scale.px(24);
+  height: scale.px(24);
   /* important: override stroke color of SVG */
 }
 
@@ -579,6 +580,8 @@
 
 /* Order redesign: the supplied Figma frame covers desktop only. */
 .orderPage {
+  @include scale.container;
+
   width: 100%;
 }
 
@@ -603,18 +606,18 @@
 
 .orderNavigation {
   display: flex;
-  gap: 12px;
-  margin-top: 20px;
+  gap: scale.px(12);
+  margin-top: scale.px(20);
 }
 
 .orderActionButton {
   width: 50%;
-  min-height: 54px;
-  border: 1px solid #121319;
-  border-radius: 20px;
+  min-height: scale.px(54);
+  border: scale.px(1) solid #121319;
+  border-radius: scale.px(20);
   background: #fff;
   font-family: 'Raleway', sans-serif;
-  font-size: 16px;
+  font-size: scale.px(16);
   color: #121319;
   cursor: pointer;
 }
@@ -643,9 +646,9 @@
 
   .orderPage {
     width: 100vw;
-    min-height: 900px;
+    min-height: scale.px(900);
     margin-left: calc(50% - 50vw);
-    padding: 0 clamp(20px, calc(6.25vw - 60px), 60px) 60px;
+    padding: 0 clamp(scale.px(20), calc(6.25vw - scale.px(60)), scale.px(60)) scale.px(60);
     box-sizing: border-box;
     background: #fff;
   }
@@ -655,10 +658,10 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 840px;
-    padding: 80px 0;
+    min-height: scale.px(840);
+    padding: scale.px(80) 0;
     box-sizing: border-box;
-    border-radius: 60px;
+    border-radius: scale.px(60);
     background: vars.$order-stage-background;
   }
 
@@ -669,22 +672,22 @@
 
   .orderPage .blockClothingSelector {
     display: grid;
-    grid-template-columns: 562px 590px;
+    grid-template-columns: scale.px(562) scale.px(590);
     align-items: start;
     justify-content: start;
     gap: 0;
-    width: 1200px;
-    min-height: 680px;
-    padding: 48px 48px 48px 0;
+    width: scale.px(1200);
+    min-height: scale.px(680);
+    padding: scale.px(48) scale.px(48) scale.px(48) 0;
     box-sizing: border-box;
-    border-radius: 30px;
+    border-radius: scale.px(30);
     background: #fff;
 
     .clothing-block {
       position: relative;
       display: flex;
-      width: 562px;
-      height: 584px;
+      width: scale.px(562);
+      height: scale.px(584);
       flex: none;
       flex-direction: column;
       align-items: center;
@@ -698,10 +701,10 @@
         position: static;
         display: block;
         width: 100%;
-        height: 32px;
-        margin: 10px 0 0;
+        height: scale.px(32);
+        margin: scale.px(10) 0 0;
         font-family: 'Jost', sans-serif;
-        font-size: 32px;
+        font-size: scale.px(32);
         font-weight: 400;
         line-height: 1;
         color: #d0d0d0;
@@ -713,9 +716,9 @@
         position: relative;
         inset: auto;
         display: grid;
-        width: 520px;
-        height: 520px;
-        flex: 0 0 520px;
+        width: scale.px(520);
+        height: scale.px(520);
+        flex: 0 0 scale.px(520);
         overflow: hidden;
         place-items: center;
 
@@ -742,8 +745,8 @@
         .clotheImage {
           position: static;
           display: block;
-          width: 520px;
-          height: 520px;
+          width: scale.px(520);
+          height: scale.px(520);
           min-width: 0;
           min-height: 0;
           max-width: 100%;
@@ -755,7 +758,7 @@
     }
 
     .clothingControls {
-      width: 590px;
+      width: scale.px(590);
       flex: none;
     }
 
@@ -763,17 +766,17 @@
       display: flex;
       flex-direction: column;
       gap: 0;
-      width: 590px;
-      min-height: 510px;
-      padding: 36px;
+      width: scale.px(590);
+      min-height: scale.px(510);
+      padding: scale.px(36);
       box-sizing: border-box;
-      border-radius: 30px;
+      border-radius: scale.px(30);
       background: #f0f0f0;
 
       .title {
-        margin: 0 0 20px;
+        margin: 0 0 scale.px(20);
         font-family: 'Jost', sans-serif;
-        font-size: 20px;
+        font-size: scale.px(20);
         font-weight: 500;
         line-height: 1;
         color: #2b2b2b;
@@ -781,22 +784,22 @@
 
       .selectorType {
         display: grid;
-        grid-template-columns: repeat(2, 200px);
-        grid-auto-rows: 54px;
-        gap: 12px 10px;
+        grid-template-columns: repeat(2, scale.px(200));
+        grid-auto-rows: scale.px(54);
+        gap: scale.px(12) scale.px(10);
 
         .selectorType__item {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 200px;
-          height: 54px;
-          padding: 0 14px;
+          width: scale.px(200);
+          height: scale.px(54);
+          padding: 0 scale.px(14);
           box-sizing: border-box;
-          border-radius: 40px;
+          border-radius: scale.px(40);
           background: #fff;
           font-family: 'Jost', sans-serif;
-          font-size: 13px;
+          font-size: scale.px(13);
           font-weight: 600;
           line-height: 1.4;
           color: #4b4b4b;
@@ -819,20 +822,20 @@
       }
 
       .selectorGroup--color {
-        margin-top: 22px;
+        margin-top: scale.px(22);
       }
 
       .colorSelector {
         display: flex;
         align-items: center;
-        min-height: 38px;
-        gap: 10px;
+        min-height: scale.px(38);
+        gap: scale.px(10);
       }
 
       .colorSquare {
-        width: 32px;
-        height: 32px;
-        flex: 0 0 32px;
+        width: scale.px(32);
+        height: scale.px(32);
+        flex: 0 0 scale.px(32);
         border: 0;
         border-radius: 50%;
         box-shadow: none;
@@ -845,17 +848,17 @@
 
       .colorSquare.active {
         outline: 0;
-        box-shadow: 0 0 0 1px #fff, 0 0 0 3px #161616;
+        box-shadow: 0 0 0 scale.px(1) #fff, 0 0 0 scale.px(3) #161616;
       }
 
       .selectorGroup--size {
-        margin-top: 19px;
+        margin-top: scale.px(19);
       }
 
       .selectorGroup__heading {
         position: relative;
-        height: 20px;
-        margin-bottom: 20px;
+        height: scale.px(20);
+        margin-bottom: scale.px(20);
 
         .title {
           margin: 0;
@@ -865,11 +868,11 @@
       .tableSize {
         position: absolute;
         top: 0;
-        left: 271px;
-        width: 169px;
+        left: scale.px(271);
+        width: scale.px(169);
         margin: 0;
         font-family: 'Jost', sans-serif;
-        font-size: 20px;
+        font-size: scale.px(20);
         font-weight: 500;
         line-height: 1;
         color: #cc7d54;
@@ -879,19 +882,19 @@
       .sizeSelector {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: scale.px(10);
 
         .sizeSelector__item {
           flex: 0 0 auto;
 
           .sizeSelector__box {
-            width: 80px;
-            height: 54px;
+            width: scale.px(80);
+            height: scale.px(54);
             border: 0;
-            border-radius: 40px;
+            border-radius: scale.px(40);
             background: #fff;
             font-family: 'Jost', sans-serif;
-            font-size: 13px;
+            font-size: scale.px(13);
             font-weight: 600;
             line-height: 1.4;
             color: #4b4b4b;
@@ -899,7 +902,7 @@
           }
 
           &:nth-child(6) .sizeSelector__box {
-            width: 68px;
+            width: scale.px(68);
           }
 
           input:checked + .sizeSelector__box {
@@ -914,25 +917,25 @@
 
     .orderNavigation {
       display: grid;
-      grid-template-columns: repeat(2, 285px);
-      gap: 20px;
-      width: 590px;
-      height: 54px;
-      margin-top: 20px;
+      grid-template-columns: repeat(2, scale.px(285));
+      gap: scale.px(20);
+      width: scale.px(590);
+      height: scale.px(54);
+      margin-top: scale.px(20);
     }
 
     .orderActionButton {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 285px;
-      height: 54px;
-      min-height: 54px;
-      padding: 0 62px;
+      width: scale.px(285);
+      height: scale.px(54);
+      min-height: scale.px(54);
+      padding: 0 scale.px(62);
       box-sizing: border-box;
-      border-radius: 40px;
+      border-radius: scale.px(40);
       font-family: 'Jost', sans-serif;
-      font-size: 13px;
+      font-size: scale.px(13);
       font-weight: 600;
       line-height: 1.4;
       text-align: center;
@@ -940,13 +943,13 @@
     }
 
     .orderActionButton--back {
-      border: 1px solid #4b4b4b;
+      border: scale.px(1) solid #4b4b4b;
       background: #fff;
       color: #4b4b4b;
     }
 
     .orderActionButton--next {
-      border: 1px solid #161616;
+      border: scale.px(1) solid #161616;
       background: #161616;
       color: #fff;
     }
@@ -961,10 +964,10 @@
   }
 
   .orderPage {
-    width: min(100vw, 640px);
-    min-height: 477px;
-    margin-left: calc(50% - min(50vw, 320px));
-    padding: 10px;
+    width: min(100vw, scale.px(640));
+    min-height: scale.px(477);
+    margin-left: calc(50% - min(50vw, scale.px(320)));
+    padding: scale.px(10);
     box-sizing: border-box;
     background: #fff;
   }
@@ -974,8 +977,8 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 457px;
-    border-radius: 20px;
+    min-height: scale.px(457);
+    border-radius: scale.px(20);
     background: vars.$order-stage-background;
   }
 
@@ -986,22 +989,22 @@
 
   .orderPage .blockClothingSelector {
     display: grid;
-    grid-template-columns: 240px 290px;
+    grid-template-columns: scale.px(240) scale.px(290);
     align-items: start;
     justify-content: start;
     gap: 0;
-    width: 560px;
-    min-height: 397px;
-    padding: 30px 30px 30px 0;
+    width: scale.px(560);
+    min-height: scale.px(397);
+    padding: scale.px(30) scale.px(30) scale.px(30) 0;
     box-sizing: border-box;
-    border-radius: 20px;
+    border-radius: scale.px(20);
     background: #fff;
 
     .clothing-block {
       position: relative;
-      width: 240px;
+      width: scale.px(240);
       max-width: none;
-      height: 337px;
+      height: scale.px(337);
       flex: none;
       align-self: auto;
       overflow: visible;
@@ -1015,11 +1018,11 @@
         left: 0;
         z-index: 1;
         display: block;
-        width: 240px;
-        height: 16px;
+        width: scale.px(240);
+        height: scale.px(16);
         margin: 0;
         font-family: 'Jost', sans-serif;
-        font-size: 16px;
+        font-size: scale.px(16);
         font-weight: 400;
         line-height: 1;
         color: #d0d0d0;
@@ -1029,11 +1032,11 @@
 
       .image-wrapper {
         position: absolute;
-        top: 44px;
-        left: 8px;
+        top: scale.px(44);
+        left: scale.px(8);
         display: block;
-        width: 225px;
-        height: 198px;
+        width: scale.px(225);
+        height: scale.px(198);
         overflow: hidden;
 
         .image-frame {
@@ -1070,7 +1073,7 @@
     }
 
     .clothingControls {
-      width: 290px;
+      width: scale.px(290);
       flex: none;
     }
 
@@ -1080,48 +1083,48 @@
       flex-wrap: nowrap;
       justify-content: flex-start;
       gap: 0;
-      width: 290px;
-      min-height: 297px;
-      padding: 24px 25px;
+      width: scale.px(290);
+      min-height: scale.px(297);
+      padding: scale.px(24) scale.px(25);
       box-sizing: border-box;
-      border-radius: 20px;
+      border-radius: scale.px(20);
       background: #f0f0f0;
       overflow: visible;
 
       .title {
         margin: 0;
         font-family: 'Jost', sans-serif;
-        font-size: 12px;
+        font-size: scale.px(12);
         font-weight: 500;
         line-height: 1;
         color: #2b2b2b;
       }
 
       .selectorGroup--type > .title {
-        margin-bottom: 10px;
+        margin-bottom: scale.px(10);
         font-weight: 600;
         line-height: 1.4;
       }
 
       .selectorType {
         display: grid;
-        grid-template-columns: repeat(2, 100px);
-        grid-auto-rows: 28px;
-        gap: 5px;
+        grid-template-columns: repeat(2, scale.px(100));
+        grid-auto-rows: scale.px(28);
+        gap: scale.px(5);
 
         .selectorType__item {
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 0;
-          width: 100px;
-          height: 28px;
-          padding: 0 8px;
+          width: scale.px(100);
+          height: scale.px(28);
+          padding: 0 scale.px(8);
           box-sizing: border-box;
-          border-radius: 40px;
+          border-radius: scale.px(40);
           background: #fff;
           font-family: 'Jost', sans-serif;
-          font-size: 8px;
+          font-size: scale.px(8);
           font-weight: 600;
           line-height: 1.4;
           color: #4b4b4b;
@@ -1144,10 +1147,10 @@
       }
 
       .selectorGroup--color {
-        margin-top: 15px;
+        margin-top: scale.px(15);
 
         > .title {
-          margin-bottom: 7px;
+          margin-bottom: scale.px(7);
         }
       }
 
@@ -1155,14 +1158,14 @@
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        min-height: 30px;
-        gap: 8px;
+        min-height: scale.px(30);
+        gap: scale.px(8);
       }
 
       .colorSquare {
-        width: 24px;
-        height: 24px;
-        flex: 0 0 24px;
+        width: scale.px(24);
+        height: scale.px(24);
+        flex: 0 0 scale.px(24);
         border: 0;
         border-radius: 50%;
         box-shadow: none;
@@ -1175,17 +1178,17 @@
 
       .colorSquare.active {
         outline: 0;
-        box-shadow: 0 0 0 1px #fff, 0 0 0 3px #161616;
+        box-shadow: 0 0 0 scale.px(1) #fff, 0 0 0 scale.px(3) #161616;
       }
 
       .selectorGroup--size {
-        margin-top: 15px;
+        margin-top: scale.px(15);
       }
 
       .selectorGroup__heading {
         position: relative;
-        height: 12px;
-        margin-bottom: 10px;
+        height: scale.px(12);
+        margin-bottom: scale.px(10);
 
         .title {
           margin: 0;
@@ -1200,7 +1203,7 @@
         width: auto;
         margin: 0;
         font-family: 'Jost', sans-serif;
-        font-size: 12px;
+        font-size: scale.px(12);
         font-weight: 400;
         line-height: 1;
         color: #bc5823;
@@ -1209,8 +1212,8 @@
 
       .sizeSelector {
         display: grid;
-        grid-template-columns: repeat(5, 44px);
-        gap: 5px;
+        grid-template-columns: repeat(5, scale.px(44));
+        gap: scale.px(5);
         width: 100%;
 
         &.sizeSelector--six {
@@ -1224,12 +1227,12 @@
 
           .sizeSelector__box {
             width: 100%;
-            height: 28px;
+            height: scale.px(28);
             border: 0;
-            border-radius: 40px;
+            border-radius: scale.px(40);
             background: #fff;
             font-family: 'Jost', sans-serif;
-            font-size: 8px;
+            font-size: scale.px(8);
             font-weight: 600;
             line-height: 1.4;
             color: #4b4b4b;
@@ -1249,10 +1252,10 @@
     .orderNavigation {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      width: 290px;
-      height: 28px;
-      margin-top: 12px;
+      gap: scale.px(10);
+      width: scale.px(290);
+      height: scale.px(28);
+      margin-top: scale.px(12);
     }
 
     .orderActionButton {
@@ -1264,9 +1267,9 @@
       min-height: 0;
       padding: 0;
       box-sizing: border-box;
-      border-radius: 40px;
+      border-radius: scale.px(40);
       font-family: 'Jost', sans-serif;
-      font-size: 8px;
+      font-size: scale.px(8);
       font-weight: 600;
       line-height: 1.4;
       text-align: center;
@@ -1274,21 +1277,20 @@
     }
 
     .orderActionButton--back {
-      border: 1px solid #4b4b4b;
+      border: scale.px(1) solid #4b4b4b;
       background: #fff;
       color: #4b4b4b;
     }
 
     .orderActionButton--next {
-      border: 1px solid #161616;
+      border: scale.px(1) solid #161616;
       background: #161616;
       color: #fff;
     }
   }
 }
 
-/* Order redesign: mobile frame 320 x 830. The canvas stays at the supplied
-   width and is centred on wider phones until the tablet breakpoint. */
+/* Mobile design pixels follow the 320px frame proportionally until tablet. */
 @media (max-width: bp.$mobile-max) {
   .App--order {
     overflow-x: clip;
@@ -1300,15 +1302,16 @@
 
   .orderPage {
     position: relative;
-    left: 50%;
-    width: 320px;
+    left: auto;
+    width: scale.px(320);
     max-width: 100vw;
-    min-height: 862px;
-    margin: 0 0 10px;
-    padding: 10px 3px;
+    min-height: scale.px(862);
+    margin: 0 0 scale.px(10);
+    margin-left: calc(50% - 50vw);
+    padding: scale.px(10) scale.px(3);
     box-sizing: border-box;
     background: #fff;
-    transform: translateX(-50%);
+    transform: none;
   }
 
   .orderPage__stage {
@@ -1316,10 +1319,10 @@
     align-items: flex-start;
     justify-content: center;
     width: 100%;
-    min-height: 842px;
+    min-height: scale.px(842);
     padding: 0;
     box-sizing: border-box;
-    border-radius: 20px;
+    border-radius: scale.px(20);
     background: #fff;
   }
 
@@ -1331,21 +1334,21 @@
 
   .orderPage .blockClothingSelector {
     display: block;
-    width: 314px;
+    width: scale.px(314);
     max-width: 100%;
     height: auto;
-    min-height: 842px;
-    padding: 0 0 20px;
+    min-height: scale.px(842);
+    padding: 0 0 scale.px(20);
     box-sizing: border-box;
-    border-radius: 20px;
+    border-radius: scale.px(20);
     background: #fff;
 
     .clothing-block {
       position: relative;
-      width: 314px;
+      width: scale.px(314);
       max-width: 100%;
-      height: 351px;
-      min-height: 351px;
+      height: scale.px(351);
+      min-height: scale.px(351);
       flex: none;
       align-self: auto;
       overflow: visible;
@@ -1355,12 +1358,12 @@
 
       .clothingSelectorMobile__arrow {
         position: absolute;
-        top: 20px;
-        left: 20px;
+        top: scale.px(20);
+        left: scale.px(20);
         z-index: 2;
         display: block;
-        width: 40px;
-        height: 40px;
+        width: scale.px(40);
+        height: scale.px(40);
         padding: 0;
         border: 0;
         border-radius: 50%;
@@ -1369,22 +1372,22 @@
 
         img {
           display: block;
-          width: 40px;
-          height: 40px;
+          width: scale.px(40);
+          height: scale.px(40);
         }
       }
 
       .orderStepTitle {
         position: absolute;
-        top: 27px;
-        left: 7px;
+        top: scale.px(27);
+        left: scale.px(7);
         z-index: 1;
         display: block;
-        width: 300px;
-        height: 24px;
+        width: scale.px(300);
+        height: scale.px(24);
         margin: 0;
         font-family: 'Jost', sans-serif;
-        font-size: 24px;
+        font-size: scale.px(24);
         font-weight: 400;
         line-height: 1;
         color: #0c0c0c;
@@ -1394,18 +1397,18 @@
 
       .image-wrapper {
         position: absolute;
-        top: 71px;
-        left: 22px;
+        top: scale.px(71);
+        left: scale.px(22);
         display: block;
-        width: 270px;
-        height: 270px;
+        width: scale.px(270);
+        height: scale.px(270);
         overflow: hidden;
 
         .image-frame {
           position: relative;
           display: block;
-          width: 270px;
-          height: 270px;
+          width: scale.px(270);
+          height: scale.px(270);
           min-height: 0;
           max-height: none;
           overflow: hidden;
@@ -1417,8 +1420,8 @@
           position: absolute;
           inset: 0;
           display: block;
-          width: 270px;
-          height: 270px;
+          width: scale.px(270);
+          height: scale.px(270);
         }
 
         .clotheImage {
@@ -1435,7 +1438,7 @@
     }
 
     .clothingControls {
-      width: 314px;
+      width: scale.px(314);
       max-width: 100%;
       flex: none;
     }
@@ -1446,48 +1449,48 @@
       flex-wrap: nowrap;
       justify-content: flex-start;
       gap: 0;
-      width: 308px;
-      min-height: 411px;
-      margin-left: 3px;
-      padding: 30px 20px 17px;
+      width: scale.px(308);
+      min-height: scale.px(411);
+      margin-left: scale.px(3);
+      padding: scale.px(30) scale.px(20) scale.px(17);
       box-sizing: border-box;
-      border-radius: 30px;
+      border-radius: scale.px(30);
       background: #f0f0f0;
       overflow: hidden;
 
       .title {
         margin: 0;
         font-family: 'Jost', sans-serif;
-        font-size: 16px;
+        font-size: scale.px(16);
         font-weight: 500;
         line-height: 1;
         color: #2b2b2b;
       }
 
       .selectorGroup--type > .title {
-        margin-bottom: 12px;
+        margin-bottom: scale.px(12);
       }
 
       .selectorType {
         display: grid;
-        grid-template-columns: 268px;
-        grid-auto-rows: 40px;
-        gap: 6px;
-        width: 268px;
+        grid-template-columns: scale.px(268);
+        grid-auto-rows: scale.px(40);
+        gap: scale.px(6);
+        width: scale.px(268);
 
         .selectorType__item {
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 0;
-          width: 268px;
-          height: 40px;
-          padding: 0 12px;
+          width: scale.px(268);
+          height: scale.px(40);
+          padding: 0 scale.px(12);
           box-sizing: border-box;
-          border-radius: 40px;
+          border-radius: scale.px(40);
           background: #fff;
           font-family: 'Jost', sans-serif;
-          font-size: 12px;
+          font-size: scale.px(12);
           font-weight: 600;
           line-height: 1.4;
           color: #4b4b4b;
@@ -1515,10 +1518,10 @@
       }
 
       .selectorGroup--color {
-        margin-top: 21px;
+        margin-top: scale.px(21);
 
         > .title {
-          margin-bottom: 12px;
+          margin-bottom: scale.px(12);
         }
       }
 
@@ -1526,14 +1529,14 @@
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        min-height: 30px;
-        gap: 7.5px;
+        min-height: scale.px(30);
+        gap: scale.px(7.5);
       }
 
       .colorSquare {
-        width: 30px;
-        height: 30px;
-        flex: 0 0 30px;
+        width: scale.px(30);
+        height: scale.px(30);
+        flex: 0 0 scale.px(30);
         padding: 0;
         border: 0;
         border-radius: 50%;
@@ -1547,8 +1550,8 @@
 
       .colorSquare.active {
         outline: 0;
-        border: 1.5px solid #fff;
-        box-shadow: 0 0 0 1.5px #161616;
+        border: scale.px(1.5) solid #fff;
+        box-shadow: 0 0 0 scale.px(1.5) #161616;
       }
 
       .colorSquare.is-disabled {
@@ -1558,13 +1561,13 @@
       }
 
       .selectorGroup--size {
-        margin-top: 25px;
+        margin-top: scale.px(25);
       }
 
       .selectorGroup__heading {
         position: relative;
-        height: 16px;
-        margin-bottom: 10px;
+        height: scale.px(16);
+        margin-bottom: scale.px(10);
 
         .title {
           margin: 0;
@@ -1577,9 +1580,9 @@
 
       .sizeSelector {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(41px, 1fr));
-        gap: 4px;
-        width: 266px;
+        grid-template-columns: repeat(auto-fit, minmax(scale.px(41), 1fr));
+        gap: scale.px(4);
+        width: scale.px(266);
 
         .sizeSelector__item {
           display: block;
@@ -1591,12 +1594,12 @@
 
           .sizeSelector__box {
             width: 100%;
-            height: 40px;
+            height: scale.px(40);
             border: 0;
-            border-radius: 40px;
+            border-radius: scale.px(40);
             background: #fff;
             font-family: 'Jost', sans-serif;
-            font-size: 12px;
+            font-size: scale.px(12);
             font-weight: 600;
             line-height: 1.4;
             color: #4b4b4b;
@@ -1617,22 +1620,22 @@
 
     .orderNavigation {
       display: block;
-      width: 274px;
-      height: 40px;
-      margin: 20px 20px 0;
+      width: scale.px(274);
+      height: scale.px(40);
+      margin: scale.px(20) scale.px(20) 0;
     }
 
     .orderActionButton {
       align-items: center;
       justify-content: center;
-      width: 274px;
-      height: 40px;
-      min-height: 40px;
+      width: scale.px(274);
+      height: scale.px(40);
+      min-height: scale.px(40);
       padding: 0;
       box-sizing: border-box;
-      border-radius: 40px;
+      border-radius: scale.px(40);
       font-family: 'Jost', sans-serif;
-      font-size: 12px;
+      font-size: scale.px(12);
       font-weight: 600;
       line-height: 1.4;
       text-align: center;
@@ -1645,7 +1648,7 @@
 
     .orderActionButton--next {
       display: flex;
-      border: 1px solid #161616;
+      border: scale.px(1) solid #161616;
       background: #161616;
       color: #fff;
     }

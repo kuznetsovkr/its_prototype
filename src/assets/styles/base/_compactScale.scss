@@ -15,6 +15,13 @@ $tablet-design-width: 640;
   @return calc(#{$value} * var(--compact-layout-pixel, 1px));
 }
 
+// The final mobile safeguard reads this value and applies a 16px minimum.
+// Native modal controls without a compact layout keep the existing 16px font.
+@mixin control-font($value) {
+  --mobile-control-font-size: #{px($value)};
+  font-size: px($value);
+}
+
 @mixin container {
   --compact-layout-pixel: 1px;
 

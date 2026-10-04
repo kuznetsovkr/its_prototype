@@ -6,6 +6,6 @@
   #root textarea,
   #root select,
   #root input:not([type="button"]):not([type="checkbox"]):not([type="color"]):not([type="file"]):not([type="hidden"]):not([type="image"]):not([type="radio"]):not([type="range"]):not([type="reset"]):not([type="submit"]) {
-    font-size: 16px;
+    font-size: max(16px, var(--mobile-control-font-size, 16px));
   }
 }

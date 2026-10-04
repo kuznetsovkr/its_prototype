@@ -1,4 +1,5 @@
 @use "../base/breakpoints" as bp;
+@use "../base/compactScale" as scale;
 @use "../base/variables" as vars;
 
 .containerDetails{
@@ -531,6 +532,8 @@
 }
 
 .recipientOrderPage {
+  @include scale.container;
+
   font-family: 'Jost', sans-serif;
 }
 
@@ -554,8 +557,8 @@
 .recipientOrderForm input:focus-visible,
 .recipientOrderForm textarea:focus-visible,
 .recipientOrderNavigation button:focus-visible {
-  outline: 2px solid #bc5823;
-  outline-offset: 2px;
+  outline: scale.px(2) solid #bc5823;
+  outline-offset: scale.px(2);
 }
 
 .recipientOrderForm {
@@ -625,8 +628,8 @@
   display: grid;
   flex: 0 0 auto;
   margin: 0;
-  border: 1px solid #bc5823;
-  border-radius: 3px;
+  border: scale.px(1) solid #bc5823;
+  border-radius: scale.px(3);
   appearance: none;
   place-content: center;
   background: #fff;
@@ -636,8 +639,8 @@
 .recipientOrderForm__noMiddleName input::before {
   width: 60%;
   height: 35%;
-  border-bottom: 1px solid #fff;
-  border-left: 1px solid #fff;
+  border-bottom: scale.px(1) solid #fff;
+  border-left: scale.px(1) solid #fff;
   content: '';
   transform: rotate(-45deg) scale(0);
 }
@@ -671,7 +674,7 @@
 .recipientOrderForm__group button {
   display: block;
   width: 100%;
-  padding-inline: 20px;
+  padding-inline: scale.px(20);
   text-align: left;
 }
 
@@ -684,8 +687,8 @@
 
 .recipientOrderForm__validation {
   position: absolute;
-  top: calc(100% + 3px);
-  left: 10px;
+  top: calc(100% + scale.px(3));
+  left: scale.px(10);
   color: #a53636;
   font-size: 0.85em;
   line-height: 1;
@@ -742,7 +745,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px 16px;
+  gap: scale.px(6) scale.px(16);
   margin: 0;
   color: #2b2b2b;
   line-height: 1.2;
@@ -771,7 +774,7 @@
   display: grid;
   flex: 0 0 auto;
   margin: 0;
-  border: 1px solid #bc5823;
+  border: scale.px(1) solid #bc5823;
   border-radius: 0;
   appearance: none;
   place-content: center;
@@ -782,8 +785,8 @@
 .recipientOrderForm__consent input::before {
   width: 60%;
   height: 35%;
-  border-bottom: 2px solid #fff;
-  border-left: 2px solid #fff;
+  border-bottom: scale.px(2) solid #fff;
+  border-left: scale.px(2) solid #fff;
   content: '';
   transform: rotate(-45deg) scale(0);
 }
@@ -804,14 +807,14 @@
 .recipientOrderForm__legalLink {
   color: #bc5823;
   text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
+  text-decoration-thickness: scale.px(1);
+  text-underline-offset: scale.px(2);
 }
 
 .recipientOrderForm__legalLink:focus-visible {
-  border-radius: 2px;
-  outline: 2px solid #479ceb;
-  outline-offset: 2px;
+  border-radius: scale.px(2);
+  outline: scale.px(2) solid #479ceb;
+  outline-offset: scale.px(2);
 }
 
 .recipientOrderCard__imageFrame img.is-product-preview {
@@ -829,9 +832,9 @@
   position: absolute;
   display: grid;
   box-sizing: border-box;
-  gap: 8px;
-  border: 1px solid rgb(188 88 35 / 24%);
-  border-radius: 18px;
+  gap: scale.px(8);
+  border: scale.px(1) solid rgb(188 88 35 / 24%);
+  border-radius: scale.px(18);
   background: #fff;
 }
 
@@ -844,7 +847,7 @@
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 10px;
+  gap: scale.px(10);
 }
 
 .recipientOrderForm__turnstileShield {
@@ -873,7 +876,7 @@
 .recipientOrderForm__turnstileCopy {
   display: grid;
   min-width: 0;
-  gap: 1px;
+  gap: scale.px(1);
   line-height: 1.25;
 }
 
@@ -889,7 +892,7 @@
   flex: 0 0 auto;
   margin-left: auto;
   border: 0;
-  border-radius: 999px;
+  border-radius: scale.px(999);
   background: #f0e7df;
   color: #bc5823;
   font-weight: 600;
@@ -903,7 +906,7 @@
 
 .recipientOrderForm__turnstileWidget {
   width: 100%;
-  min-height: 65px;
+  min-height: scale.px(65);
   overflow: hidden;
 }
 
@@ -929,20 +932,20 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  border-radius: 40px;
+  border-radius: scale.px(40);
   font-weight: 600;
   text-align: center;
   text-transform: uppercase;
 }
 
 .recipientOrderNavigation__back {
-  border: 1px solid #4b4b4b;
+  border: scale.px(1) solid #4b4b4b;
   background: #fff;
   color: #4b4b4b;
 }
 
 .recipientOrderNavigation__submit {
-  border: 1px solid #161616;
+  border: scale.px(1) solid #161616;
   background: #161616;
   color: #fff;
 }
@@ -966,16 +969,16 @@
 .recipientOrderCard__error {
   position: fixed;
   z-index: 30;
-  right: 20px;
-  bottom: 20px;
-  max-width: min(420px, calc(100vw - 40px));
+  right: scale.px(20);
+  bottom: scale.px(20);
+  max-width: min(scale.px(420), calc(100vw - scale.px(40)));
   margin: 0;
-  padding: 12px 16px;
-  border-radius: 12px;
+  padding: scale.px(12) scale.px(16);
+  border-radius: scale.px(12);
   background: #a53636;
   color: #fff;
   font-family: 'Jost', sans-serif;
-  font-size: 14px;
+  font-size: scale.px(14);
   line-height: 1.35;
 }
 
@@ -1393,50 +1396,50 @@
 
 @media (min-width: bp.$desktop-min) {
   .recipientOrderPage.has-turnstile {
-    min-height: 1630px;
+    min-height: scale.px(1630);
   }
 
   .recipientOrderPage.has-turnstile .recipientOrderPage__stage {
-    min-height: 1570px;
+    min-height: scale.px(1570);
   }
 
   .recipientOrderPage.has-turnstile .recipientOrderCard {
-    height: 1410px;
+    height: scale.px(1410);
   }
 
   .recipientOrderPage.has-turnstile .recipientOrderCard__preview {
-    height: 1314px;
+    height: scale.px(1314);
   }
 
   .recipientOrderPage.has-turnstile .recipientOrderForm {
-    height: 1240px;
+    height: scale.px(1240);
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified {
-    min-height: 1550px;
+    min-height: scale.px(1550);
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderPage__stage {
-    min-height: 1490px;
+    min-height: scale.px(1490);
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderCard {
-    height: 1330px;
+    height: scale.px(1330);
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderCard__preview {
-    height: 1234px;
+    height: scale.px(1234);
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderForm {
-    height: 1160px;
+    height: scale.px(1160);
   }
 
   .recipientOrderPage {
     width: 100vw;
-    min-height: 1472px;
+    min-height: scale.px(1472);
     margin-left: calc(50% - 50vw);
-    padding: 0 clamp(20px, calc(6.25vw - 60px), 60px) 60px;
+    padding: 0 clamp(scale.px(20), calc(6.25vw - scale.px(60)), scale.px(60)) scale.px(60);
     box-sizing: border-box;
     background: #fff;
   }
@@ -1446,39 +1449,39 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 1412px;
-    padding: 80px 0;
+    min-height: scale.px(1412);
+    padding: scale.px(80) 0;
     box-sizing: border-box;
-    border-radius: 60px;
+    border-radius: scale.px(60);
     background: vars.$order-stage-background;
   }
 
   .recipientOrderCard {
     display: grid;
-    grid-template-columns: 562px 590px;
+    grid-template-columns: scale.px(562) scale.px(590);
     align-items: start;
-    width: 1200px;
-    height: 1252px;
-    padding: 48px 48px 48px 0;
+    width: scale.px(1200);
+    height: scale.px(1252);
+    padding: scale.px(48) scale.px(48) scale.px(48) 0;
     box-sizing: border-box;
-    border-radius: 30px;
+    border-radius: scale.px(30);
     background: #fff;
   }
 
   .recipientOrderCard__preview {
     position: relative;
-    width: 562px;
-    height: 1156px;
+    width: scale.px(562);
+    height: scale.px(1156);
   }
 
   .recipientOrderCard__backArrow {
     position: absolute;
     z-index: 2;
-    top: 6px;
-    left: 45px;
+    top: scale.px(6);
+    left: scale.px(45);
     display: block;
-    width: 40px;
-    height: 40px;
+    width: scale.px(40);
+    height: scale.px(40);
     padding: 0;
     border: 0;
     background: transparent;
@@ -1487,20 +1490,20 @@
   .recipientOrderCard__backIcon,
   .recipientOrderCard__backIcon img {
     display: block;
-    width: 40px;
-    height: 40px;
+    width: scale.px(40);
+    height: scale.px(40);
   }
 
   .recipientOrderCard__title {
     position: absolute;
     z-index: 1;
-    top: 10px;
-    left: 180px;
-    width: 206px;
-    height: 32px;
+    top: scale.px(10);
+    left: scale.px(180);
+    width: scale.px(206);
+    height: scale.px(32);
     margin: 0;
     color: #d0d0d0;
-    font-size: 32px;
+    font-size: scale.px(32);
     font-weight: 400;
     line-height: 1;
     text-transform: lowercase;
@@ -1509,20 +1512,20 @@
 
   .recipientOrderCard__imageFrame {
     position: absolute;
-    top: 34px;
-    left: -5px;
-    width: 567px;
-    height: 499px;
+    top: scale.px(34);
+    left: scale.px(-5);
+    width: scale.px(567);
+    height: scale.px(499);
     overflow: hidden;
   }
 
   .recipientOrderCard__imageFrame img {
     position: absolute;
-    top: -120.409px;
+    top: scale.px(-120.409);
     left: 0;
     display: block;
-    width: 567px;
-    height: 756.534px;
+    width: scale.px(567);
+    height: scale.px(756.534);
     max-width: none;
     max-height: none;
     object-fit: fill;
@@ -1530,258 +1533,258 @@
 
   .recipientOrderCard__controls,
   .recipientOrderForm {
-    width: 590px;
+    width: scale.px(590);
   }
 
   .recipientOrderForm {
-    height: 1082px;
-    border-radius: 30px;
+    height: scale.px(1082);
+    border-radius: scale.px(30);
   }
 
   .recipientOrderForm__heading {
-    left: 36px;
-    height: 20px;
-    font-size: 20px;
+    left: scale.px(36);
+    height: scale.px(20);
+    font-size: scale.px(20);
   }
 
   .recipientOrderForm__heading--personal {
-    top: 36px;
+    top: scale.px(36);
   }
 
   .recipientOrderForm__heading--delivery {
-    top: 498px;
+    top: scale.px(498);
   }
 
   .recipientOrderForm__field,
   .recipientOrderForm__phoneField {
-    left: 36px;
-    width: 518px;
-    height: 54px;
-    border-radius: 40px;
+    left: scale.px(36);
+    width: scale.px(518);
+    height: scale.px(54);
+    border-radius: scale.px(40);
   }
 
   .recipientOrderForm__field {
-    padding: 0 30px;
-    font-size: 16px;
+    padding: 0 scale.px(30);
+    @include scale.control-font(16);
     font-weight: 500;
     line-height: 1.4;
   }
 
   .recipientOrderForm__field--fullName {
-    top: 76px;
+    top: scale.px(76);
   }
 
   .recipientOrderForm__noMiddleName {
-    top: 58px;
-    right: 48px;
-    gap: 6px;
-    font-size: 11px;
-    line-height: 14px;
+    top: scale.px(58);
+    right: scale.px(48);
+    gap: scale.px(6);
+    font-size: scale.px(11);
+    line-height: scale.px(14);
   }
 
   .recipientOrderForm__noMiddleName input {
-    width: 14px;
-    height: 14px;
+    width: scale.px(14);
+    height: scale.px(14);
   }
 
   .recipientOrderForm__phoneField {
-    top: 150px;
+    top: scale.px(150);
   }
 
   .recipientOrderForm__field--email {
-    top: 224px;
+    top: scale.px(224);
   }
 
   .recipientOrderForm__field--contact {
-    top: 298px;
+    top: scale.px(298);
   }
 
   .recipientOrderForm__field--orderComment {
-    top: 372px;
-    height: 102px;
-    padding-top: 18px;
+    top: scale.px(372);
+    height: scale.px(102);
+    padding-top: scale.px(18);
   }
 
   .recipientOrderForm__group {
-    left: 36px;
-    width: 518px;
-    font-size: 13px;
+    left: scale.px(36);
+    width: scale.px(518);
+    font-size: scale.px(13);
     line-height: 1.4;
   }
 
   .recipientOrderForm__group > span {
-    height: 18px;
-    margin-bottom: 10px;
+    height: scale.px(18);
+    margin-bottom: scale.px(10);
     font-weight: 600;
   }
 
   .recipientOrderForm__group input,
   .recipientOrderForm__group button {
-    height: 54px;
-    padding-inline: 30px;
-    border-radius: 40px;
-    font-size: 16px;
+    height: scale.px(54);
+    padding-inline: scale.px(30);
+    border-radius: scale.px(40);
+    @include scale.control-font(16);
     font-weight: 500;
     line-height: 1.4;
   }
 
   .recipientOrderForm__deliveryMethod {
-    top: 533px;
-    left: 36px;
-    width: 518px;
-    min-height: 32px;
-    font-size: 13px;
+    top: scale.px(533);
+    left: scale.px(36);
+    width: scale.px(518);
+    min-height: scale.px(32);
+    font-size: scale.px(13);
     line-height: 1.4;
   }
 
   .recipientOrderForm__radio,
   .recipientOrderForm__radioOuter {
-    width: 32px;
-    height: 32px;
+    width: scale.px(32);
+    height: scale.px(32);
   }
 
   .recipientOrderForm__radioInner {
-    top: 10px;
-    left: 10px;
-    width: 12px;
-    height: 12px;
+    top: scale.px(10);
+    left: scale.px(10);
+    width: scale.px(12);
+    height: scale.px(12);
   }
 
   .recipientOrderForm__deliveryMethodText {
-    margin-top: 7px;
-    margin-left: 10px;
+    margin-top: scale.px(7);
+    margin-left: scale.px(10);
     white-space: nowrap;
   }
 
   .recipientOrderForm__deliveryMethodText > span {
-    margin-left: 8px;
+    margin-left: scale.px(8);
   }
 
   .recipientOrderForm__group--pickup {
-    top: 585px;
+    top: scale.px(585);
   }
 
   .recipientOrderForm__group--recipient {
-    top: 687px;
+    top: scale.px(687);
   }
 
   .recipientOrderForm__group--recipientPhone {
-    top: 784px;
+    top: scale.px(784);
   }
 
   .recipientOrderForm__group--deliveryComment {
-    top: 886px;
+    top: scale.px(886);
   }
 
   .recipientOrderSummary {
-    top: 978px;
-    left: 36px;
-    width: 518px;
-    min-height: 28px;
-    font-size: 12px;
+    top: scale.px(978);
+    left: scale.px(36);
+    width: scale.px(518);
+    min-height: scale.px(28);
+    font-size: scale.px(12);
   }
 
   .recipientOrderForm__consent {
-    top: 1018px;
-    left: 36px;
-    width: 518px;
-    gap: 10px;
-    font-size: 13px;
+    top: scale.px(1018);
+    left: scale.px(36);
+    width: scale.px(518);
+    gap: scale.px(10);
+    font-size: scale.px(13);
     line-height: 1.4;
   }
 
   .recipientOrderForm__consent input {
-    width: 20px;
-    height: 20px;
+    width: scale.px(20);
+    height: scale.px(20);
   }
 
   .recipientOrderForm__consent > span {
-    width: 488px;
+    width: scale.px(488);
   }
 
   .recipientOrderForm__turnstile {
-    top: 1086px;
-    left: 36px;
-    width: 518px;
-    min-height: 125px;
-    padding: 10px 12px;
+    top: scale.px(1086);
+    left: scale.px(36);
+    width: scale.px(518);
+    min-height: scale.px(125);
+    padding: scale.px(10) scale.px(12);
   }
 
   .recipientOrderForm__turnstileShield {
-    width: 30px;
-    height: 30px;
+    width: scale.px(30);
+    height: scale.px(30);
   }
 
   .recipientOrderForm__turnstileCopy {
-    font-size: 12px;
+    font-size: scale.px(12);
   }
 
   .recipientOrderForm__turnstileCopy small {
-    font-size: 10px;
+    font-size: scale.px(10);
   }
 
   .recipientOrderForm__turnstileRetry {
-    min-height: 28px;
-    padding: 0 12px;
-    font-size: 8px;
+    min-height: scale.px(28);
+    padding: 0 scale.px(12);
+    font-size: scale.px(8);
   }
 
   .recipientOrderNavigation {
-    grid-template-columns: repeat(2, 285px);
-    gap: 20px;
-    width: 590px;
-    height: 54px;
-    margin-top: 20px;
+    grid-template-columns: repeat(2, scale.px(285));
+    gap: scale.px(20);
+    width: scale.px(590);
+    height: scale.px(54);
+    margin-top: scale.px(20);
   }
 
   .recipientOrderNavigation button {
-    width: 285px;
-    height: 54px;
-    padding: 0 20px;
-    font-size: 13px;
+    width: scale.px(285);
+    height: scale.px(54);
+    padding: 0 scale.px(20);
+    font-size: scale.px(13);
     line-height: 1.4;
   }
 }
 
 @media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
   .recipientOrderPage.has-turnstile {
-    min-height: 1016px;
+    min-height: scale.px(1016);
   }
 
   .recipientOrderPage.has-turnstile .recipientOrderPage__stage {
-    min-height: 996px;
+    min-height: scale.px(996);
   }
 
   .recipientOrderPage.has-turnstile .recipientOrderCard {
-    height: 936px;
+    height: scale.px(936);
   }
 
   .recipientOrderPage.has-turnstile .recipientOrderCard__preview {
-    height: 876px;
+    height: scale.px(876);
   }
 
   .recipientOrderPage.has-turnstile .recipientOrderForm {
-    height: 836px;
+    height: scale.px(836);
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified {
-    min-height: 946px;
+    min-height: scale.px(946);
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderPage__stage {
-    min-height: 926px;
+    min-height: scale.px(926);
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderCard {
-    height: 866px;
+    height: scale.px(866);
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderCard__preview {
-    height: 806px;
+    height: scale.px(806);
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderForm {
-    height: 766px;
+    height: scale.px(766);
   }
 
   .App--recipient main > .container > .wrapper {
@@ -1790,15 +1793,16 @@
 
   .recipientOrderPage {
     position: relative;
-    left: 50%;
-    width: 640px;
+    left: auto;
+    width: scale.px(640);
     max-width: 100vw;
-    min-height: 870px;
+    min-height: scale.px(870);
     margin: 0;
-    padding: 10px;
+    margin-left: calc(50% - 50vw);
+    padding: scale.px(10);
     box-sizing: border-box;
     background: #fff;
-    transform: translateX(-50%);
+    transform: none;
   }
 
   .recipientOrderPage__stage {
@@ -1806,37 +1810,37 @@
     align-items: flex-start;
     justify-content: center;
     width: 100%;
-    min-height: 850px;
-    padding: 30px;
-    border-radius: 20px;
+    min-height: scale.px(850);
+    padding: scale.px(30);
+    border-radius: scale.px(20);
     background: vars.$order-stage-background;
   }
 
   .recipientOrderCard {
     display: grid;
-    grid-template-columns: 240px 290px;
+    grid-template-columns: scale.px(240) scale.px(290);
     align-items: start;
-    width: 560px;
-    height: 790px;
-    padding: 30px 30px 30px 0;
-    border-radius: 20px;
+    width: scale.px(560);
+    height: scale.px(790);
+    padding: scale.px(30) scale.px(30) scale.px(30) 0;
+    border-radius: scale.px(20);
     background: #fff;
   }
 
   .recipientOrderCard__preview {
     position: relative;
-    width: 240px;
-    height: 730px;
+    width: scale.px(240);
+    height: scale.px(730);
   }
 
   .recipientOrderCard__backArrow {
     position: absolute;
     z-index: 2;
-    top: -6px;
-    left: 24px;
+    top: scale.px(-6);
+    left: scale.px(24);
     display: block;
-    width: 32px;
-    height: 32px;
+    width: scale.px(32);
+    height: scale.px(32);
     padding: 0;
     border: 0;
     background: transparent;
@@ -1845,19 +1849,19 @@
   .recipientOrderCard__backIcon,
   .recipientOrderCard__backIcon img {
     display: block;
-    width: 32px;
-    height: 32px;
+    width: scale.px(32);
+    height: scale.px(32);
   }
 
   .recipientOrderCard__title {
     position: absolute;
     top: 0;
-    left: 69px;
-    width: 103px;
-    height: 16px;
+    left: scale.px(69);
+    width: scale.px(103);
+    height: scale.px(16);
     margin: 0;
     color: #d0d0d0;
-    font-size: 16px;
+    font-size: scale.px(16);
     font-weight: 400;
     line-height: 1;
     text-transform: lowercase;
@@ -1866,20 +1870,20 @@
 
   .recipientOrderCard__imageFrame {
     position: absolute;
-    top: 44px;
-    left: 8px;
-    width: 225px;
-    height: 198px;
+    top: scale.px(44);
+    left: scale.px(8);
+    width: scale.px(225);
+    height: scale.px(198);
     overflow: hidden;
   }
 
   .recipientOrderCard__imageFrame img {
     position: absolute;
-    top: -47.777px;
+    top: scale.px(-47.777);
     left: 0;
     display: block;
-    width: 225px;
-    height: 300.188px;
+    width: scale.px(225);
+    height: scale.px(300.188);
     max-width: none;
     max-height: none;
     object-fit: fill;
@@ -1887,124 +1891,124 @@
 
   .recipientOrderCard__controls,
   .recipientOrderForm {
-    width: 290px;
+    width: scale.px(290);
   }
 
   .recipientOrderForm {
-    height: 690px;
-    border-radius: 20px;
+    height: scale.px(690);
+    border-radius: scale.px(20);
   }
 
   .recipientOrderForm__heading {
-    left: 25px;
-    height: 17px;
-    font-size: 12px;
+    left: scale.px(25);
+    height: scale.px(17);
+    font-size: scale.px(12);
     font-weight: 600;
     line-height: 1.4;
   }
 
   .recipientOrderForm__heading--personal {
-    top: 24px;
+    top: scale.px(24);
   }
 
   .recipientOrderForm__heading--delivery {
-    top: 321px;
+    top: scale.px(321);
   }
 
   .recipientOrderForm__field,
   .recipientOrderForm__phoneField {
-    left: 25px;
-    width: 240px;
-    height: 30px;
-    border-radius: 40px;
+    left: scale.px(25);
+    width: scale.px(240);
+    height: scale.px(30);
+    border-radius: scale.px(40);
   }
 
   .recipientOrderForm__field {
-    padding: 0 10px;
-    font-size: 8px;
+    padding: 0 scale.px(10);
+    @include scale.control-font(8);
     line-height: 1.4;
   }
 
   .recipientOrderForm__field--fullName {
-    top: 53px;
+    top: scale.px(53);
   }
 
   .recipientOrderForm__noMiddleName {
-    top: 41px;
-    right: 30px;
-    gap: 4px;
-    font-size: 8px;
-    line-height: 12px;
+    top: scale.px(41);
+    right: scale.px(30);
+    gap: scale.px(4);
+    font-size: scale.px(8);
+    line-height: scale.px(12);
   }
 
   .recipientOrderForm__noMiddleName input {
-    width: 12px;
-    height: 12px;
+    width: scale.px(12);
+    height: scale.px(12);
   }
 
   .recipientOrderForm__phoneField {
-    top: 95px;
+    top: scale.px(95);
   }
 
   .recipientOrderForm__field--email {
-    top: 137px;
+    top: scale.px(137);
   }
 
   .recipientOrderForm__field--contact {
-    top: 179px;
+    top: scale.px(179);
   }
 
   .recipientOrderForm__field--orderComment {
-    top: 221px;
-    height: 80px;
-    padding-top: 10px;
-    border-radius: 15px;
+    top: scale.px(221);
+    height: scale.px(80);
+    padding-top: scale.px(10);
+    border-radius: scale.px(15);
   }
 
   .recipientOrderForm__group {
-    left: 25px;
-    width: 240px;
-    font-size: 8px;
+    left: scale.px(25);
+    width: scale.px(240);
+    font-size: scale.px(8);
     line-height: 1.4;
   }
 
   .recipientOrderForm__group > span {
-    height: 11px;
-    margin-bottom: 6px;
+    height: scale.px(11);
+    margin-bottom: scale.px(6);
   }
 
   .recipientOrderForm__group input,
   .recipientOrderForm__group button {
-    height: 30px;
-    padding-inline: 10px;
-    border-radius: 40px;
-    font-size: 8px;
+    height: scale.px(30);
+    padding-inline: scale.px(10);
+    border-radius: scale.px(40);
+    @include scale.control-font(8);
     line-height: 1.4;
   }
 
   .recipientOrderForm__deliveryMethod {
-    top: 350px;
-    left: 29px;
-    width: 236px;
-    min-height: 28px;
-    font-size: 8px;
+    top: scale.px(350);
+    left: scale.px(29);
+    width: scale.px(236);
+    min-height: scale.px(28);
+    font-size: scale.px(8);
     line-height: 1.4;
   }
 
   .recipientOrderForm__radio {
-    width: 24px;
-    height: 24px;
+    width: scale.px(24);
+    height: scale.px(24);
   }
 
   .recipientOrderForm__radioResponsive {
     display: block;
-    width: 24px;
-    height: 24px;
+    width: scale.px(24);
+    height: scale.px(24);
   }
 
   .recipientOrderForm__radioResponsive img {
-    width: 24px;
-    height: 24px;
+    width: scale.px(24);
+    height: scale.px(24);
   }
 
   .recipientOrderForm__radioOuter,
@@ -2013,105 +2017,105 @@
   }
 
   .recipientOrderForm__deliveryMethodText {
-    width: 206px;
-    margin-top: 1px;
-    margin-left: 6px;
+    width: scale.px(206);
+    margin-top: scale.px(1);
+    margin-left: scale.px(6);
   }
 
   .recipientOrderForm__deliveryMethodText > span {
-    margin-left: 4px;
+    margin-left: scale.px(4);
   }
 
   .recipientOrderForm__group--pickup {
-    top: 390px;
+    top: scale.px(390);
   }
 
   .recipientOrderForm__group--recipient {
-    top: 449px;
+    top: scale.px(449);
   }
 
   .recipientOrderForm__group--recipientPhone {
-    top: 502px;
+    top: scale.px(502);
   }
 
   .recipientOrderForm__group--deliveryComment {
-    top: 561px;
+    top: scale.px(561);
   }
 
   .recipientOrderSummary {
-    top: 612px;
-    left: 29px;
+    top: scale.px(612);
+    left: scale.px(29);
     display: grid;
-    gap: 2px;
-    width: 236px;
-    font-size: 9px;
+    gap: scale.px(2);
+    width: scale.px(236);
+    font-size: scale.px(9);
     line-height: 1.2;
   }
 
   .recipientOrderForm__consent {
-    top: 640px;
-    left: 29px;
-    width: 236px;
-    gap: 10px;
-    font-size: 8px;
+    top: scale.px(640);
+    left: scale.px(29);
+    width: scale.px(236);
+    gap: scale.px(10);
+    font-size: scale.px(8);
     line-height: 1.4;
   }
 
   .recipientOrderForm__consent input {
-    width: 12px;
-    height: 12px;
-    margin-top: 5px;
+    width: scale.px(12);
+    height: scale.px(12);
+    margin-top: scale.px(5);
   }
 
   .recipientOrderForm__consent > span {
-    width: 210px;
+    width: scale.px(210);
   }
 
   .recipientOrderForm__turnstile {
-    top: 704px;
-    left: 29px;
-    width: 236px;
-    min-height: 115px;
-    padding: 8px;
-    border-radius: 12px;
+    top: scale.px(704);
+    left: scale.px(29);
+    width: scale.px(236);
+    min-height: scale.px(115);
+    padding: scale.px(8);
+    border-radius: scale.px(12);
   }
 
   .recipientOrderForm__turnstileHeader {
-    gap: 6px;
+    gap: scale.px(6);
   }
 
   .recipientOrderForm__turnstileShield {
-    width: 24px;
-    height: 24px;
+    width: scale.px(24);
+    height: scale.px(24);
   }
 
   .recipientOrderForm__turnstileCopy {
-    font-size: 8px;
+    font-size: scale.px(8);
   }
 
   .recipientOrderForm__turnstileCopy small {
-    font-size: 7px;
+    font-size: scale.px(7);
   }
 
   .recipientOrderForm__turnstileRetry {
-    min-height: 22px;
-    padding: 0 7px;
-    font-size: 6px;
+    min-height: scale.px(22);
+    padding: 0 scale.px(7);
+    font-size: scale.px(6);
   }
 
   .recipientOrderNavigation {
-    grid-template-columns: repeat(2, 140px);
-    gap: 10px;
-    width: 290px;
-    height: 28px;
-    margin-top: 12px;
+    grid-template-columns: repeat(2, scale.px(140));
+    gap: scale.px(10);
+    width: scale.px(290);
+    height: scale.px(28);
+    margin-top: scale.px(12);
   }
 
   .recipientOrderNavigation button {
-    width: 140px;
-    height: 28px;
-    padding: 0 12px;
-    font-size: 8px;
+    width: scale.px(140);
+    height: scale.px(28);
+    padding: 0 scale.px(12);
+    font-size: scale.px(8);
     line-height: 1.4;
   }
 
@@ -2126,31 +2130,31 @@
 
 @media (max-width: bp.$mobile-max) {
   .recipientOrderPage.has-turnstile {
-    min-height: 1326px;
+    min-height: scale.px(1326);
   }
 
   .recipientOrderPage.has-turnstile .recipientOrderPage__stage,
   .recipientOrderPage.has-turnstile .recipientOrderCard {
-    min-height: 1313px;
-    height: 1313px;
+    min-height: scale.px(1313);
+    height: scale.px(1313);
   }
 
   .recipientOrderPage.has-turnstile .recipientOrderForm {
-    height: 882px;
+    height: scale.px(882);
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified {
-    min-height: 1254px;
+    min-height: scale.px(1254);
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderPage__stage,
   .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderCard {
-    min-height: 1241px;
-    height: 1241px;
+    min-height: scale.px(1241);
+    height: scale.px(1241);
   }
 
   .recipientOrderPage.has-turnstile.is-turnstile-verified .recipientOrderForm {
-    height: 810px;
+    height: scale.px(810);
   }
 
   .App--recipient main > .container > .wrapper {
@@ -2159,15 +2163,16 @@
 
   .recipientOrderPage {
     position: relative;
-    left: 50%;
-    width: 320px;
+    left: auto;
+    width: scale.px(320);
     max-width: 100vw;
-    min-height: 1188px;
+    min-height: scale.px(1188);
     margin: 0;
-    padding: 10px 3px 3px;
+    margin-left: calc(50% - 50vw);
+    padding: scale.px(10) scale.px(3) scale.px(3);
     box-sizing: border-box;
     background: #fff;
-    transform: translateX(-50%);
+    transform: none;
   }
 
   .recipientOrderPage__stage {
@@ -2175,34 +2180,34 @@
     align-items: flex-start;
     justify-content: center;
     width: 100%;
-    min-height: 1175px;
+    min-height: scale.px(1175);
     padding: 0;
-    border-radius: 20px;
+    border-radius: scale.px(20);
     background: #fff;
   }
 
   .recipientOrderCard {
     display: block;
-    width: 314px;
-    height: 1175px;
-    border-radius: 20px;
+    width: scale.px(314);
+    height: scale.px(1175);
+    border-radius: scale.px(20);
     background: #fff;
   }
 
   .recipientOrderCard__preview {
     position: relative;
-    width: 314px;
-    height: 351px;
+    width: scale.px(314);
+    height: scale.px(351);
   }
 
   .recipientOrderCard__backArrow {
     position: absolute;
     z-index: 2;
-    top: 20px;
-    left: 20px;
+    top: scale.px(20);
+    left: scale.px(20);
     display: block;
-    width: 40px;
-    height: 40px;
+    width: scale.px(40);
+    height: scale.px(40);
     padding: 0;
     border: 0;
     background: transparent;
@@ -2211,19 +2216,19 @@
   .recipientOrderCard__backIcon,
   .recipientOrderCard__backIcon img {
     display: block;
-    width: 40px;
-    height: 40px;
+    width: scale.px(40);
+    height: scale.px(40);
   }
 
   .recipientOrderCard__title {
     position: absolute;
-    top: 27px;
-    left: 7px;
-    width: 300px;
-    height: 24px;
+    top: scale.px(27);
+    left: scale.px(7);
+    width: scale.px(300);
+    height: scale.px(24);
     margin: 0;
     color: #0c0c0c;
-    font-size: 24px;
+    font-size: scale.px(24);
     font-weight: 400;
     line-height: 1;
     text-align: center;
@@ -2233,10 +2238,10 @@
 
   .recipientOrderCard__imageFrame {
     position: absolute;
-    top: 71px;
-    left: 22px;
-    width: 270px;
-    height: 270px;
+    top: scale.px(71);
+    left: scale.px(22);
+    width: scale.px(270);
+    height: scale.px(270);
     overflow: hidden;
   }
 
@@ -2252,123 +2257,123 @@
   }
 
   .recipientOrderCard__controls {
-    width: 314px;
+    width: scale.px(314);
   }
 
   .recipientOrderForm {
-    width: 308px;
-    height: 744px;
-    margin-left: 3px;
-    border-radius: 30px;
+    width: scale.px(308);
+    height: scale.px(744);
+    margin-left: scale.px(3);
+    border-radius: scale.px(30);
   }
 
   .recipientOrderForm__heading {
-    left: 20px;
-    height: 16px;
-    font-size: 16px;
+    left: scale.px(20);
+    height: scale.px(16);
+    font-size: scale.px(16);
   }
 
   .recipientOrderForm__heading--personal {
-    top: 30px;
+    top: scale.px(30);
   }
 
   .recipientOrderForm__heading--delivery {
-    top: 298px;
+    top: scale.px(298);
   }
 
   .recipientOrderForm__field,
   .recipientOrderForm__phoneField {
-    left: 20px;
-    width: 268px;
-    height: 36px;
-    border-radius: 40px;
+    left: scale.px(20);
+    width: scale.px(268);
+    height: scale.px(36);
+    border-radius: scale.px(40);
   }
 
   .recipientOrderForm__field {
-    padding: 0 12px;
-    font-size: 10px;
+    padding: 0 scale.px(12);
+    @include scale.control-font(10);
     line-height: 1.4;
   }
 
   .recipientOrderForm__field--fullName {
-    top: 58px;
+    top: scale.px(58);
   }
 
   .recipientOrderForm__noMiddleName {
-    top: 46px;
-    right: 25px;
-    gap: 4px;
-    font-size: 10px;
-    line-height: 12px;
+    top: scale.px(46);
+    right: scale.px(25);
+    gap: scale.px(4);
+    font-size: scale.px(10);
+    line-height: scale.px(12);
   }
 
   .recipientOrderForm__noMiddleName input {
-    width: 12px;
-    height: 12px;
+    width: scale.px(12);
+    height: scale.px(12);
   }
 
   .recipientOrderForm__phoneField {
-    top: 104px;
+    top: scale.px(104);
   }
 
   .recipientOrderForm__field--email {
-    top: 150px;
+    top: scale.px(150);
   }
 
   .recipientOrderForm__field--contact {
-    top: 196px;
+    top: scale.px(196);
   }
 
   .recipientOrderForm__field--orderComment {
-    top: 242px;
-    height: 36px;
-    padding-top: 10px;
+    top: scale.px(242);
+    height: scale.px(36);
+    padding-top: scale.px(10);
   }
 
   .recipientOrderForm__group {
-    left: 20px;
-    width: 268px;
-    font-size: 10px;
+    left: scale.px(20);
+    width: scale.px(268);
+    font-size: scale.px(10);
     line-height: 1.4;
   }
 
   .recipientOrderForm__group > span {
-    height: 14px;
-    margin-bottom: 8px;
+    height: scale.px(14);
+    margin-bottom: scale.px(8);
   }
 
   .recipientOrderForm__group input,
   .recipientOrderForm__group button {
-    height: 36px;
-    padding-inline: 12px;
-    border-radius: 40px;
-    font-size: 10px;
+    height: scale.px(36);
+    padding-inline: scale.px(12);
+    border-radius: scale.px(40);
+    @include scale.control-font(10);
     line-height: 1.4;
   }
 
   .recipientOrderForm__deliveryMethod {
-    top: 326px;
-    left: 20px;
-    width: 268px;
-    min-height: 34px;
-    font-size: 10px;
+    top: scale.px(326);
+    left: scale.px(20);
+    width: scale.px(268);
+    min-height: scale.px(34);
+    font-size: scale.px(10);
     line-height: 1.4;
   }
 
   .recipientOrderForm__radio {
-    width: 20px;
-    height: 20px;
+    width: scale.px(20);
+    height: scale.px(20);
   }
 
   .recipientOrderForm__radioResponsive {
     display: block;
-    width: 20px;
-    height: 20px;
+    width: scale.px(20);
+    height: scale.px(20);
   }
 
   .recipientOrderForm__radioResponsive img {
-    width: 20px;
-    height: 20px;
+    width: scale.px(20);
+    height: scale.px(20);
   }
 
   .recipientOrderForm__radioOuter,
@@ -2377,111 +2382,111 @@
   }
 
   .recipientOrderForm__deliveryMethodText {
-    width: 241px;
-    margin-left: 7px;
+    width: scale.px(241);
+    margin-left: scale.px(7);
   }
 
   .recipientOrderForm__deliveryMethodText > span {
-    margin-left: 3px;
+    margin-left: scale.px(3);
   }
 
   .recipientOrderForm__group--pickup {
-    top: 370px;
+    top: scale.px(370);
   }
 
   .recipientOrderForm__group--recipient {
-    top: 440px;
+    top: scale.px(440);
   }
 
   .recipientOrderForm__group--recipientPhone {
-    top: 506px;
+    top: scale.px(506);
   }
 
   .recipientOrderForm__group--deliveryComment {
-    top: 576px;
+    top: scale.px(576);
   }
 
   .recipientOrderSummary {
-    top: 640px;
-    left: 20px;
+    top: scale.px(640);
+    left: scale.px(20);
     display: grid;
-    gap: 2px;
-    width: 268px;
-    font-size: 10px;
+    gap: scale.px(2);
+    width: scale.px(268);
+    font-size: scale.px(10);
     line-height: 1.2;
   }
 
   .recipientOrderForm__consent {
-    top: 680px;
-    left: 20px;
-    width: 268px;
-    gap: 10px;
-    font-size: 8px;
+    top: scale.px(680);
+    left: scale.px(20);
+    width: scale.px(268);
+    gap: scale.px(10);
+    font-size: scale.px(8);
     line-height: 1.4;
   }
 
   .recipientOrderForm__consent input {
-    width: 20px;
-    height: 20px;
+    width: scale.px(20);
+    height: scale.px(20);
   }
 
   .recipientOrderForm__consent > span {
-    width: 238px;
-    margin-top: 6px;
+    width: scale.px(238);
+    margin-top: scale.px(6);
   }
 
   .recipientOrderForm__turnstile {
-    top: 750px;
-    left: 20px;
-    width: 268px;
-    min-height: 115px;
-    padding: 8px;
-    border-radius: 14px;
+    top: scale.px(750);
+    left: scale.px(20);
+    width: scale.px(268);
+    min-height: scale.px(115);
+    padding: scale.px(8);
+    border-radius: scale.px(14);
   }
 
   .recipientOrderForm__turnstileHeader {
-    gap: 7px;
+    gap: scale.px(7);
   }
 
   .recipientOrderForm__turnstileShield {
-    width: 32px;
-    height: 32px;
+    width: scale.px(32);
+    height: scale.px(32);
     line-height: 0;
     place-items: center;
   }
 
   .recipientOrderForm__turnstileShield svg {
     display: block;
-    width: 18px;
-    height: 20px;
+    width: scale.px(18);
+    height: scale.px(20);
   }
 
   .recipientOrderForm__turnstileCopy {
-    font-size: 9px;
+    font-size: scale.px(9);
   }
 
   .recipientOrderForm__turnstileCopy small {
-    font-size: 8px;
+    font-size: scale.px(8);
   }
 
   .recipientOrderForm__turnstileRetry {
-    min-height: 24px;
-    padding: 0 8px;
-    font-size: 7px;
+    min-height: scale.px(24);
+    padding: 0 scale.px(8);
+    font-size: scale.px(7);
   }
 
   .recipientOrderNavigation {
     display: block;
-    width: 274px;
-    height: 40px;
-    margin: 20px 20px 0;
+    width: scale.px(274);
+    height: scale.px(40);
+    margin: scale.px(20) scale.px(20) 0;
   }
 
   .recipientOrderNavigation button {
-    width: 274px;
-    height: 40px;
-    padding: 0 20px;
-    font-size: 12px;
+    width: scale.px(274);
+    height: scale.px(40);
+    padding: 0 scale.px(20);
+    font-size: scale.px(12);
     line-height: 1.4;
   }
 
@@ -2595,4 +2600,3 @@
   }
 }
 /* stylelint-enable no-descending-specificity */
-

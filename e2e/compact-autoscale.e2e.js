@@ -1,3 +1,4 @@
+/* global document, getComputedStyle, window -- Playwright browser callbacks */
 import { expect, test } from "@playwright/test";
 
 test.setTimeout(90_000);
@@ -172,11 +173,11 @@ test("scaled review cards keep native horizontal gestures and unscaled modal coo
   await expect(card).toBeFocused();
 });
 
-test("shared header and footer scale on internal routes without scaling the constructor yet", async ({ page }, testInfo) => {
+test("shared header, footer and constructor scale together on internal routes", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium", "Check both compact ranges once");
   for (const [width, mode, headerHeight, footerHeight, orderWidth] of [
-    [390, "mobile", 66 * 390 / 320, 958 * 390 / 320, 320],
-    [1024, "tablet", 24 * 1024 / 640, 796 * 1024 / 640, 640],
+    [390, "mobile", 66 * 390 / 320, 958 * 390 / 320, 390],
+    [1024, "tablet", 24 * 1024 / 640, 796 * 1024 / 640, 1024],
   ]) {
     await page.setViewportSize({ width, height: 900 });
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -185,6 +186,6 @@ test("shared header and footer scale on internal routes without scaling the cons
     await expect(header).toHaveCSS("position", "relative");
     await expect.poll(async () => (await header.boundingBox()).height).toBeCloseTo(headerHeight, 0);
     await expect.poll(async () => (await page.locator(".home-footer").boundingBox()).height).toBeCloseTo(footerHeight, 0);
-    expect((await page.locator(".orderPage").boundingBox()).width, `${mode} order scaling is iteration two`).toBe(orderWidth);
+    expect((await page.locator(".orderPage").boundingBox()).width, `${mode} order canvas`).toBeCloseTo(orderWidth, 0);
   }
 });

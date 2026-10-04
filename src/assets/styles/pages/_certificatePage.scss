@@ -1,15 +1,18 @@
 @use "../base/breakpoints" as bp;
+@use "../base/compactScale" as scale;
 
 .App--certificate { overflow-x: clip; }
 
 .certificatePage {
+  @include scale.container;
+
   --certificate-orange: #bc5823;
   --certificate-cream: #f4f0e6;
   --certificate-ink: #161616;
 
   width: 100%;
-  min-height: 1040px;
-  padding: 40px clamp(20px, calc(6.25vw - 60px), 60px) 39px;
+  min-height: scale.px(1040);
+  padding: scale.px(40) clamp(scale.px(20), calc(6.25vw - scale.px(60)), scale.px(60)) scale.px(39);
   box-sizing: border-box;
   background: #fff;
   font-family: "Jost", Arial, sans-serif;
@@ -18,21 +21,21 @@
 .certificatePage__stage {
   position: relative;
   width: 100%;
-  max-width: 1800px;
-  height: 961px;
+  max-width: scale.px(1800);
+  height: scale.px(961);
   margin: 0 auto;
   overflow: hidden;
-  border-radius: 30px;
+  border-radius: scale.px(30);
   background: var(--certificate-cream);
 }
 
 .certificatePage__card {
   position: absolute;
-  top: 80px;
+  top: scale.px(80);
   left: 50%;
-  width: 1200px;
-  height: 801px;
-  border-radius: 20px;
+  width: scale.px(1200);
+  height: scale.px(801);
+  border-radius: scale.px(20);
   background: #fff;
   transform: translateX(-50%);
 }
@@ -40,12 +43,12 @@
 .certificatePage__title {
   position: absolute;
   z-index: 4;
-  top: 60px;
+  top: scale.px(60);
   left: 50%;
   margin: 0;
   color: var(--certificate-orange);
   font-family: "NauryzRedKeds", "RightGrotesk", sans-serif;
-  font-size: 64px;
+  font-size: scale.px(64);
   font-weight: 700;
   line-height: 1;
   text-transform: lowercase;
@@ -56,22 +59,22 @@
 .certificatePage__visualSurface {
   position: absolute;
   z-index: 0;
-  top: 164px;
-  left: 48px;
-  width: 558px;
-  height: 593px;
+  top: scale.px(164);
+  left: scale.px(48);
+  width: scale.px(558);
+  height: scale.px(593);
   overflow: hidden;
-  border-radius: 30px;
+  border-radius: scale.px(30);
   background: #fff;
 }
 
 .certificatePage__glow {
   position: absolute;
   z-index: 1;
-  top: -102px;
-  left: -148px;
-  width: 876px;
-  height: 859px;
+  top: scale.px(-102);
+  left: scale.px(-148);
+  width: scale.px(876);
+  height: scale.px(859);
 }
 
 .certificatePage__glowImage-picture,
@@ -88,10 +91,10 @@
 .certificatePage__ticket {
   position: absolute;
   z-index: 3;
-  top: 448.704px;
-  left: 321.488px;
-  width: 614.376px;
-  height: 426.1px;
+  top: scale.px(448.704);
+  left: scale.px(321.488);
+  width: scale.px(614.376);
+  height: scale.px(426.1);
   transform: translate(-50%, -50%) rotate(6.55deg);
   transform-origin: center;
 }
@@ -114,12 +117,12 @@
 .certificatePage__offer {
   position: absolute;
   z-index: 2;
-  top: 164px;
-  right: 50px;
-  width: 524px;
-  height: 593px;
+  top: scale.px(164);
+  right: scale.px(50);
+  width: scale.px(524);
+  height: scale.px(593);
   overflow: hidden;
-  border-radius: 30px;
+  border-radius: scale.px(30);
   color: #fff;
   background: var(--certificate-ink);
 }
@@ -133,41 +136,41 @@
 }
 
 .certificatePage__offerTitle {
-  top: 60px;
-  left: 60px;
+  top: scale.px(60);
+  left: scale.px(60);
   color: var(--certificate-orange);
-  font-size: 20px;
+  font-size: scale.px(20);
   font-weight: 600;
   line-height: 1.4;
 }
 
 .certificatePage__amount {
-  top: 104px;
-  left: 60px;
-  font-size: 32px;
+  top: scale.px(104);
+  left: scale.px(60);
+  font-size: scale.px(32);
   font-weight: 600;
   line-height: 1.4;
 }
 
 .certificatePage__denominationLabel {
-  top: 170px;
-  left: 60px;
-  font-size: 14px;
+  top: scale.px(170);
+  left: scale.px(60);
+  font-size: scale.px(14);
   font-weight: 400;
   line-height: 1.4;
 }
 
 .certificatePage__denomination {
+  @include scale.control-font(14);
   position: absolute;
-  top: 196px;
-  left: 60px;
-  width: 220px;
-  height: 30px;
+  top: scale.px(196);
+  left: scale.px(60);
+  width: scale.px(220);
+  height: scale.px(30);
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: scale.px(10);
   color: var(--certificate-ink);
   background: #fff;
-  font-size: 14px;
   font-weight: 400;
   line-height: 1.4;
 }
@@ -176,7 +179,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  padding: 0 28px 0 12px;
+  padding: 0 scale.px(28) 0 scale.px(12);
   border: 0;
   border-radius: inherit;
   appearance: none;
@@ -188,16 +191,16 @@
 }
 
 .certificatePage__denomination:focus-within {
-  outline: 2px solid var(--certificate-orange);
-  outline-offset: 3px;
+  outline: scale.px(2) solid var(--certificate-orange);
+  outline-offset: scale.px(3);
 }
 
 .certificatePage__arrow {
   position: absolute;
-  top: 10px;
-  right: 9px;
-  width: 10px;
-  height: 10px;
+  top: scale.px(10);
+  right: scale.px(9);
+  width: scale.px(10);
+  height: scale.px(10);
   transform: rotate(180deg);
   pointer-events: none;
 }
@@ -206,26 +209,26 @@
 .certificatePage__arrowImage {
   position: absolute;
   top: 0;
-  left: 0.67px;
+  left: scale.px(0.67);
   display: block;
-  width: 8.66026px;
-  height: 7.5px;
+  width: scale.px(8.66026);
+  height: scale.px(7.5);
 }
 
 .certificatePage__action {
   position: absolute;
-  top: 258px;
-  left: 60px;
-  width: 220px;
-  height: 54px;
+  top: scale.px(258);
+  left: scale.px(60);
+  width: scale.px(220);
+  height: scale.px(54);
   padding: 0;
   border: 0;
-  border-radius: 40px;
+  border-radius: scale.px(40);
   color: #272727;
   background: var(--certificate-orange);
   cursor: default;
   font-family: inherit;
-  font-size: 13px;
+  font-size: scale.px(13);
   font-weight: 600;
   line-height: 1.4;
   opacity: 1;
@@ -235,10 +238,10 @@
 
 .certificatePage__actionStatus {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  width: scale.px(1);
+  height: scale.px(1);
   padding: 0;
-  margin: -1px;
+  margin: scale.px(-1);
   overflow: hidden;
   clip-path: inset(50%);
   border: 0;
@@ -246,38 +249,39 @@
 }
 
 .certificatePage__conditions {
-  top: 339px;
-  left: 36px;
-  width: 428px;
-  padding-left: 24px;
+  top: scale.px(339);
+  left: scale.px(36);
+  width: scale.px(428);
+  padding-left: scale.px(24);
   color: #d3d3d3;
-  font-size: 16px;
+  font-size: scale.px(16);
   font-weight: 400;
   line-height: 1.4;
 }
 
 @media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
   .certificatePage {
-    width: min(100vw, 640px);
-    min-height: 426px;
-    padding: 10px;
+    width: min(100vw, scale.px(640));
+    min-height: scale.px(426);
+    padding: scale.px(10);
     margin: 0 auto;
+    margin-left: calc(50% - 50vw);
   }
 
   .certificatePage__stage {
-    height: 406px;
-    border-radius: 20px;
+    height: scale.px(406);
+    border-radius: scale.px(20);
   }
 
   .certificatePage__card {
-    top: 30px;
-    width: 560px;
-    height: 346px;
+    top: scale.px(30);
+    width: scale.px(560);
+    height: scale.px(346);
   }
 
   .certificatePage__title {
-    top: 30px;
-    font-size: 30px;
+    top: scale.px(30);
+    font-size: scale.px(30);
   }
 
   .certificatePage__visualSurface {
@@ -289,119 +293,120 @@
   }
 
   .certificatePage__glow {
-    top: 48.711px;
-    left: -25.289px;
-    width: 329px;
-    height: 322px;
+    top: scale.px(48.711);
+    left: scale.px(-25.289);
+    width: scale.px(329);
+    height: scale.px(322);
   }
 
   .certificatePage__ticket {
-    top: 193.502px;
-    left: 131.282px;
-    width: 240px;
-    height: 167px;
+    top: scale.px(193.502);
+    left: scale.px(131.282);
+    width: scale.px(240);
+    height: scale.px(167);
     transform: translate(-50%, -50%) rotate(7deg);
   }
 
   .certificatePage__offer {
-    top: 80px;
-    right: 30px;
-    width: 270px;
-    height: 236px;
-    border-radius: 20px;
+    top: scale.px(80);
+    right: scale.px(30);
+    width: scale.px(270);
+    height: scale.px(236);
+    border-radius: scale.px(20);
   }
 
   .certificatePage__offerTitle {
-    top: 24px;
-    left: 25px;
-    font-size: 12px;
+    top: scale.px(24);
+    left: scale.px(25);
+    font-size: scale.px(12);
   }
 
   .certificatePage__amount {
-    top: 49px;
-    left: 25px;
-    font-size: 20px;
+    top: scale.px(49);
+    left: scale.px(25);
+    font-size: scale.px(20);
   }
 
   .certificatePage__denominationLabel {
-    top: 85px;
-    left: 25px;
-    font-size: 8px;
+    top: scale.px(85);
+    left: scale.px(25);
+    font-size: scale.px(8);
   }
 
   .certificatePage__denomination {
-    top: 101px;
-    left: 25px;
-    width: 160px;
-    height: 28px;
-    font-size: 16px;
+    @include scale.control-font(16);
+    top: scale.px(101);
+    left: scale.px(25);
+    width: scale.px(160);
+    height: scale.px(28);
   }
 
   .certificatePage__denomination select {
-    padding-left: 8px;
+    padding-left: scale.px(8);
   }
 
   .certificatePage__arrow {
-    top: 10px;
-    right: 8px;
-    width: 8px;
-    height: 8px;
+    top: scale.px(10);
+    right: scale.px(8);
+    width: scale.px(8);
+    height: scale.px(8);
   }
 
   .certificatePage__arrowImage-picture,
   .certificatePage__arrowImage {
-    left: 0.536px;
-    width: 6.9282px;
-    height: 6px;
+    left: scale.px(0.536);
+    width: scale.px(6.9282);
+    height: scale.px(6);
   }
 
   .certificatePage__action {
-    top: 138px;
-    left: 25px;
-    width: 150px;
-    height: 28px;
+    top: scale.px(138);
+    left: scale.px(25);
+    width: scale.px(150);
+    height: scale.px(28);
     color: #fff;
-    font-size: 8px;
+    font-size: scale.px(8);
   }
 
   .certificatePage__conditions {
-    top: 181px;
-    left: 25px;
-    width: 221px;
+    top: scale.px(181);
+    left: scale.px(25);
+    width: scale.px(221);
     padding-left: 0;
-    font-size: 8px;
+    font-size: scale.px(8);
   }
 
-  .certificatePage__conditions li { margin-left: 12px; }
+  .certificatePage__conditions li { margin-left: scale.px(12); }
 }
 
 @media (max-width: bp.$mobile-max) {
   .certificatePage {
     position: relative;
-    left: 50%;
-    width: 320px;
+    left: auto;
+    width: scale.px(320);
     max-width: 100vw;
-    min-height: 520px;
-    padding: 10px 3px;
+    min-height: scale.px(520);
+    padding: scale.px(10) scale.px(3);
     margin: 0;
-    transform: translateX(-50%);
+    margin-left: calc(50% - 50vw);
+    transform: none;
   }
 
   .certificatePage__stage {
-    height: 500px;
-    border-radius: 20px;
+    height: scale.px(500);
+    border-radius: scale.px(20);
   }
 
   .certificatePage__card {
-    top: 7px;
-    width: 300px;
-    height: 486px;
+    top: scale.px(7);
+    width: scale.px(300);
+    height: scale.px(486);
     overflow: hidden;
   }
 
   .certificatePage__title {
-    top: 30px;
-    font-size: 24px;
+    top: scale.px(30);
+    font-size: scale.px(24);
     text-align: center;
   }
 
@@ -414,17 +419,17 @@
   }
 
   .certificatePage__glow {
-    top: 0.711px;
-    left: -14.289px;
-    width: 300px;
-    height: 323px;
+    top: scale.px(0.711);
+    left: scale.px(-14.289);
+    width: scale.px(300);
+    height: scale.px(323);
   }
 
   .certificatePage__ticket {
-    top: 145.502px;
-    left: 150.282px;
-    width: 240px;
-    height: 167px;
+    top: scale.px(145.502);
+    left: scale.px(150.282);
+    width: scale.px(240);
+    height: scale.px(167);
     transform: translate(-50%, -50%) rotate(7deg);
   }
 
@@ -433,84 +438,84 @@
   }
 
   .certificatePage__offer {
-    top: 238px;
-    right: 15px;
-    width: 270px;
-    height: 233px;
-    border-radius: 30px;
+    top: scale.px(238);
+    right: scale.px(15);
+    width: scale.px(270);
+    height: scale.px(233);
+    border-radius: scale.px(30);
     background:
-      radial-gradient(ellipse 170px 95px at 50% 0, rgb(105 86 143 / 48%) 0%, rgb(105 86 143 / 12%) 35%, transparent 65%),
-      linear-gradient(to bottom, rgb(80 75 85 / 50%) 0, transparent 60px),
+      radial-gradient(ellipse scale.px(170) scale.px(95) at 50% 0, rgb(105 86 143 / 48%) 0%, rgb(105 86 143 / 12%) 35%, transparent 65%),
+      linear-gradient(to bottom, rgb(80 75 85 / 50%) 0, transparent scale.px(60)),
       var(--certificate-ink);
   }
 
   .certificatePage__offerTitle {
-    top: 25px;
-    left: 25px;
-    font-size: 12px;
+    top: scale.px(25);
+    left: scale.px(25);
+    font-size: scale.px(12);
   }
 
   .certificatePage__amount {
-    top: 50px;
-    left: 25px;
-    font-size: 20px;
+    top: scale.px(50);
+    left: scale.px(25);
+    font-size: scale.px(20);
   }
 
   .certificatePage__denominationLabel {
-    top: 86px;
-    left: 25px;
-    font-size: 8px;
+    top: scale.px(86);
+    left: scale.px(25);
+    font-size: scale.px(8);
   }
 
   .certificatePage__denomination {
-    top: 102px;
-    left: 25px;
-    width: 160px;
-    height: 28px;
-    font-size: 16px;
+    @include scale.control-font(16);
+    top: scale.px(102);
+    left: scale.px(25);
+    width: scale.px(160);
+    height: scale.px(28);
   }
 
   .certificatePage__denomination select {
-    padding-left: 8px;
+    padding-left: scale.px(8);
   }
 
   .certificatePage__arrow {
-    top: 10px;
-    right: 8px;
-    width: 8px;
-    height: 8px;
+    top: scale.px(10);
+    right: scale.px(8);
+    width: scale.px(8);
+    height: scale.px(8);
   }
 
   .certificatePage__arrowImage-picture,
   .certificatePage__arrowImage {
-    left: 0.536px;
-    width: 6.9282px;
-    height: 6px;
+    left: scale.px(0.536);
+    width: scale.px(6.9282);
+    height: scale.px(6);
   }
 
   .certificatePage__action {
-    top: 139px;
-    left: 25px;
-    width: 150px;
-    height: 28px;
+    top: scale.px(139);
+    left: scale.px(25);
+    width: scale.px(150);
+    height: scale.px(28);
     color: #fff;
-    font-size: 8px;
+    font-size: scale.px(8);
   }
 
   .certificatePage__conditions {
-    top: 181px;
-    left: 25px;
-    width: 220px;
-    padding-left: 12px;
+    top: scale.px(181);
+    left: scale.px(25);
+    width: scale.px(220);
+    padding-left: scale.px(12);
     list-style: none;
-    font-size: 8px;
+    font-size: scale.px(8);
   }
 
   .certificatePage__conditions li { position: relative; }
 
   .certificatePage__conditions li::before {
     position: absolute;
-    left: -8px;
+    left: scale.px(-8);
     content: "-";
   }
 }
