@@ -274,12 +274,16 @@ const RecipientDetails = () => {
               <div className="recipientOrderNavigation">
                 <button
                   type="button"
-                  className="recipientOrderNavigation__back"
-                  onClick={() => navigate(-1)}
-                  disabled={isCheckoutLocked}
-                  title={isCheckoutLocked ? "Заказ уже создан. Завершите или повторите оплату" : undefined}
+                  className="recipientOrderNavigation__cart"
+                  disabled
+                  aria-label="Добавить в корзину"
+                  aria-describedby="recipient-cart-unavailable"
+                  title="Корзина пока недоступна — сейчас можно оформить одно изделие"
                 >
-                  назад
+                  <span>добавить в корзину</span>
+                  <small id="recipient-cart-unavailable" className="recipientOrderNavigation__cartHint">
+                    Корзина пока недоступна
+                  </small>
                 </button>
                 <button
                   type="button"
@@ -288,16 +292,9 @@ const RecipientDetails = () => {
                   disabled={!canSubmit || isPaying}
                   title={!canSubmit ? getSubmitDisabledMessage() : undefined}
                 >
-                  {isPaying ? "Обрабатываем..." : isManualCheckout ? "отправить заявку" : checkoutQuote?.requiresBankPayment === false ? "оформить заказ" : (
-                    <>
-                      <span className="recipientOrderNavigation__paymentLabel">
-                        {checkoutQuote?.paymentTestMode
-                          ? `к оплате ${formatPrice(checkoutQuote.paymentAmount)}`
-                          : "к оплате"}
-                      </span>
-                      <span className="recipientOrderNavigation__tabletLabel">далее</span>
-                    </>
-                  )}
+                  {isPaying ? "Обрабатываем..." : isManualCheckout ? "отправить заявку" : checkoutQuote?.requiresBankPayment === false ? "оформить заказ" : checkoutQuote?.paymentTestMode
+                    ? `к оплате ${formatPrice(checkoutQuote.paymentAmount)}`
+                    : "к оплате"}
                 </button>
               </div>
             </div>

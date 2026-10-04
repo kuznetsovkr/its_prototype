@@ -55,10 +55,11 @@ test("сертификат применяется, удаляется и не п
   expect(api.quotes[0].certificateCode).toBe(code);
   for (const width of info.project.name === "desktop-chromium" ? [1440, 820] : [320, 390, 428]) {
     await page.setViewportSize({ width, height: 950 });
-    const [comment, input, summary, consent, submit, form, card] = await Promise.all([
+    const [comment, input, summary, consent, submit, cart, form, card] = await Promise.all([
       page.locator(".recipientOrderForm__group--deliveryComment").boundingBox(),
       page.locator(".orderCertificate").boundingBox(), page.locator(".recipientOrderSummary").boundingBox(),
       page.locator(".recipientOrderForm__consent").boundingBox(), page.locator(".recipientOrderNavigation__submit").boundingBox(),
+      page.getByRole("button", { name: "Добавить в корзину", exact: true }).boundingBox(),
       page.locator(".recipientOrderForm").boundingBox(), page.locator(".recipientOrderCard").boundingBox(),
     ]);
     expect(input.y).toBeGreaterThanOrEqual(comment.y + comment.height);
@@ -67,6 +68,16 @@ test("сертификат применяется, удаляется и не п
     expect(form.y + form.height).toBeGreaterThanOrEqual(consent.y + consent.height);
     expect(submit.y).toBeGreaterThanOrEqual(form.y + form.height);
     expect(card.y + card.height + 1).toBeGreaterThanOrEqual(submit.y + submit.height);
+    expect(cart.y).toBeGreaterThanOrEqual(form.y + form.height);
+    expect(card.y + card.height + 1).toBeGreaterThanOrEqual(cart.y + cart.height);
+    if (width < 640) {
+      expect(cart.y).toBeGreaterThanOrEqual(submit.y + submit.height);
+      expect(Math.abs(cart.x - submit.x)).toBeLessThanOrEqual(1);
+      expect(Math.abs(cart.width - submit.width)).toBeLessThanOrEqual(1);
+    } else {
+      expect(Math.abs(cart.y - submit.y)).toBeLessThanOrEqual(1);
+      expect(cart.x + cart.width).toBeLessThanOrEqual(submit.x);
+    }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
     if (width < 1280) expect(await page.locator("#order-certificate-code").evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(16);
     await page.screenshot({ path: info.outputPath(`certificate-order-${width}.png`), fullPage: true });
@@ -75,6 +86,24 @@ test("сертификат применяется, удаляется и не п
   await page.getByRole("button", { name: "Удалить", exact: true }).click();
   await expect(page.locator("#order-certificate-code")).toHaveValue("");
   await expect(page.locator(".recipientOrderSummary")).not.toContainText("Сертификат:");
+});
+test("кнопка корзины пока неактивна и не очищает заказ, возврат остаётся сверху", async ({ page }) => {
+  const api = await prepare(page);
+  await apply(page);
+  await expect(page.locator(".recipientOrderSummary")).toContainText("К оплате: 390 ₽");
+  const cart = page.getByRole("button", { name: "Добавить в корзину", exact: true });
+  await expect(cart).toBeVisible();
+  await expect(cart).toBeDisabled();
+  await expect(cart).toHaveAccessibleDescription("Корзина пока недоступна");
+  await expect(page.getByRole("button", { name: "Вернуться назад", exact: true })).toBeEnabled();
+  const draft = await page.evaluate(() => sessionStorage.getItem("its_order_draft_v1"));
+  await cart.evaluate((button) => button.click());
+  await expect(page).toHaveURL(/\/recipient$/);
+  expect(await page.evaluate(() => sessionStorage.getItem("its_order_draft_v1"))).toBe(draft);
+  expect(api.creates).toHaveLength(0);
+  expect(api.links).toHaveLength(0);
+  expect(api.completions).toHaveLength(0);
+  await expect(page.locator(".recipientOrderNavigation__submit")).toHaveText("к оплате");
 });
 test("некорректный или истёкший код не позволяет оплатить заказ", async ({ page }) => {
   await prepare(page, { invalid: true });

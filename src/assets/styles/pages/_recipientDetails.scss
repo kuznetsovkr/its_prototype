@@ -938,10 +938,18 @@
   text-transform: uppercase;
 }
 
-.recipientOrderNavigation__back {
+.recipientOrderNavigation__cart {
+  flex-direction: column;
   border: scale.px(1) solid #4b4b4b;
   background: #fff;
   color: #4b4b4b;
+}
+
+.recipientOrderNavigation__cartHint {
+  color: rgb(74 74 74 / 70%);
+  font-size: scale.px(7);
+  font-weight: 400;
+  text-transform: none;
 }
 
 .recipientOrderNavigation__submit {
@@ -954,16 +962,15 @@
   cursor: not-allowed;
 }
 
-.recipientOrderCard__backArrow:disabled,
-.recipientOrderForm__deliveryMethod:disabled,
-.recipientOrderForm__group button:disabled,
-.recipientOrderNavigation__back:disabled {
+.recipientOrderNavigation__cart:disabled {
   cursor: not-allowed;
-  opacity: 0.55;
 }
 
-.recipientOrderNavigation__tabletLabel {
-  display: none;
+.recipientOrderCard__backArrow:disabled,
+.recipientOrderForm__deliveryMethod:disabled,
+.recipientOrderForm__group button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .recipientOrderCard__error {
@@ -2107,24 +2114,16 @@
     grid-template-columns: repeat(2, scale.px(140));
     gap: scale.px(10);
     width: scale.px(290);
-    height: scale.px(28);
+    height: scale.px(36);
     margin-top: scale.px(12);
   }
 
   .recipientOrderNavigation button {
     width: scale.px(140);
-    height: scale.px(28);
+    height: scale.px(36);
     padding: 0 scale.px(12);
     font-size: scale.px(8);
     line-height: 1.4;
-  }
-
-  .recipientOrderNavigation__paymentLabel {
-    display: none;
-  }
-
-  .recipientOrderNavigation__tabletLabel {
-    display: inline;
   }
 }
 
@@ -2476,9 +2475,11 @@
   }
 
   .recipientOrderNavigation {
-    display: block;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: scale.px(10);
     width: scale.px(274);
-    height: scale.px(40);
+    height: auto;
     margin: scale.px(20) scale.px(20) 0;
   }
 
@@ -2490,8 +2491,18 @@
     line-height: 1.4;
   }
 
-  .recipientOrderNavigation .recipientOrderNavigation__back {
-    display: none;
+  .recipientOrderNavigation__submit {
+    grid-row: 1;
+  }
+
+  .recipientOrderNavigation__cart {
+    grid-row: 2;
+    background: #4a4a4a;
+    color: #fff;
+  }
+
+  .recipientOrderNavigation__cartHint {
+    color: rgb(255 255 255 / 70%);
   }
 
   .recipientCdekDialog {
