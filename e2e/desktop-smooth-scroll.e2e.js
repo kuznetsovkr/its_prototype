@@ -55,7 +55,12 @@ test.describe("desktop smooth scrolling", () => {
     await carousel.scrollIntoViewIfNeeded();
     await carousel.hover();
     await monitorWheel(page);
-    await page.mouse.wheel(180, 0);
+    // Move a full card: a fixed 180px delta can snap back to the first card.
+    const scrollStep = await carousel.evaluate(element => {
+      const cards = element.querySelectorAll(".home-reviews-carousel__item");
+      return cards[1].offsetLeft - cards[0].offsetLeft;
+    });
+    await page.mouse.wheel(scrollStep, 0);
     await expect.poll(() => page.evaluate(() => window.lastWheelPrevented)).toBe(false);
     await expect.poll(() => carousel.evaluate(el => el.scrollLeft)).toBeGreaterThan(0);
   });

@@ -2,8 +2,8 @@ import { expect, test } from "@playwright/test";
 
 const viewports = [
   { name: "desktop", width: 1440, height: 900, distance: 25 },
-  { name: "tablet", width: 1024, height: 768, distance: 25 },
-  { name: "mobile", width: 390, height: 844, distance: 10 },
+  { name: "tablet", width: 1024, height: 768, distance: 25 * 1024 / 640 },
+  { name: "mobile", width: 390, height: 844, distance: 10 * 390 / 320 },
   { name: "small-mobile", width: 320, height: 700, distance: 10 },
 ];
 

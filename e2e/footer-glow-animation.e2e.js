@@ -58,7 +58,7 @@ test("home footer glow uses the same centered geometry as the dark footer", asyn
   test.skip(testInfo.project.name !== "desktop-chromium", "All widths are checked in Chromium");
   await page.emulateMedia({ reducedMotion: "reduce" });
 
-  for (const [width, expectedGlowWidth] of [[1440, 992], [1024, 900], [390, 625]]) {
+  for (const [width, expectedGlowWidth] of [[1440, 992], [1024, 900 * 1024 / 640], [390, 625 * 390 / 320]]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
 

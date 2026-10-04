@@ -1,0 +1,28 @@
+@use "sass:math";
+@use "breakpoints" as bp;
+
+$mobile-design-width: 320;
+$tablet-design-width: 640;
+
+// Design pixels grow with the compact layout, while percentages and native
+// viewport coordinates (sticky headers, modal overlays, scrolling) stay intact.
+// Keep the default at 1px so desktop geometry and unscaled components are unchanged.
+@function px($value) {
+  @if not math.is-unitless($value) {
+    @error "compactScale.px expects a unitless number of design pixels";
+  }
+
+  @return calc(#{$value} * var(--compact-layout-pixel, 1px));
+}
+
+@mixin container {
+  --compact-layout-pixel: 1px;
+
+  @media (max-width: bp.$mobile-max) {
+    & { --compact-layout-pixel: max(1px, #{math.div(100, $mobile-design-width)}vw); }
+  }
+
+  @media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
+    & { --compact-layout-pixel: #{math.div(100, $tablet-design-width)}vw; }
+  }
+}

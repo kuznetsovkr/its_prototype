@@ -290,7 +290,8 @@ test("мобильная шапка сохраняет корзину и цен�
   ]);
   expect(Math.abs((logoBox.x + logoBox.width / 2) - (headerBox.x + headerBox.width / 2)))
     .toBeLessThan(2);
-  expect(headerBox.x + headerBox.width - (bagBox.x + bagBox.width)).toBeLessThanOrEqual(25);
+  expect(headerBox.x + headerBox.width - (bagBox.x + bagBox.width))
+    .toBeCloseTo(25 * page.viewportSize().width / 320, 0);
 
   await bag.click();
   await expect(page).toHaveURL(/\/order$/);
