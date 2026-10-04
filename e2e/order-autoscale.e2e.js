@@ -79,6 +79,11 @@ for (const { mode, base, widths } of [
       if (route === "/recipient") await expect(page.getByTestId("turnstile-panel")).toHaveClass(/is-verified/);
       await page.evaluate(() => document.fonts.ready);
       const baseline = await geometry(page, selectors);
+      // The certificate checkout tail is content-driven (errors, discounts and
+      // the 16px input minimum). Its containers keep their scaled width, but
+      // their height must adapt instead of inheriting the old fixed canvas.
+      const hasFlowHeight = (selector) => route === "/recipient" &&
+        [".recipientOrderPage__stage", ".recipientOrderCard", ".recipientOrderForm"].includes(selector);
       for (const width of widths) {
         await page.setViewportSize({ width, height: 900 });
         await expect.poll(async () => (await page.locator(root).boundingBox()).width).toBeCloseTo(width, 0);
@@ -87,13 +92,13 @@ for (const { mode, base, widths } of [
           const current = await geometry(page, selectors);
           return Math.max(...current.flatMap((item, index) => [
             Math.abs(item.width - baseline[index].width * width / base),
-            Math.abs(item.height - baseline[index].height * width / base),
+            hasFlowHeight(item.selector) ? 0 : Math.abs(item.height - baseline[index].height * width / base),
           ]));
         }).toBeLessThan(0.5);
         const actual = await geometry(page, selectors);
         actual.forEach((item, index) => {
           expect(item.width, `${route} ${width}px ${item.selector} width`).toBeCloseTo(baseline[index].width * width / base, 0);
-          expect(item.height, `${route} ${width}px ${item.selector} height`).toBeCloseTo(baseline[index].height * width / base, 0);
+          if (!hasFlowHeight(item.selector)) expect(item.height, `${route} ${width}px ${item.selector} height`).toBeCloseTo(baseline[index].height * width / base, 0);
         });
         const bounds = await page.locator(root).boundingBox();
         expect(bounds.x, `${route} ${width}px canvas left`).toBeCloseTo(0, 0);

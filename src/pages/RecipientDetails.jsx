@@ -8,6 +8,7 @@ import { useRecipientDetails } from "../features/order/recipient/useRecipientDet
 import { normalizePhoneDigits } from "../features/order/recipient/recipientValidation";
 import TurnstilePanel from "../components/TurnstilePanel";
 import RecipientPersonalFields from "../features/order/shared/RecipientPersonalFields";
+import OrderCertificateField from "../features/order/recipient/OrderCertificateField";
 import recipientBackIcon from "../images/order/recipient-back.svg";
 import orderBackIconTablet from "../images/order/order-back-tablet.svg";
 import orderBackIconMobile from "../images/order/order-back-mobile.svg";
@@ -37,6 +38,8 @@ const RecipientDetails = () => {
     checkoutQuote, checkoutQuoteLoading, checkoutQuoteError,
     isManualCheckout, isCheckoutLocked,
     turnstile,
+    certificate,
+    isCertificateAvailable,
   } = useRecipientDetails();
   const formDisabled = isPaying || isCheckoutLocked;
   const turnstileClassName = turnstile.isVisible
@@ -69,7 +72,7 @@ const RecipientDetails = () => {
 
   return (
     <>
-      <section className={`recipientOrderPage${turnstileClassName}`} aria-labelledby="recipient-order-title">
+      <section className={`recipientOrderPage has-certificate${turnstileClassName}`} aria-labelledby="recipient-order-title">
         <div className="recipientOrderPage__stage">
           <div className="recipientOrderCard">
             <div className="recipientOrderCard__preview">
@@ -104,7 +107,7 @@ const RecipientDetails = () => {
             </div>
 
             <div className="recipientOrderCard__controls">
-              <div className="recipientOrderForm">
+              <div className="recipientOrderForm recipientOrderForm--certificate">
                 <h2 className="recipientOrderForm__heading recipientOrderForm__heading--personal">
                   Введите свои данные
                 </h2>
@@ -218,21 +221,25 @@ const RecipientDetails = () => {
                   />
                 </label>
 
+                <div className="recipientOrderForm__checkoutTail">
+                <OrderCertificateField certificate={certificate} disabled={formDisabled} manual={isManualCheckout} demo={!isCertificateAvailable} quoteError={checkoutQuoteError} />
                 <div className="recipientOrderSummary" aria-live="polite">
                   {isManualCheckout ? (
                     <strong>Стоимость рассчитает менеджер после отправки заявки</strong>
                   ) : checkoutQuoteLoading ? (
                     <span>Рассчитываем итоговую стоимость…</span>
                   ) : checkoutQuoteError ? (
-                    <span className="recipientOrderSummary__error">{checkoutQuoteError}</span>
+                    <span className="recipientOrderSummary__error" id="order-quote-error">{checkoutQuoteError}</span>
                   ) : checkoutQuote ? (
                     <>
                       <span>Изделие и вышивка: {formatPrice(checkoutQuote.merchandisePrice)}</span>
                       <span>Доставка: {formatPrice(checkoutQuote.deliveryPrice)}</span>
+                      {checkoutQuote.certificateDiscount > 0 && <span>Сертификат: −{formatPrice(checkoutQuote.certificateDiscount)}</span>}
+                      {checkoutQuote.certificate && <span>Останется на сертификате: {formatPrice(checkoutQuote.certificate.remaining)}</span>}
                       <strong>
                         {checkoutQuote.paymentTestMode
                           ? `К оплате: ${formatPrice(checkoutQuote.paymentAmount)} (тест)`
-                          : `Итого: ${formatPrice(checkoutQuote.totalPrice)}`}
+                          : `${checkoutQuote.certificateDiscount > 0 ? "К оплате" : "Итого"}: ${formatPrice(checkoutQuote.amountDue ?? checkoutQuote.totalPrice)}`}
                       </strong>
                     </>
                   ) : null}
@@ -259,6 +266,7 @@ const RecipientDetails = () => {
                 </label>
 
                 <TurnstilePanel challenge={turnstile} disabled={formDisabled} />
+                </div>
               </div>
 
               {error && <p className="recipientOrderCard__error" role="alert">{error}</p>}
@@ -280,7 +288,7 @@ const RecipientDetails = () => {
                   disabled={!canSubmit || isPaying}
                   title={!canSubmit ? getSubmitDisabledMessage() : undefined}
                 >
-                  {isPaying ? "Обрабатываем..." : isManualCheckout ? "отправить заявку" : (
+                  {isPaying ? "Обрабатываем..." : isManualCheckout ? "отправить заявку" : checkoutQuote?.requiresBankPayment === false ? "оформить заказ" : (
                     <>
                       <span className="recipientOrderNavigation__paymentLabel">
                         {checkoutQuote?.paymentTestMode

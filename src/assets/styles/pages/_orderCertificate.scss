@@ -1,0 +1,121 @@
+@use "../base/breakpoints" as bp;
+@use "../base/compactScale" as scale;
+
+// Upper fields retain their design geometry; the new tail grows with its content.
+.recipientOrderPage.has-certificate,
+.recipientOrderPage.has-certificate.has-turnstile,
+.recipientOrderPage.has-certificate .recipientOrderPage__stage,
+.recipientOrderPage.has-certificate.has-turnstile .recipientOrderPage__stage,
+.recipientOrderPage.has-certificate .recipientOrderCard,
+.recipientOrderPage.has-certificate.has-turnstile .recipientOrderCard {
+  height: auto;
+  min-height: 0;
+}
+
+.recipientOrderPage.has-certificate .recipientOrderForm.recipientOrderForm--certificate {
+  height: auto;
+  padding: scale.px(978) scale.px(36) scale.px(30);
+}
+
+.recipientOrderForm__checkoutTail {
+  display: grid;
+  gap: scale.px(30);
+}
+
+.recipientOrderForm__checkoutTail .recipientOrderSummary,
+.recipientOrderForm__checkoutTail .recipientOrderForm__consent,
+.recipientOrderForm__checkoutTail .recipientOrderForm__turnstile {
+  position: static;
+  width: 100%;
+  margin: 0;
+}
+
+.recipientOrderForm__checkoutTail .recipientOrderSummary {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: scale.px(4);
+  overflow-wrap: anywhere;
+}
+
+.orderCertificate {
+  display: grid;
+  min-width: 0;
+  gap: scale.px(8);
+  font-size: scale.px(13);
+}
+
+.orderCertificate label {
+  font-weight: 600;
+}
+
+.orderCertificate__entry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: scale.px(8);
+}
+
+.orderCertificate__entry input {
+  width: 100%;
+  min-width: 0;
+  height: scale.px(54);
+  padding: 0 scale.px(30);
+  border: 0;
+  border-radius: scale.px(40);
+  color: #161616;
+  background: #fff;
+  font-size: 16px;
+}
+
+.orderCertificate__entry input::placeholder {
+  color: #b1b1b1;
+}
+
+.orderCertificate__entry button {
+  min-height: 32px;
+  padding: 4px 16px;
+  border: 1px solid #161616;
+  border-radius: 40px;
+  color: #fff;
+  background: #161616;
+  cursor: pointer;
+}
+
+.orderCertificate__entry button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.orderCertificate small {
+  color: #4b4b4b;
+  line-height: 1.4;
+}
+
+@media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
+  .recipientOrderPage.has-certificate .recipientOrderForm.recipientOrderForm--certificate {
+    padding: scale.px(612) scale.px(29) scale.px(30);
+  }
+
+  .orderCertificate {
+    font-size: scale.px(10);
+  }
+
+  .orderCertificate__entry input {
+    height: scale.px(36);
+    padding-inline: scale.px(15);
+  }
+}
+
+@media (max-width: bp.$mobile-max) {
+  .recipientOrderPage.has-certificate .recipientOrderForm.recipientOrderForm--certificate {
+    padding: scale.px(640) scale.px(20) scale.px(30);
+  }
+
+  .orderCertificate {
+    font-size: scale.px(10);
+  }
+
+  .orderCertificate__entry input {
+    height: scale.px(36);
+    padding-inline: scale.px(15);
+  }
+}

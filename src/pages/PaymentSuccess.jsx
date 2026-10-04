@@ -92,6 +92,12 @@ export default function PaymentSuccess() {
 
       try {
         const { data } = await api.get(`/orders/${orderId}`, orderAccessConfig(orderId, orderToken));
+        if (data.requiresReview || data.paymentStatus === 'review') {
+          finalizedRef.current = true;
+          setStatus('bankPending');
+          setMsg('Оплата получена, но заказ требует проверки менеджером. Не оплачивайте его повторно. Свяжитесь с нами и сообщите номер заказа: ' + orderId);
+          return;
+        }
         if (data.paymentStatus === 'paid') {
           if (data.status !== 'Оплачено') {
             try {

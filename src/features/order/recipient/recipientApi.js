@@ -28,6 +28,10 @@ export const getPaymentLink = async (orderId, orderToken) => {
   return data.pay_url;
 };
 
+export const completeCertificateOrder = async (orderId, orderToken) => {
+  await api.post(`/orders/${encodeURIComponent(orderId)}/complete-certificate`, {}, orderAccessConfig(orderId, orderToken));
+};
+
 export const getCheckoutQuote = async (selection) => {
   const { data } = await api.post("/pricing/checkout", selection);
   return data;

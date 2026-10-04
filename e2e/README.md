@@ -18,6 +18,23 @@ npm run test:e2e
 Use `npm run test:e2e:headed` for local visual debugging. Failure traces,
 screenshots, and videos are written to the ignored `test-results` directory.
 
+## Gift certificate checkout
+
+`certificate.e2e.js` covers purchase and email-status presentation;
+`order-certificate.e2e.js` covers applying/removing a code, delivery exclusion,
+zero-due completion, resuming the same order after reload, manual payment review
+and the protected admin history. All API and bank responses in these scenarios
+are intercepted; no real orders, emails or payments are created.
+
+```bash
+npm run test:e2e -- certificate.e2e.js order-certificate.e2e.js --workers=1
+```
+
+The ordinary demo build does not redeem certificates. The browser tests use the
+existing explicit E2E flag to exercise the real client workflow with mock APIs.
+The recipient form keeps scaled widths and upper-field geometry, while the new
+checkout tail uses content-driven height for totals, errors and CAPTCHA.
+
 ## Compact autoscale regression checks
 
 The autoscale suites cover proportional sizing, the 639/640 and 1199/1200

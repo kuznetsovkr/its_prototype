@@ -5,7 +5,7 @@ export const buildOrderFormData = ({
   preferredContact, deliveryComment, privacyConsent, productType,
   color, size, selectedType, embroideryTypeRu, patronusCount, petFaceCount,
   customText, customTextFont, customOption, pickupPoint, manualAddress, isNoCdek, cdekData,
-  uploadedImage, turnstileToken,
+  uploadedImage, turnstileToken, certificateCode,
 }) => {
   const formData = new FormData();
   const recipientFullName = deliveryRecipient.trim();
@@ -41,6 +41,7 @@ export const buildOrderFormData = ({
     deliveryAddress: pickupPoint || manualAddress?.value || "",
     turnstileToken: turnstileToken || "",
   }).forEach(([key, value]) => formData.append(key, value));
+  if (certificateCode) formData.append("certificateCode", certificateCode);
 
   if (!isNoCdek && cdekData) {
     formData.append("cdekMode", cdekData.mode || "");

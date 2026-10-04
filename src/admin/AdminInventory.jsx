@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CatalogManager from "./CatalogManager";
 import PricingManager from "./PricingManager";
+import CertificateManager from "./CertificateManager";
 import WarehouseTable from "../components/WarehouseTable";
 import ColorSelect from "../components/ColorSelect";
 import api from "../api";
@@ -484,6 +485,7 @@ const AdminInventory = () => {
           />
         )}
       </section>
+      <CertificateManager />
     </section>
   );
 };

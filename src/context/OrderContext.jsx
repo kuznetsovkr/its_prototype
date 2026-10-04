@@ -6,6 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { getOrderAccessToken } from "../utils/orderAccess";
 
 const ORDER_DRAFT_STORAGE_KEY = "its_order_draft_v1";
 const ORDER_DRAFT_VERSION = 1;
@@ -70,6 +71,8 @@ const isSameRecipient = (a, b) =>
   (a?.deliveryRecipient || "") === (b?.deliveryRecipient || "") &&
   (a?.recipientPhone || "") === (b?.recipientPhone || "") &&
   (a?.deliveryComment || "") === (b?.deliveryComment || "") &&
+  (a?.certificateCode || "") === (b?.certificateCode || "") &&
+  JSON.stringify(a?.savedOrder ?? null) === JSON.stringify(b?.savedOrder ?? null) &&
   Boolean(a?.privacyConsent) === Boolean(b?.privacyConsent) &&
   (a?.pickupPoint || "") === (b?.pickupPoint || "") &&
   Number(a?.deliveryPrice ?? 0) === Number(b?.deliveryPrice ?? 0) &&
@@ -124,6 +127,8 @@ const initialState = {
     deliveryRecipient: "",
     recipientPhone: "",
     deliveryComment: "",
+    certificateCode: "",
+    savedOrder: null,
     privacyConsent: false,
     pickupPoint: "",
     deliveryPrice: null,
@@ -171,6 +176,8 @@ const restoreOrderDraft = () => {
 
     const storedOrder = draft.order;
     const storedEmbroidery = storedOrder.embroidery || {};
+    const savedOrder = storedOrder.recipient?.savedOrder;
+    const hasSavedOrder = Boolean(savedOrder?.orderId && savedOrder?.orderToken === getOrderAccessToken(savedOrder.orderId));
     // Older drafts defaulted to Patronus without a user selection. Do not restore that
     // implicit choice as a visible price; preserve drafts with evidence of a real choice.
     const hasSelectedType = storedEmbroidery.typeSelectionExplicit === true ||
@@ -207,7 +214,7 @@ const restoreOrderDraft = () => {
           manualAddress: normalizeManualAddress(storedOrder.recipient?.manualAddress, null),
         },
       },
-      missingUploadFiles: normalizeUploadMetadata(draft.uploadFiles),
+      missingUploadFiles: hasSavedOrder ? [] : normalizeUploadMetadata(draft.uploadFiles),
     };
   } catch {
     window.sessionStorage.removeItem(ORDER_DRAFT_STORAGE_KEY);
@@ -252,7 +259,7 @@ export const OrderProvider = ({ children }) => {
   }, [order, missingUploadFiles]);
 
   useEffect(() => {
-    if (order.embroidery.uploadedImage.length === 0) return undefined;
+    if (order.embroidery.uploadedImage.length === 0 || order.recipient.savedOrder) return undefined;
 
     const warnBeforeFileLoss = (event) => {
       event.preventDefault();
@@ -261,13 +268,13 @@ export const OrderProvider = ({ children }) => {
 
     window.addEventListener("beforeunload", warnBeforeFileLoss);
     return () => window.removeEventListener("beforeunload", warnBeforeFileLoss);
-  }, [order.embroidery.uploadedImage.length]);
+  }, [order.embroidery.uploadedImage.length, order.recipient.savedOrder]);
 
   const setClothing = useCallback((payload) => {
     setOrder((prev) => {
       const next = { ...prev.clothing, ...payload };
       if (isSameClothing(next, prev.clothing)) return prev;
-      return { ...prev, clothing: next };
+      return { ...prev, clothing: next, recipient: { ...prev.recipient, savedOrder: null } };
     });
   }, []);
 
@@ -285,7 +292,12 @@ export const OrderProvider = ({ children }) => {
           : prev.embroidery.customOption,
       };
       if (isSameEmbroidery(next, prev.embroidery)) return prev;
-      return { ...prev, embroidery: next };
+      const selectionChanged = next.type !== prev.embroidery.type || next.customText !== prev.embroidery.customText ||
+        next.patronusCount !== prev.embroidery.patronusCount || next.petFaceCount !== prev.embroidery.petFaceCount ||
+        next.customTextFont !== prev.embroidery.customTextFont || next.comment !== prev.embroidery.comment ||
+        !isSameFiles(next.uploadedImage, prev.embroidery.uploadedImage) ||
+        JSON.stringify(next.customOption) !== JSON.stringify(prev.embroidery.customOption);
+      return { ...prev, embroidery: next, recipient: selectionChanged ? { ...prev.recipient, savedOrder: null } : prev.recipient };
     });
   }, []);
 

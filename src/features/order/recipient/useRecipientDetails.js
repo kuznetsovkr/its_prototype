@@ -9,12 +9,14 @@ import { getEmbroideryCountError, getPatronusLimit } from "../embroidery/embroid
 import { getOrderAccessToken, storeOrderAccessToken } from "../../../utils/orderAccess";
 import {
   confirmOrder,
+  completeCertificateOrder,
   createOrder,
   getCheckoutQuote,
   getPaymentLink,
 } from "./recipientApi";
 import { buildOrderFormData } from "./recipientOrderPayload";
 import { useTurnstileChallenge } from "./useTurnstileChallenge";
+import { useOrderCertificate } from "./useOrderCertificate";
 import {
   formatPhoneNumber,
   hasFullManualAddress,
@@ -45,6 +47,8 @@ export const useRecipientDetails = () => {
   const navigate = useNavigate();
   const { order, setRecipient } = useOrder();
   const { clothing, embroidery, recipient: recipientState } = order;
+  const isCertificateAvailable = !IS_DEMO_MODE || IS_TURNSTILE_E2E;
+  const certificate = useOrderCertificate(isCertificateAvailable ? recipientState.certificateCode : "", setRecipient);
   const locationState = location.state || {};
 
   const productType = clothing.type || locationState.productType;
@@ -136,8 +140,12 @@ export const useRecipientDetails = () => {
         : null)
   );
   const [isPaying, setIsPaying] = useState(false);
-  const [orderId, setOrderId] = useState(null);
-  const [draftOrder, setDraftOrder] = useState(null);
+  const [draftOrder, setDraftOrder] = useState(() => {
+    if (!isCertificateAvailable) return null;
+    const saved = recipientState.savedOrder;
+    return saved?.orderId && saved?.orderToken === getOrderAccessToken(saved.orderId) ? saved : null;
+  });
+  const [orderId, setOrderId] = useState(draftOrder?.orderId || null);
   const [checkoutQuote, setCheckoutQuote] = useState(null);
   const [checkoutQuoteLoading, setCheckoutQuoteLoading] = useState(false);
   const [checkoutQuoteError, setCheckoutQuoteError] = useState("");
@@ -299,7 +307,7 @@ export const useRecipientDetails = () => {
   ]);
 
   useEffect(() => {
-    if (IS_DEMO_MODE) return;
+    if (IS_DEMO_MODE || draftOrder) return;
     const hasClothing = Boolean(productType && color && size);
     const hasEmbroidery =
       selectedType === "custom"
@@ -314,7 +322,7 @@ export const useRecipientDetails = () => {
     } else if (!hasEmbroidery) {
       navigate("/embroidery", { replace: true });
     }
-  }, [productType, color, size, selectedType, uploadedImage?.length, customOption.text, customOption.image, customText, navigate]);
+  }, [productType, color, size, selectedType, uploadedImage?.length, customOption.text, customOption.image, customText, navigate, draftOrder]);
 
   const handleNoCdekToggle = (event) => {
     const checked = event.target.checked;
@@ -384,6 +392,12 @@ export const useRecipientDetails = () => {
   const isManualCheckout = isCustomType || isNoCdek;
 
   useEffect(() => {
+    if (draftOrder) {
+      setCheckoutQuote(draftOrder);
+      setCheckoutQuoteLoading(false);
+      setCheckoutQuoteError("");
+      return undefined;
+    }
     if (isManualCheckout) {
       setCheckoutQuote({ manual: true, merchandisePrice: null, deliveryPrice: null, totalPrice: null });
       setCheckoutQuoteLoading(false);
@@ -397,7 +411,7 @@ export const useRecipientDetails = () => {
       return undefined;
     }
 
-    if (IS_DEMO_MODE) {
+    if (IS_DEMO_MODE && (!IS_TURNSTILE_E2E || !certificate.appliedCode)) {
       const merchandisePrice = Number(embroidery.price);
       const normalizedDeliveryPrice = Number(deliveryPrice);
       const hasDemoPrice = Number.isFinite(merchandisePrice) && Number.isFinite(normalizedDeliveryPrice);
@@ -427,6 +441,7 @@ export const useRecipientDetails = () => {
       petFaceCount,
       cdekMode: "office",
       cdekAddress: { code: cdekOfficeCode },
+      ...(certificate.appliedCode ? { certificateCode: certificate.appliedCode } : {}),
     }).then((quote) => {
       if (!cancelled) setCheckoutQuote(quote);
     }).catch((quoteError) => {
@@ -449,6 +464,8 @@ export const useRecipientDetails = () => {
     petFaceCount,
     deliveryPrice,
     embroidery.price,
+    certificate.appliedCode,
+    draftOrder,
   ]);
 
   const recipientValidation = validateRecipient({
@@ -469,11 +486,15 @@ export const useRecipientDetails = () => {
   });
   const isFormValid = recipientValidation.isValid;
   const getMissingFieldsMessage = () => recipientValidation.message;
-  const hasCheckoutTotal = Number.isFinite(Number(checkoutQuote?.totalPrice));
+  const hasCheckoutTotal = checkoutQuote?.totalPrice != null && Number.isFinite(Number(checkoutQuote.totalPrice));
   const canSubmit = isFormValid && Boolean(selectedType) && !embroideryCountError &&
+    !certificate.hasUnappliedCode && !certificate.error && !(isManualCheckout && certificate.appliedCode) &&
     (isManualCheckout || (!checkoutQuoteLoading && !checkoutQuoteError && hasCheckoutTotal)) &&
     (Boolean(draftOrder) || turnstile.isSatisfied);
   const getSubmitDisabledMessage = () => {
+    if (certificate.error) return certificate.error;
+    if (certificate.hasUnappliedCode) return "Примените или удалите код сертификата";
+    if (isManualCheckout && certificate.appliedCode) return "Сертификат можно применить после расчёта стоимости менеджером. Удалите код, чтобы отправить заявку";
     if (!selectedType) return "Выберите тип вышивки";
     if (!isFormValid) return getMissingFieldsMessage();
     if (embroideryCountError) return embroideryCountError;
@@ -538,10 +559,12 @@ export const useRecipientDetails = () => {
         productType, color, size, selectedType, embroideryTypeRu,
         patronusCount, petFaceCount, customText, customTextFont, customOption, pickupPoint,
         manualAddress, isNoCdek, cdekData, uploadedImage, turnstileToken: turnstile.token,
+        certificateCode: certificate.appliedCode,
       }));
       setOrderId(data.orderId);
       setDraftOrder(data);
       storeOrderAccessToken(data.orderId, data.orderToken);
+      setRecipient({ savedOrder: data });
       sessionStorage.setItem("pay_order_id", String(data.orderId));
       sessionStorage.removeItem("pay_cdek_number");
       if (data?.cdekNumber) {
@@ -563,7 +586,7 @@ export const useRecipientDetails = () => {
     setError('');
     setIsPaying(true);
 
-    if (IS_DEMO_MODE) {
+    if (IS_DEMO_MODE && (!IS_TURNSTILE_E2E || (!certificate.appliedCode && !draftOrder))) {
       const now = new Date();
       const demoOrderId = buildDemoOrderId(now);
       const demoCdekNumber = isNoCdek ? null : buildDemoCdekNumber(now);
@@ -599,6 +622,7 @@ export const useRecipientDetails = () => {
         totalPrice,
         paymentAmount,
         paymentTestMode,
+        certificateDiscount, amountDue, requiresBankPayment,
       } = activeDraft;
       setOrderId(oid);
 
@@ -610,6 +634,7 @@ export const useRecipientDetails = () => {
           totalPrice,
           paymentAmount,
           paymentTestMode,
+          certificateDiscount, amountDue, requiresBankPayment,
         });
       }
 
@@ -617,6 +642,13 @@ export const useRecipientDetails = () => {
         await confirmOrder(oid, "manual", orderToken);
         setIsPaying(false);
         navigate("/thank-you", { state: { orderNumber: oid, manual: true, cdekNumber: cdekNum || null } });
+        return;
+      }
+
+      if (requiresBankPayment === false && amountDue === 0) {
+        await completeCertificateOrder(oid, orderToken);
+        setIsPaying(false);
+        navigate("/thank-you", { state: { orderNumber: oid, cdekNumber: cdekNum || null } });
         return;
       }
 
@@ -701,5 +733,7 @@ export const useRecipientDetails = () => {
     handleCdekSelect, applyDemoPickup, handleNoCdekToggle,
     manualAddress, setManualAddress, dadataToken, isManualAddressFull,
     turnstile,
+    certificate,
+    isCertificateAvailable,
   };
 };
