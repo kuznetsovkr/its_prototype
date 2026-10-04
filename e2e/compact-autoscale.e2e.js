@@ -7,7 +7,8 @@ const openHome = async (page, width, height = 900) => {
   await page.setViewportSize({ width, height });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  await expect(page.locator(".home-about__card")).toBeVisible();
+  // Wait for the lazy route, including a cold WebKit context, before measuring it.
+  await expect(page.locator(".home-about__card")).toBeVisible({ timeout: 15_000 });
   await page.evaluate(() => document.fonts.ready);
 };
 
@@ -36,7 +37,7 @@ for (const { name, base, widths } of [
   { name: "tablet", base: 640, widths: [640, 768, 820, 1024, 1199] },
 ]) {
   test(`compact autoscale: all ${name} sections use the same proportions`, async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name !== "desktop-chromium", "Check the full width matrix once");
+    test.skip(Boolean(testInfo.project.use.isMobile), "Check the full width matrix once");
     await openHome(page, base);
     const baseline = await readGeometry(page, commonSelectors);
 
@@ -64,7 +65,7 @@ for (const { name, base, widths } of [
 }
 
 test("compact autoscale switches layouts at the existing boundaries without a reload", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "desktop-chromium", "Check the width boundaries once");
+  test.skip(Boolean(testInfo.project.use.isMobile), "Check the width boundaries once");
   await openHome(page, 390);
   for (const [width, mode, heroHeight, headerPosition, footerHeight] of [
     [639, "mobile", 601 * 639 / 320, "sticky", 958 * 639 / 320],
@@ -84,7 +85,7 @@ test("compact autoscale switches layouts at the existing boundaries without a re
 });
 
 test("autoscaled works and FAQ keep dynamic content inside their surfaces", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "desktop-chromium", "Check mobile and tablet widths once");
+  test.skip(Boolean(testInfo.project.use.isMobile), "Check mobile and tablet widths once");
   for (const width of [390, 639, 640, 1024, 1199]) {
     await openHome(page, width);
     await page.locator(".home-works__actions").getByRole("button", { name: /ещ[её] примеры/i }).click();
@@ -110,7 +111,7 @@ test("autoscaled works and FAQ keep dynamic content inside their surfaces", asyn
 });
 
 test("the scaled mobile menu locks scrolling, fits the viewport and restores focus", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "mobile-chromium", "Use the touch browser for mobile interactions");
+  test.skip(!testInfo.project.use.isMobile, "Use the touch browser for mobile interactions");
   await openHome(page, 430, 740);
   await page.evaluate(() => window.scrollTo(0, 1200));
   const trigger = page.locator(".home-header__burger");
@@ -140,8 +141,9 @@ test("the scaled mobile menu locks scrolling, fits the viewport and restores foc
   await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
 });
 
-test("scaled review cards keep native horizontal gestures and unscaled modal coordinates", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "mobile-chromium", "Use the touch browser for mobile interactions");
+test("scaled review cards keep native horizontal gestures and unscaled modal coordinates", async ({ page, browserName }, testInfo) => {
+  test.skip(!testInfo.project.use.isMobile, "Use the touch browser for mobile interactions");
+  test.skip(browserName !== "chromium", "Touch swipes use Chromium CDP; WebKit modal rotation is checked separately");
   await openHome(page, 390, 844);
   const viewport = page.locator(".home-reviews-carousel__viewport");
   await viewport.scrollIntoViewIfNeeded();
@@ -174,7 +176,7 @@ test("scaled review cards keep native horizontal gestures and unscaled modal coo
 });
 
 test("shared header, footer and constructor scale together on internal routes", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "desktop-chromium", "Check both compact ranges once");
+  test.skip(Boolean(testInfo.project.use.isMobile), "Check both compact ranges once");
   for (const [width, mode, headerHeight, footerHeight, orderWidth] of [
     [390, "mobile", 66 * 390 / 320, 958 * 390 / 320, 390],
     [1024, "tablet", 24 * 1024 / 640, 796 * 1024 / 640, 1024],

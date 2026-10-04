@@ -67,7 +67,7 @@ for (const { mode, base, widths } of [
   { mode: "tablet", base: 640, widths: [640, 768, 820, 1024, 1199] },
 ]) {
   test(`constructor and certificate follow the ${mode} design proportions`, async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name !== "desktop-chromium", "Run the full geometry matrix once");
+    test.skip(Boolean(testInfo.project.use.isMobile), "Run the full geometry matrix once");
     await page.setViewportSize({ width: base, height: 900 });
     await selectClothing(page);
     await selectEmbroidery(page);
@@ -113,7 +113,7 @@ for (const { mode, base, widths } of [
 }
 
 test("compact text fields scale above the 16px minimum and preserve their values", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "mobile-chromium", "Use touch input typography, including the tablet range");
+  test.skip(!testInfo.project.use.isMobile, "Use touch input typography, including the tablet range");
   await selectClothing(page);
   await page.locator(".orderActionButton--next").click();
   await page.locator(".embroideryDesktopTabs button").nth(1).click();
@@ -153,7 +153,7 @@ test("compact text fields scale above the 16px minimum and preserve their values
 });
 
 test("order overlays keep native viewport coordinates, focus and scroll locks", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "desktop-chromium", "Exercise phone and tablet layouts once");
+  test.skip(Boolean(testInfo.project.use.isMobile), "Exercise phone and tablet layouts once");
   await selectClothing(page);
   for (const width of [390, 1024]) {
     await page.setViewportSize({ width, height: 740 });
@@ -205,7 +205,7 @@ test("order overlays keep native viewport coordinates, focus and scroll locks", 
 });
 
 test("the restored-files notice clears the scaled header and stays inside the viewport", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "mobile-chromium", "Check the mobile fixed-position notice");
+  test.skip(!testInfo.project.use.isMobile, "Check the mobile fixed-position notice");
   await selectClothing(page);
   await selectEmbroidery(page);
   await page.evaluate(() => {

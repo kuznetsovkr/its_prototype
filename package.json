@@ -21,6 +21,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "test:e2e:autoscale:webkit": "playwright test --config playwright.autoscale.config.mjs",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:install": "playwright install chromium",
     "test:all": "npm test && npm run test:e2e",

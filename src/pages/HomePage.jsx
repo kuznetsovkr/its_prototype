@@ -80,9 +80,9 @@ const HomePage = () => {
   };
 
   const reviews = (
-    <ReviewsSection assets={currentAssets.reviews} breakpoint={breakpoint} onOrder={handleOrder} />
+    <ReviewsSection key="reviews" assets={currentAssets.reviews} breakpoint={breakpoint} onOrder={handleOrder} />
   );
-  const customers = <CustomersSection assets={customerAssets} />;
+  const customers = <CustomersSection key="customers" assets={customerAssets} />;
 
   return (
     <div className={`home-page home-page--${breakpoint}`} id="top">
@@ -105,11 +105,11 @@ const HomePage = () => {
 
         <WorksSection assets={worksAssets} breakpoint={breakpoint} onOrder={handleOrder} />
 
+        {/* Stable keys preserve tabs, review dialogs and focus when these sections swap positions. */}
         {breakpoint === "tablet" ? customers : reviews}
         {breakpoint === "tablet" ? reviews : customers}
 
         <FaqSection
-          breakpoint={breakpoint}
           glow={breakpoint === "mobile" ? homeAssets.mobile.icons.faqGlow : null}
         />
         <QuestionsSection assets={questionsAssets} />

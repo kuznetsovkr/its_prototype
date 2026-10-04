@@ -2,7 +2,7 @@ import { faqItems } from "../../data/homeContent";
 import { HomeAccordion } from "./primitives";
 import useScrollZoom from "./useScrollZoom";
 
-const FaqSection = ({ breakpoint, glow }) => {
+const FaqSection = ({ glow }) => {
   const sectionRef = useScrollZoom();
 
   return (
@@ -16,7 +16,6 @@ const FaqSection = ({ breakpoint, glow }) => {
             className="home-faq__accordion"
             defaultOpenItemId={faqItems[0].id}
             items={faqItems}
-            key={breakpoint}
             renderIndicator={() => null}
           />
         </div>
