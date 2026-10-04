@@ -6,6 +6,7 @@ import PageLayout from './components/PageLayout';
 import RequireAdmin from './components/RequireAdmin';
 import RouteLoader from './components/RouteLoader';
 import SeoMetadata from './components/SeoMetadata';
+import DesktopSmoothScroll from './components/DesktopSmoothScroll';
 import { isOrderStepPath } from './config/routes';
 
 const loadHomePage = () => import('./pages/HomePage');
@@ -138,6 +139,7 @@ const AppShell = () => {
             <div className={`App${isOrderPage ? ' App--order' : ''}${isEmbroideryPage ? ' App--embroidery' : ''}${isRecipientPage ? ' App--recipient' : ''}${isCertificatePage ? ' App--certificate' : ''}${isAdminPage ? ' App--admin' : ''}`}>
                 {!isHomePage && <Header />}
                 <SeoMetadata />
+                <DesktopSmoothScroll />
                 <ScrollToTop />
                 <RoutePreloader />
                 {isHomePage ? routes : <main>{routes}</main>}
