@@ -1,4 +1,5 @@
 @use "../base/breakpoints" as bp;
+@use "../base/variables" as vars;
 
 .containerDetails{
   --recipient-input-height: 43px;
@@ -1449,7 +1450,7 @@
     padding: 80px 0;
     box-sizing: border-box;
     border-radius: 60px;
-    background: #161616;
+    background: vars.$order-stage-background;
   }
 
   .recipientOrderCard {
@@ -1808,7 +1809,7 @@
     min-height: 850px;
     padding: 30px;
     border-radius: 20px;
-    background: #161616;
+    background: vars.$order-stage-background;
   }
 
   .recipientOrderCard {

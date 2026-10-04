@@ -284,6 +284,32 @@
   text-underline-position: from-font;
 }
 
+@media (min-width: bp.$desktop-min) {
+  .home-footer__legal {
+    left: 50%;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: min(1118px, calc(100% - 200px));
+    transform: translateX(-50%);
+  }
+
+  .home-footer__legal > * { position: static; }
+
+  .home-footer__legal a:nth-child(2) {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .home-footer__legal-design {
+    display: block;
+    margin-left: auto;
+    text-decoration: underline;
+    text-underline-position: from-font;
+  }
+}
+
 @media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
   .home-footer { height: 796px; }
 

@@ -254,9 +254,16 @@ const EmbroideryDesktop = ({
                       )}
                     </div>
                   ) : (
-                    getUploadInstructions(selectedType).map((instruction) => (
-                      <p key={instruction}>{instruction}</p>
-                    ))
+                    <div
+                      className="embroideryUploadStage__instructionText"
+                      role="region"
+                      aria-label="Инструкция по загрузке фотографий"
+                      tabIndex={0}
+                    >
+                      {getUploadInstructions(selectedType).map((instruction) => (
+                        <p key={instruction}>{instruction}</p>
+                      ))}
+                    </div>
                   )}
                 </div>
 

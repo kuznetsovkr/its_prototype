@@ -1,4 +1,5 @@
 @use "../base/breakpoints" as bp;
+@use "../base/variables" as vars;
 
 .orderBlock {
   width: 100%;
@@ -658,7 +659,7 @@
     padding: 80px 0;
     box-sizing: border-box;
     border-radius: 60px;
-    background: #161616;
+    background: vars.$order-stage-background;
   }
 
   .orderPage .orderBlock--clothing {
@@ -975,7 +976,7 @@
     width: 100%;
     min-height: 457px;
     border-radius: 20px;
-    background: #161616;
+    background: vars.$order-stage-background;
   }
 
   .orderPage .orderBlock--clothing {

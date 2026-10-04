@@ -1,5 +1,11 @@
 @use "breakpoints";
 
+$order-stage-background: radial-gradient(
+  ellipse 59.23% 59.23% at 50% 45.12%,
+  #f0f0f0 0%,
+  #4b4b4b 100%
+);
+
 $breakpoints: (
   xs: 480px,
   sm: breakpoints.$tablet-min,

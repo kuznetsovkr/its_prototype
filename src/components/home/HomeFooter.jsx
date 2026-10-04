@@ -96,7 +96,9 @@ const HomeFooter = ({ assets, navigationBase = "", onOrder, variant = "home" }) 
             ? <Link to={item.href} key={item.href}>{item.label}</Link>
             : <a href={item.href} key={item.href}>{item.label}</a>
         ))}
-        <span className="home-footer__legal-design">Дизайн сайта — Илья Погудин</span>
+        <span className="home-footer__legal-design">
+          Дизайн сайта<span className="home-footer__compact-label"> — Илья Погудин</span>
+        </span>
         <span className="home-footer__legal-development">
           Разработка сайта<span className="home-footer__compact-label"> — ............. ...............</span>
         </span>
