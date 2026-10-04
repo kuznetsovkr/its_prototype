@@ -7,6 +7,7 @@ import RequireAdmin from './components/RequireAdmin';
 import RouteLoader from './components/RouteLoader';
 import SeoMetadata from './components/SeoMetadata';
 import DesktopSmoothScroll from './components/DesktopSmoothScroll';
+import CertificatePaymentReturn from './features/certificate/CertificatePaymentReturn';
 import { isOrderStepPath } from './config/routes';
 
 const loadHomePage = () => import('./pages/HomePage');
@@ -117,8 +118,8 @@ const AppShell = () => {
                 <Route path="/embroidery" element={<PageLayout><EmbroideryPage /></PageLayout>} />
                 <Route path="/recipient" element={<PageLayout><RecipientDetails /></PageLayout>} />
                 <Route path="/thank-you" element={<PageLayout><ThankYouPage /></PageLayout>} />
-                <Route path="/payment-success" element={<PageLayout><PaymentSuccess /></PageLayout>} />
-                <Route path="/payment-fail" element={<PageLayout><PaymentFail /></PageLayout>} />
+                <Route path="/payment-success" element={<CertificatePaymentReturn><PageLayout><PaymentSuccess /></PageLayout></CertificatePaymentReturn>} />
+                <Route path="/payment-fail" element={<CertificatePaymentReturn failed><PageLayout><PaymentFail /></PageLayout></CertificatePaymentReturn>} />
                 <Route path="/admin" element={<PageLayout><AdminLoginPage /></PageLayout>} />
 
                 {/* Админку можно оставить без layout-а, если она отдельная */}

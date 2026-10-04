@@ -1,0 +1,199 @@
+@use "../base/breakpoints" as bp;
+@use "../base/compactScale" as scale;
+
+.certificateCheckout {
+  @include scale.container;
+  padding: scale.px(40) clamp(scale.px(12), 3vw, scale.px(60));
+  background: #161616;
+  font-family: "Jost", Arial, sans-serif;
+  color: #161616;
+}
+
+.certificateCheckout__card {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: scale.px(40);
+  border-radius: scale.px(30);
+  background: #fff;
+}
+
+.certificateCheckout__header {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: scale.px(40);
+  margin-bottom: scale.px(24);
+}
+
+.certificateCheckout__header h1 {
+  margin: 0;
+  font-size: scale.px(32);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.certificateCheckout__back {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.certificateCheckout__back img { display: block; }
+.certificateCheckout__body { display: grid; grid-template-columns: 1fr 1fr; gap: scale.px(24); }
+.certificateCheckout__preview { position: relative; isolation: isolate; min-width: 0; min-height: scale.px(340); }
+
+.certificateCheckout__glow {
+  position: absolute;
+  top: 12%;
+  left: 10%;
+  width: 80%;
+  height: 65%;
+  transform: rotate(180deg);
+  filter: blur(scale.px(35.645));
+  object-fit: cover;
+}
+
+.certificateCheckout__ticket {
+  position: absolute;
+  top: 10%;
+  left: 5%;
+  width: 90%;
+  height: auto;
+  transform: rotate(7deg);
+  mix-blend-mode: overlay;
+}
+
+.certificateCheckout__nominal {
+  position: absolute;
+  bottom: scale.px(8);
+  left: 0;
+  width: 100%;
+  margin: 0;
+  font-size: scale.px(14);
+  text-align: center;
+}
+
+.certificateCheckout__controls { min-width: 0; }
+.certificateCheckout__form.recipientOrderForm {
+  position: static;
+  display: grid;
+  gap: scale.px(10);
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  padding: scale.px(30);
+  border-radius: scale.px(30);
+  box-sizing: border-box;
+  overflow: visible;
+  background: #f0f0f0;
+}
+
+.certificateCheckout .recipientOrderForm__heading {
+  position: static;
+  margin: 0 0 scale.px(4);
+  width: auto;
+  height: auto;
+  color: #2b2b2b;
+  font-size: scale.px(20);
+  line-height: 1;
+}
+
+.certificateCheckout .recipientOrderForm__phoneField { position: static; width: 100%; height: auto; }
+.certificateCheckout .recipientOrderForm__field {
+  @include scale.control-font(16);
+  position: static;
+  width: 100%;
+  height: scale.px(44);
+  min-height: 36px;
+  margin: 0;
+  padding: scale.px(10) scale.px(15);
+  border: 0;
+  border-radius: scale.px(40);
+  box-sizing: border-box;
+  color: #2b2b2b;
+  background: #fff;
+  line-height: 1.2;
+  font-family: inherit;
+}
+
+.certificateCheckout textarea.recipientOrderForm__field { resize: vertical; max-height: scale.px(180); }
+.certificateCheckout .recipientOrderForm__consent {
+  position: static;
+  display: flex;
+  align-items: flex-start;
+  gap: scale.px(10);
+  width: 100%;
+  margin: scale.px(10) 0 0;
+  font-size: scale.px(12);
+  line-height: 1.4;
+}
+
+.certificateCheckout .recipientOrderForm__consent input { flex: 0 0 scale.px(20); width: scale.px(20); height: scale.px(20); }
+.certificateCheckout .recipientOrderForm__consent > span { position: static; width: auto; font-size: inherit; }
+.certificateCheckout .recipientOrderForm__consent em { color: #bc5823; font-style: normal; }
+.certificateCheckout .recipientOrderForm__turnstile { position: static; width: 100%; margin: scale.px(10) 0 0; box-sizing: border-box; }
+.certificateCheckout__payAmount { margin: scale.px(14) 0; font-size: scale.px(14); text-align: center; }
+
+.certificateCheckout__submit,
+.certificateCheckout__secondary {
+  display: block;
+  width: 100%;
+  min-height: max(40px, #{scale.px(48)});
+  margin: scale.px(20) 0 0;
+  padding: scale.px(10) scale.px(16);
+  border: 1px solid #0c0c0c;
+  border-radius: scale.px(40);
+  color: #fff;
+  background: #0c0c0c;
+  cursor: pointer;
+  font: 600 #{scale.px(13)} / 1.4 "Jost", Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.certificateCheckout__secondary { color: #161616; background: #fff; }
+.certificateCheckout button:disabled { opacity: 0.55; cursor: not-allowed; }
+.certificateCheckout button:focus-visible { outline: 2px solid #bc5823; outline-offset: 3px; }
+.certificateCheckout__notice,
+.certificateCheckout__error { margin: scale.px(16) 0 0; font-size: scale.px(14); line-height: 1.5; overflow-wrap: anywhere; }
+.certificateCheckout__error { color: #a52d16; }
+.certificateCheckout__result { padding: scale.px(30); border-radius: scale.px(30); background: #f0f0f0; }
+.certificateCheckout__result h2 { margin: 0 0 scale.px(16); font-size: scale.px(24); }
+.certificateCheckout__result p { font-size: scale.px(16); line-height: 1.5; }
+.certificateCheckout__home { display: block; margin-top: scale.px(20); color: #bc5823; text-align: center; }
+
+@media (max-width: bp.$tablet-max) {
+  .certificateCheckout { padding: scale.px(10) scale.px(3) scale.px(20); }
+  .certificateCheckout__card { padding: scale.px(20); border-radius: scale.px(20); }
+  .certificateCheckout__header h1 { font-size: scale.px(24); }
+  .certificateCheckout__form.recipientOrderForm { padding: scale.px(30) scale.px(20); }
+  .certificateCheckout .recipientOrderForm__heading { font-size: scale.px(16); }
+}
+
+@media (max-width: bp.$mobile-max) {
+  .certificateCheckout__card { padding: scale.px(20) scale.px(3); }
+  .certificateCheckout__header { margin: 0 scale.px(17); }
+  .certificateCheckout__body { grid-template-columns: 1fr; gap: 0; }
+  .certificateCheckout__preview { height: scale.px(259); min-height: 0; }
+  .certificateCheckout__glow { top: scale.px(35); left: scale.px(53); width: scale.px(185); height: scale.px(180); }
+  .certificateCheckout__ticket { top: scale.px(16); left: scale.px(20); width: scale.px(240); }
+  .certificateCheckout__nominal { bottom: scale.px(12); }
+  .certificateCheckout .recipientOrderForm__field { height: scale.px(36); }
+  .certificateCheckout .recipientOrderForm__consent { font-size: scale.px(10); }
+  .certificateCheckout__submit,
+  .certificateCheckout__secondary,
+  .certificateCheckout__notice,
+  .certificateCheckout__error,
+  .certificateCheckout__payAmount { width: auto; margin-right: scale.px(17); margin-left: scale.px(17); }
+  .certificateCheckout__submit,
+  .certificateCheckout__secondary { width: calc(100% - #{scale.px(34)}); }
+  .certificateCheckout__submit { min-height: scale.px(40); font-size: scale.px(12); }
+}

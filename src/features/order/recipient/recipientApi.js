@@ -1,5 +1,6 @@
 import api from "../../../api";
 import { orderAccessConfig } from "../../../utils/orderAccess";
+import { markOrderPayment } from "../../certificate/certificateStorage";
 
 export const createOrder = async (formData) => {
   const { data } = await api.post("/orders/create", formData);
@@ -23,6 +24,7 @@ export const getPaymentLink = async (orderId, orderToken) => {
     { orderId },
     orderAccessConfig(orderId, orderToken)
   );
+  markOrderPayment();
   return data.pay_url;
 };
 

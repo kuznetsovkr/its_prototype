@@ -1,16 +1,14 @@
-import { useState } from "react";
 import ResponsiveAsset from "../components/home/ResponsiveAsset";
 import { certificateAssets } from "../images/certificate";
-
-const CERTIFICATE_DENOMINATIONS = [
-  1000, 2000, 3000, 4000, 5000, 6000, 8000,
-  10000, 12000, 14000, 16000, 18000, 20000,
-];
+import CertificateCheckout from "../features/certificate/CertificateCheckout";
+import { useCertificateCheckout } from "../features/certificate/useCertificateCheckout";
 
 const formatAmount = (amount) => new Intl.NumberFormat("ru-RU").format(amount);
 
 const CertificatePage = () => {
-  const [denomination, setDenomination] = useState(CERTIFICATE_DENOMINATIONS[0]);
+  const checkout = useCertificateCheckout();
+  const { denomination, setDenomination } = checkout;
+  if (checkout.phase !== "offer") return <CertificateCheckout checkout={checkout} />;
 
   return (
   <section className="certificatePage" aria-labelledby="certificate-page-title">
@@ -67,7 +65,7 @@ const CertificatePage = () => {
               value={denomination}
               onChange={(event) => setDenomination(Number(event.target.value))}
             >
-              {CERTIFICATE_DENOMINATIONS.map((amount) => (
+              {checkout.config.denominations.map((amount) => (
                 <option value={amount} key={amount}>{formatAmount(amount)} руб.</option>
               ))}
             </select>
@@ -86,13 +84,13 @@ const CertificatePage = () => {
             className="certificatePage__action"
             type="button"
             aria-describedby="certificate-action-status"
-            disabled
+            onClick={() => checkout.setPhase("form")}
           >
             Подарить сертификат
           </button>
 
           <p className="certificatePage__actionStatus" id="certificate-action-status">
-            Покупка сертификатов будет подключена позже
+            {checkout.config.enabled ? "После оплаты отправим код на ваш email" : "Форма покупки доступна для просмотра; оплата пока выключена"}
           </p>
 
           <ul className="certificatePage__conditions">

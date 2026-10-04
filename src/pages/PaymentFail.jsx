@@ -8,6 +8,7 @@ import {
   orderAccessConfig,
 } from '../utils/orderAccess';
 import s from './PaymentFail.module.scss';
+import { markOrderPayment } from '../features/certificate/certificateStorage';
 
 export default function PaymentFail() {
   const navigate = useNavigate();
@@ -45,6 +46,7 @@ export default function PaymentFail() {
         orderAccessConfig(orderId, orderToken)
       );
       if (!data?.pay_url) throw new Error('Платёжная ссылка не получена');
+      markOrderPayment();
       window.location.assign(data.pay_url);
     } catch (paymentError) {
       setError(paymentError.message || 'Не удалось повторить оплату');

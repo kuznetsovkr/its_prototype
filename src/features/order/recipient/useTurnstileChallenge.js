@@ -7,7 +7,7 @@ const disabledConfig = Object.freeze({
   action: "",
 });
 
-export const useTurnstileChallenge = ({ disabled = false } = {}) => {
+export const useTurnstileChallenge = ({ disabled = false, loadConfig = getPublicCheckoutConfig } = {}) => {
   const [config, setConfig] = useState(disabled ? disabledConfig : {
     status: "loading",
     siteKey: "",
@@ -28,7 +28,7 @@ export const useTurnstileChallenge = ({ disabled = false } = {}) => {
     setConfig({ status: "loading", siteKey: "", action: "" });
     setTokenState("");
 
-    getPublicCheckoutConfig()
+    loadConfig()
       .then((data) => {
         if (!active) return;
         const turnstile = data?.turnstile;
@@ -48,7 +48,7 @@ export const useTurnstileChallenge = ({ disabled = false } = {}) => {
     return () => {
       active = false;
     };
-  }, [configAttempt, disabled]);
+  }, [configAttempt, disabled, loadConfig]);
 
   const setToken = (value) => {
     const normalized = typeof value === "string" ? value.trim().slice(0, 2048) : "";

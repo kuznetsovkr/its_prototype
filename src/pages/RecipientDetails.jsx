@@ -7,6 +7,7 @@ import { MEDIA_QUERIES } from "../config/breakpoints";
 import { useRecipientDetails } from "../features/order/recipient/useRecipientDetails";
 import { normalizePhoneDigits } from "../features/order/recipient/recipientValidation";
 import TurnstilePanel from "../components/TurnstilePanel";
+import RecipientPersonalFields from "../features/order/shared/RecipientPersonalFields";
 import recipientBackIcon from "../images/order/recipient-back.svg";
 import orderBackIconTablet from "../images/order/order-back-tablet.svg";
 import orderBackIconMobile from "../images/order/order-back-mobile.svg";
@@ -108,65 +109,14 @@ const RecipientDetails = () => {
                   Введите свои данные
                 </h2>
 
-                <input
-                  className="recipientOrderForm__field recipientOrderForm__field--fullName"
-                  type="text"
-                  autoComplete="name"
-                  placeholder={hasNoMiddleName ? "Фамилия Имя" : "ФИО"}
-                  value={fullNameInput}
-                  onChange={handleFullNameChange}
-                  disabled={formDisabled}
-                />
-
-                <label className="recipientOrderForm__noMiddleName">
-                  <input
-                    type="checkbox"
-                    checked={hasNoMiddleName}
-                    onChange={handleNoMiddleNameToggle}
-                    disabled={formDisabled}
-                  />
-                  <span>У меня нет отчества</span>
-                </label>
-
-                <div className="recipientOrderForm__phoneField">
-                  <input
-                    className="recipientOrderForm__field recipientOrderForm__field--phone"
-                    type="tel"
-                    name="phone"
-                    autoComplete="tel"
-                    placeholder="Номер телефона"
-                    value={userData.phone}
-                    onChange={handleInputChange}
-                    disabled={formDisabled}
-                    maxLength={18}
-                  />
-                </div>
-
-                <input
-                  className="recipientOrderForm__field recipientOrderForm__field--email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="E-mail"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  disabled={formDisabled}
-                />
-
-                <input
-                  className="recipientOrderForm__field recipientOrderForm__field--contact"
-                  type="text"
-                  placeholder={isMobileLayout ? "Удобный способ связи" : "Удобный способ связи ( Telegram / VK / другое )"}
-                  value={preferredContact}
-                  onChange={(event) => setPreferredContact(event.target.value)}
-                  disabled={formDisabled}
-                />
-
-                <textarea
-                  className="recipientOrderForm__field recipientOrderForm__field--orderComment"
-                  placeholder="Комментарий / пожелание к заказу"
-                  value={orderComment}
-                  onChange={(event) => setOrderComment(event.target.value)}
-                  disabled={formDisabled}
+                <RecipientPersonalFields
+                  fullName={fullNameInput} onFullNameChange={handleFullNameChange}
+                  phone={userData.phone} onPhoneChange={handleInputChange}
+                  email={email} onEmailChange={(event) => setEmail(event.target.value)}
+                  preferredContact={preferredContact} onContactChange={(event) => setPreferredContact(event.target.value)}
+                  comment={orderComment} onCommentChange={(event) => setOrderComment(event.target.value)}
+                  hasNoMiddleName={hasNoMiddleName} onNoMiddleNameChange={handleNoMiddleNameToggle}
+                  disabled={formDisabled} compact={isMobileLayout}
                 />
 
                 <h2 className="recipientOrderForm__heading recipientOrderForm__heading--delivery">
