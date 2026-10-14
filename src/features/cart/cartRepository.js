@@ -2,7 +2,7 @@ import { buildCartItemFormData } from "./cartItem";
 import { CART_REVISION_KEY, CART_STORAGE_KEY, readCartAccess, writeCartAccess } from "./cartStorage";
 
 export const createCartRepository = ({ client, storage, lock = (callback) => callback() }) => {
-  let state = { id: null, items: [], expiresAt: null, pending: false, error: null };
+  let state = { id: null, items: [], merchandisePrice: null, expiresAt: null, pending: false, initialized: false, error: null };
   let queue = Promise.resolve();
   const listeners = new Set();
   const publish = (next) => {
@@ -22,7 +22,7 @@ export const createCartRepository = ({ client, storage, lock = (callback) => cal
     // A quota failure updating the expiry must not hide a successfully saved
     // item. The original access token was saved before uploading any files.
     try { writeCartAccess(storage, { ...access, expiresAt: cart.expiresAt }); } catch { /* Keep the existing access. */ }
-    publish({ id: cart.id, items: cart.items, expiresAt: cart.expiresAt, error: null });
+    publish({ id: cart.id, items: cart.items, merchandisePrice: cart.merchandisePrice ?? null, expiresAt: cart.expiresAt, error: null });
   };
   const run = (operation) => {
     const task = queue.then(() => lock(async () => {
@@ -32,7 +32,7 @@ export const createCartRepository = ({ client, storage, lock = (callback) => cal
         if (["cart_expired", "cart_not_found", "cart_access_required"].includes(error.code)) {
           // Only the server, not the browser clock, decides whether a cart expired.
           forget(state.id || readCartAccess(storage)?.id);
-          publish({ id: null, items: [], expiresAt: null });
+          publish({ id: null, items: [], merchandisePrice: null, expiresAt: null });
         }
         publish({ error: error.message || "Не удалось обработать корзину" });
         throw error;
@@ -52,9 +52,9 @@ export const createCartRepository = ({ client, storage, lock = (callback) => cal
     subscribe: (listener) => { listeners.add(listener); return () => listeners.delete(listener); },
     load: () => run(async () => {
       const access = readCartAccess(storage);
-      if (!access) { publish({ id: null, items: [], expiresAt: null }); return; }
+      if (!access) { publish({ id: null, items: [], merchandisePrice: null, expiresAt: null }); return; }
       accept(await client.load(access), access);
-    }),
+    }).finally(() => publish({ initialized: true })),
     addItem: (draft, options) => {
       // Capture a complete item before awaiting network or changing the current
       // constructor. A retry must reuse options.requestKey.
@@ -90,7 +90,7 @@ export const createCartRepository = ({ client, storage, lock = (callback) => cal
       const access = readCartAccess(storage);
       if (access) await client.clear(access);
       forget(access?.id);
-      publish({ id: null, items: [], expiresAt: null });
+      publish({ id: null, items: [], merchandisePrice: null, expiresAt: null });
       revision();
     }),
     restoreItem: (itemId) => run(async () => {

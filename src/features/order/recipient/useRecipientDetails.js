@@ -5,6 +5,8 @@ import { MEDIA_QUERIES } from "../../../config/breakpoints";
 import { APP_ENV } from "../../../config/env";
 import { DELIVERY_METHODS, restoreDeliveryMethod } from "../../../config/delivery";
 import { useOrder } from "../../../context/OrderContext";
+import { useRecipientCart } from "../../cart/useRecipientCart";
+import { GROUP_PAYMENT_NOTICE } from "../../cart/cartPresentation";
 import { buildDemoCdekNumber, buildDemoOrderId } from "../../../mocks/demoData";
 import { getEmbroideryCountError, getPatronusLimit } from "../embroidery/embroideryLimits";
 import { getOrderAccessToken, storeOrderAccessToken } from "../../../utils/orderAccess";
@@ -154,6 +156,7 @@ export const useRecipientDetails = () => {
   const turnstile = useTurnstileChallenge({
     disabled: IS_DEMO_MODE && !IS_TURNSTILE_E2E,
   });
+  const cart = useRecipientCart({ turnstile, privacyConsent, isCheckoutLocked: Boolean(draftOrder), isPaying });
 
   // Dadata
   const [deliveryMethod, setDeliveryMethod] = useState(() => restoreDeliveryMethod(recipientState));
@@ -322,7 +325,7 @@ export const useRecipientDetails = () => {
   ]);
 
   useEffect(() => {
-    if (IS_DEMO_MODE || draftOrder) return;
+    if (IS_DEMO_MODE || draftOrder || cart.cartOnly || !cart.initialized || cart.pending || cart.alreadySaved || cart.error) return;
     const hasClothing = Boolean(productType && color && size);
     const hasEmbroidery =
       selectedType === "custom"
@@ -337,7 +340,7 @@ export const useRecipientDetails = () => {
     } else if (!hasEmbroidery) {
       navigate("/embroidery", { replace: true });
     }
-  }, [productType, color, size, selectedType, uploadedImage?.length, customOption.text, customOption.image, customText, navigate, draftOrder]);
+  }, [productType, color, size, selectedType, uploadedImage?.length, customOption.text, customOption.image, customText, navigate, draftOrder, cart.cartOnly, cart.initialized, cart.pending, cart.alreadySaved, cart.error]);
 
   const handleNoCdekToggle = (event) => {
     const checked = event.target.checked;
@@ -420,6 +423,12 @@ export const useRecipientDetails = () => {
       setCheckoutQuoteError("");
       return undefined;
     }
+    if (cart.paymentBlocked) {
+      setCheckoutQuote(null);
+      setCheckoutQuoteLoading(false);
+      setCheckoutQuoteError("");
+      return undefined;
+    }
     if (isManualCheckout) {
       setCheckoutQuote({ manual: true, merchandisePrice: null, deliveryPrice: null, totalPrice: null });
       setCheckoutQuoteLoading(false);
@@ -488,6 +497,7 @@ export const useRecipientDetails = () => {
     embroidery.price,
     certificate.appliedCode,
     draftOrder,
+    cart.paymentBlocked,
   ]);
 
   const recipientValidation = validateRecipient({
@@ -511,11 +521,12 @@ export const useRecipientDetails = () => {
   const isFormValid = recipientValidation.isValid;
   const getMissingFieldsMessage = () => recipientValidation.message;
   const hasCheckoutTotal = checkoutQuote?.totalPrice != null && Number.isFinite(Number(checkoutQuote.totalPrice));
-  const canSubmit = isFormValid && Boolean(selectedType) && !embroideryCountError &&
+  const canSubmit = !cart.paymentBlocked && isFormValid && Boolean(selectedType) && !embroideryCountError &&
     !certificate.hasUnappliedCode && !certificate.error && !(isManualCheckout && certificate.appliedCode) &&
     (isManualCheckout || (!checkoutQuoteLoading && !checkoutQuoteError && hasCheckoutTotal)) &&
     (Boolean(draftOrder) || turnstile.isSatisfied);
   const getSubmitDisabledMessage = () => {
+    if (cart.paymentBlocked) return cart.error || (!cart.initialized || cart.busy ? "Дождитесь загрузки корзины" : GROUP_PAYMENT_NOTICE);
     if (certificate.error) return certificate.error;
     if (certificate.hasUnappliedCode) return "Примените или удалите код сертификата";
     if (isManualCheckout && certificate.appliedCode) return "Сертификат можно применить после расчёта стоимости менеджером. Удалите код, чтобы отправить заявку";
@@ -746,6 +757,7 @@ export const useRecipientDetails = () => {
 
 
   return {
+    cart,
     navigate, productType, clothingProfile: clothing.profile, isCustomType,
     clothingPreviewSrc: clothing.previewSrc || "",
     clothingPreviewAlt: clothing.previewAlt || clothing.type || "Одежда",

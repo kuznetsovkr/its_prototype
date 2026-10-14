@@ -8,6 +8,8 @@ import {
 } from "react";
 import { getOrderAccessToken } from "../utils/orderAccess";
 import { restoreDeliveryMethod } from "../config/delivery";
+import { createCartItemKey } from "../features/cart/cartItem";
+import { isCartId } from "../features/cart/cartStorage";
 
 const ORDER_DRAFT_STORAGE_KEY = "its_order_draft_v1";
 const ORDER_DRAFT_VERSION = 1;
@@ -144,6 +146,7 @@ const initialState = {
 };
 
 const createInitialState = () => ({
+  cartItemKey: createCartItemKey(),
   clothing: { ...initialState.clothing },
   embroidery: {
     ...initialState.embroidery,
@@ -193,6 +196,7 @@ const restoreOrderDraft = () => {
           Boolean(storedOrder.recipient?.userData?.firstName)));
     return {
       order: {
+        cartItemKey: isCartId(storedOrder.cartItemKey) ? storedOrder.cartItemKey : createCartItemKey(),
         clothing: {
           ...initialState.clothing,
           ...(storedOrder.clothing || {}),
@@ -280,7 +284,9 @@ export const OrderProvider = ({ children }) => {
     setOrder((prev) => {
       const next = { ...prev.clothing, ...payload };
       if (isSameClothing(next, prev.clothing)) return prev;
-      return { ...prev, clothing: next, recipient: { ...prev.recipient, savedOrder: null } };
+      const selectionChanged = next.type !== prev.clothing.type || next.color !== prev.clothing.color || next.size !== prev.clothing.size;
+      return { ...prev, clothing: next, cartItemKey: selectionChanged ? createCartItemKey() : prev.cartItemKey,
+        recipient: { ...prev.recipient, savedOrder: null } };
     });
   }, []);
 
@@ -303,7 +309,8 @@ export const OrderProvider = ({ children }) => {
         next.customTextFont !== prev.embroidery.customTextFont || next.comment !== prev.embroidery.comment ||
         !isSameFiles(next.uploadedImage, prev.embroidery.uploadedImage) ||
         JSON.stringify(next.customOption) !== JSON.stringify(prev.embroidery.customOption);
-      return { ...prev, embroidery: next, recipient: selectionChanged ? { ...prev.recipient, savedOrder: null } : prev.recipient };
+      return { ...prev, embroidery: next, cartItemKey: selectionChanged ? createCartItemKey() : prev.cartItemKey,
+        recipient: selectionChanged ? { ...prev.recipient, savedOrder: null } : prev.recipient };
     });
   }, []);
 
@@ -340,6 +347,11 @@ export const OrderProvider = ({ children }) => {
     }
   }, []);
 
+  const resetCurrentItem = useCallback(() => {
+    setMissingUploadFiles([]);
+    setOrder((prev) => ({ ...createInitialState(), recipient: { ...prev.recipient, savedOrder: null } }));
+  }, []);
+
   const value = useMemo(
     () => ({
       order,
@@ -347,6 +359,7 @@ export const OrderProvider = ({ children }) => {
       setEmbroidery,
       setRecipient,
       resetOrder,
+      resetCurrentItem,
       missingUploadFiles,
       dismissMissingUploadFiles,
     }),
@@ -356,6 +369,7 @@ export const OrderProvider = ({ children }) => {
       setEmbroidery,
       setRecipient,
       resetOrder,
+      resetCurrentItem,
       missingUploadFiles,
       dismissMissingUploadFiles,
     ]

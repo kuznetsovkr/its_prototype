@@ -30,7 +30,9 @@ const fixture = (storage = memoryStorage()) => {
 describe("persistent guest cart foundation", () => {
   it("does not create a cart or contact the API just by visiting a site with no saved access", async () => {
     const { repository, client } = fixture();
+    expect(repository.getSnapshot().initialized).toBe(false);
     await repository.load();
+    expect(repository.getSnapshot().initialized).toBe(true);
     expect(repository.getSnapshot().items).toEqual([]);
     expect(client.load).not.toHaveBeenCalled();
     expect(client.createSession).not.toHaveBeenCalled();

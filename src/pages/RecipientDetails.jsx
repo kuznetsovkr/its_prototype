@@ -9,6 +9,8 @@ import TurnstilePanel from "../components/TurnstilePanel";
 import RecipientPersonalFields from "../features/order/shared/RecipientPersonalFields";
 import OrderCertificateField from "../features/order/recipient/OrderCertificateField";
 import RecipientDeliveryFields from "../features/order/recipient/RecipientDeliveryFields";
+import RecipientCartList from "../features/cart/RecipientCartList";
+import { GROUP_PAYMENT_NOTICE } from "../features/cart/cartPresentation";
 import recipientBackIcon from "../images/order/recipient-back.svg";
 import orderBackIconTablet from "../images/order/order-back-tablet.svg";
 import orderBackIconMobile from "../images/order/order-back-mobile.svg";
@@ -18,7 +20,8 @@ const priceFormatter = new Intl.NumberFormat("ru-RU");
 
 const RecipientDetails = () => {
   const {
-      navigate, clothingProfile, clothingPreviewSrc, clothingPreviewAlt,
+    cart,
+    navigate, clothingProfile, clothingPreviewSrc, clothingPreviewAlt, isCustomType,
     fullNameInput, handleFullNameChange, isPaying,
     hasNoMiddleName, handleNoMiddleNameToggle,
     userData, handleInputChange, email, setEmail, isMobileLayout,
@@ -38,7 +41,8 @@ const RecipientDetails = () => {
     certificate,
     isCertificateAvailable,
   } = useRecipientDetails();
-  const formDisabled = isPaying || isCheckoutLocked;
+  const formDisabled = isPaying || isCheckoutLocked || cart.busy;
+  const showCart = cart.cartOnly || cart.items.length > 0;
   const turnstileClassName = turnstile.isVisible
     ? ` has-turnstile${turnstile.token ? " is-turnstile-verified" : ""}`
     : "";
@@ -67,15 +71,15 @@ const RecipientDetails = () => {
 
   return (
     <>
-      <section className={`recipientOrderPage has-certificate${turnstileClassName}`} aria-labelledby="recipient-order-title">
+      <section className={`recipientOrderPage has-certificate${turnstileClassName}${showCart ? " has-cart" : ""}`} aria-labelledby="recipient-order-title">
         <div className="recipientOrderPage__stage">
           <div className="recipientOrderCard">
             <div className="recipientOrderCard__preview">
               <button
                 type="button"
                 className="recipientOrderCard__backArrow"
-                onClick={() => navigate(-1)}
-                disabled={isCheckoutLocked}
+                onClick={() => cart.cartOnly ? navigate("/order") : navigate(-1)}
+                disabled={isCheckoutLocked || cart.busy}
                 aria-label="Вернуться назад"
                 title={isCheckoutLocked ? "Заказ уже создан. Завершите или повторите оплату" : undefined}
               >
@@ -87,10 +91,10 @@ const RecipientDetails = () => {
               </button>
 
               <h1 className="recipientOrderCard__title" id="recipient-order-title">
-                заказ изделия
+                {showCart ? "ваш заказ" : "заказ изделия"}
               </h1>
 
-              <div className="recipientOrderCard__imageFrame">
+              {showCart ? <RecipientCartList cart={cart} disabled={formDisabled} /> : <div className="recipientOrderCard__imageFrame">
                 {clothingPreviewSrc ? (
                   <img className="is-product-preview" src={clothingPreviewSrc} alt={clothingPreviewAlt} />
                 ) : (
@@ -98,7 +102,7 @@ const RecipientDetails = () => {
                     <span>изображение не загружено</span>
                   </div>
                 )}
-              </div>
+              </div>}
             </div>
 
             <div className="recipientOrderCard__controls">
@@ -118,7 +122,7 @@ const RecipientDetails = () => {
                 />
 
                 <RecipientDeliveryFields
-                  deliveryMethod={deliveryMethod} onMethodChange={handleDeliveryMethodChange} disabled={formDisabled}
+                  deliveryMethod={deliveryMethod} onMethodChange={handleDeliveryMethodChange} disabled={formDisabled || cart.cartOnly}
                   pickupPoint={pickupPoint} isCdekPickupSelected={isCdekPickupSelected} onOpenCdek={() => setIsCdekPickerOpen(true)}
                   postalPoint={postalPoint} onPostalPointChange={setPostalPoint} manualAddress={manualAddress}
                   deliveryRecipient={deliveryRecipient} onRecipientChange={setDeliveryRecipient}
@@ -127,10 +131,15 @@ const RecipientDetails = () => {
                 />
 
                 <div className="recipientOrderForm__checkoutTail">
-                <OrderCertificateField certificate={certificate} disabled={formDisabled} manual={isManualCheckout} demo={!isCertificateAvailable} quoteError={checkoutQuoteError} />
+                <OrderCertificateField certificate={certificate} disabled={formDisabled || cart.paymentBlocked} manual={isManualCheckout} demo={!isCertificateAvailable} quoteError={checkoutQuoteError} />
                 <div className="recipientOrderSummary" aria-live="polite">
-                  {isManualCheckout ? (
-                    <strong>Стоимость рассчитает менеджер после отправки заявки</strong>
+                  {cart.paymentBlocked ? (
+                    <span>{GROUP_PAYMENT_NOTICE}</span>
+                  ) : isManualCheckout ? (
+                    <>
+                      <strong>Стоимость рассчитает менеджер после отправки заявки</strong>
+                      {isCustomType && cart.items.length > 0 && <span>Индивидуальная заявка отправляется отдельно. Изделия в корзине в неё не входят.</span>}
+                    </>
                   ) : checkoutQuoteLoading ? (
                     <span>Рассчитываем итоговую стоимость…</span>
                   ) : checkoutQuoteError ? (
@@ -170,24 +179,30 @@ const RecipientDetails = () => {
                   </span>
                 </label>
 
-                <TurnstilePanel challenge={turnstile} disabled={formDisabled} />
+                {!cart.cartOnly && <TurnstilePanel challenge={turnstile} disabled={formDisabled} />}
                 </div>
               </div>
 
               {error && <p className="recipientOrderCard__error" role="alert">{error}</p>}
+              {!showCart && cart.uiError && <div className="recipientCartActionError">
+                <p role="alert">{cart.uiError}</p>
+                {cart.error && <button type="button" className="recipientCart__retry" disabled={cart.busy}
+                  onClick={() => cart.reloadCart().catch(() => undefined)}>Повторить загрузку корзины</button>}
+              </div>}
 
               <div className="recipientOrderNavigation">
                 <button
                   type="button"
                   className="recipientOrderNavigation__cart"
-                  disabled
-                  aria-label="Добавить в корзину"
-                  aria-describedby="recipient-cart-unavailable"
-                  title="Корзина пока недоступна — сейчас можно оформить одно изделие"
+                  disabled={cart.cartOnly ? formDisabled : !cart.canAdd}
+                  onClick={cart.cartOnly ? () => navigate("/order") : cart.addCurrentItem}
+                  aria-label={cart.cartOnly ? "Создать ещё одно изделие" : "Добавить в корзину"}
+                  aria-describedby="recipient-cart-hint"
+                  title={cart.addError || undefined}
                 >
-                  <span>добавить в корзину</span>
-                  <small id="recipient-cart-unavailable" className="recipientOrderNavigation__cartHint">
-                    Корзина пока недоступна
+                  <span>{cart.saving ? "сохраняем…" : cart.cartOnly ? "создать ещё изделие" : "добавить в корзину"}</span>
+                  <small id="recipient-cart-hint" className="recipientOrderNavigation__cartHint">
+                    {cart.cartOnly ? "Вернуться к выбору изделия" : "Нажмите, если хотите сделать ещё одно изделие"}
                   </small>
                 </button>
                 <button

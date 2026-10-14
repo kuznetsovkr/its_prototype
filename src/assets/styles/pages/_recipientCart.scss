@@ -1,0 +1,223 @@
+@use "../base/breakpoints" as bp;
+@use "../base/compactScale" as scale;
+
+.orderCartShortcut {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 16px;
+  margin: 0 auto 16px;
+  padding: 12px 20px;
+  color: #4b4b4b;
+  font-family: 'Jost', sans-serif;
+  text-align: center;
+}
+
+.orderCartShortcut a,
+.recipientCart__continue { color: #bc5823; }
+
+.recipientOrderPage.has-cart .recipientOrderCard__preview {
+  height: auto;
+  padding-top: scale.px(76);
+}
+
+.recipientOrderPage.has-cart .recipientOrderCard__title {
+  left: scale.px(45);
+  width: scale.px(485);
+  text-align: center;
+}
+
+.recipientCart {
+  box-sizing: border-box;
+  width: scale.px(485);
+  margin-left: scale.px(45);
+  padding: scale.px(16);
+  border-radius: scale.px(30);
+  color: #161616;
+  background: #f0f0f0;
+  font-size: scale.px(13);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.recipientCart__items {
+  display: grid;
+  gap: scale.px(12);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recipientCart__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: scale.px(100) minmax(0, 1fr);
+  align-items: start;
+  gap: scale.px(10);
+  min-height: scale.px(100);
+}
+
+.recipientCart__image {
+  display: grid;
+  aspect-ratio: 1;
+  overflow: hidden;
+  padding: scale.px(6);
+  border: scale.px(1) solid #fff;
+  border-radius: scale.px(20);
+  background: radial-gradient(#fff, #d4d4d4);
+  place-items: center;
+}
+
+.recipientCart__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+}
+
+.recipientCart__details { min-width: 0; }
+
+.recipientCart__details h2 {
+  display: flex;
+  align-items: center;
+  gap: scale.px(7);
+  min-height: scale.px(32);
+  margin: 0;
+  padding-right: scale.px(32);
+  font-size: inherit;
+  font-weight: 600;
+}
+
+.recipientCart__dot {
+  display: grid;
+  width: scale.px(20);
+  height: scale.px(20);
+  flex: 0 0 auto;
+  place-items: center;
+}
+
+// Keep each original SVG viewport and its square proportions when scaling the image box.
+.recipientCart__dot img {
+  width: 100%;
+  height: auto;
+  max-width: none;
+}
+
+.recipientCart__details p { margin: scale.px(7) 0 scale.px(4); }
+.recipientCart__details small { display: block; color: #4b4b4b; }
+
+.recipientCart__quantity {
+  display: flex;
+  align-items: center;
+  gap: scale.px(2);
+  font-size: scale.px(10);
+  font-weight: 600;
+}
+
+.recipientCart__quantity button,
+.recipientCart__remove {
+  position: relative;
+  display: grid;
+  width: scale.px(32);
+  height: scale.px(32);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: inherit;
+  background: transparent;
+  font-size: inherit;
+  cursor: pointer;
+  place-items: center;
+}
+
+.recipientCart__remove img,
+.recipientCart__quantity button img {
+  position: absolute;
+  width: scale.px(20);
+  height: scale.px(20);
+  max-width: none;
+}
+
+.recipientCart__remove { top: 0; right: 0; position: absolute; }
+.recipientCart__quantity button span { position: relative; line-height: 1; }
+.recipientCart__quantity button:disabled,
+.recipientCart__remove:disabled { opacity: .4; cursor: default; }
+
+.recipientCart button:focus-visible,
+.recipientCart a:focus-visible { outline: 2px solid #bc5823; outline-offset: 2px; }
+
+.recipientCart__total {
+  margin: scale.px(28) 0 scale.px(4);
+  color: #4b4b4b;
+  font-size: scale.px(16);
+  font-weight: 500;
+}
+
+.recipientCart__total small { display: block; margin-top: scale.px(4); font-size: scale.px(11); font-weight: 400; }
+.recipientCart__error { color: #9c2e16; }
+.recipientCartActionError {
+  margin: scale.px(16) 0;
+  padding: scale.px(12) scale.px(16);
+  border-radius: scale.px(12);
+  color: #9c2e16;
+  background: #fff0e7;
+  font-size: scale.px(13);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.recipientCartActionError p { margin: 0 0 scale.px(8); }
+.recipientCart__continue { display: block; margin-top: scale.px(16); }
+
+.recipientCart__retry {
+  padding: scale.px(8) scale.px(12);
+  border: 1px solid #4b4b4b;
+  border-radius: scale.px(20);
+  background: #fff;
+  cursor: pointer;
+}
+
+.recipientOrderNavigation__cartHint { white-space: normal; }
+
+@media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
+  .recipientOrderPage.has-cart .recipientOrderCard__preview { padding-top: scale.px(44); }
+  .recipientOrderPage.has-cart .recipientOrderCard__title { left: scale.px(60); width: scale.px(170); }
+
+  .recipientCart {
+    width: scale.px(225);
+    margin-left: scale.px(8);
+    padding: scale.px(10);
+    border-radius: scale.px(20);
+    font-size: scale.px(9);
+  }
+
+  .recipientCart__item { grid-template-columns: scale.px(58) minmax(0, 1fr); gap: scale.px(8); min-height: scale.px(58); }
+  .recipientCart__image { padding: scale.px(4); border-radius: scale.px(12); }
+  .recipientCart__details h2 { min-height: scale.px(24); gap: scale.px(4); padding-right: scale.px(24); }
+  .recipientCart__quantity button,
+  .recipientCart__remove { width: scale.px(24); height: scale.px(24); }
+  .recipientCart__quantity { font-size: scale.px(8); }
+  .recipientCart__remove img,
+  .recipientCart__quantity button img { width: scale.px(16); height: scale.px(16); }
+  .recipientCart__total { font-size: scale.px(12); }
+  .recipientCart__total small { font-size: scale.px(9); }
+}
+
+@media (max-width: bp.$mobile-max) {
+  .recipientOrderPage.has-cart .recipientOrderCard__preview { padding: scale.px(75) 0 scale.px(20); }
+  .recipientOrderPage.has-cart .recipientOrderCard__title { left: scale.px(65); width: scale.px(180); }
+
+  .recipientCart {
+    width: scale.px(274);
+    margin-left: scale.px(20);
+    padding: scale.px(12);
+    border-radius: scale.px(20);
+    font-size: scale.px(11);
+  }
+
+  .recipientCart__item { grid-template-columns: scale.px(68) minmax(0, 1fr); gap: scale.px(8); min-height: scale.px(68); }
+  .recipientCart__image { padding: scale.px(4); border-radius: scale.px(14); }
+  .recipientCart__details h2 { gap: scale.px(4); }
+  .recipientCart__quantity { font-size: scale.px(11); }
+  .recipientCart__total { font-size: scale.px(13); }
+}
