@@ -193,7 +193,7 @@ test("покупатель проходит основной путь и нач�
 
   await page.getByPlaceholder("ФИО").fill("Иванов Иван Иванович");
   await page.getByPlaceholder("Номер телефона").fill("+7 999 123-45-67");
-  await page.locator(".recipientOrderForm__deliveryMethod").click();
+  await page.locator(".recipientOrderForm__group--pickup button").click();
   await expect(page.getByRole("dialog", { name: "Выбор пункта СДЭК" })).toBeVisible();
   await page.getByRole("button", { name: "Select demo pickup point" }).click();
 
@@ -227,7 +227,7 @@ test("другой получатель требует телефон, а выб
   await expect(page.getByText("Город", { exact: true })).toHaveCount(0);
   await page.getByPlaceholder("ФИО").fill("Иванов Иван Иванович");
   await page.getByPlaceholder("Номер телефона").fill("+7 999 123-45-67");
-  await page.locator(".recipientOrderForm__deliveryMethod").click();
+  await page.locator(".recipientOrderForm__group--pickup button").click();
   await page.getByRole("button", { name: "Select demo pickup point" }).click();
   await page.getByRole("checkbox", { name: /Я даю своё согласие/ }).check();
   await expect(page.getByTestId("turnstile-panel")).toHaveClass(/is-verified/, { timeout: 20_000 });

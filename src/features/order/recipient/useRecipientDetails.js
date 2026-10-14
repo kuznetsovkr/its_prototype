@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { IS_DEMO_MODE, IS_TURNSTILE_E2E } from "../../../config/demoMode";
 import { MEDIA_QUERIES } from "../../../config/breakpoints";
 import { APP_ENV } from "../../../config/env";
+import { DELIVERY_METHODS, restoreDeliveryMethod } from "../../../config/delivery";
 import { useOrder } from "../../../context/OrderContext";
 import { buildDemoCdekNumber, buildDemoOrderId } from "../../../mocks/demoData";
 import { getEmbroideryCountError, getPatronusLimit } from "../embroidery/embroideryLimits";
@@ -155,7 +156,9 @@ export const useRecipientDetails = () => {
   });
 
   // Dadata
-  const [isNoCdek, setIsNoCdek] = useState(Boolean(recipientState.isNoCdek));
+  const [deliveryMethod, setDeliveryMethod] = useState(() => restoreDeliveryMethod(recipientState));
+  const [postalPoint, setPostalPoint] = useState(recipientState.postalPoint || "");
+  const isNoCdek = deliveryMethod !== "cdek";
   const dadataToken = APP_ENV.dadataToken;
 
   const isManualAddressFull = useMemo(() => {
@@ -191,6 +194,8 @@ export const useRecipientDetails = () => {
       manualBlock: recipientState.manualAddress?.data?.block || "",
       manualFlat: recipientState.manualAddress?.data?.flat || "",
       isNoCdek: Boolean(recipientState.isNoCdek),
+      deliveryMethod: restoreDeliveryMethod(recipientState),
+      postalPoint: recipientState.postalPoint || "",
       cdek: recipientState.cdek,
       email: recipientState.email || "",
       preferredContact: recipientState.preferredContact || "",
@@ -210,6 +215,8 @@ export const useRecipientDetails = () => {
       manualBlock: manualAddress?.data?.block || "",
       manualFlat: manualAddress?.data?.flat || "",
       isNoCdek: Boolean(isNoCdek),
+      deliveryMethod,
+      postalPoint,
       cdek: cdekData,
       email,
       preferredContact,
@@ -234,6 +241,8 @@ export const useRecipientDetails = () => {
       local.manualBlock === stored.manualBlock &&
       local.manualFlat === stored.manualFlat &&
       local.isNoCdek === stored.isNoCdek &&
+      local.deliveryMethod === stored.deliveryMethod &&
+      local.postalPoint === stored.postalPoint &&
       JSON.stringify(local.cdek ?? null) === JSON.stringify(stored.cdek ?? null) &&
       local.email === stored.email &&
       local.preferredContact === stored.preferredContact &&
@@ -253,6 +262,8 @@ export const useRecipientDetails = () => {
     manualAddress?.data?.block,
     manualAddress?.data?.flat,
     isNoCdek,
+    deliveryMethod,
+    postalPoint,
     cdekData,
     email,
     preferredContact,
@@ -274,6 +285,8 @@ export const useRecipientDetails = () => {
       deliveryPrice,
       manualAddress: manualAddressNormalized,
       isNoCdek,
+      deliveryMethod,
+      postalPoint,
       cdek: cdekData,
       email,
       preferredContact,
@@ -294,6 +307,8 @@ export const useRecipientDetails = () => {
     manualAddress?.data?.flat,
     manualAddressNormalized,
     isNoCdek,
+    deliveryMethod,
+    postalPoint,
     cdekData,
     email,
     preferredContact,
@@ -326,7 +341,7 @@ export const useRecipientDetails = () => {
 
   const handleNoCdekToggle = (event) => {
     const checked = event.target.checked;
-    setIsNoCdek(checked);
+    setDeliveryMethod(checked ? "manual" : "cdek");
 
     if (!IS_DEMO_MODE || checked) return;
     setPickupPoint(DEMO_PICKUP_POINT);
@@ -343,6 +358,13 @@ export const useRecipientDetails = () => {
       address: { code: "DEMO-PVZ", address: DEMO_PICKUP_POINT },
       addressLabel: DEMO_PICKUP_POINT,
     });
+  };
+
+  const handleDeliveryMethodChange = (method) => {
+    if (draftOrder || isPaying || !DELIVERY_METHODS.includes(method)) return;
+    setDeliveryMethod(method);
+    setError("");
+    setIsCdekPickerOpen(false);
   };
 
   const handleInputChange = (e) => {
@@ -470,10 +492,12 @@ export const useRecipientDetails = () => {
 
   const recipientValidation = validateRecipient({
     userData,
-    deliveryRecipient,
-    recipientPhone,
+    deliveryRecipient: deliveryMethod === "pickup" ? "" : deliveryRecipient,
+    recipientPhone: deliveryMethod === "pickup" ? "" : recipientPhone,
     hasNoMiddleName,
     isNoCdek,
+    deliveryMethod,
+    postalPoint,
     manualAddress,
     isCdekPickupSelected,
     privacyConsent,
@@ -517,7 +541,7 @@ export const useRecipientDetails = () => {
     setPickupPoint(label);
     setDeliveryPrice(payload?.tariff?.delivery_sum ?? payload?.tariff?.total_sum ?? null);
     setCdekData(payload || null);
-    setIsNoCdek(false);
+    setDeliveryMethod("cdek");
     setManualAddress(null);
     setIsCdekPickerOpen(false);
   };
@@ -554,11 +578,14 @@ export const useRecipientDetails = () => {
     if (draftOrder?.orderId && draftOrder?.orderToken) return draftOrder;
     try {
       const data = await createOrder(buildOrderFormData({
-        userData, deliveryRecipient, recipientPhone, orderComment, embroideryComment: comment,
+        userData, deliveryRecipient: deliveryMethod === "pickup" ? "" : deliveryRecipient,
+        recipientPhone: deliveryMethod === "pickup" ? "" : recipientPhone,
+        orderComment, embroideryComment: comment,
         email, preferredContact, deliveryComment, privacyConsent,
         productType, color, size, selectedType, embroideryTypeRu,
         patronusCount, petFaceCount, customText, customTextFont, customOption, pickupPoint,
         manualAddress, isNoCdek, cdekData, uploadedImage, turnstileToken: turnstile.token,
+        deliveryMethod, postalPoint,
         certificateCode: certificate.appliedCode,
       }));
       setOrderId(data.orderId);
@@ -589,7 +616,7 @@ export const useRecipientDetails = () => {
     if (IS_DEMO_MODE && (!IS_TURNSTILE_E2E || (!certificate.appliedCode && !draftOrder))) {
       const now = new Date();
       const demoOrderId = buildDemoOrderId(now);
-      const demoCdekNumber = isNoCdek ? null : buildDemoCdekNumber(now);
+      const demoCdekNumber = isNoCdek || isCustomType ? null : buildDemoCdekNumber(now);
       setOrderId(demoOrderId);
       sessionStorage.setItem("pay_order_id", demoOrderId);
       if (demoCdekNumber) {
@@ -728,6 +755,7 @@ export const useRecipientDetails = () => {
     preferredContact, setPreferredContact, orderComment, setOrderComment,
     isCdekPickerOpen, setIsCdekPickerOpen,
     pickupPoint, setPickupPoint, setDeliveryPrice, isNoCdek,
+    deliveryMethod, postalPoint, setPostalPoint, handleDeliveryMethodChange,
     isCdekPickupSelected, deliveryRecipient, setDeliveryRecipient, recipientPhone, handleRecipientPhoneChange,
     deliveryComment, setDeliveryComment, privacyConsent, setPrivacyConsent,
     error, handlePayment, isFormValid, canSubmit, getMissingFieldsMessage,

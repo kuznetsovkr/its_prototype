@@ -53,7 +53,7 @@ test("all order screens switch layout at 639/640 and 1199/1200 without resetting
     if (route === "/recipient") {
       await page.getByPlaceholder("ФИО", { exact: true }).fill("Иванов Иван Иванович");
       await page.getByPlaceholder("Номер телефона").fill("+7 999 123-45-67");
-      await page.locator(".recipientOrderForm__deliveryMethod").click();
+      await page.locator(".recipientOrderForm__group--pickup button").click();
       await page.getByRole("button", { name: "Select demo pickup point" }).click();
       await page.getByRole("checkbox", { name: /Я даю своё согласие/ }).check();
     }
@@ -107,7 +107,7 @@ test("rotation keeps text, focus, recipient phone and manual-address modal usabl
   await recipient.fill("Петров Пётр Петрович");
   await phone.fill("+7 999 234-56-78");
   const phoneValue = await phone.inputValue();
-  await page.locator(".recipientOrderForm__deliveryMethod").click();
+  await page.locator(".recipientOrderForm__group--pickup button").click();
   await page.getByRole("checkbox", { name: "В моём городе нет СДЭКа" }).check();
   const dialog = page.getByRole("dialog", { name: "Указание адреса ручной доставки" });
   const address = page.locator(".manualAddress__input");

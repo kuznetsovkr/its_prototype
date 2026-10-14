@@ -1,6 +1,13 @@
 import { describe, expect, test } from "vitest";
 import { buildOrderFormData } from "./recipientOrderPayload";
 
+const deliveryBase = {
+  userData: { firstName: "Иван", lastName: "Иванов", phone: "+7 (999) 123-45-67" },
+  deliveryRecipient: "Петров Пётр", recipientPhone: "+7 (912) 345-67-89", orderComment: "", email: "", preferredContact: "",
+  deliveryComment: "Позвонить другому получателю", privacyConsent: true, productType: "Футболка", color: "Чёрный", size: "M",
+  selectedType: "Car", pickupPoint: "Старый ПВЗ", cdekData: { mode: "office", address: { code: "OLD" } }, uploadedImage: [],
+};
+
 describe("recipient order payload", () => {
   test("keeps checkout contact details and the selected custom font", () => {
     const payload = buildOrderFormData({
@@ -83,5 +90,28 @@ describe("recipient order payload", () => {
     expect(payload.get("recipientFullName")).toBe("");
     expect(payload.get("recipientPhoneDigits")).toBe("");
     expect(payload.get("cdekAddress")).toBe('{"code":"KRS1"}');
+  });
+
+  test("postal requests never carry a stale CDEK office or its address", () => {
+    const payload = buildOrderFormData({ ...deliveryBase, deliveryMethod: "russian_post", postalPoint: "660075, Красноярск, Маерчака, 5" });
+    expect(payload.get("deliveryMethod")).toBe("russian_post");
+    expect(payload.get("deliveryAddress")).toBe("660075, Красноярск, Маерчака, 5");
+    expect(payload.has("cdekMode")).toBe(false);
+    expect(payload.has("cdekAddress")).toBe(false);
+    expect(payload.get("recipientPhoneDigits")).toBe("79123456789");
+  });
+  test("pickup uses the fixed shop address and does not carry hidden recipient fields", () => {
+    const payload = buildOrderFormData({ ...deliveryBase, deliveryMethod: "pickup" });
+    expect(payload.get("deliveryAddress")).toBe("Красноярск, ул. Ломоносова, 11");
+    expect(payload.get("recipientFullName")).toBe("");
+    expect(payload.get("recipientPhoneDigits")).toBe("");
+    expect(payload.get("deliveryComment")).toBe("");
+    expect(payload.has("cdekMode")).toBe(false);
+  });
+  test("legacy manual addresses override a stale pickup-point label", () => {
+    const payload = buildOrderFormData({ ...deliveryBase, isNoCdek: true, manualAddress: { value: "Новый адрес" } });
+    expect(payload.get("deliveryMethod")).toBe("manual");
+    expect(payload.get("deliveryAddress")).toBe("Новый адрес");
+    expect(payload.has("cdekAddress")).toBe(false);
   });
 });

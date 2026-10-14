@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { getOrderAccessToken } from "../utils/orderAccess";
+import { restoreDeliveryMethod } from "../config/delivery";
 
 const ORDER_DRAFT_STORAGE_KEY = "its_order_draft_v1";
 const ORDER_DRAFT_VERSION = 1;
@@ -71,6 +72,8 @@ const isSameRecipient = (a, b) =>
   (a?.deliveryRecipient || "") === (b?.deliveryRecipient || "") &&
   (a?.recipientPhone || "") === (b?.recipientPhone || "") &&
   (a?.deliveryComment || "") === (b?.deliveryComment || "") &&
+  (a?.deliveryMethod || "") === (b?.deliveryMethod || "") &&
+  (a?.postalPoint || "") === (b?.postalPoint || "") &&
   (a?.certificateCode || "") === (b?.certificateCode || "") &&
   JSON.stringify(a?.savedOrder ?? null) === JSON.stringify(b?.savedOrder ?? null) &&
   Boolean(a?.privacyConsent) === Boolean(b?.privacyConsent) &&
@@ -127,6 +130,8 @@ const initialState = {
     deliveryRecipient: "",
     recipientPhone: "",
     deliveryComment: "",
+    deliveryMethod: "cdek",
+    postalPoint: "",
     certificateCode: "",
     savedOrder: null,
     privacyConsent: false,
@@ -207,6 +212,7 @@ const restoreOrderDraft = () => {
         recipient: {
           ...initialState.recipient,
           ...(storedOrder.recipient || {}),
+          deliveryMethod: restoreDeliveryMethod(storedOrder.recipient),
           userData: {
             ...initialState.recipient.userData,
             ...(storedOrder.recipient?.userData || {}),

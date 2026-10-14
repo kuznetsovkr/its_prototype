@@ -52,6 +52,10 @@ Telegram messages are sent. Fresh-request scenarios are skipped in the ordinary
 demo suite and run in this profile instead. Run it separately from other profiles,
 which share the build directory and preview port.
 
+It also runs `order-delivery.e2e.js`: CDEK/Post/pickup switching, keyboard controls,
+responsive geometry, restoring the postal office, request-only submission and
+retry locks. Unapproved Post/pickup tariffs never create a bank request.
+
 ## Compact autoscale regression checks
 
 The autoscale suites cover proportional sizing, the 639/640 and 1199/1200

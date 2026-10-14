@@ -1,0 +1,153 @@
+@use "../base/breakpoints" as bp;
+@use "../base/compactScale" as scale;
+
+// Keep the approved upper fields; let the delivery section and checkout tail grow naturally.
+.recipientOrderPage.has-certificate .recipientOrderForm.recipientOrderForm--deliveryMethods {
+  padding-top: scale.px(498);
+}
+
+.recipientOrderForm__delivery {
+  margin-bottom: scale.px(20);
+}
+
+.recipientOrderForm__delivery .recipientOrderForm__heading--delivery {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0 0 scale.px(15);
+}
+
+.recipientDeliveryMethods {
+  display: grid;
+  min-width: 0;
+  gap: scale.px(12);
+  margin: 0 0 scale.px(20);
+  padding: 0;
+  border: 0;
+}
+
+.recipientOrderForm__delivery .recipientOrderForm__deliveryMethod {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  min-height: scale.px(32);
+  gap: scale.px(10);
+  cursor: pointer;
+}
+
+.recipientOrderForm__delivery .recipientOrderForm__deliveryMethodText {
+  min-width: 0;
+  margin-left: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.recipientOrderForm__delivery .recipientOrderForm__deliveryMethodText > span {
+  color: #4b4b4b;
+}
+
+.recipientDeliveryMethods__input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: scale.px(32);
+  height: scale.px(32);
+  margin: 0;
+  opacity: 0;
+}
+
+.recipientDeliveryMethods__radio {
+  position: relative;
+  display: grid;
+  width: scale.px(32);
+  height: scale.px(32);
+  flex: 0 0 auto;
+  border-radius: 50%;
+  place-items: center;
+  pointer-events: none;
+}
+
+.recipientDeliveryMethods__outer {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.recipientDeliveryMethods__dot {
+  position: absolute;
+  width: 37.5%;
+  height: auto;
+}
+
+.recipientDeliveryMethods__input:focus-visible + .recipientDeliveryMethods__radio {
+  outline: 2px solid #bc5823;
+  outline-offset: 2px;
+}
+
+.recipientDeliveryMethods:disabled { opacity: .6; }
+.recipientDeliveryMethods:disabled .recipientOrderForm__deliveryMethod { cursor: default; }
+
+.recipientDeliveryDetails {
+  display: grid;
+  gap: scale.px(20);
+}
+
+.recipientDeliveryDetails .recipientOrderForm__group {
+  position: static;
+  width: 100%;
+}
+
+.recipientDeliveryDetails .recipientOrderForm__group input {
+  font-size: max(16px, var(--mobile-control-font-size, 16px));
+}
+
+.recipientDeliveryDetails .recipientOrderForm__validation {
+  position: static;
+  display: block;
+  margin-top: scale.px(6);
+  white-space: normal;
+  line-height: 1.4;
+}
+
+.recipientDeliveryDetails__pickup {
+  display: grid;
+  gap: scale.px(4);
+  min-height: scale.px(54);
+  padding: scale.px(15) scale.px(30);
+  border-radius: scale.px(40);
+  background: #fff;
+  color: #161616;
+  font-size: scale.px(16);
+  font-weight: 500;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.recipientDeliveryDetails__pickup em {
+  color: #bc5823;
+  font-style: normal;
+}
+
+.recipientDeliveryDetails__hint {
+  display: block;
+  margin-top: scale.px(8);
+  color: #4b4b4b;
+  font-size: max(12px, #{scale.px(12)});
+  line-height: 1.4;
+}
+
+@media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
+  .recipientOrderPage.has-certificate .recipientOrderForm.recipientOrderForm--deliveryMethods { padding-top: scale.px(321); }
+  .recipientOrderForm__delivery .recipientOrderForm__deliveryMethod { font-size: max(12px, #{scale.px(10)}); }
+  .recipientOrderForm__delivery .recipientOrderForm__deliveryMethodText { margin-top: scale.px(4); }
+  .recipientDeliveryDetails__pickup { min-height: scale.px(36); padding: scale.px(10) scale.px(15); font-size: scale.px(12); }
+}
+
+@media (max-width: bp.$mobile-max) {
+  .recipientOrderPage.has-certificate .recipientOrderForm.recipientOrderForm--deliveryMethods { padding-top: scale.px(298); }
+  .recipientOrderForm__delivery .recipientOrderForm__deliveryMethod { font-size: max(12px, #{scale.px(10)}); }
+  .recipientOrderForm__delivery .recipientOrderForm__deliveryMethodText { margin-top: 0; }
+  .recipientOrderForm__delivery .recipientOrderForm__deliveryMethodText > span { display: block; margin-left: 0; }
+  .recipientDeliveryMethods__input, .recipientDeliveryMethods__radio { width: scale.px(24); height: scale.px(24); }
+  .recipientDeliveryDetails__pickup { min-height: scale.px(36); padding: scale.px(10) scale.px(15); font-size: max(12px, #{scale.px(12)}); }
+}

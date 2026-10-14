@@ -1,4 +1,5 @@
 import { normalizePhoneDigits } from "./recipientValidation";
+import { SELF_PICKUP } from "../../../config/delivery";
 
 export const buildOrderFormData = ({
   userData, deliveryRecipient, recipientPhone, orderComment, embroideryComment, email,
@@ -6,9 +7,10 @@ export const buildOrderFormData = ({
   color, size, selectedType, embroideryTypeRu, patronusCount, petFaceCount,
   customText, customTextFont, customOption, pickupPoint, manualAddress, isNoCdek, cdekData,
   uploadedImage, turnstileToken, certificateCode,
+  deliveryMethod = isNoCdek ? "manual" : "cdek", postalPoint = "",
 }) => {
   const formData = new FormData();
-  const recipientFullName = deliveryRecipient.trim();
+  const recipientFullName = deliveryMethod === "pickup" ? "" : deliveryRecipient.trim();
   const comment = orderComment.trim() || String(embroideryComment || "").trim();
   const productTypeName = typeof productType === "object"
     ? productType.name ?? productType.type ?? String(productType)
@@ -19,13 +21,13 @@ export const buildOrderFormData = ({
     lastName: userData.lastName || "",
     middleName: userData.middleName || "",
     phone: userData.phone || "",
-    recipientPhoneDigits: deliveryRecipient.trim() || String(recipientPhone || "").trim()
+    recipientPhoneDigits: deliveryMethod !== "pickup" && (recipientFullName || String(recipientPhone || "").trim())
       ? normalizePhoneDigits(recipientPhone)
       : "",
     recipientFullName,
     email: email.trim(),
     preferredContact: preferredContact.trim(),
-    deliveryComment: deliveryComment.trim(),
+    deliveryComment: deliveryMethod === "pickup" ? "" : deliveryComment.trim(),
     privacyConsent: String(privacyConsent),
     productType: productTypeName,
     color: color || "",
@@ -38,12 +40,15 @@ export const buildOrderFormData = ({
     customTextFont: customTextFont || "",
     customOption: JSON.stringify(customOption || {}),
     comment,
-    deliveryAddress: pickupPoint || manualAddress?.value || "",
+    deliveryMethod,
+    deliveryAddress: deliveryMethod === "pickup" ? SELF_PICKUP.address
+      : deliveryMethod === "russian_post" ? postalPoint.trim()
+      : deliveryMethod === "manual" ? manualAddress?.value || "" : pickupPoint || "",
     turnstileToken: turnstileToken || "",
   }).forEach(([key, value]) => formData.append(key, value));
   if (certificateCode) formData.append("certificateCode", certificateCode);
 
-  if (!isNoCdek && cdekData) {
+  if (deliveryMethod === "cdek" && cdekData) {
     formData.append("cdekMode", cdekData.mode || "");
     formData.append("cdekAddress", JSON.stringify(cdekData.address || {}));
     formData.append("cdekAddressLabel", cdekData.addressLabel || "");

@@ -5,17 +5,13 @@ import "react-dadata/dist/react-dadata.css";
 import { IS_DEMO_MODE } from "../config/demoMode";
 import { MEDIA_QUERIES } from "../config/breakpoints";
 import { useRecipientDetails } from "../features/order/recipient/useRecipientDetails";
-import { normalizePhoneDigits } from "../features/order/recipient/recipientValidation";
 import TurnstilePanel from "../components/TurnstilePanel";
 import RecipientPersonalFields from "../features/order/shared/RecipientPersonalFields";
 import OrderCertificateField from "../features/order/recipient/OrderCertificateField";
+import RecipientDeliveryFields from "../features/order/recipient/RecipientDeliveryFields";
 import recipientBackIcon from "../images/order/recipient-back.svg";
 import orderBackIconTablet from "../images/order/order-back-tablet.svg";
 import orderBackIconMobile from "../images/order/order-back-mobile.svg";
-import recipientRadioOuter from "../images/order/recipient-radio-outer.svg";
-import recipientRadioInner from "../images/order/recipient-radio-inner.svg";
-import recipientRadioTablet from "../images/order/recipient-radio-tablet.svg";
-import recipientRadioMobile from "../images/order/recipient-radio-mobile.svg";
 
 const MyCdekWidget = lazy(() => import("../components/MyCdekWidget"));
 const priceFormatter = new Intl.NumberFormat("ru-RU");
@@ -30,6 +26,7 @@ const RecipientDetails = () => {
     isCdekPickerOpen, setIsCdekPickerOpen,
     pickupPoint, setPickupPoint, setDeliveryPrice, isNoCdek,
     isCdekPickupSelected, deliveryRecipient, setDeliveryRecipient,
+    deliveryMethod, postalPoint, setPostalPoint, handleDeliveryMethodChange,
     recipientPhone, handleRecipientPhoneChange,
     deliveryComment, setDeliveryComment, privacyConsent, setPrivacyConsent,
     error, handlePayment, canSubmit, getSubmitDisabledMessage,
@@ -46,8 +43,6 @@ const RecipientDetails = () => {
     ? ` has-turnstile${turnstile.token ? " is-turnstile-verified" : ""}`
     : "";
   const formatPrice = (value) => `${priceFormatter.format(Number(value))} ₽`;
-  const recipientPhoneInvalid = Boolean(deliveryRecipient.trim()) &&
-    !/^7\d{10}$/.test(normalizePhoneDigits(recipientPhone));
 
   useEffect(() => {
     if (!isCdekPickerOpen) return undefined;
@@ -107,7 +102,7 @@ const RecipientDetails = () => {
             </div>
 
             <div className="recipientOrderCard__controls">
-              <div className="recipientOrderForm recipientOrderForm--certificate">
+              <div className="recipientOrderForm recipientOrderForm--certificate recipientOrderForm--deliveryMethods">
                 <h2 className="recipientOrderForm__heading recipientOrderForm__heading--personal">
                   Введите свои данные
                 </h2>
@@ -122,104 +117,14 @@ const RecipientDetails = () => {
                   disabled={formDisabled} compact={isMobileLayout}
                 />
 
-                <h2 className="recipientOrderForm__heading recipientOrderForm__heading--delivery">
-                  Доставка
-                </h2>
-
-                <button
-                  type="button"
-                  className="recipientOrderForm__deliveryMethod"
-                  onClick={() => setIsCdekPickerOpen(true)}
-                  disabled={formDisabled}
-                >
-                  <span className="recipientOrderForm__radio" aria-hidden="true">
-                    <picture className="recipientOrderForm__radioResponsive">
-                      <source media={MEDIA_QUERIES.mobile} srcSet={recipientRadioMobile} />
-                      <img src={recipientRadioTablet} alt="" />
-                    </picture>
-                    <img className="recipientOrderForm__radioOuter" src={recipientRadioOuter} alt="" />
-                    <img className="recipientOrderForm__radioInner" src={recipientRadioInner} alt="" />
-                  </span>
-                  <span className="recipientOrderForm__deliveryMethodText">
-                    <strong>СДЭК — </strong>
-                    Доставка до пункта выдачи заказов <span>срок и стоимость — после выбора ПВЗ</span>
-                  </span>
-                </button>
-
-                <label className="recipientOrderForm__group recipientOrderForm__group--pickup">
-                  <span>Пункт получения</span>
-                  <button
-                    type="button"
-                    onClick={() => setIsCdekPickerOpen(true)}
-                    disabled={formDisabled}
-                    aria-describedby={
-                      !isNoCdek && !isCdekPickupSelected
-                        ? "recipient-pickup-validation"
-                        : undefined
-                    }
-                    aria-label={
-                      isCdekPickupSelected
-                        ? `Выбран пункт получения: ${pickupPoint}`
-                        : "Выберите пункт получения СДЭК"
-                    }
-                  >
-                    {pickupPoint || "Выберите пункт получения"}
-                  </button>
-                  {!isNoCdek && !isCdekPickupSelected && (
-                    <small
-                      className="recipientOrderForm__validation"
-                      id="recipient-pickup-validation"
-                    >
-                      Выберите ПВЗ, чтобы продолжить
-                    </small>
-                  )}
-                </label>
-
-                <label className="recipientOrderForm__group recipientOrderForm__group--recipient">
-                  <span>
-                    Другой получатель (ФИО, если отличается)
-                  </span>
-                  <input
-                    type="text"
-                    autoComplete="shipping name"
-                    placeholder="Иванов Иван Иванович"
-                    value={deliveryRecipient}
-                    onChange={(event) => setDeliveryRecipient(event.target.value)}
-                    disabled={formDisabled}
-                  />
-                </label>
-
-                <label className="recipientOrderForm__group recipientOrderForm__group--recipientPhone">
-                  <span>Телефон другого получателя</span>
-                  <input
-                    type="tel"
-                    autoComplete="shipping tel"
-                    placeholder="+7 (999) 123-45-67"
-                    value={recipientPhone}
-                    onChange={handleRecipientPhoneChange}
-                    disabled={formDisabled}
-                    maxLength={18}
-                    required={Boolean(deliveryRecipient.trim())}
-                    aria-invalid={recipientPhoneInvalid}
-                    aria-describedby={recipientPhoneInvalid ? "recipient-phone-validation" : undefined}
-                  />
-                  {recipientPhoneInvalid && (
-                    <small className="recipientOrderForm__validation" id="recipient-phone-validation">
-                      Укажите корректный телефон получателя
-                    </small>
-                  )}
-                </label>
-
-                <label className="recipientOrderForm__group recipientOrderForm__group--deliveryComment">
-                  <span>Комментарий</span>
-                  <input
-                    type="text"
-                    placeholder="Комментарий к доставке"
-                    value={deliveryComment}
-                    onChange={(event) => setDeliveryComment(event.target.value)}
-                    disabled={formDisabled}
-                  />
-                </label>
+                <RecipientDeliveryFields
+                  deliveryMethod={deliveryMethod} onMethodChange={handleDeliveryMethodChange} disabled={formDisabled}
+                  pickupPoint={pickupPoint} isCdekPickupSelected={isCdekPickupSelected} onOpenCdek={() => setIsCdekPickerOpen(true)}
+                  postalPoint={postalPoint} onPostalPointChange={setPostalPoint} manualAddress={manualAddress}
+                  deliveryRecipient={deliveryRecipient} onRecipientChange={setDeliveryRecipient}
+                  recipientPhone={recipientPhone} onRecipientPhoneChange={handleRecipientPhoneChange}
+                  deliveryComment={deliveryComment} onCommentChange={setDeliveryComment}
+                />
 
                 <div className="recipientOrderForm__checkoutTail">
                 <OrderCertificateField certificate={certificate} disabled={formDisabled} manual={isManualCheckout} demo={!isCertificateAvailable} quoteError={checkoutQuoteError} />

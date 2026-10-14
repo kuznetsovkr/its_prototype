@@ -142,7 +142,7 @@ test("compact text fields scale above the 16px minimum and preserve their values
     await expect.poll(() => name.evaluate((element) => parseFloat(getComputedStyle(element).fontSize)))
       .toBeCloseTo(Math.max(16, designFont * width / base), 2);
     await expect(name).toHaveValue("Иванов Иван Иванович");
-    const fonts = await page.locator(".recipientOrderForm input:not([type=checkbox]), .recipientOrderForm textarea")
+    const fonts = await page.locator(".recipientOrderForm input:not([type=checkbox]):not([type=radio]), .recipientOrderForm textarea")
       .evaluateAll((fields) => fields.map((element) => parseFloat(getComputedStyle(element).fontSize)));
     expect(fonts.every((size) => size >= 16)).toBe(true);
   }
@@ -186,7 +186,7 @@ test("order overlays keep native viewport coordinates, focus and scroll locks", 
     await expect(examples).toHaveCount(0);
     await expect(examplesTrigger).toBeFocused();
     await page.goto("/recipient");
-    await page.locator(".recipientOrderForm__deliveryMethod").click();
+    await page.locator(".recipientOrderForm__group--pickup button").click();
     const cdek = page.locator(".recipientCdekDialog");
     await page.getByRole("checkbox", { name: "В моём городе нет СДЭКа" }).uncheck();
     await expect(cdek).toHaveCSS("position", "fixed");
@@ -194,7 +194,7 @@ test("order overlays keep native viewport coordinates, focus and scroll locks", 
     expect(overlay).toMatchObject({ x: 0, y: 0, width, height: 740 });
     await page.getByRole("button", { name: "Select demo pickup point" }).click();
     await expect(cdek).not.toHaveClass(/is-open/);
-    await page.locator(".recipientOrderForm__deliveryMethod").click();
+    await page.locator(".recipientOrderForm__group--pickup button").click();
     await page.getByRole("checkbox", { name: "В моём городе нет СДЭКа" }).check();
     const address = page.locator(".manualAddress__input");
     await address.fill("Красноярск, улица Ленина, дом 1");

@@ -1,3 +1,5 @@
+import { POSTAL_POINT_MAX_LENGTH } from "../../../config/delivery";
+
 export const cleanPhone = (value) => (value || "").replace(/\D/g, "");
 
 export const normalizePhoneDigits = (value) => {
@@ -44,6 +46,8 @@ export const validateRecipient = ({
   recipientPhone = "",
   hasNoMiddleName = false,
   isNoCdek,
+  deliveryMethod = isNoCdek ? "manual" : "cdek",
+  postalPoint = "",
   manualAddress,
   isCdekPickupSelected,
   privacyConsent,
@@ -54,8 +58,15 @@ export const validateRecipient = ({
   if (!hasNoMiddleName && !userData.middleName.trim()) missing.push("отчество");
   if (!userData.phone.trim()) missing.push("телефон");
 
-  if (isNoCdek) {
+  if (deliveryMethod === "russian_post") {
+    if (!postalPoint.trim()) missing.push("отделение Почты России");
+    else if (postalPoint.trim().length > POSTAL_POINT_MAX_LENGTH) missing.push(`сокращённый адрес отделения Почты России (до ${POSTAL_POINT_MAX_LENGTH} символов)`);
+  } else if (deliveryMethod === "pickup") {
+    // The pickup address is fixed by the shop; no CDEK office or shipping address is required.
+  } else if (deliveryMethod === "manual") {
     if (!manualAddress?.value || !hasFullManualAddress(manualAddress)) missing.push("полный адрес до дома");
+  } else if (deliveryMethod !== "cdek") {
+    missing.push("способ получения");
   } else if (!isCdekPickupSelected) {
     missing.push("пункт выдачи СДЭК");
   }
