@@ -119,7 +119,7 @@ export default function PaymentSuccess() {
             sessionStorage.removeItem('pay_cdek_number');
           }
           navigate('/thank-you', {
-            state: { orderNumber: orderId, cdekNumber: data.cdekNumber || null },
+            state: { orderNumber: orderId, cdekNumber: data.cdekNumber || null, receiptEmailProvided: data.hasBuyerEmail === true && data.paymentProvider === 'paykeeper' },
           });
           return;
         }

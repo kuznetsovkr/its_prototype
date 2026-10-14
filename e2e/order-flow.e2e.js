@@ -206,7 +206,7 @@ test("покупатель проходит основной путь и нач�
   await submitButton.click();
 
   await expect(page).toHaveURL(/\/thank-you$/);
-  await expect(page.getByRole("heading", { name: /Спасибо!\s*Всё получилось\./ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "спасибо за заказ", exact: true })).toBeVisible();
   await expect(page.locator(".thx__order-number").first()).toHaveText(/^DEMO-\d{8}-\d{6}$/);
 
   await page.getByRole("link", { name: "на главную", exact: true }).click();

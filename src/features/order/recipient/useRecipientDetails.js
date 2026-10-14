@@ -602,6 +602,7 @@ export const useRecipientDetails = () => {
         state: {
           orderNumber: demoOrderId,
           manual: isManualCheckout,
+          requestKind: isCustomType ? "individual" : "delivery",
           cdekNumber: demoCdekNumber,
         },
       });
@@ -626,7 +627,7 @@ export const useRecipientDetails = () => {
       } = activeDraft;
       setOrderId(oid);
 
-      if (Number.isFinite(Number(totalPrice))) {
+      if (totalPrice != null && Number.isFinite(Number(totalPrice))) {
         setCheckoutQuote({
           manual: false,
           merchandisePrice,
@@ -641,7 +642,7 @@ export const useRecipientDetails = () => {
       if (pricePending) {
         await confirmOrder(oid, "manual", orderToken);
         setIsPaying(false);
-        navigate("/thank-you", { state: { orderNumber: oid, manual: true, cdekNumber: cdekNum || null } });
+        navigate("/thank-you", { state: { orderNumber: oid, manual: true, requestKind: isCustomType ? "individual" : "delivery", cdekNumber: cdekNum || null } });
         return;
       }
 
@@ -659,7 +660,9 @@ export const useRecipientDetails = () => {
     } catch (e) {
       setError(
         `${e.message || "Не удалось создать заказ или перейти к оплате"}` +
-        (activeDraft?.orderId ? ". Заказ уже сохранён — повторите оплату." : "")
+        (activeDraft?.orderId ? activeDraft.pricePending
+          ? ". Заявка уже сохранена — повторите отправку. Повторно создавать её не нужно."
+          : ". Заказ уже сохранён — повторите оплату." : "")
       );
       setIsPaying(false);
       }

@@ -35,6 +35,23 @@ existing explicit E2E flag to exercise the real client workflow with mock APIs.
 The recipient form keeps scaled widths and upper-field geometry, while the new
 checkout tail uses content-driven height for totals, errors and CAPTCHA.
 
+## Order completion and individual requests
+
+`order-completion.e2e.js` checks the paid and individual-request result screens,
+responsive geometry, accessible contact links, the direct-entry guard, server
+payment confirmation, and retries without duplicate requests or a bank redirect.
+
+```bash
+npm run test:e2e:completion
+```
+
+This separate profile uses `VITE_DEMO_MODE=false` so fresh requests exercise the
+real client create/confirm workflow. API responses are intercepted locally;
+unhandled API/CDEK calls are blocked. No real orders, bank payments, email or
+Telegram messages are sent. Fresh-request scenarios are skipped in the ordinary
+demo suite and run in this profile instead. Run it separately from other profiles,
+which share the build directory and preview port.
+
 ## Compact autoscale regression checks
 
 The autoscale suites cover proportional sizing, the 639/640 and 1199/1200

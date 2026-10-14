@@ -120,6 +120,8 @@ test("заказ с нулевой доплатой подтверждается
   await apply(page);
   await page.getByRole("button", { name: "оформить заказ", exact: true }).click();
   await expect(page).toHaveURL(/\/thank-you$/);
+  await expect(page.getByRole("heading", { name: "спасибо за заказ", exact: true })).toBeVisible();
+  await expect(page.locator(".thx__text")).not.toContainText("Чек придёт");
   expect(api.creates).toHaveLength(1);
   expect(api.creates[0]).toContain(code);
   expect(api.completions).toEqual(["fixture-order-token"]);

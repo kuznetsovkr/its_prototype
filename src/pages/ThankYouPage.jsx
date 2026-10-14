@@ -1,28 +1,31 @@
-import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useOrder } from '../context/OrderContext';
-import thankYouDog from '../images/home/desktop/questions-dog-on.webp';
-import '../assets/styles/pages/_thx.scss';
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useOrder } from "../context/OrderContext";
+import OrderCompletionPanel from "../features/order/completion/OrderCompletionPanel";
+import { getOrderCompletionContent } from "../features/order/completion/orderCompletionContent";
+import "../assets/styles/pages/_thx.scss";
 
 const ThankYouPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { resetOrder } = useOrder();
-  const { orderNumber, manual, cdekNumber: stateCdekNumber } = location.state || {};
-  const cdekNumber = stateCdekNumber || null;
-  const [copyState, setCopyState] = useState('idle');
+  const { orderNumber, manual, requestKind, receiptEmailProvided, cdekNumber } = location.state || {};
+  const titleRef = useRef(null);
+  const [copyState, setCopyState] = useState("idle");
+  const content = getOrderCompletionContent({ manual, requestKind, receiptEmailProvided });
 
   useEffect(() => {
     if (!orderNumber) {
-      navigate('/order', { replace: true });
+      navigate("/order", { replace: true });
       return;
     }
     resetOrder();
+    titleRef.current?.focus({ preventScroll: true });
   }, [navigate, orderNumber, resetOrder]);
 
   useEffect(() => {
-    if (copyState === 'idle') return undefined;
-    const timer = setTimeout(() => setCopyState('idle'), 2500);
+    if (copyState === "idle") return undefined;
+    const timer = setTimeout(() => setCopyState("idle"), 2500);
     return () => clearTimeout(timer);
   }, [copyState]);
 
@@ -30,110 +33,33 @@ const ThankYouPage = () => {
     if (!cdekNumber) return;
     try {
       await navigator.clipboard.writeText(cdekNumber);
-      setCopyState('copied');
+      setCopyState("copied");
     } catch {
-      setCopyState('error');
+      setCopyState("error");
     }
   };
+  const copyLabel = copyState === "copied" ? "Скопировано"
+    : copyState === "error" ? "Не удалось скопировать" : "Скопировать";
 
-  const copyLabel = copyState === 'copied'
-    ? 'Скопировано'
-    : copyState === 'error'
-      ? 'Не удалось скопировать'
-      : 'Скопировать';
-
-  if (!orderNumber) {
-    return <div className="route-loading" role="status">Переходим к оформлению заказа…</div>;
-  }
+  if (!orderNumber) return <div className="route-loading" role="status">Переходим к оформлению заказа…</div>;
 
   return (
-    <div className="thx">
-      <section className="thx__card" aria-labelledby="thx-title">
-        <div className="thx__visual" aria-hidden="true">
-          <span className="thx__spark thx__spark--one">✦</span>
-          <span className="thx__spark thx__spark--two">✦</span>
-          <span className="thx__spark thx__spark--three">✦</span>
-          <div className="thx__seal">
-            <span>заказ</span>
-            <strong>принят</strong>
-          </div>
-          <img className="thx__dog" src={thankYouDog} alt="" />
-        </div>
-
-        <div className="thx__content">
-          <div className="thx__heading">
-            <p className="thx__eyebrow">
-              <span className="thx__check" aria-hidden="true">
-                <svg viewBox="0 0 16 16">
-                  <path d="m3.5 8.2 2.7 2.7 6.3-6.1" />
-                </svg>
-              </span>
-              заказ успешно оформлен
-            </p>
-            <h1 id="thx-title" className="thx__title">
-              Спасибо!<br />Всё получилось.
-            </h1>
-            <p className="thx__text">
-              {manual
-                ? 'Заявка уже у нас. Менеджер свяжется с вами для уточнения деталей и расчёта стоимости.'
-                : 'Мы приняли ваш заказ и уже передали его в работу.'}
-            </p>
-          </div>
-
-          <div className="thx__details" aria-label="Детали заказа">
-            <div className="thx__details-heading">
-              <h2>Детали заказа</h2>
-              <span>{manual ? 'ручной расчёт' : 'заказ оплачен'}</span>
-            </div>
-
-            <div className="thx__order-row">
-              <span className="thx__order-label">Номер заказа</span>
-              <strong className="thx__order-number">{orderNumber}</strong>
-            </div>
-
-            {!manual && orderNumber && (
-              cdekNumber ? (
-                <button
-                  type="button"
-                  className={`thx__order-row thx__order-row--copy${copyState === 'error' ? ' is-error' : ''}`}
-                  onClick={copyTrack}
-                  aria-label={`Трек-номер СДЭК ${cdekNumber}. ${copyLabel}`}
-                >
-                  <span className="thx__order-label">Трек-номер СДЭК</span>
-                  <span className="thx__track">
-                    <strong className="thx__order-number">{cdekNumber}</strong>
-                    <span className="thx__copy-status" aria-live="polite">{copyLabel}</span>
-                  </span>
-                </button>
-              ) : (
-                <div className="thx__order-row">
-                  <span className="thx__order-label">Трек-номер СДЭК</span>
-                  <span className="thx__pending">
-                    <i aria-hidden="true" />пришлём после изготовления
-                  </span>
-                </div>
-              )
+    <section className={`thx${manual ? " thx--manual" : ""}`} aria-labelledby="thx-title">
+      <div className="thx__stage">
+        <div className="thx__card">
+          <OrderCompletionPanel content={content} titleRef={titleRef} />
+          <div className="thx__meta" aria-label="Детали заказа">
+            <p>{manual ? "Номер заявки" : "Номер заказа"}: <strong className="thx__order-number">{orderNumber}</strong></p>
+            {!manual && cdekNumber && (
+              <button type="button" className="thx__tracking" onClick={copyTrack} aria-label={`Трек-номер СДЭК ${cdekNumber}. ${copyLabel}`}>
+                Трек-номер СДЭК: <strong>{cdekNumber}</strong> <span aria-live="polite">{copyLabel}</span>
+              </button>
             )}
+            <Link className="thx__home-link" to="/">на главную</Link>
           </div>
-
-          <div className="thx__next">
-            <span>что дальше</span>
-            <p>
-              {manual
-                ? 'Проверим детали заказа, рассчитаем итоговую стоимость и напишем удобным для вас способом.'
-                : 'Подготовим заказ к производству и сообщим, когда он будет готов к отправке.'}
-            </p>
-          </div>
-
-          <Link className="thx__home-link" to="/">
-            <span>на главную</span>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </Link>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 };
 

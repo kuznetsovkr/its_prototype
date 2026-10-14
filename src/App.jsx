@@ -105,6 +105,7 @@ const AppShell = () => {
     const isEmbroideryPage = pathname === '/embroidery';
     const isRecipientPage = pathname === '/recipient';
     const isCertificatePage = pathname === '/certificate';
+    const isThankYouPage = pathname === '/thank-you';
     const isAdminPage = pathname.startsWith('/admin');
 
     const routes = (
@@ -137,7 +138,7 @@ const AppShell = () => {
     );
 
     return (
-            <div className={`App${isOrderPage ? ' App--order' : ''}${isEmbroideryPage ? ' App--embroidery' : ''}${isRecipientPage ? ' App--recipient' : ''}${isCertificatePage ? ' App--certificate' : ''}${isAdminPage ? ' App--admin' : ''}`}>
+            <div className={`App${isOrderPage ? ' App--order' : ''}${isEmbroideryPage ? ' App--embroidery' : ''}${isRecipientPage ? ' App--recipient' : ''}${isCertificatePage ? ' App--certificate' : ''}${isThankYouPage ? ' App--thankYou' : ''}${isAdminPage ? ' App--admin' : ''}`}>
                 {!isHomePage && <Header />}
                 <SeoMetadata />
                 <DesktopSmoothScroll />
