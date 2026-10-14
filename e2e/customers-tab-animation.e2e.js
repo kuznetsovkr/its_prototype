@@ -39,7 +39,7 @@ for (const viewport of viewports) {
     await tabs.nth(1).focus();
     await page.keyboard.press("ArrowRight");
     await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
-    await expect(panels.nth(2)).toContainText("Уход:");
+    await expect(panels.nth(2)).toContainText("Уход за изделием:");
     await expect(panels.nth(2).locator(".home-customers__content"))
       .toHaveCSS("animation-name", "home-customers-content-enter");
 

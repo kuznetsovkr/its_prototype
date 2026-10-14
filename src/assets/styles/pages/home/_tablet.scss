@@ -328,10 +328,10 @@
   .home-works__actions { gap: scale.px(10); margin-top: scale.px(20); }
   .home-works__actions .home-button { width: scale.px(190); height: scale.px(36); }
 
-  .home-customers__surface { height: scale.px(380); min-height: 0; padding: scale.px(30); }
+  .home-customers__surface { height: auto; min-height: scale.px(380); padding: scale.px(30); }
 
   .home-customers__inner {
-    width: 100%; height: scale.px(320); min-height: 0; padding: scale.px(30);
+    width: 100%; height: auto; min-height: scale.px(320); padding: scale.px(30);
   }
 
   .home-tabs { margin-top: scale.px(20); }
@@ -344,20 +344,25 @@
   .home-tabs__tab:nth-child(5) { width: scale.px(67); }
 
   .home-customers__content {
+    --customer-card-min-height: #{scale.px(166)};
+
     width: scale.px(500);
+    max-width: 100%;
     margin: scale.px(20) auto 0;
-    grid-template-columns: scale.px(166) scale.px(324);
+    grid-template-columns: scale.px(166) minmax(0, 1fr);
     gap: scale.px(10);
   }
 
-  .home-customers__photo,
-  .home-customers__image-picture,
-  .home-customers__image { width: scale.px(166); height: scale.px(166); }
+  .home-customers__content--delivery { --customer-card-min-height: #{scale.px(199)}; }
+  .home-customers__content--care,
+  .home-customers__content--wholesale { --customer-card-min-height: #{scale.px(221)}; }
+  .home-customers__content--returns { --customer-card-min-height: #{scale.px(201)}; }
 
   .home-customers__photo { border-radius: scale.px(20); }
-  .home-customers__copy { min-height: scale.px(166); padding: scale.px(30); border-radius: scale.px(20); }
+  .home-customers__copy { padding: scale.px(30); border-radius: scale.px(20); }
   .home-customers__copy h3 { margin-bottom: scale.px(12); font-size: scale.px(12); }
   .home-customers__copy p { font-size: scale.px(8); }
+  .home-customers__copy p + p { margin-top: scale.px(10); }
 
   .home-reviews__surface { height: scale.px(438); min-height: 0; padding: scale.px(30); }
 

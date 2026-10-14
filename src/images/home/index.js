@@ -29,7 +29,6 @@ import desktopReviewsItem01 from './desktop/reviews-item-01.webp';
 import desktopReviewsItem04 from './desktop/reviews-item-04.jpg';
 import desktopReviewsItem05 from './desktop/reviews-item-05.webp';
 import desktopReviewsItem06 from './desktop/reviews-item-06.webp';
-import desktopCustomersOrderPhoto from './desktop/customers-order-photo.webp';
 import desktopQuestionsDogTwo from './desktop/questions-dog-two.webp';
 import desktopQuestionsDogOn from './desktop/questions-dog-on.webp';
 import desktopSocialCard01 from './desktop/social-card-01.webp';
@@ -87,8 +86,6 @@ import tabletReviewsItem02 from './desktop/reviews-item-02.webp';
 import tabletReviewsItem01 from './desktop/reviews-item-01.webp';
 import tabletQuestionsDogOn from './desktop/questions-dog-on.webp';
 import tabletQuestionsDogTwo from './desktop/questions-dog-two.webp';
-import tabletCustomersOrderPhoto from './desktop/customers-order-photo.webp';
-import tabletCustomersDeliveryPhoto from './tablet/customers-delivery-photo.webp';
 import tabletFooterGlow from './tablet/footer-glow.svg';
 import tabletFooterTelegram from './tablet/footer-telegram.svg';
 import tabletFooterVk from './tablet/footer-vk.svg';
@@ -109,7 +106,6 @@ import mobileWorksCard04Layer01 from './desktop/works-card-06-layer-01.png';
 import mobileWorksCard04Layer02 from './desktop/works-card-06-layer-02.webp';
 import mobileWorksCard05 from './mobile/works-card-05-composite.webp';
 import mobileWorksCard06 from './desktop/works-shared-portrait.webp';
-import mobileCustomersOrderPhoto from './desktop/customers-order-photo.webp';
 import mobileReviewsItem01 from './desktop/reviews-item-02.webp';
 import mobileReviewsItem02 from './desktop/reviews-item-03.jpg';
 import mobileQuestionsDogOn from './desktop/questions-dog-on.webp';
@@ -233,9 +229,6 @@ export const homeAssets = {
       nextArrow: desktopReviewsArrowNext,
       pagination: desktopReviewsPagination,
     },
-    customers: {
-      orderPhoto: desktopCustomersOrderPhoto,
-    },
     questions: {
       dogs: [desktopQuestionsDogOn, desktopQuestionsDogTwo],
     },
@@ -287,10 +280,6 @@ export const homeAssets = {
     reviews: {
       items: [tabletReviewsItem01, tabletReviewsItem02, tabletReviewsItem03, desktopReviewsItem04, desktopReviewsItem05, desktopReviewsItem06],
     },
-    customers: {
-      orderPhoto: tabletCustomersOrderPhoto,
-      deliveryPhoto: tabletCustomersDeliveryPhoto,
-    },
     questions: {
       dogs: [tabletQuestionsDogOn, tabletQuestionsDogTwo],
     },
@@ -333,9 +322,6 @@ export const homeAssets = {
     },
     reviews: {
       items: [mobileReviewsItem01, mobileReviewsItem02, desktopReviewsItem04, desktopReviewsItem05, desktopReviewsItem06],
-    },
-    customers: {
-      orderPhoto: mobileCustomersOrderPhoto,
     },
     questions: {
       dogs: [mobileQuestionsDogOn, mobileQuestionsDogTwo],

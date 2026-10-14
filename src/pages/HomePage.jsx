@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { homeAssets, siteFooterAssets } from "../images/home";
+import { customerAssets } from "../images/home/customers";
 import Header from "../components/Header";
 import AboutSection from "../components/home/AboutSection";
 import CustomersSection from "../components/home/CustomersSection";
@@ -56,19 +57,6 @@ const HomePage = () => {
     additionalItems: currentAssets.works.additionalItems,
     headingAvatar: breakpoint === "desktop" ? homeAssets.desktop.works.headingAvatar : null,
     headingStickers: breakpoint === "desktop" ? homeAssets.desktop.works.headingStickers : [],
-  };
-
-  const customerAssets = {
-    order: {
-      desktop: homeAssets.desktop.customers.orderPhoto,
-      tablet: homeAssets.tablet.customers.orderPhoto,
-      mobile: homeAssets.mobile.customers.orderPhoto,
-    },
-    delivery: {
-      desktop: homeAssets.desktop.customers.orderPhoto,
-      tablet: homeAssets.tablet.customers.deliveryPhoto,
-      mobile: homeAssets.mobile.customers.orderPhoto,
-    },
   };
 
   const questionsAssets = {

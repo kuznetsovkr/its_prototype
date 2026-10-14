@@ -6,21 +6,19 @@ import useScrollZoom from "./useScrollZoom";
 const CustomersSection = ({ assets }) => {
   const sectionRef = useScrollZoom();
   const tabs = customerTabs.map((tab) => {
-    const photo = tab.id === "delivery" && assets.delivery.tablet
-      ? assets.delivery
-      : assets.order;
+    const photo = assets[tab.id];
 
     return {
       id: tab.id,
       label: tab.label,
       content: (
-        <div className="home-customers__content">
+        <div className={`home-customers__content home-customers__content--${tab.id}`}>
           <div className="home-customers__photo">
             <ResponsiveAsset
               desktop={photo.desktop}
               tablet={photo.tablet}
               mobile={photo.mobile}
-              alt="Пример вышивки на изделии"
+              alt={tab.photoAlt}
               className="home-customers__image"
             />
           </div>
