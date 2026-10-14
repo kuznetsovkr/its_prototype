@@ -89,6 +89,7 @@
 .home-process__visual,
 .home-customers__photo,
 .home-social__item {
+  position: relative;
   scale: var(--home-scroll-zoom-scale, 1);
   transform-origin: center;
 }
@@ -661,20 +662,46 @@
   height: auto;
   aspect-ratio: 1;
   flex: 1 1 0;
+  overflow: hidden;
   border-radius: scale.px(30);
 }
 
-.home-social__item .home-layered-asset__layer {
+.home-social__poster,
+.home-social__video {
+  position: absolute;
   inset: 0;
   width: 100%;
   max-width: 100%;
   height: 100%;
   object-fit: cover;
 }
+.home-social__video { opacity: 0; pointer-events: none; }
+.home-social__video.is-ready { opacity: 1; }
+.home-social__motion-toggle {
+  position: absolute;
+  z-index: 1;
+  top: scale.px(24);
+  right: scale.px(24);
+  display: grid;
+  place-items: center;
+  width: scale.px(32);
+  height: scale.px(32);
+  padding: scale.px(4);
+  border: 1px solid rgb(22 22 22 / 25%);
+  border-radius: 50%;
+  background: var(--home-white);
+  color: var(--home-ink);
+  cursor: pointer;
+
+  svg { width: 100%; height: 100%; }
+  &:focus-visible { outline: 2px solid var(--home-orange); outline-offset: scale.px(3); }
+}
 .home-social__actions { display: flex; justify-content: center; gap: scale.px(20); margin-top: scale.px(41); }
 .home-social__actions .home-button { width: scale.px(200); }
 
 @media (prefers-reduced-motion: reduce) {
+  .home-social__video,
+  .home-social__motion-toggle { display: none; }
   .home-page .home-hero__subtitle,
   .home-page .home-hero__order { animation: none; opacity: 1; }
   .home-page .home-about__photo-slide.is-entering { animation: none; }

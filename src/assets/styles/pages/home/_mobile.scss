@@ -763,15 +763,7 @@
   .home-social__item:first-child,
   .home-social__item:last-child { width: scale.px(80); height: scale.px(80); flex-basis: scale.px(80); }
 
-  .home-social__item--3 .home-layered-asset__layer {
-    inset: auto;
-    top: -49.59%;
-    left: 0;
-    width: 100%;
-    max-width: none;
-    height: 170.03%;
-    object-fit: fill;
-  }
+  .home-social__motion-toggle { top: scale.px(10); right: scale.px(12); width: scale.px(28); height: scale.px(28); }
 
   .home-social__actions {
     position: absolute;

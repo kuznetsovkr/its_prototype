@@ -475,6 +475,7 @@
 
   .home-social__actions { gap: scale.px(10); margin-top: scale.px(20); }
   .home-social__actions .home-button { min-width: 0; width: scale.px(100); height: scale.px(36); padding: 0 scale.px(5); }
+  .home-social__motion-toggle { top: scale.px(12); right: scale.px(12); width: scale.px(28); height: scale.px(28); }
 
   .home-footer { display: flow-root; }
 }

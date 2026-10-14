@@ -18,12 +18,6 @@ import desktopReviewsItem05 from './desktop/reviews-item-05.webp';
 import desktopReviewsItem06 from './desktop/reviews-item-06.webp';
 import desktopQuestionsDogTwo from './desktop/questions-dog-two.webp';
 import desktopQuestionsDogOn from './desktop/questions-dog-on.webp';
-import desktopSocialCard01 from './desktop/social-card-01.webp';
-import desktopSocialCard02Layer01 from './desktop/social-card-02-layer-01.webp';
-import desktopSocialCard02Layer02 from './desktop/social-card-02-layer-02.webp';
-import desktopSocialCard03 from './desktop/social-card-03.webp';
-import desktopSocialCard04 from './desktop/social-card-04.webp';
-import desktopSocialCard05 from './desktop/social-card-05.webp';
 import desktopFooterLogoMilk from './desktop/footer-logo-milk.webp';
 import desktopFooterIllustration from './desktop/footer-illustration.webp';
 import desktopProcessConnector from './desktop/process-connector.svg';
@@ -43,10 +37,6 @@ import tabletHeroLogoGraphite from './desktop/hero-logo-graphite.png';
 import tabletHeroLogoMilk from './desktop/hero-logo-milk.webp';
 import tabletAboutPhoto from './mobile/about-photo-layer-02.webp';
 import tabletProcessConnector from './tablet/process-connector.svg';
-import tabletSocialCard01Layer01 from './desktop/social-card-02-layer-01.webp';
-import tabletSocialCard01Layer02 from './desktop/social-card-02-layer-02.webp';
-import tabletSocialCard02 from './desktop/social-card-03.webp';
-import tabletSocialCard03 from './desktop/social-card-04.webp';
 import tabletFooterIllustration from './desktop/footer-illustration.webp';
 import tabletFooterLogoMilk from './desktop/footer-logo-milk.webp';
 import tabletReviewsItem03 from './desktop/reviews-item-03.jpg';
@@ -71,10 +61,6 @@ import mobileReviewsItem01 from './desktop/reviews-item-02.webp';
 import mobileReviewsItem02 from './desktop/reviews-item-03.jpg';
 import mobileQuestionsDogOn from './desktop/questions-dog-on.webp';
 import mobileQuestionsDogTwo from './desktop/questions-dog-two.webp';
-import mobileSocialCard01Layer01 from './desktop/social-card-02-layer-01.webp';
-import mobileSocialCard01Layer02 from './desktop/social-card-02-layer-02.webp';
-import mobileSocialCard02 from './desktop/social-card-03.webp';
-import mobileSocialCard03 from './desktop/social-card-04.webp';
 import mobileFooterLogoMilk from './desktop/footer-logo-milk.webp';
 import mobileFooterIllustration from './desktop/footer-illustration.webp';
 import mobileHeaderBag from './mobile/header-bag.svg';
@@ -90,27 +76,9 @@ import mobileFooterInstagram from './mobile/footer-instagram.svg';
 import mobileFooterVk from './mobile/footer-vk.svg';
 import mobileFooterGlow from './mobile/footer-glow.svg';
 
-const desktopSocialItems = [
-  { layers: [desktopSocialCard01] },
-  { layers: [desktopSocialCard02Layer01, desktopSocialCard02Layer02] },
-  { layers: [desktopSocialCard03] },
-  { layers: [desktopSocialCard04] },
-  { layers: [desktopSocialCard05] },
-];
-
-const tabletSocialItems = [
-  { layers: [tabletSocialCard01Layer01, tabletSocialCard01Layer02] },
-  { layers: [tabletSocialCard02] },
-  { layers: [tabletSocialCard03] },
-];
+import { homeSocialItems, compactSocialItems } from '../../data/homeSocial';
 
 const mobileAboutPhotoLayers = [mobileAboutPhotoLayer01, mobileAboutPhotoLayer02];
-
-const mobileSocialItems = [
-  { layers: [mobileSocialCard01Layer01, mobileSocialCard01Layer02] },
-  { layers: [mobileSocialCard02] },
-  { layers: [mobileSocialCard03] },
-];
 
 export const homeAssets = {
   desktop: {
@@ -147,7 +115,7 @@ export const homeAssets = {
       dogs: [desktopQuestionsDogOn, desktopQuestionsDogTwo],
     },
     social: {
-      items: desktopSocialItems,
+      items: homeSocialItems,
     },
     footer: {
       logoMilk: desktopFooterLogoMilk,
@@ -194,7 +162,7 @@ export const homeAssets = {
       dogs: [tabletQuestionsDogOn, tabletQuestionsDogTwo],
     },
     social: {
-      items: tabletSocialItems,
+      items: compactSocialItems,
     },
     footer: {
       logoMilk: tabletFooterLogoMilk,
@@ -234,7 +202,7 @@ export const homeAssets = {
       faqGlow: mobileFaqGlow,
     },
     social: {
-      items: mobileSocialItems,
+      items: compactSocialItems,
     },
     footer: {
       logoMilk: mobileFooterLogoMilk,
