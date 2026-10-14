@@ -1,0 +1,52 @@
+@use "../base/compactScale" as scale;
+
+.home-works__item--paired::after { display: none; }
+
+.home-work-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+  touch-action: pan-y pinch-zoom;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.home-page .home-work-card__image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: opacity 200ms ease;
+}
+
+.home-work-card__image--work { opacity: 1; }
+.home-work-card__image--original { opacity: 0; }
+.home-work-card.is-showing-original .home-work-card__image--work { opacity: 0; }
+.home-work-card.is-showing-original .home-work-card__image--original { opacity: 1; }
+
+.home-work-card:focus-visible { outline: none; }
+
+.home-work-card:focus-visible::after {
+  position: absolute;
+  z-index: 1;
+  inset: scale.px(4);
+  border: scale.px(2) solid #fff;
+  border-radius: inherit;
+  box-shadow: 0 0 0 scale.px(2) #161616;
+  content: "";
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-page .home-work-card__image { transition: none; }
+}

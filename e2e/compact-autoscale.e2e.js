@@ -9,6 +9,7 @@ const openHome = async (page, width, height = 900) => {
   await page.goto("/");
   // Wait for the lazy route, including a cold WebKit context, before measuring it.
   await expect(page.locator(".home-about__card")).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator(".home-page")).toHaveClass(`home-page home-page--${width < 640 ? "mobile" : width < 1200 ? "tablet" : "desktop"}`);
   await page.evaluate(() => document.fonts.ready);
 };
 

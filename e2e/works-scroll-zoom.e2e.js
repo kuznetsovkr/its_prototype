@@ -38,7 +38,7 @@ for (const viewport of viewports) {
     const works = page.locator(".home-works");
     const first = works.locator(".home-works__item").first();
     const fifth = works.locator(".home-works__item").nth(4);
-    await expect(first).toBeAttached();
+    await expect(first).toBeAttached({ timeout: 15_000 });
 
     await scrollCardToProgress(page, 0, 0);
     await expect.poll(() => readScale(first)).toBeCloseTo(0.9, 2);

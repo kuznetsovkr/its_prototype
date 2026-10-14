@@ -366,16 +366,16 @@
     flex: 1 1 0;
   }
 
-  .home-works.is-expanded { height: scale.px(1315); min-height: scale.px(1315); }
+  .home-works.is-expanded { height: scale.px(1615); min-height: scale.px(1615); }
   .home-works.is-expanded .home-works__surface,
-  .home-works.is-expanded .home-works__inner { height: scale.px(1265); min-height: scale.px(1265); }
+  .home-works.is-expanded .home-works__inner { height: scale.px(1565); min-height: scale.px(1565); }
 
   .home-works.is-expanded .home-works__grid {
     display: grid;
-    height: scale.px(1097);
+    height: scale.px(1397);
     grid-auto-rows: scale.px(97);
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: repeat(11, scale.px(97));
+    grid-template-rows: repeat(14, scale.px(97));
     gap: scale.px(3);
   }
 
@@ -401,8 +401,11 @@
   .home-works.is-expanded .home-works__item--more-7 { grid-area: 10 / 1 / 12 / 4; }
   .home-works.is-expanded .home-works__item--more-8 { grid-area: 8 / 3; }
   .home-works.is-expanded .home-works__item--more-9 { grid-area: 9 / 3; }
+  .home-works.is-expanded .home-works__item--more-10 { grid-area: 12 / 1; }
+  .home-works.is-expanded .home-works__item--more-11 { grid-area: 12 / 2 / 13 / 4; }
+  .home-works.is-expanded .home-works__item--more-12 { grid-area: 13 / 1 / 15 / 4; }
 
-  .home-works.is-expanded .home-works__actions { top: scale.px(1195); }
+  .home-works.is-expanded .home-works__actions { top: scale.px(1495); }
 
   .home-reviews { height: scale.px(578); min-height: scale.px(578); padding-top: 0; }
   .home-reviews__surface { height: scale.px(528); min-height: scale.px(528); padding: 0; }

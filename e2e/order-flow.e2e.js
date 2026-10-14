@@ -375,8 +375,8 @@ test("дополнительные примеры работ раскрываю�
 
   await moreButton.click();
   await expect(works).toHaveClass(/is-expanded/);
-  await expect(items).toHaveCount(initialCount + 9);
-  await expect(works.locator(".home-works__item--additional")).toHaveCount(9);
+  await expect(items).toHaveCount(18);
+  await expect(works.locator(".home-works__item--additional")).toHaveCount(18 - initialCount);
   await expect(moreButton).toHaveAttribute("aria-expanded", "true");
   await expect.poll(() => page.evaluate(
     () => document.documentElement.scrollWidth <= document.documentElement.clientWidth

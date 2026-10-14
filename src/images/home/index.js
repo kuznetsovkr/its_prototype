@@ -8,19 +8,6 @@ import desktopProcessStep01Photo from './desktop/process-step-01-photo.jpg';
 import desktopProcessStep02Photo from './desktop/process-step-02-photo.webp';
 import desktopProcessStep03Photo from './desktop/process-step-03-photo.webp';
 import desktopProcessStep04Photo from './desktop/process-step-04-photo.jpg';
-import desktopWorksCard03 from './desktop/works-card-03.webp';
-import desktopWorksCard02Layer01 from './desktop/works-card-02-layer-01.png';
-import desktopWorksSharedPortrait from './desktop/works-shared-portrait.webp';
-import desktopWorksCard02Layer03 from './desktop/works-card-02-layer-03.webp';
-import desktopWorksCard05Layer01 from './desktop/works-card-05-layer-01.jpg';
-import desktopWorksCard05Layer02 from './desktop/works-card-05-layer-02.png';
-import desktopWorksCard05Layer03 from './desktop/works-card-05-layer-03.webp';
-import desktopWorksCard09 from './desktop/works-card-09.webp';
-import desktopWorksCard01 from './desktop/works-card-01.webp';
-import desktopWorksCard07 from './desktop/works-card-07-2026.webp';
-import desktopWorksCard06Layer01 from './desktop/works-card-06-layer-01.png';
-import desktopWorksCard06Layer02 from './desktop/works-card-06-layer-02.webp';
-import desktopWorksCard04 from './desktop/works-card-04.webp';
 import desktopWorksHeadingSticker from './desktop/works-heading-sticker.png';
 import desktopWorksHeadingAvatar from './desktop/works-heading-avatar.webp';
 import desktopReviewsItem03 from './desktop/reviews-item-03.jpg';
@@ -62,25 +49,6 @@ import tabletSocialCard02 from './desktop/social-card-03.webp';
 import tabletSocialCard03 from './desktop/social-card-04.webp';
 import tabletFooterIllustration from './desktop/footer-illustration.webp';
 import tabletFooterLogoMilk from './desktop/footer-logo-milk.webp';
-import tabletWorksCompact03 from './desktop/works-card-03.webp';
-import tabletWorksCompact02 from './desktop/works-card-02-layer-03.webp';
-import tabletWorksCompact05 from './desktop/works-card-05-layer-03.webp';
-import tabletWorksCompact09 from './desktop/works-card-09.webp';
-import tabletWorksCompact01 from './desktop/works-card-01.webp';
-import tabletWorksCompact07 from './desktop/works-shared-portrait.webp';
-import tabletWorksCompact06 from './desktop/works-card-06-layer-02.webp';
-import tabletWorksCompact04 from './desktop/works-card-04.webp';
-import tabletWorksExpanded10Layer01 from './desktop/works-card-06-layer-01.png';
-import tabletWorksExpanded10Layer03 from './tablet/works-expanded-10-layer-03.webp';
-import tabletWorksExpanded12Layer01 from './desktop/works-card-02-layer-01.png';
-import tabletWorksExpanded12Layer03 from './desktop/works-card-06-layer-01.png';
-import tabletWorksExpanded14 from './desktop/works-card-05-layer-01.jpg';
-import tabletWorksExpanded13Layer02 from './tablet/works-expanded-13-layer-02.webp';
-import tabletWorksExpanded16Layer02 from './tablet/works-expanded-16-layer-02.webp';
-import tabletWorksExpanded15 from './tablet/works-expanded-15.webp';
-import tabletWorksAdditional01 from './tablet/works-additional-01.webp';
-import tabletWorksAdditional08 from './tablet/works-additional-08.webp';
-import tabletWorksAdditional09 from './tablet/works-additional-09.webp';
 import tabletReviewsItem03 from './desktop/reviews-item-03.jpg';
 import tabletReviewsItem02 from './desktop/reviews-item-02.webp';
 import tabletReviewsItem01 from './desktop/reviews-item-01.webp';
@@ -99,13 +67,6 @@ import mobileProcessStep01Photo from './desktop/process-step-03-photo.webp';
 import mobileProcessStep02Photo from './desktop/process-step-02-photo.webp';
 import mobileProcessStep03Photo from './desktop/process-step-01-photo.jpg';
 import mobileProcessStep04Photo from './desktop/process-step-04-photo.jpg';
-import mobileWorksCard01 from './desktop/works-card-01.webp';
-import mobileWorksCard02 from './desktop/works-card-09.webp';
-import mobileWorksCard03 from './desktop/works-card-02-layer-03.webp';
-import mobileWorksCard04Layer01 from './desktop/works-card-06-layer-01.png';
-import mobileWorksCard04Layer02 from './desktop/works-card-06-layer-02.webp';
-import mobileWorksCard05 from './mobile/works-card-05-composite.webp';
-import mobileWorksCard06 from './desktop/works-shared-portrait.webp';
 import mobileReviewsItem01 from './desktop/reviews-item-02.webp';
 import mobileReviewsItem02 from './desktop/reviews-item-03.jpg';
 import mobileQuestionsDogOn from './desktop/questions-dog-on.webp';
@@ -129,48 +90,12 @@ import mobileFooterInstagram from './mobile/footer-instagram.svg';
 import mobileFooterVk from './mobile/footer-vk.svg';
 import mobileFooterGlow from './mobile/footer-glow.svg';
 
-const desktopWorksItems = [
-  { layers: [desktopWorksCard01] },
-  { layers: [desktopWorksCard02Layer01, desktopWorksSharedPortrait, desktopWorksCard02Layer03] },
-  { layers: [desktopWorksCard03] },
-  { layers: [desktopWorksCard04] },
-  { layers: [desktopWorksCard05Layer01, desktopWorksCard05Layer02, desktopWorksCard05Layer03] },
-  { layers: [desktopWorksCard06Layer01, desktopWorksCard06Layer02] },
-  { layers: [desktopWorksCard07] },
-  { layers: [desktopWorksCard09] },
-  { layers: [desktopWorksSharedPortrait] },
-];
-
 const desktopSocialItems = [
   { layers: [desktopSocialCard01] },
   { layers: [desktopSocialCard02Layer01, desktopSocialCard02Layer02] },
   { layers: [desktopSocialCard03] },
   { layers: [desktopSocialCard04] },
   { layers: [desktopSocialCard05] },
-];
-
-const tabletWorksCompactItems = [
-  { layers: [tabletWorksCompact01] },
-  { layers: [tabletWorksCompact02] },
-  { layers: [tabletWorksCompact03] },
-  { layers: [tabletWorksCompact04] },
-  { layers: [tabletWorksCompact05] },
-  { layers: [tabletWorksCompact06] },
-  { layers: [tabletAboutPhoto] },
-  { layers: [tabletWorksCompact09] },
-  { layers: [tabletWorksCompact07] },
-];
-
-const additionalWorksItems = [
-  { layers: [tabletWorksAdditional01] },
-  { layers: [tabletWorksExpanded12Layer01, tabletWorksCompact07, tabletWorksExpanded12Layer03] },
-  { layers: [tabletWorksExpanded10Layer01, tabletWorksCompact06, tabletWorksExpanded10Layer03] },
-  { layers: [tabletWorksCompact02, tabletWorksExpanded13Layer02] },
-  { layers: [tabletWorksExpanded15] },
-  { layers: [tabletWorksExpanded14] },
-  { layers: [tabletWorksCompact02, tabletWorksExpanded16Layer02] },
-  { layers: [tabletWorksAdditional08] },
-  { layers: [tabletWorksAdditional09] },
 ];
 
 const tabletSocialItems = [
@@ -180,15 +105,6 @@ const tabletSocialItems = [
 ];
 
 const mobileAboutPhotoLayers = [mobileAboutPhotoLayer01, mobileAboutPhotoLayer02];
-
-const mobileWorksItems = [
-  { layers: [mobileWorksCard01] },
-  { layers: [mobileWorksCard02] },
-  { layers: [mobileWorksCard03] },
-  { layers: [mobileWorksCard04Layer01, mobileWorksCard04Layer02] },
-  { layers: [mobileWorksCard05] },
-  { layers: [mobileWorksCard06] },
-];
 
 const mobileSocialItems = [
   { layers: [mobileSocialCard01Layer01, mobileSocialCard01Layer02] },
@@ -218,8 +134,6 @@ export const homeAssets = {
       connector: desktopProcessConnector,
     },
     works: {
-      items: desktopWorksItems,
-      additionalItems: additionalWorksItems,
       headingStickers: [desktopWorksHeadingSticker, desktopWorksHeadingSticker],
       headingAvatar: desktopWorksHeadingAvatar,
     },
@@ -273,10 +187,6 @@ export const homeAssets = {
       ],
       connector: tabletProcessConnector,
     },
-    works: {
-      compactItems: tabletWorksCompactItems,
-      additionalItems: additionalWorksItems,
-    },
     reviews: {
       items: [tabletReviewsItem01, tabletReviewsItem02, tabletReviewsItem03, desktopReviewsItem04, desktopReviewsItem05, desktopReviewsItem06],
     },
@@ -315,10 +225,6 @@ export const homeAssets = {
     },
     process: {
       items: [mobileProcessStep01Photo, mobileProcessStep02Photo, mobileProcessStep03Photo, mobileProcessStep04Photo],
-    },
-    works: {
-      items: mobileWorksItems,
-      additionalItems: additionalWorksItems,
     },
     reviews: {
       items: [mobileReviewsItem01, mobileReviewsItem02, desktopReviewsItem04, desktopReviewsItem05, desktopReviewsItem06],

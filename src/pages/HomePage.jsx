@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { homeAssets, siteFooterAssets } from "../images/home";
 import { customerAssets } from "../images/home/customers";
+import { getHomeWorks } from "../data/homeWorks";
 import Header from "../components/Header";
 import AboutSection from "../components/home/AboutSection";
 import CustomersSection from "../components/home/CustomersSection";
@@ -49,12 +50,7 @@ const HomePage = () => {
   ];
 
   const worksAssets = {
-    initialItems: breakpoint === "desktop"
-      ? homeAssets.desktop.works.items
-      : breakpoint === "tablet"
-        ? homeAssets.tablet.works.compactItems
-        : homeAssets.mobile.works.items,
-    additionalItems: currentAssets.works.additionalItems,
+    ...getHomeWorks(breakpoint),
     headingAvatar: breakpoint === "desktop" ? homeAssets.desktop.works.headingAvatar : null,
     headingStickers: breakpoint === "desktop" ? homeAssets.desktop.works.headingStickers : [],
   };

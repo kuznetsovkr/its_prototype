@@ -1,19 +1,7 @@
 import { useState } from "react";
 import { HomeButton } from "./primitives";
-import LayeredAsset from "./LayeredAsset";
+import WorkComparisonCard from "./WorkComparisonCard";
 import useWorksScrollZoom from "./useWorksScrollZoom";
-
-const workLabels = [
-  "Вышивка кота на голубом изделии",
-  "Автомобиль DeLorean",
-  "Портреты собак на бордовом изделии",
-  "Вышитый портрет",
-  "Вышивка корги",
-  "Белая собака на сером изделии",
-  "Портрет человека с собакой",
-  "Собака с футбольным мячом",
-  "Портрет собаки на синем изделии",
-];
 
 const WorksSection = ({ assets, breakpoint, onOrder }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -40,12 +28,19 @@ const WorksSection = ({ assets, breakpoint, onOrder }) => {
             ))}
           </div>
 
+          <p className="home-visually-hidden" id="home-works-instructions">
+            Наведите указатель, чтобы увидеть исходное фото. На сенсорном экране нажмите на работу,
+            затем нажмите ещё раз, чтобы вернуться к вышивке. С клавиатуры используйте Enter или пробел,
+            Escape возвращает вышивку.
+          </p>
+
           <div className="home-works__grid" id="home-works-gallery">
             {items.map((item, index) => {
               const additionalIndex = index - initialItems.length + 1;
               const isAdditional = additionalIndex > 0;
               const itemClassName = [
                 "home-works__item",
+                "home-works__item--paired",
                 `home-works__item--${index + 1}`,
                 isAdditional ? "home-works__item--additional" : "",
                 isAdditional ? `home-works__item--more-${additionalIndex}` : "",
@@ -54,13 +49,10 @@ const WorksSection = ({ assets, breakpoint, onOrder }) => {
               return (
                 <figure
                   className={itemClassName}
-                  key={`${breakpoint}-${isAdditional ? "more" : "initial"}-${isAdditional ? additionalIndex : index}`}
+                  key={item.id}
                   style={isAdditional ? { "--home-work-reveal-index": additionalIndex } : undefined}
                 >
-                  <LayeredAsset
-                    layers={item.layers || [item]}
-                    label={workLabels[index] || `Пример работы ${index + 1}`}
-                  />
+                  <WorkComparisonCard item={item} breakpoint={breakpoint} />
                 </figure>
               );
             })}
