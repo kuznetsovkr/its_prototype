@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import EmbroideryDesktop from "./EmbroideryDesktop";
 
 const noop = () => {};
-const renderInstructions = (selectedType) => {
+const renderInstructions = (selectedType, desktopTab = "image") => {
   const selection = {
     clothingPreviewSrc: "",
     clothingPreviewAlt: "",
@@ -36,9 +36,9 @@ const renderInstructions = (selectedType) => {
   const markup = renderToStaticMarkup(
     <EmbroideryDesktop
       selection={selection}
-      desktopTab="image"
-      desktopDetailsOpen
-      isUploadStage
+      desktopTab={desktopTab}
+      desktopDetailsOpen={desktopTab === "image"}
+      isUploadStage={desktopTab === "image"}
       fileInputRef={{ current: null }}
       onImageTab={noop}
       onTextTab={noop}
@@ -51,6 +51,27 @@ const renderInstructions = (selectedType) => {
 };
 
 describe("embroidery upload instructions", () => {
+  test("custom image instructions replace the previous type's text and do not leak to other types", () => {
+    const instruction = "Отправьте, пожалуйста, фотографию, которую хотите вышить и/или опишите вашу идею";
+    for (const selectedType of ["Patronus", "custom", "Car", "petFace", "custom", "Patronus"]) {
+      const markup = renderInstructions(selectedType);
+      if (selectedType === "custom") {
+        expect(markup.match(/<p>/g)).toHaveLength(1);
+        expect(markup).toContain(instruction);
+        expect(markup).not.toContain("фото вашего питомца");
+        expect(markup).not.toContain("фотографию вашего автомобиля");
+        expect(markup).not.toContain("Для вышивки мордочки питомца");
+        expect(markup).not.toContain("1000 руб");
+      } else {
+        expect(markup).not.toContain(instruction);
+      }
+    }
+  });
+
+  test("the custom text tab does not show image upload instructions", () => {
+    expect(renderInstructions("custom", "text")).toBe("");
+  });
+
   test("renders car paragraphs and replaces them when the selected type changes", () => {
     const car = renderInstructions("Car");
     const petFace = renderInstructions("petFace");

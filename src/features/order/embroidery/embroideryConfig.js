@@ -33,7 +33,9 @@ export const UPLOAD_INSTRUCTIONS_BY_TYPE = {
   petFace: [
     "Для вышивки мордочки питомца отправьте отдельное фото с выражением мордочки, которое хотите видеть на вышивке. Мы будем ориентироваться именно на это фото при создании эскиза",
   ],
-  custom: UPLOAD_INSTRUCTIONS,
+  custom: [
+    "Отправьте, пожалуйста, фотографию, которую хотите вышить и/или опишите вашу идею",
+  ],
 };
 
 export const getUploadInstructions = (type) => UPLOAD_INSTRUCTIONS_BY_TYPE[type] || [];

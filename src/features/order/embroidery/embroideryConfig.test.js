@@ -33,13 +33,19 @@ describe("embroidery uploads", () => {
 });
 
 describe("upload instructions", () => {
-  test("uses the exact domain type keys and preserves existing instructions for other types", () => {
+  test("uses the exact domain type keys and preserves the patronus instructions", () => {
     expect(EMBROIDERY_TYPES.map(({ value }) => value)).toEqual([
       "Patronus", "Car", "petFace", "custom",
     ]);
     expect(getUploadInstructions("Patronus")).toBe(UPLOAD_INSTRUCTIONS);
-    expect(getUploadInstructions("custom")).toBe(UPLOAD_INSTRUCTIONS);
     expect(getUploadInstructions("unknown")).toEqual([]);
+  });
+
+  test("custom image instructions use the agreed text rather than the patronus instructions", () => {
+    expect(getUploadInstructions("custom")).toEqual([
+      "Отправьте, пожалуйста, фотографию, которую хотите вышить и/или опишите вашу идею",
+    ]);
+    expect(getUploadInstructions("custom")).not.toBe(UPLOAD_INSTRUCTIONS);
   });
 
   test("keeps the car and pet-face paragraphs separate without previous-type text", () => {
