@@ -47,7 +47,7 @@ describe("recipient order payload", () => {
       patronusCount: 1,
       petFaceCount: 1,
       customText: "Привет",
-      customTextFont: "Georgia",
+      customTextFont: "Onest Bold",
       customOption: { image: false, text: true },
       pickupPoint: "Красноярск, Мира, 1",
       manualAddress: null,
@@ -61,7 +61,7 @@ describe("recipient order payload", () => {
       turnstileToken: "turnstile-response-token",
     });
 
-    expect(payload.get("customTextFont")).toBe("Georgia");
+    expect(payload.get("customTextFont")).toBe("Onest Bold");
     expect(payload.get("recipientFullName")).toBe("Петров Пётр Петрович");
     expect(payload.get("recipientPhoneDigits")).toBe("79123456789");
     expect(payload.has("deliveryCity")).toBe(false);
@@ -91,7 +91,7 @@ describe("recipient order payload", () => {
       patronusCount: 0,
       petFaceCount: 0,
       customText: "Привет",
-      customTextFont: "Arial",
+      customTextFont: "Onest Bold",
       customOption: { image: false, text: true },
       pickupPoint: "Красноярск, Мира, 1",
       manualAddress: null,

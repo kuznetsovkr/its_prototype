@@ -1897,3 +1897,142 @@ button.embroideryDesktopChoice__example {
     line-height: 1.3;
   }
 }
+
+// Inscription fields grow with their content rather than clipping larger type.
+.embroideryPage .embroiderySelectorDesktop--text { height: auto; }
+
+.embroiderySelectorDesktop--text .embroiderySelectorDesktop__panel { height: auto; }
+
+.embroideryDesktopDetails--text {
+  --inscription-label-size: 16px;
+  --inscription-control-size: 16px;
+  --inscription-preview-size: 20px;
+  --inscription-control-height: 48px;
+  --inscription-text-height: 72px;
+  --inscription-preview-height: 88px;
+
+  max-height: none;
+  padding-right: 0;
+  overflow: visible;
+}
+
+.embroideryDesktopDetails--text .embroideryDesktopDetails__field {
+  gap: scale.px(8);
+  margin-top: scale.px(14);
+
+  > span {
+    color: #2b2b2b;
+    font-size: var(--inscription-label-size);
+    line-height: 1.4;
+  }
+
+  textarea,
+  select {
+    --mobile-control-font-size: var(--inscription-control-size);
+
+    box-sizing: border-box;
+    min-height: var(--inscription-control-height);
+    padding: scale.px(12) scale.px(16);
+    border: 1px solid #d2d2d2;
+    border-radius: scale.px(20);
+    color: #2b2b2b;
+    font-size: var(--inscription-control-size);
+    line-height: 1.5;
+    transition: border-color .2s ease, box-shadow .2s ease;
+
+  }
+
+  textarea { height: var(--inscription-text-height); }
+
+  select {
+    min-width: 0;
+    padding-right: scale.px(46);
+    appearance: none;
+    border-radius: scale.px(28);
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%234b4b4b' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right scale.px(17) center / scale.px(16);
+    cursor: pointer;
+
+    &:hover { border-color: #bc5823; }
+  }
+
+  :is(textarea, select):focus-visible {
+    border-color: #bc5823;
+    outline: 2px solid #bc5823;
+    outline-offset: 2px;
+  }
+
+  :is(textarea, select)[aria-invalid="true"] { border-color: #a53636; }
+}
+
+.embroideryDesktopDetails--text .embroideryDesktopDetails__field:first-child textarea {
+  --mobile-control-font-size: var(--inscription-preview-size);
+
+  height: var(--inscription-preview-height);
+  font-size: var(--inscription-preview-size);
+}
+
+.embroideryDesktopDetails--text .embroideryDesktopDetails__error {
+  margin-top: scale.px(10);
+  font-size: var(--inscription-label-size);
+  line-height: 1.4;
+}
+
+// Enhance the native picker where supported; other browsers keep their OS picker.
+@supports (appearance: base-select) {
+  .embroideryDesktopDetails--text .embroideryDesktopDetails__field select,
+  .embroideryDesktopDetails--text select::picker(select) { appearance: base-select; }
+
+  .embroideryDesktopDetails--text select::picker-icon { display: none; }
+
+  .embroideryDesktopDetails--text select::picker(select) {
+    max-height: min(360px, 50dvh);
+    padding: 6px;
+    border: 1px solid #e6dfd5;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 12px 28px rgb(0 0 0 / 12%);
+    scrollbar-width: thin;
+    scrollbar-color: #4b4b4b transparent;
+  }
+
+  .embroideryDesktopDetails--text option {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: var(--inscription-control-size);
+    white-space: normal;
+    overflow-wrap: anywhere;
+
+    &:hover,
+    &:focus { background: #f4f0e6; color: #bc5823; }
+    &:checked { background: #161616; color: #fff; }
+  }
+}
+
+.embroiderySelectorDesktop--text .embroiderySelectorDesktop__price {
+  position: static;
+  margin: scale.px(24) 0 0;
+  color: #4b4b4b;
+  font-size: max(14px, #{scale.px(16)});
+  line-height: 1.4;
+}
+
+@media (max-width: bp.$tablet-max) {
+  .embroideryDesktopDetails--text {
+    --inscription-label-size: max(14px, #{scale.px(12)});
+    --inscription-control-size: max(16px, #{scale.px(12)});
+    --inscription-preview-size: max(18px, #{scale.px(16)});
+    --inscription-control-height: #{scale.px(40)};
+    --inscription-text-height: #{scale.px(56)};
+    --inscription-preview-height: #{scale.px(72)};
+  }
+
+  .embroiderySelectorDesktop--text .embroiderySelectorDesktop__panel h2 {
+    height: auto;
+    font-size: max(16px, #{scale.px(14)});
+    line-height: 1.3;
+    white-space: normal;
+  }
+
+  .embroiderySelectorDesktop--text .embroideryDesktopTabs button { font-size: max(14px, #{scale.px(12)}); }
+  .embroiderySelectorDesktop--text .embroiderySelectorDesktop__price { font-size: max(14px, #{scale.px(12)}); }
+}

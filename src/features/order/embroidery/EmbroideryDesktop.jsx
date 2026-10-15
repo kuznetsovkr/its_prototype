@@ -68,7 +68,7 @@ const EmbroideryDesktop = ({
 
   return (
       <div
-        className={`embroiderySelectorDesktop${isUploadStage ? " embroiderySelectorDesktop--upload" : ""}`}
+        className={`embroiderySelectorDesktop${isUploadStage ? " embroiderySelectorDesktop--upload" : ""}${desktopTab === "text" ? " embroiderySelectorDesktop--text" : ""}`}
       >
         {missingUploadFiles.length > 0 && (
           <div className="embroideryRestoreNotice" role="alert">

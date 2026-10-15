@@ -1,11 +1,6 @@
 // Values are stored in orders and sent to the API; CSS aliases are local to
 // the constructor so supplied faces cannot replace the site's UI typography.
 export const CUSTOM_TEXT_FONT_OPTIONS = [
-  { value: "Arial", family: "Arial", fallback: "sans-serif" },
-  { value: "Courier New", family: "Courier New", fallback: "monospace" },
-  { value: "Georgia", family: "Georgia", fallback: "serif" },
-  { value: "Times New Roman", family: "Times New Roman", fallback: "serif" },
-  { value: "Comic Sans MS", family: "Comic Sans MS", fallback: "cursive" },
   { value: "Book Antiqua", family: "ITS Embroidery Book Antiqua", fallback: "serif" },
   { value: "Century Schoolbook Bold", label: "Century Schoolbook Bold", family: "ITS Embroidery Century", fallback: "serif", weight: 700 },
   { value: "Lumios Marker", family: "ITS Embroidery Lumios Marker", fallback: "cursive" },
@@ -17,10 +12,12 @@ export const CUSTOM_TEXT_FONT_OPTIONS = [
 ];
 
 export const CUSTOM_TEXT_FONTS = CUSTOM_TEXT_FONT_OPTIONS.map(({ value }) => value);
+export const DEFAULT_CUSTOM_TEXT_FONT = "Onest Bold";
 export const getCustomTextFont = (value) => CUSTOM_TEXT_FONT_OPTIONS.find(font => font.value === value);
+export const normalizeCustomTextFont = (value) => getCustomTextFont(value)?.value || DEFAULT_CUSTOM_TEXT_FONT;
 
 export const getCustomTextFontStyle = (value) => {
-  const font = getCustomTextFont(value) || CUSTOM_TEXT_FONT_OPTIONS[0];
+  const font = getCustomTextFont(normalizeCustomTextFont(value));
   return {
     fontFamily: `"${font.family}", ${font.fallback}`,
     fontWeight: font.weight || 400,

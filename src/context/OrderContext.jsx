@@ -9,6 +9,7 @@ import {
 import { getOrderAccessToken } from "../utils/orderAccess";
 import { restoreDeliveryMethod } from "../config/delivery";
 import { normalizeDeliveryCity } from "../features/order/recipient/deliveryCity";
+import { DEFAULT_CUSTOM_TEXT_FONT, normalizeCustomTextFont } from "../features/order/embroidery/customTextFonts";
 import { createCartItemKey } from "../features/cart/cartItem";
 import { getCartStorage, isCartId } from "../features/cart/cartStorage";
 import { CONSTRUCTOR_DRAFT_KEY, createConstructorDraftStore } from "../features/cart/constructorDraft";
@@ -115,7 +116,7 @@ const initialState = {
     type: "",
     typeSelectionExplicit: false,
     customText: "",
-    customTextFont: "Arial",
+    customTextFont: DEFAULT_CUSTOM_TEXT_FONT,
     comment: "",
     uploadedImage: [],
     patronusCount: 1,
@@ -219,6 +220,7 @@ const restoreOrderDraft = (persistentStore) => {
         embroidery: {
           ...initialState.embroidery,
           ...storedEmbroidery,
+          customTextFont: normalizeCustomTextFont(storedEmbroidery.customTextFont),
           type: hasSelectedType ? storedEmbroidery.type : "",
           typeSelectionExplicit: hasSelectedType,
           price: null,
@@ -329,6 +331,7 @@ export const OrderProvider = ({ children }) => {
       const next = {
         ...prev.embroidery,
         ...payload,
+        customTextFont: normalizeCustomTextFont(payload?.customTextFont ?? prev.embroidery.customTextFont),
         customOption: payload?.customOption
           ? { ...prev.embroidery.customOption, ...payload.customOption }
           : prev.embroidery.customOption,

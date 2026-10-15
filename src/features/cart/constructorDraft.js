@@ -1,4 +1,5 @@
 import { isCartId } from "./cartStorage";
+import { normalizeCustomTextFont } from "../order/embroidery/customTextFonts";
 
 export const CONSTRUCTOR_DRAFT_KEY = "its_constructor_draft_v1";
 export const CONSTRUCTOR_DRAFT_TTL = 30 * 24 * 60 * 60 * 1000;
@@ -21,7 +22,7 @@ export const constructorSnapshot = (order, missingFiles = []) => {
     cartItemKey: order.cartItemKey,
     clothing: selection,
     embroidery: { type, typeSelectionExplicit: Boolean(type), customText: text(embroidery.customText, 2500),
-      customTextFont: text(embroidery.customTextFont, 80) || "Arial", comment: text(embroidery.comment, 2500),
+      customTextFont: normalizeCustomTextFont(embroidery.customTextFont), comment: text(embroidery.comment, 2500),
       patronusCount: count(embroidery.patronusCount, 4), petFaceCount: count(embroidery.petFaceCount, 5),
       customOption: { image: embroidery.customOption?.image === true, text: embroidery.customOption?.text === true } },
     uploadFiles: (Array.isArray(files) ? files : []).slice(0, 10).map((file) => ({

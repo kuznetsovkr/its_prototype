@@ -4,7 +4,7 @@ import { IS_DEMO_MODE } from "../../../config/demoMode";
 import { useOrder } from "../../../context/OrderContext";
 import { getEmbroideryPrices } from "./embroideryApi";
 import { getEmbroideryCountError, getPatronusLimit } from "./embroideryLimits";
-import { getCustomTextFontError } from "./customTextFonts";
+import { DEFAULT_CUSTOM_TEXT_FONT, getCustomTextFontError, normalizeCustomTextFont } from "./customTextFonts";
 import {
   isSameFiles,
   isSameOptions,
@@ -37,7 +37,7 @@ export const useEmbroiderySelection = () => {
   );
   const [petFaceCount, setPetFaceCount] = useState(embroidery.petFaceCount || 1);
   const [customOption, setCustomOption] = useState(embroidery.customOption || emptyCustomOption());
-  const [customTextFont, setCustomTextFont] = useState(embroidery.customTextFont || "Arial");
+  const [customTextFont, setCustomTextFont] = useState(() => normalizeCustomTextFont(embroidery.customTextFont));
   const [serverPrices, setServerPrices] = useState(null);
   const [priceLoading, setPriceLoading] = useState(!IS_DEMO_MODE);
   const [priceError, setPriceError] = useState("");
@@ -175,7 +175,7 @@ export const useEmbroiderySelection = () => {
       (embroidery.type || "") === nextEmbroidery.type &&
       Boolean(embroidery.typeSelectionExplicit) === nextEmbroidery.typeSelectionExplicit &&
       (embroidery.customText || "") === nextEmbroidery.customText &&
-      (embroidery.customTextFont || "Arial") === nextEmbroidery.customTextFont &&
+      normalizeCustomTextFont(embroidery.customTextFont) === nextEmbroidery.customTextFont &&
       (embroidery.comment || "") === nextEmbroidery.comment &&
       (embroidery.patronusCount || 1) === nextEmbroidery.patronusCount &&
       (embroidery.petFaceCount || 1) === nextEmbroidery.petFaceCount &&
@@ -201,7 +201,7 @@ export const useEmbroiderySelection = () => {
       patronusCount: embroidery.patronusCount || 1,
       petFaceCount: embroidery.petFaceCount || 1,
       customOption: embroidery.customOption || emptyCustomOption(),
-      customTextFont: embroidery.customTextFont || "Arial",
+      customTextFont: normalizeCustomTextFont(embroidery.customTextFont),
     };
     const inSync = selectedType === next.type && customText === next.customText &&
       isSameFiles(uploadedImage, next.uploadedImage) && comment === next.comment &&
@@ -235,7 +235,7 @@ export const useEmbroiderySelection = () => {
       if (selectedType !== "custom") {
         setCustomOption(emptyCustomOption());
         setCustomText("");
-        setCustomTextFont("Arial");
+        setCustomTextFont(DEFAULT_CUSTOM_TEXT_FONT);
       }
     }
     previousTypeRef.current = selectedType;

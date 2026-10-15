@@ -11,8 +11,8 @@ const ConstructorDraftNotice = () => {
   const navigate = useNavigate();
   const hasDraft = !order.recipient.savedOrder && Boolean(constructorSnapshot(order));
   if (!hasDraft && !constructorDraftError) return null;
-  return <div className="orderCartShortcut orderDraftNotice" role={constructorDraftError ? "alert" : "status"}>
-    <span>{constructorDraftError || "Черновик сохраняется в этом браузере на 30 дней после последнего изменения. Фото нужно выбрать заново после закрытия страницы, пока изделие не добавлено в корзину."}</span>
+  return <div className="orderCartShortcut orderDraftNotice" role={constructorDraftError ? "alert" : undefined}>
+    {constructorDraftError && <span>{constructorDraftError}</span>}
     {hasDraft && <button type="button" onClick={() => {
       if (!confirmDiscardConstructor(order)) return;
       resetCurrentItem(); navigate("/order");

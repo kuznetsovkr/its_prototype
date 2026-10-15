@@ -10,6 +10,7 @@ import { GROUP_PAYMENT_NOTICE, UNFINISHED_CART_NOTICE } from "../../cart/cartPre
 import { buildCartBuyer, getCartCheckoutKey, cartWidgetPackages } from "../../cart/cartCheckout";
 import { buildDemoCdekNumber, buildDemoOrderId } from "../../../mocks/demoData";
 import { getEmbroideryCountError, getPatronusLimit } from "../embroidery/embroideryLimits";
+import { normalizeCustomTextFont } from "../embroidery/customTextFonts";
 import { getOrderAccessToken, storeOrderAccessToken } from "../../../utils/orderAccess";
 import {
   confirmOrder,
@@ -64,7 +65,7 @@ export const useRecipientDetails = () => {
   const selectedType = embroidery.type || locationState.selectedType;
   const isCustomType = selectedType === "custom";
   const customText = embroidery.customText || locationState.customText;
-  const customTextFont = embroidery.customTextFont || locationState.customTextFont || "Arial";
+  const customTextFont = normalizeCustomTextFont(embroidery.customTextFont || locationState.customTextFont);
   const customOption = embroidery.customOption || locationState.customOption || { image: false, text: false };
   const uploadedImage = embroidery.uploadedImage || locationState.uploadedImage || [];
   const comment = embroidery.comment || locationState.comment;

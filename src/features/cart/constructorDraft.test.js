@@ -8,6 +8,13 @@ const order = () => ({ cartItemKey: id, clothing: { type: "Худи", color: "Ч
   recipient: { email: "buyer@example.com", phone: "79999999999", certificateCode: "secret", privacyConsent: true } });
 const memory = () => { const map = new Map(); return { getItem: (key) => map.get(key) || null, setItem: (key, value) => map.set(key, value), removeItem: (key) => map.delete(key) }; };
 describe("unfinished constructor persistence", () => {
+  it("updates legacy font choices without losing the inscription text", () => {
+    const input = { ...order(), embroidery: { type: "custom", typeSelectionExplicit: true,
+      customOption: { text: true, image: false }, customText: "Моя надпись", customTextFont: "Arial" } };
+    const snapshot = constructorSnapshot(input);
+    expect(snapshot.embroidery.customTextFont).toBe("Onest Bold");
+    expect(snapshot.embroidery.customText).toBe("Моя надпись");
+  });
   it("restores the exact selected inscription font with its text after restarting the browser", () => {
     for (const customTextFont of CUSTOM_TEXT_FONTS) {
       const storage = memory();

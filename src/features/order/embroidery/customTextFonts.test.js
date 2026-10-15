@@ -1,10 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { CUSTOM_TEXT_FONTS, CUSTOM_TEXT_FONT_OPTIONS, getCustomTextFontError, getCustomTextFontStyle } from "./customTextFonts";
+import { CUSTOM_TEXT_FONTS, CUSTOM_TEXT_FONT_OPTIONS, DEFAULT_CUSTOM_TEXT_FONT, normalizeCustomTextFont, getCustomTextFontError, getCustomTextFontStyle } from "./customTextFonts";
 
 describe("шрифты надписи", () => {
-  test("adds the eight supplied faces and retains existing saved choices", () => {
+  test("offers only the eight supplied faces", () => {
     expect(CUSTOM_TEXT_FONTS).toEqual([
-      "Arial", "Courier New", "Georgia", "Times New Roman", "Comic Sans MS",
       "Book Antiqua", "Century Schoolbook Bold", "Lumios Marker", "Montserrat Bold",
       "Onest Bold", "Swanky and Moo Moo", "Unbounded", "Vasek Italic",
     ]);
@@ -22,7 +21,14 @@ describe("шрифты надписи", () => {
     expect(getCustomTextFontStyle("Onest Bold").fontWeight).toBe(700);
     expect(getCustomTextFontStyle("Vasek Italic").fontStyle).toBe("italic");
     expect(getCustomTextFontStyle("Book Antiqua").fontWeight).toBe(400);
-    expect(getCustomTextFontStyle("unknown-family").fontFamily).toBe('"Arial", sans-serif');
+    expect(getCustomTextFontStyle("unknown-family").fontFamily).toBe('"ITS Embroidery Onest", sans-serif');
+  });
+
+  test("replaces removed or missing draft choices with an available Cyrillic font", () => {
+    for (const old of [undefined, "", "Arial", "Courier New", "Georgia", "Times New Roman", "Comic Sans MS", "unknown"]) {
+      expect(normalizeCustomTextFont(old)).toBe(DEFAULT_CUSTOM_TEXT_FONT);
+    }
+    for (const font of CUSTOM_TEXT_FONTS) expect(normalizeCustomTextFont(font)).toBe(font);
   });
 
   test("reports Cyrillic in the Latin face without changing or transliterating the user's text", () => {
