@@ -87,14 +87,15 @@ test("сертификат применяется, удаляется и не п
   await expect(page.locator("#order-certificate-code")).toHaveValue("");
   await expect(page.locator(".recipientOrderSummary")).not.toContainText("Сертификат:");
 });
-test("кнопка корзины пока неактивна и не очищает заказ, возврат остаётся сверху", async ({ page }) => {
+test("незаполненное изделие не добавляется в корзину и не теряет данные сертификата", async ({ page }) => {
   const api = await prepare(page);
   await apply(page);
   await expect(page.locator(".recipientOrderSummary")).toContainText("К оплате: 390 ₽");
   const cart = page.getByRole("button", { name: "Добавить в корзину", exact: true });
   await expect(cart).toBeVisible();
   await expect(cart).toBeDisabled();
-  await expect(cart).toHaveAccessibleDescription("Корзина пока недоступна");
+  await expect(cart).toHaveAccessibleDescription("Нажмите, если хотите сделать ещё одно изделие");
+  await expect(cart).toHaveAttribute("title", /Загрузите.*фотографий/);
   await expect(page.getByRole("button", { name: "Вернуться назад", exact: true })).toBeEnabled();
   const draft = await page.evaluate(() => sessionStorage.getItem("its_order_draft_v1"));
   await cart.evaluate((button) => button.click());
