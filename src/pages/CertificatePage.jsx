@@ -18,6 +18,7 @@ const CertificatePage = () => {
           Сертификат
         </h1>
 
+        <div className="certificatePage__offerSurface" aria-hidden="true" />
         <div className="certificatePage__visualSurface" aria-hidden="true">
           <div className="certificatePage__glow">
             <ResponsiveAsset
@@ -27,6 +28,8 @@ const CertificatePage = () => {
               alt=""
               className="certificatePage__glowImage"
               loading="eager"
+              width={900}
+              height={900}
             />
           </div>
         </div>
