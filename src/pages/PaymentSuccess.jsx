@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import { useCart } from '../context/CartContext';
 import { getOrderAccessToken, orderAccessConfig } from '../utils/orderAccess';
 import s from './PaymentSuccess.module.scss';
 
@@ -63,6 +64,7 @@ const PaymentStatusMedia = ({ media }) => {
 };
 
 export default function PaymentSuccess() {
+  const { reloadCart } = useCart();
   const navigate = useNavigate();
   const [msg, setMsg] = useState('Оплата успешно завершена. Подтверждаем заказ…');
   const [status, setStatus] = useState('confirming');
@@ -94,6 +96,7 @@ export default function PaymentSuccess() {
         const { data } = await api.get(`/orders/${orderId}`, orderAccessConfig(orderId, orderToken));
         if (data.requiresReview || data.paymentStatus === 'review') {
           finalizedRef.current = true;
+          if (data.isCartOrder) await reloadCart().catch(() => undefined);
           setStatus('bankPending');
           setMsg('Оплата получена, но заказ требует проверки менеджером. Не оплачивайте его повторно. Свяжитесь с нами и сообщите номер заказа: ' + orderId);
           return;
@@ -113,6 +116,7 @@ export default function PaymentSuccess() {
           }
 
           finalizedRef.current = true;
+          if (data.isCartOrder) await reloadCart().catch(() => undefined);
           if (data.cdekNumber) {
             sessionStorage.setItem('pay_cdek_number', String(data.cdekNumber));
           } else {
@@ -148,7 +152,7 @@ export default function PaymentSuccess() {
       finalizedRef.current = true;
       clearInterval(timer);
     };
-  }, [navigate]);
+  }, [navigate, reloadCart]);
 
   const media = STATUS_MEDIA[status];
 

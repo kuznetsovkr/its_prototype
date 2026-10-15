@@ -25,12 +25,12 @@ const RecipientCartList = ({ cart, disabled = false }) => {
               {item.current ? <small>Текущее изделие — ещё не в корзине</small> : (
                 <div className="recipientCart__quantity" role="group" aria-label={`Количество: ${item.productType}, ${item.color}, ${item.size}`}>
                   <button type="button" aria-label={`Уменьшить количество: ${item.productType}`}
-                    disabled={disabled || cart.busy || item.quantity <= 1} onClick={() => cart.changeQuantity(item.id, item.quantity - 1)}>
+                    disabled={disabled || cart.busy || Boolean(cart.checkout) || item.quantity <= 1} onClick={() => cart.changeQuantity(item.id, item.quantity - 1)}>
                     <img src={quantityCircle} alt="" aria-hidden="true" /><span aria-hidden="true">−</span>
                   </button>
                   <span aria-live="polite">{item.quantity} шт</span>
                   <button type="button" aria-label={`Увеличить количество: ${item.productType}`}
-                    disabled={disabled || cart.busy || item.quantity >= 20} onClick={() => cart.changeQuantity(item.id, item.quantity + 1)}>
+                    disabled={disabled || cart.busy || Boolean(cart.checkout) || item.quantity >= 20} onClick={() => cart.changeQuantity(item.id, item.quantity + 1)}>
                     <img src={quantityCircle} alt="" aria-hidden="true" /><span aria-hidden="true">+</span>
                   </button>
                 </div>
@@ -39,7 +39,7 @@ const RecipientCartList = ({ cart, disabled = false }) => {
             </div>
             {!item.current && <button className="recipientCart__remove" type="button"
               aria-label={`Удалить изделие: ${item.productType}, ${item.color}, ${item.size}`}
-              disabled={disabled || cart.busy} onClick={() => cart.removeItem(item.id)}>
+              disabled={disabled || cart.busy || Boolean(cart.checkout)} onClick={() => cart.removeItem(item.id)}>
               <img src={removeIcon} alt="" aria-hidden="true" />
             </button>}
           </li>

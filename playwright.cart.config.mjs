@@ -10,7 +10,7 @@ export default defineConfig({
     // Fixtures are outside public/ and not included in production builds.
     command: "npm run dev -- --host 127.0.0.1 --port 4174 --strictPort",
     url: "http://127.0.0.1:4174", reuseExistingServer: false,
-    env: { ...process.env, VITE_API_URL: "/api", VITE_DEMO_MODE: "true", VITE_ALLOW_INDEXING: "false" },
+    env: { ...process.env, VITE_API_URL: "/api", VITE_DEMO_MODE: "true", VITE_TURNSTILE_E2E: "true", VITE_ALLOW_INDEXING: "false" },
   },
   projects: [
     { name: "desktop-chromium", use: { ...devices["Desktop Chrome"] } },

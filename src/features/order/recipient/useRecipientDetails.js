@@ -7,6 +7,7 @@ import { DELIVERY_METHODS, restoreDeliveryMethod } from "../../../config/deliver
 import { useOrder } from "../../../context/OrderContext";
 import { useRecipientCart } from "../../cart/useRecipientCart";
 import { GROUP_PAYMENT_NOTICE } from "../../cart/cartPresentation";
+import { buildCartBuyer, getCartCheckoutKey, cartWidgetPackages } from "../../cart/cartCheckout";
 import { buildDemoCdekNumber, buildDemoOrderId } from "../../../mocks/demoData";
 import { getEmbroideryCountError, getPatronusLimit } from "../embroidery/embroideryLimits";
 import { getOrderAccessToken, storeOrderAccessToken } from "../../../utils/orderAccess";
@@ -157,12 +158,49 @@ export const useRecipientDetails = () => {
     disabled: IS_DEMO_MODE && !IS_TURNSTILE_E2E,
   });
   const cart = useRecipientCart({ turnstile, privacyConsent, isCheckoutLocked: Boolean(draftOrder), isPaying });
+  const { quoteCart, revision: cartRevision } = cart;
+  const draftMatchesCheckout = !draftOrder || Boolean(draftOrder.isCartOrder) === cart.isGroup;
+  useEffect(() => {
+    if (!cart.initialized || !draftOrder || draftMatchesCheckout) return;
+    // A previous standalone invoice must never be used to pay a new basket (or
+    // vice versa). Its order/token remains valid independently; only detach it.
+    setDraftOrder(null); setOrderId(null); setRecipient({ savedOrder: null });
+  }, [cart.initialized, draftOrder, draftMatchesCheckout, setRecipient]);
+  const shippingPackages = useMemo(() => cart.isGroup ? cartWidgetPackages(cart.items) : null, [cart.isGroup, cart.items]);
+  const activeCartOrderId = cart.activeCheckout?.orderId;
+  useEffect(() => {
+    if (!cart.isGroup || !cart.initialized || cart.pending) return;
+    if (cart.activeCheckout) {
+      const saved = cart.activeCheckout;
+      storeOrderAccessToken(saved.orderId, saved.orderToken);
+      setDraftOrder(saved); setOrderId(saved.orderId);
+      setRecipient({ savedOrder: saved });
+      const buyer = saved.buyer;
+      if (buyer) {
+        const nextUser = { firstName: buyer.firstName, lastName: buyer.lastName, middleName: buyer.middleName || "", phone: formatPhoneNumber(buyer.phone) };
+        setUserData(nextUser); setFullNameInput(joinFullName(nextUser)); setHasNoMiddleName(!nextUser.middleName);
+        setEmail(buyer.email || ""); setPreferredContact(buyer.preferredContact || ""); setOrderComment(buyer.comment || "");
+        const sameRecipient = buyer.recipientFullName === joinFullName(nextUser) && buyer.recipientPhone === buyer.phone;
+        setDeliveryRecipient(sameRecipient ? "" : buyer.recipientFullName || "");
+        setRecipientPhone(sameRecipient ? "" : formatPhoneNumber(buyer.recipientPhone));
+        setDeliveryComment(buyer.deliveryComment || ""); setPrivacyConsent(true);
+      }
+      setPickupPoint(saved.deliveryAddress || "");
+      setCdekData({ mode: "office", address: { code: saved.officeCode }, addressLabel: saved.deliveryAddress });
+      setDeliveryMethod("cdek");
+    } else if (draftOrder?.isCartOrder) {
+      setDraftOrder(null); setOrderId(null); setRecipient({ savedOrder: null });
+    }
+  }, [activeCartOrderId, cart.activeCheckout, cart.isGroup, cart.initialized, cart.pending, draftOrder?.isCartOrder, setRecipient]);
 
   // Dadata
   const [deliveryMethod, setDeliveryMethod] = useState(() => restoreDeliveryMethod(recipientState));
   const [postalPoint, setPostalPoint] = useState(recipientState.postalPoint || "");
   const isNoCdek = deliveryMethod !== "cdek";
   const dadataToken = APP_ENV.dadataToken;
+  useEffect(() => {
+    if (cart.isGroup && deliveryMethod !== "cdek") setDeliveryMethod("cdek");
+  }, [cart.isGroup, deliveryMethod]);
 
   const isManualAddressFull = useMemo(() => {
     return hasFullManualAddress(manualAddress);
@@ -364,7 +402,7 @@ export const useRecipientDetails = () => {
   };
 
   const handleDeliveryMethodChange = (method) => {
-    if (draftOrder || isPaying || !DELIVERY_METHODS.includes(method)) return;
+    if (draftOrder || isPaying || !DELIVERY_METHODS.includes(method) || (cart.isGroup && method !== "cdek")) return;
     setDeliveryMethod(method);
     setError("");
     setIsCdekPickerOpen(false);
@@ -414,16 +452,16 @@ export const useRecipientDetails = () => {
   const isCdekPickupSelected = Boolean(
     String(pickupPoint || "").trim() && cdekData?.mode === "office" && cdekOfficeCode
   );
-  const isManualCheckout = isCustomType || isNoCdek;
+  const isManualCheckout = !cart.isGroup && (isCustomType || isNoCdek);
 
   useEffect(() => {
-    if (draftOrder) {
+    if (draftOrder && draftMatchesCheckout) {
       setCheckoutQuote(draftOrder);
       setCheckoutQuoteLoading(false);
       setCheckoutQuoteError("");
       return undefined;
     }
-    if (cart.paymentBlocked) {
+    if (cart.paymentBlocked || cart.requiresCurrentSave) {
       setCheckoutQuote(null);
       setCheckoutQuoteLoading(false);
       setCheckoutQuoteError("");
@@ -435,11 +473,23 @@ export const useRecipientDetails = () => {
       setCheckoutQuoteError("");
       return undefined;
     }
-    if (!productType || !color || !size || !selectedType || !isCdekPickupSelected) {
+    if ((!cart.isGroup && (!productType || !color || !size || !selectedType)) || !isCdekPickupSelected) {
       setCheckoutQuote(null);
       setCheckoutQuoteLoading(false);
       setCheckoutQuoteError("");
       return undefined;
+    }
+
+    if (cart.isGroup) {
+      let cancelled = false;
+      setCheckoutQuote(null); setCheckoutQuoteLoading(true); setCheckoutQuoteError("");
+      const timer = setTimeout(() => {
+        quoteCart({ revision: cartRevision, officeCode: cdekOfficeCode, certificateCode: certificate.appliedCode || "" })
+          .then((quote) => { if (!cancelled) setCheckoutQuote(quote); })
+          .catch((quoteError) => { if (!cancelled) setCheckoutQuoteError(quoteError.message || "Не удалось рассчитать стоимость корзины"); })
+          .finally(() => { if (!cancelled) setCheckoutQuoteLoading(false); });
+      }, 300);
+      return () => { cancelled = true; clearTimeout(timer); };
     }
 
     if (IS_DEMO_MODE && (!IS_TURNSTILE_E2E || !certificate.appliedCode)) {
@@ -497,7 +547,12 @@ export const useRecipientDetails = () => {
     embroidery.price,
     certificate.appliedCode,
     draftOrder,
+    draftMatchesCheckout,
     cart.paymentBlocked,
+    cart.requiresCurrentSave,
+    cart.isGroup,
+    cartRevision,
+    quoteCart,
   ]);
 
   const recipientValidation = validateRecipient({
@@ -521,16 +576,20 @@ export const useRecipientDetails = () => {
   const isFormValid = recipientValidation.isValid;
   const getMissingFieldsMessage = () => recipientValidation.message;
   const hasCheckoutTotal = checkoutQuote?.totalPrice != null && Number.isFinite(Number(checkoutQuote.totalPrice));
-  const canSubmit = !cart.paymentBlocked && isFormValid && Boolean(selectedType) && !embroideryCountError &&
+  const canSubmit = cart.isGroup && draftOrder?.isCartOrder
+    ? draftOrder.paymentStatus === "pending" && !cart.busy
+    : draftMatchesCheckout && !cart.paymentBlocked && !cart.requiresCurrentSave && isFormValid && (cart.isGroup || Boolean(selectedType)) && !embroideryCountError &&
     !certificate.hasUnappliedCode && !certificate.error && !(isManualCheckout && certificate.appliedCode) &&
     (isManualCheckout || (!checkoutQuoteLoading && !checkoutQuoteError && hasCheckoutTotal)) &&
     (Boolean(draftOrder) || turnstile.isSatisfied);
   const getSubmitDisabledMessage = () => {
+    if (cart.activeCheckout?.paymentStatus === "review") return "Оплата получена. Заказ требует проверки менеджером; повторно платить не нужно";
+    if (cart.requiresCurrentSave) return GROUP_PAYMENT_NOTICE;
     if (cart.paymentBlocked) return cart.error || (!cart.initialized || cart.busy ? "Дождитесь загрузки корзины" : GROUP_PAYMENT_NOTICE);
     if (certificate.error) return certificate.error;
     if (certificate.hasUnappliedCode) return "Примените или удалите код сертификата";
     if (isManualCheckout && certificate.appliedCode) return "Сертификат можно применить после расчёта стоимости менеджером. Удалите код, чтобы отправить заявку";
-    if (!selectedType) return "Выберите тип вышивки";
+    if (!selectedType && !cart.isGroup) return "Выберите тип вышивки";
     if (!isFormValid) return getMissingFieldsMessage();
     if (embroideryCountError) return embroideryCountError;
     if (checkoutQuoteLoading) return "Дождитесь итогового расчёта стоимости";
@@ -586,9 +645,14 @@ export const useRecipientDetails = () => {
   };
 
   async function createDraftOrder() {
-    if (draftOrder?.orderId && draftOrder?.orderToken) return draftOrder;
+    if (draftMatchesCheckout && draftOrder?.orderId && draftOrder?.orderToken) return draftOrder;
     try {
-      const data = await createOrder(buildOrderFormData({
+      const cartPayload = cart.isGroup ? { revision: cart.revision, officeCode: cdekOfficeCode, certificateCode: certificate.appliedCode || "",
+        quoteHash: checkoutQuote?.quoteHash, turnstileToken: turnstile.token,
+        buyer: buildCartBuyer({ userData, deliveryRecipient, recipientPhone, email, preferredContact, orderComment, deliveryComment, privacyConsent }) } : null;
+      const data = cart.isGroup
+        ? await cart.checkoutCart(cartPayload, await getCartCheckoutKey(cart.id, cartPayload))
+        : await createOrder(buildOrderFormData({
         userData, deliveryRecipient: deliveryMethod === "pickup" ? "" : deliveryRecipient,
         recipientPhone: deliveryMethod === "pickup" ? "" : recipientPhone,
         orderComment, embroideryComment: comment,
@@ -624,7 +688,7 @@ export const useRecipientDetails = () => {
     setError('');
     setIsPaying(true);
 
-    if (IS_DEMO_MODE && (!IS_TURNSTILE_E2E || (!certificate.appliedCode && !draftOrder))) {
+    if (!cart.isGroup && IS_DEMO_MODE && (!IS_TURNSTILE_E2E || (!certificate.appliedCode && !draftOrder))) {
       const now = new Date();
       const demoOrderId = buildDemoOrderId(now);
       const demoCdekNumber = isNoCdek || isCustomType ? null : buildDemoCdekNumber(now);
@@ -664,6 +728,11 @@ export const useRecipientDetails = () => {
         certificateDiscount, amountDue, requiresBankPayment,
       } = activeDraft;
       setOrderId(oid);
+      if (activeDraft.paymentStatus === "paid") {
+        await cart.reloadCart(); setIsPaying(false);
+        navigate("/thank-you", { state: { orderNumber: oid, cdekNumber: cdekNum || null } });
+        return;
+      }
 
       if (totalPrice != null && Number.isFinite(Number(totalPrice))) {
         setCheckoutQuote({
@@ -686,6 +755,7 @@ export const useRecipientDetails = () => {
 
       if (requiresBankPayment === false && amountDue === 0) {
         await completeCertificateOrder(oid, orderToken);
+        if (cart.isGroup) await cart.reloadCart();
         setIsPaying(false);
         navigate("/thank-you", { state: { orderNumber: oid, cdekNumber: cdekNum || null } });
         return;
@@ -758,6 +828,7 @@ export const useRecipientDetails = () => {
 
   return {
     cart,
+    shippingPackages,
     navigate, productType, clothingProfile: clothing.profile, isCustomType,
     clothingPreviewSrc: clothing.previewSrc || "",
     clothingPreviewAlt: clothing.previewAlt || clothing.type || "Одежда",

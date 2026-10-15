@@ -14,7 +14,7 @@ const RecipientDeliveryFields = ({
   deliveryMethod, onMethodChange, disabled, pickupPoint, isCdekPickupSelected, onOpenCdek,
   postalPoint, onPostalPointChange, manualAddress,
   deliveryRecipient, onRecipientChange, recipientPhone, onRecipientPhoneChange,
-  deliveryComment, onCommentChange,
+  deliveryComment, onCommentChange, cdekOnly = false,
 }) => {
   const recipientPhoneInvalid = Boolean(deliveryRecipient.trim()) && !/^7\d{10}$/.test(normalizePhoneDigits(recipientPhone));
   const isManual = deliveryMethod === "manual";
@@ -25,7 +25,7 @@ const RecipientDeliveryFields = ({
         {options.map(({ value, label, description, detail }) => (
           <label className="recipientOrderForm__deliveryMethod" key={value}>
             <input className="recipientDeliveryMethods__input" type="radio" name="deliveryMethod" value={value}
-              aria-label={label} checked={deliveryMethod === value} onChange={() => onMethodChange(value)} />
+              aria-label={label} disabled={cdekOnly && value !== "cdek"} checked={deliveryMethod === value} onChange={() => onMethodChange(value)} />
             <span className="recipientDeliveryMethods__radio" aria-hidden="true">
               <img className="recipientDeliveryMethods__outer" src={radioOuter} alt="" />
               <img className="recipientDeliveryMethods__dot" src={deliveryMethod === value ? radioActive : radioInactive} alt="" />
@@ -37,6 +37,7 @@ const RecipientDeliveryFields = ({
           </label>
         ))}
       </fieldset>
+      {cdekOnly && <p className="recipientDeliveryDetails__hint">Для онлайн-оплаты корзины сейчас доступен СДЭК. Каждое изделие рассчитывается как отдельное место.</p>}
 
       <div className="recipientDeliveryDetails">
         {deliveryMethod === "pickup" ? (

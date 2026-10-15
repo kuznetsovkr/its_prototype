@@ -1,4 +1,4 @@
-export const GROUP_PAYMENT_NOTICE = "Оплата корзины будет подключена на следующем этапе. Сейчас можно сохранить изделия, изменить количество или удалить позиции.";
+export const GROUP_PAYMENT_NOTICE = "Добавьте текущее изделие в корзину, чтобы подтвердить общий состав и рассчитать доставку перед оплатой.";
 
 export const currentCartItem = (order) => {
   const { clothing, embroidery } = order;
@@ -14,5 +14,5 @@ export const cartEmbroideryLabel = (item) => {
   return `${names[item.embroideryType] || item.embroideryTypeRu || item.embroideryType}${count > 1 ? ` × ${count}` : ""}`;
 };
 
-export const cartPaymentBlocked = (cart, { cartOnly = false, isCustom = false } = {}) =>
-  !cart.initialized || cart.pending || Boolean(cart.error) || cartOnly || (!isCustom && cart.items.length > 0);
+export const cartPaymentBlocked = (cart, { cartOnly = false } = {}) =>
+  !cart.initialized || cart.pending || (Boolean(cart.error) && !cart.checkout) || (cartOnly && !cart.items.length && !cart.checkout);

@@ -25,6 +25,11 @@ export const cartApi = {
   setQuantity: async (access, itemId, quantity) => (await client.patch(`${path(access)}/items/${idPath(itemId)}`, { quantity }, config(access))).data,
   remove: async (access, itemId) => (await client.delete(`${path(access)}/items/${idPath(itemId)}`, config(access))).data,
   clear: async (access) => (await client.delete(path(access), config(access))).data,
+  quote: async (access, input) => (await client.post(`${path(access)}/quote`, input, config(access))).data,
+  checkout: async (access, input, requestKey) => (await client.post(`${path(access)}/checkout`, input, {
+    headers: { ...config(access).headers, "Idempotency-Key": requestKey },
+  })).data,
+  cancelCheckout: async (access) => (await client.post(`${path(access)}/checkout/cancel`, {}, config(access))).data,
   readAttachment: async (access, itemId, attachmentId) => (await client.get(
     `${path(access)}/items/${idPath(itemId)}/attachments/${idPath(attachmentId)}`, { ...config(access), responseType: "blob" },
   )).data,

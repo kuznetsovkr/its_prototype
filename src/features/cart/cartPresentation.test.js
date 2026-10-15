@@ -10,13 +10,14 @@ vi.mock("../../utils/url", () => ({ buildImgSrc: (value) => value }));
 const item = { id: "saved", productType: "Худи", color: "Чёрный", size: "M", embroideryType: "Patronus", patronusCount: 4, quantity: 1, linePrice: 9000 };
 const ready = { initialized: true, pending: false, items: [], error: null };
 describe("cart presentation and staged checkout safety", () => {
-  it("blocks single-item payment while restoring, after an error or with saved payable items", () => {
+  it("blocks checkout while restoring, after an error or with an empty cart; saved items can now be paid together", () => {
     expect(cartPaymentBlocked(ready)).toBe(false);
-    for (const changes of [{ initialized: false }, { pending: true }, { error: "Сеть недоступна" }, { items: [item] }]) {
+    for (const changes of [{ initialized: false }, { pending: true }, { error: "Сеть недоступна" }]) {
       expect(cartPaymentBlocked({ ...ready, ...changes })).toBe(true);
     }
     expect(cartPaymentBlocked(ready, { cartOnly: true })).toBe(true);
-    expect(cartPaymentBlocked({ ...ready, items: [item] }, { isCustom: true })).toBe(false);
+    expect(cartPaymentBlocked({ ...ready, items: [item] }, { cartOnly: true })).toBe(false);
+    expect(cartPaymentBlocked({ ...ready, error: "Ответ потерян", checkout: { orderId: 1 } }, { cartOnly: true })).toBe(false);
   });
   it("uses actual garment/embroidery data, not mock t-shirt names or default prices", () => {
     const current = currentCartItem({ clothing: { type: "hoodie", profile: { name: "Худи" }, color: "Зелёный", size: "XL", previewSrc: "/actual.webp" },

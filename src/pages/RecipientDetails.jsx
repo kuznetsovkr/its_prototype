@@ -21,6 +21,7 @@ const priceFormatter = new Intl.NumberFormat("ru-RU");
 const RecipientDetails = () => {
   const {
     cart,
+    shippingPackages,
     navigate, clothingProfile, clothingPreviewSrc, clothingPreviewAlt, isCustomType,
     fullNameInput, handleFullNameChange, isPaying,
     hasNoMiddleName, handleNoMiddleNameToggle,
@@ -122,7 +123,8 @@ const RecipientDetails = () => {
                 />
 
                 <RecipientDeliveryFields
-                  deliveryMethod={deliveryMethod} onMethodChange={handleDeliveryMethodChange} disabled={formDisabled || cart.cartOnly}
+                  deliveryMethod={deliveryMethod} onMethodChange={handleDeliveryMethodChange}
+                  disabled={formDisabled || (cart.isGroup && !cart.items.length)} cdekOnly={cart.isGroup}
                   pickupPoint={pickupPoint} isCdekPickupSelected={isCdekPickupSelected} onOpenCdek={() => setIsCdekPickerOpen(true)}
                   postalPoint={postalPoint} onPostalPointChange={setPostalPoint} manualAddress={manualAddress}
                   deliveryRecipient={deliveryRecipient} onRecipientChange={setDeliveryRecipient}
@@ -133,7 +135,7 @@ const RecipientDetails = () => {
                 <div className="recipientOrderForm__checkoutTail">
                 <OrderCertificateField certificate={certificate} disabled={formDisabled || cart.paymentBlocked} manual={isManualCheckout} demo={!isCertificateAvailable} quoteError={checkoutQuoteError} />
                 <div className="recipientOrderSummary" aria-live="polite">
-                  {cart.paymentBlocked ? (
+                  {cart.paymentBlocked || cart.requiresCurrentSave ? (
                     <span>{GROUP_PAYMENT_NOTICE}</span>
                   ) : isManualCheckout ? (
                     <>
@@ -146,7 +148,7 @@ const RecipientDetails = () => {
                     <span className="recipientOrderSummary__error" id="order-quote-error">{checkoutQuoteError}</span>
                   ) : checkoutQuote ? (
                     <>
-                      <span>Изделие и вышивка: {formatPrice(checkoutQuote.merchandisePrice)}</span>
+                      <span>{cart.isGroup ? "Все изделия и вышивка" : "Изделие и вышивка"}: {formatPrice(checkoutQuote.merchandisePrice)}</span>
                       <span>Доставка: {formatPrice(checkoutQuote.deliveryPrice)}</span>
                       {checkoutQuote.certificateDiscount > 0 && <span>Сертификат: −{formatPrice(checkoutQuote.certificateDiscount)}</span>}
                       {checkoutQuote.certificate && <span>Останется на сертификате: {formatPrice(checkoutQuote.certificate.remaining)}</span>}
@@ -179,11 +181,19 @@ const RecipientDetails = () => {
                   </span>
                 </label>
 
-                {!cart.cartOnly && <TurnstilePanel challenge={turnstile} disabled={formDisabled} />}
+                {(!cart.cartOnly || (cart.items.length > 0 && !cart.activeCheckout)) && <TurnstilePanel challenge={turnstile} disabled={formDisabled} />}
                 </div>
               </div>
 
-              {error && <p className="recipientOrderCard__error" role="alert">{error}</p>}
+              {error && <p className={cart.isGroup ? "recipientCartActionError" : "recipientOrderCard__error"} role="alert">{error}</p>}
+              {cart.activeCheckout && <div className="recipientCartCheckout" aria-live="polite">
+                <p>{cart.activeCheckout.paymentStatus === "review"
+                  ? "Оплата получена. Заказ требует проверки менеджером — повторно платить не нужно."
+                  : `Заказ №${cart.activeCheckout.orderId} создан. Состав и сумма зафиксированы на время резерва.`}</p>
+                {cart.activeCheckout.paymentStatus === "pending" && <button type="button" className="recipientCart__retry"
+                  disabled={cart.busy || isPaying} onClick={cart.cancelCheckout}>Отменить оформление и изменить корзину</button>}
+                {cart.activeCheckout.paymentStatus === "pending" && <p>После отмены не оплачивайте прежнюю ссылку.</p>}
+              </div>}
               {!showCart && cart.uiError && <div className="recipientCartActionError">
                 <p role="alert">{cart.uiError}</p>
                 {cart.error && <button type="button" className="recipientCart__retry" disabled={cart.busy}
@@ -208,11 +218,11 @@ const RecipientDetails = () => {
                 <button
                   type="button"
                   className="recipientOrderNavigation__submit"
-                  onClick={handlePayment}
-                  disabled={!canSubmit || isPaying}
-                  title={!canSubmit ? getSubmitDisabledMessage() : undefined}
+                  onClick={cart.requiresCurrentSave ? cart.confirmCurrentItem : handlePayment}
+                  disabled={isPaying || (cart.requiresCurrentSave ? !cart.canAdd : !canSubmit)}
+                  title={cart.requiresCurrentSave ? cart.addError || GROUP_PAYMENT_NOTICE : !canSubmit ? getSubmitDisabledMessage() : undefined}
                 >
-                  {isPaying ? "Обрабатываем..." : isManualCheckout ? "отправить заявку" : checkoutQuote?.requiresBankPayment === false ? "оформить заказ" : checkoutQuote?.paymentTestMode
+                  {isPaying ? "Обрабатываем..." : cart.requiresCurrentSave ? "подтвердить состав" : isManualCheckout ? "отправить заявку" : checkoutQuote?.requiresBankPayment === false ? "оформить заказ" : checkoutQuote?.paymentTestMode
                     ? `к оплате ${formatPrice(checkoutQuote.paymentAmount)}`
                     : "к оплате"}
                 </button>
@@ -261,7 +271,8 @@ const RecipientDetails = () => {
             {!IS_DEMO_MODE && isCdekPickerOpen && !isNoCdek && (
               <Suspense fallback={<p className="cdek-map__loading">Загружаем карту…</p>}>
                 <MyCdekWidget
-                    clothingProfile={clothingProfile}
+                  clothingProfile={clothingProfile}
+                  shippingPackages={shippingPackages}
                   onAddressSelect={setPickupPoint}
                   onRateSelect={setDeliveryPrice}
                   onCdekSelect={handleCdekSelect}
@@ -273,10 +284,10 @@ const RecipientDetails = () => {
                 Select demo pickup point
               </button>
             )}
-            <label className={`recipientCdekDialog__manualToggle${isNoCdek ? " is-active" : ""}`}>
+            {!cart.isGroup && <label className={`recipientCdekDialog__manualToggle${isNoCdek ? " is-active" : ""}`}>
               <input type="checkbox" checked={isNoCdek} onChange={handleNoCdekToggle} />
               <span>В моём городе нет СДЭКа</span>
-            </label>
+            </label>}
             {isNoCdek && (
               <div className="manualAddress">
                 <div className="manualAddress__intro">

@@ -22,5 +22,6 @@ export const useCart = () => {
   if (!repository) throw new Error("useCart должен использоваться внутри CartProvider");
   const cart = useSyncExternalStore(repository.subscribe, repository.getSnapshot, repository.getSnapshot);
   return { ...cart, addItem: repository.addItem, setQuantity: repository.setQuantity,
-    removeItem: repository.removeItem, clearCart: repository.clear, reloadCart: repository.load, restoreItem: repository.restoreItem };
+    removeItem: repository.removeItem, clearCart: repository.clear, reloadCart: repository.load, restoreItem: repository.restoreItem,
+    quoteCart: repository.quote, checkoutCart: repository.checkout, cancelCartCheckout: repository.cancelCheckout };
 };

@@ -5,10 +5,13 @@ import { CartProvider } from "../../src/context/CartContext";
 import { OrderProvider, useOrder } from "../../src/context/OrderContext";
 import RecipientDetails from "../../src/pages/RecipientDetails";
 import OrderPage from "../../src/pages/OrderPage";
+import PaymentSuccess from "../../src/pages/PaymentSuccess";
+import ThankYouPage from "../../src/pages/ThankYouPage";
+import { storeOrderAccessToken } from "../../src/utils/orderAccess";
 import "../../src/assets/styles/main.scss";
 
 const Harness = () => {
-  const { order, setClothing, setEmbroidery } = useOrder();
+  const { order, setClothing, setEmbroidery, setRecipient } = useOrder();
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,12 +26,20 @@ const Harness = () => {
       <input aria-label="Фото для теста" type="file" onChange={(event) => setFile(event.target.files[0])} />
       <button disabled={!file} onClick={seed}>Подготовить худи</button>
       <button onClick={() => navigate("/recipient?cart=1")}>Открыть сохранённую корзину</button>
+      <button onClick={() => navigate("/payment-success")}>Вернуться с оплаты</button>
+      <button onClick={() => {
+        storeOrderAccessToken(99, "old-standalone-order");
+        setRecipient({ savedOrder: { orderId: 99, orderToken: "old-standalone-order", isCartOrder: false } });
+        navigate("/order");
+      }}>Подставить прежний одиночный заказ</button>
     </div>
     <output hidden data-testid="draft-state">{JSON.stringify({ path: location.pathname, cartItemKey: order.cartItemKey,
       clothing: order.clothing, embroideryType: order.embroidery.type, files: order.embroidery.uploadedImage.map((entry) => entry.name), recipient: order.recipient })}</output>
     <Routes>
       <Route path="/recipient" element={<RecipientDetails />} />
       <Route path="/order" element={<OrderPage />} />
+      <Route path="/payment-success" element={<PaymentSuccess />} />
+      <Route path="/thank-you" element={<ThankYouPage />} />
       <Route path="/embroidery" element={<p>Нужно повторно загрузить фото</p>} />
     </Routes>
   </>;

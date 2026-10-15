@@ -2,7 +2,7 @@ import { buildCartItemFormData } from "./cartItem";
 import { CART_REVISION_KEY, CART_STORAGE_KEY, readCartAccess, writeCartAccess } from "./cartStorage";
 
 export const createCartRepository = ({ client, storage, lock = (callback) => callback() }) => {
-  let state = { id: null, items: [], merchandisePrice: null, expiresAt: null, pending: false, initialized: false, error: null };
+  let state = { id: null, items: [], revision: 0, checkout: null, merchandisePrice: null, expiresAt: null, pending: false, initialized: false, error: null };
   let queue = Promise.resolve();
   const listeners = new Set();
   const publish = (next) => {
@@ -22,7 +22,8 @@ export const createCartRepository = ({ client, storage, lock = (callback) => cal
     // A quota failure updating the expiry must not hide a successfully saved
     // item. The original access token was saved before uploading any files.
     try { writeCartAccess(storage, { ...access, expiresAt: cart.expiresAt }); } catch { /* Keep the existing access. */ }
-    publish({ id: cart.id, items: cart.items, merchandisePrice: cart.merchandisePrice ?? null, expiresAt: cart.expiresAt, error: null });
+    publish({ id: cart.id, items: cart.items, revision: cart.revision ?? 0, checkout: cart.checkout || null,
+      merchandisePrice: cart.merchandisePrice ?? null, expiresAt: cart.expiresAt, error: null });
   };
   const run = (operation) => {
     const task = queue.then(() => lock(async () => {
@@ -32,7 +33,7 @@ export const createCartRepository = ({ client, storage, lock = (callback) => cal
         if (["cart_expired", "cart_not_found", "cart_access_required"].includes(error.code)) {
           // Only the server, not the browser clock, decides whether a cart expired.
           forget(state.id || readCartAccess(storage)?.id);
-          publish({ id: null, items: [], merchandisePrice: null, expiresAt: null });
+          publish({ id: null, items: [], revision: 0, checkout: null, merchandisePrice: null, expiresAt: null });
         }
         publish({ error: error.message || "Не удалось обработать корзину" });
         throw error;
@@ -52,7 +53,7 @@ export const createCartRepository = ({ client, storage, lock = (callback) => cal
     subscribe: (listener) => { listeners.add(listener); return () => listeners.delete(listener); },
     load: () => run(async () => {
       const access = readCartAccess(storage);
-      if (!access) { publish({ id: null, items: [], merchandisePrice: null, expiresAt: null }); return; }
+      if (!access) { publish({ id: null, items: [], revision: 0, checkout: null, merchandisePrice: null, expiresAt: null }); return; }
       accept(await client.load(access), access);
     }).finally(() => publish({ initialized: true })),
     addItem: (draft, options) => {
@@ -86,11 +87,32 @@ export const createCartRepository = ({ client, storage, lock = (callback) => cal
       accept(await client.remove(access, itemId), access);
       revision();
     }),
+    quote: (input) => client.quote(requireAccess(), input),
+    checkout: (input, requestKey) => run(async () => {
+      const access = requireAccess();
+      try {
+        const order = await client.checkout(access, input, requestKey);
+        // Preserve the confirmed order even if a subsequent cart refresh fails.
+        publish({ checkout: order, error: null });
+        revision();
+        return order;
+      } catch (error) {
+        // The POST may have committed before its response was lost. Restore
+        // its order token instead of starting another checkout or forgetting it.
+        try { accept(await client.load(access), access); } catch { /* Keep access and the original failure. */ }
+        throw error;
+      }
+    }),
+    cancelCheckout: () => run(async () => {
+      const access = requireAccess();
+      accept(await client.cancelCheckout(access), access);
+      revision();
+    }),
     clear: () => run(async () => {
       const access = readCartAccess(storage);
       if (access) await client.clear(access);
       forget(access?.id);
-      publish({ id: null, items: [], merchandisePrice: null, expiresAt: null });
+      publish({ id: null, items: [], revision: 0, checkout: null, merchandisePrice: null, expiresAt: null });
       revision();
     }),
     restoreItem: (itemId) => run(async () => {

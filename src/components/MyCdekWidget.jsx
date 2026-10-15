@@ -144,7 +144,7 @@ const closeInfoPopup = (widgetInstance) => {
   }
 };
 
-const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingProfile }) => {
+const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingProfile, shippingPackages }) => {
   const servicePath = resolveServicePath();
   const ymapsKey = String(APP_ENV.ymapsKey)
     .trim()
@@ -211,29 +211,22 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingPro
       const from = cdekConfig?.from;
       const packageProfile = clothingProfile?.package;
       const packageWeight = Number(packageProfile?.weight);
+      const goods = shippingPackages || [{ width: Number(packageProfile?.width), height: Number(packageProfile?.height),
+        length: Number(packageProfile?.length), weight: packageWeight / 1000 }];
       if (
         !Number.isInteger(tariffCode) || tariffCode <= 0 ||
         !Array.isArray(defaultLocation) || defaultLocation.length !== 2 ||
         defaultLocation.some((value) => !Number.isFinite(Number(value))) ||
         !Number.isFinite(defaultZoom) || !from?.code ||
-        [packageProfile?.width, packageProfile?.height, packageProfile?.length, packageWeight]
-          .some((value) => !Number.isFinite(Number(value)) || Number(value) <= 0)
+        !goods.length || goods.length > 50 || goods.some((item) => [item.width, item.height, item.length, item.weight]
+          .some((value) => !Number.isFinite(Number(value)) || Number(value) <= 0))
       ) {
         reportMapError(new Error("Incomplete CDEK or clothing profile configuration"));
         return;
       }
 
       clearMapErrorMessage();
-      const goods = {
-        width: Number(packageProfile.width),
-        height: Number(packageProfile.height),
-        length: Number(packageProfile.length),
-        weight: packageWeight / 1000,
-      };
-      const goodsForApi = {
-        ...goods,
-        weight_grams: packageWeight,
-      };
+      const goodsForApi = goods.map((item) => ({ ...item, weight_grams: Math.round(item.weight * 1000) }));
       autoTariffRef.current = normalizeTariff(null, tariffCode);
 
       try {
@@ -246,7 +239,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingPro
           hideFilters: { have_cashless: false, have_cash: false, is_dressing_room: false, type: false },
           hideDeliveryOptions: { office: false, door: true },
           debug: false,
-          goods: [goods],
+          goods,
           defaultLocation: defaultLocation.map(Number),
           fixBounds: null,
           lang: "rus",
@@ -268,7 +261,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingPro
               tariff: normalizedTariff,
               address,
               addressLabel,
-              goods: [goodsForApi],
+              goods: goodsForApi,
               from,
             });
 
@@ -328,7 +321,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingPro
       });
       try { instance?.destroy?.(); } catch {}
     };
-  }, [servicePath, ymapsKey, clothingProfile, cdekConfig]);
+  }, [servicePath, ymapsKey, clothingProfile, shippingPackages, cdekConfig]);
 
   return null;
 };
