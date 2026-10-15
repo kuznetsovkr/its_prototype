@@ -127,9 +127,8 @@ test("compact text fields scale above the 16px minimum and preserve their values
   for (const width of [320, 390, 639, 640, 1024, 1199]) {
     await page.setViewportSize({ width, height: 900 });
     const base = width < 640 ? 320 : 640;
-    const designFont = width < 640 ? 9 : 8;
     await expect.poll(() => inscription.evaluate((element) => parseFloat(getComputedStyle(element).fontSize)))
-      .toBeCloseTo(Math.max(16, designFont * width / base), 2);
+      .toBeCloseTo(Math.max(18, 16 * width / base), 2);
     await expect(inscription).toHaveValue("Надпись для проверки масштаба");
   }
   await page.locator(".embroiderySelectorDesktop__navigation .is-next").click();
