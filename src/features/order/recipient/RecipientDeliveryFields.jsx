@@ -1,5 +1,6 @@
 import { POSTAL_POINT_MAX_LENGTH, SELF_PICKUP } from "../../../config/delivery";
 import { normalizePhoneDigits } from "./recipientValidation";
+import RecipientCityField from "./RecipientCityField";
 import radioOuter from "../../../images/order/delivery-radio-outer.svg";
 import radioInactive from "../../../images/order/delivery-radio-inactive.svg";
 import radioActive from "../../../images/order/delivery-radio-active.svg";
@@ -15,14 +16,16 @@ const RecipientDeliveryFields = ({
   postalPoint, onPostalPointChange, manualAddress,
   deliveryRecipient, onRecipientChange, recipientPhone, onRecipientPhoneChange,
   deliveryComment, onCommentChange, cdekOnly = false,
+  city, onCityChange, citySyncing = false, cityNotice = "", cityFixedLabel = "",
 }) => {
   const recipientPhoneInvalid = Boolean(deliveryRecipient.trim()) && !/^7\d{10}$/.test(normalizePhoneDigits(recipientPhone));
   const isManual = deliveryMethod === "manual";
   return (
     <div className="recipientOrderForm__delivery">
       <h2 className="recipientOrderForm__heading recipientOrderForm__heading--delivery">Доставка</h2>
-      <fieldset className="recipientDeliveryMethods" aria-label="Способ получения" disabled={disabled}>
-        {options.map(({ value, label, description, detail }) => (
+      <RecipientCityField city={city} onChange={onCityChange} disabled={disabled} syncing={citySyncing} notice={cityNotice} fixedLabel={cityFixedLabel} />
+      <fieldset className="recipientDeliveryMethods" aria-label="Способ получения" disabled={disabled || !city || citySyncing}>
+        {options.filter(option => option.value !== "pickup" || city?.pickup).map(({ value, label, description, detail }) => (
           <label className="recipientOrderForm__deliveryMethod" key={value}>
             <input className="recipientDeliveryMethods__input" type="radio" name="deliveryMethod" value={value}
               aria-label={label} disabled={cdekOnly && value !== "cdek"} checked={deliveryMethod === value} onChange={() => onMethodChange(value)} />
@@ -60,7 +63,7 @@ const RecipientDeliveryFields = ({
         ) : (
           <label className="recipientOrderForm__group recipientOrderForm__group--pickup">
             <span>{isManual ? "Адрес ручной доставки" : "Пункт получения"}</span>
-            <button type="button" onClick={onOpenCdek} disabled={disabled}
+            <button type="button" onClick={onOpenCdek} disabled={disabled || !city || citySyncing}
               aria-describedby={!isManual && !isCdekPickupSelected ? "recipient-pickup-validation" : undefined}
               aria-label={isManual ? "Указать адрес ручной доставки" : isCdekPickupSelected
                 ? `Выбран пункт получения: ${pickupPoint}` : "Выберите пункт получения СДЭК"}>

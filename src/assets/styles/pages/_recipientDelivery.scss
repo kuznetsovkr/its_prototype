@@ -87,6 +87,68 @@
 .recipientDeliveryMethods:disabled { opacity: .6; }
 .recipientDeliveryMethods:disabled .recipientOrderForm__deliveryMethod { cursor: default; }
 
+.recipientCity {
+  position: relative;
+  display: grid;
+  gap: scale.px(8);
+  margin-bottom: scale.px(20);
+  color: #161616;
+  font-size: max(14px, #{scale.px(16)});
+}
+
+.recipientCity input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: scale.px(54);
+  padding: scale.px(15) scale.px(24);
+  border: 1px solid transparent;
+  border-radius: scale.px(30);
+  background: #fff;
+  color: #161616;
+  font: inherit;
+  font-size: max(16px, #{scale.px(16)});
+  text-overflow: ellipsis;
+}
+
+.recipientCity__control { position: relative; }
+
+.recipientCity input:focus-visible { outline: 2px solid #bc5823; outline-offset: 2px; }
+.recipientCity input[aria-invalid="true"] { border-color: #bc5823; }
+.recipientCity__error { color: #9c3521; }
+
+.recipientCity__options {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + scale.px(6));
+  right: 0;
+  left: 0;
+  max-height: min(240px, 35dvh);
+  padding: scale.px(6);
+  margin: 0;
+  overflow-y: auto;
+  border: 1px solid #e6dfd5;
+  border-radius: scale.px(16);
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
+  list-style: none;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #433f3c transparent;
+}
+
+.recipientCity__options li {
+  padding: scale.px(12) scale.px(16);
+  border-radius: scale.px(10);
+  cursor: pointer;
+  font-size: max(16px, #{scale.px(16)});
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.recipientCity__options li:hover,
+.recipientCity__options li.is-active { background: #f4f0e6; color: #bc5823; }
+
 .recipientDeliveryDetails {
   display: grid;
   gap: scale.px(20);
@@ -135,6 +197,8 @@
   font-size: max(12px, #{scale.px(12)});
   line-height: 1.4;
 }
+
+.recipientCity .recipientDeliveryDetails__hint { margin-top: 0; }
 
 @media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
   .recipientOrderPage.has-certificate .recipientOrderForm.recipientOrderForm--deliveryMethods { padding-top: scale.px(321); }

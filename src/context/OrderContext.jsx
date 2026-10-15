@@ -8,6 +8,7 @@ import {
 } from "react";
 import { getOrderAccessToken } from "../utils/orderAccess";
 import { restoreDeliveryMethod } from "../config/delivery";
+import { normalizeDeliveryCity } from "../features/order/recipient/deliveryCity";
 import { createCartItemKey } from "../features/cart/cartItem";
 import { getCartStorage, isCartId } from "../features/cart/cartStorage";
 import { CONSTRUCTOR_DRAFT_KEY, createConstructorDraftStore } from "../features/cart/constructorDraft";
@@ -76,6 +77,7 @@ const isSameRecipient = (a, b) =>
   (a?.recipientPhone || "") === (b?.recipientPhone || "") &&
   (a?.deliveryComment || "") === (b?.deliveryComment || "") &&
   (a?.deliveryMethod || "") === (b?.deliveryMethod || "") &&
+  JSON.stringify(a?.deliveryCity ?? null) === JSON.stringify(b?.deliveryCity ?? null) &&
   (a?.postalPoint || "") === (b?.postalPoint || "") &&
   (a?.certificateCode || "") === (b?.certificateCode || "") &&
   JSON.stringify(a?.savedOrder ?? null) === JSON.stringify(b?.savedOrder ?? null) &&
@@ -134,6 +136,7 @@ const initialState = {
     recipientPhone: "",
     deliveryComment: "",
     deliveryMethod: "cdek",
+    deliveryCity: null,
     postalPoint: "",
     certificateCode: "",
     savedOrder: null,
@@ -229,6 +232,7 @@ const restoreOrderDraft = (persistentStore) => {
           ...initialState.recipient,
           ...(storedOrder.recipient || {}),
           deliveryMethod: restoreDeliveryMethod(storedOrder.recipient),
+          deliveryCity: normalizeDeliveryCity(storedOrder.recipient?.deliveryCity),
           userData: {
             ...initialState.recipient.userData,
             ...(storedOrder.recipient?.userData || {}),
@@ -345,6 +349,7 @@ export const OrderProvider = ({ children }) => {
       const next = {
         ...prev.recipient,
         ...payload,
+        deliveryCity: payload?.deliveryCity !== undefined ? normalizeDeliveryCity(payload.deliveryCity) : prev.recipient.deliveryCity,
         userData: payload?.userData
           ? { ...prev.recipient.userData, ...payload.userData }
           : prev.recipient.userData,

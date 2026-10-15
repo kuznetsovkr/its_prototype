@@ -10,6 +10,11 @@ const deliveryBase = {
 };
 
 describe("recipient order payload", () => {
+  test("sends only the server-issued city receipt, not a client-supplied city name or coordinates", () => {
+    const payload = buildOrderFormData({ ...deliveryBase, deliveryCity: { token: "signed-city-receipt", name: "Город", longitude: 37, latitude: 55 } });
+    expect(payload.get("deliveryCityToken")).toBe("signed-city-receipt");
+    for (const field of ["deliveryCity", "longitude", "latitude"]) expect(payload.has(field)).toBe(false);
+  });
   test("keeps each font's canonical value rather than its CSS alias or label", () => {
     for (const customTextFont of CUSTOM_TEXT_FONTS) {
       const payload = buildOrderFormData({ ...deliveryBase, selectedType: "custom", customTextFont,

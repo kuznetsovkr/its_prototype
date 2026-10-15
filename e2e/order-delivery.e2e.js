@@ -21,6 +21,7 @@ const prepare = async (page, { failFirstConfirm = false } = {}) => {
       clothing: { type: "Hoodie", color: "Чёрный", size: "M", previewSrc: "/fixture-hoodie.webp", previewAlt: "Чёрное худи" },
       embroidery: { type: "Car", typeSelectionExplicit: true, uploadedImage: [] },
       recipient: { userData: { firstName: "Иван", lastName: "Иванов", middleName: "", phone: "+7 (999) 123-45-67" },
+        deliveryCity: { id: "cdek:278", name: "Красноярск", label: "г Красноярск", longitude: 92.868, latitude: 56.0106, pickup: true, token: "fixture-city", expiresAt: Date.now() + 86400000 },
         hasNoMiddleName: true, privacyConsent: true, pickupPoint: "Старый ПВЗ", cdek: { mode: "office", address: { code: "KRS1" } } },
     } }));
   });
@@ -89,7 +90,7 @@ test("новые способы адаптивны, переключаются �
   }
   await expect(page.getByText("Время по согласованию", { exact: true })).toBeVisible();
   await expect(page.getByText(/Ломоносова, 11/)).toBeVisible();
-  await expect(page.getByText("Город", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("combobox", { name: "Город получения" })).toHaveValue(/Красноярск/);
 });
 
 test("переключение и обновление сохраняют отделение, но не используют старые ПВЗ и стоимость", async ({ page }) => {

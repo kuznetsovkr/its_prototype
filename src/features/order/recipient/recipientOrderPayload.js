@@ -7,6 +7,7 @@ export const buildOrderFormData = ({
   color, size, selectedType, embroideryTypeRu, patronusCount, petFaceCount,
   customText, customTextFont, customOption, pickupPoint, manualAddress, isNoCdek, cdekData,
   uploadedImage, turnstileToken, certificateCode,
+  deliveryCity,
   deliveryMethod = isNoCdek ? "manual" : "cdek", postalPoint = "",
 }) => {
   const formData = new FormData();
@@ -41,6 +42,7 @@ export const buildOrderFormData = ({
     customOption: JSON.stringify(customOption || {}),
     comment,
     deliveryMethod,
+    deliveryCityToken: deliveryCity?.token || "",
     deliveryAddress: deliveryMethod === "pickup" ? SELF_PICKUP.address
       : deliveryMethod === "russian_post" ? postalPoint.trim()
       : deliveryMethod === "manual" ? manualAddress?.value || "" : pickupPoint || "",

@@ -1,7 +1,9 @@
 import { describe, expect, test } from "vitest";
 import { formatPhoneNumber, splitFullName, validateRecipient } from "./recipientValidation";
+import { demoDeliveryCity } from "./deliveryCity";
 
 const validData = {
+  deliveryCity: demoDeliveryCity(),
   userData: {
     lastName: "Иванов",
     firstName: "Иван",

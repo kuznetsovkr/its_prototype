@@ -90,6 +90,7 @@ const prepareIndividual = async (page, { failCreate = false, failFirstConfirm = 
       clothing: { type: "Hoodie", color: "Чёрный", size: "M" },
       embroidery: { type: "custom", typeSelectionExplicit: true, uploadedImage: [], customOption: { image: true, text: false } },
       recipient: { userData: { firstName: "Иван", lastName: "Иванов", middleName: "", phone: "+7 (999) 123-45-67" },
+        deliveryCity: { id: "cdek:278", name: "Красноярск", label: "г Красноярск", longitude: 92.868, latitude: 56.0106, pickup: true, token: "fixture-city", expiresAt: Date.now() + 86400000 },
         hasNoMiddleName: true, privacyConsent: true, pickupPoint: "ПВЗ Красноярск", cdek: { mode: "office", address: { code: "KRS1" } } },
     } }));
   });

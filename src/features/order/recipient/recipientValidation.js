@@ -1,4 +1,5 @@
 import { POSTAL_POINT_MAX_LENGTH } from "../../../config/delivery";
+import { isDeliveryCitySelected } from "./deliveryCity";
 
 export const cleanPhone = (value) => (value || "").replace(/\D/g, "");
 
@@ -51,12 +52,15 @@ export const validateRecipient = ({
   manualAddress,
   isCdekPickupSelected,
   privacyConsent,
+  deliveryCity,
 }) => {
   const missing = [];
   if (!userData.lastName.trim()) missing.push("фамилию");
   if (!userData.firstName.trim()) missing.push("имя");
   if (!hasNoMiddleName && !userData.middleName.trim()) missing.push("отчество");
   if (!userData.phone.trim()) missing.push("телефон");
+  if (!isDeliveryCitySelected(deliveryCity)) missing.push("город получения из подсказок");
+  if (deliveryMethod === "pickup" && !deliveryCity?.pickup) missing.push("Красноярск как город получения для самовывоза");
 
   if (deliveryMethod === "russian_post") {
     if (!postalPoint.trim()) missing.push("отделение Почты России");

@@ -216,7 +216,7 @@ test("покупатель проходит основной путь и нач�
   await expect(page.locator(".orderNavigation .orderActionButton--next")).toBeDisabled();
 });
 
-test("другой получатель требует телефон, а выбор ПВЗ не требует поля города", async ({ page }, testInfo) => {
+test("другой получатель требует телефон, город выбирается отдельным комбобоксом", async ({ page }, testInfo) => {
   await startOrder(page);
   await continueToRecipient(page);
 
@@ -224,7 +224,7 @@ test("другой получатель требует телефон, а выб
   const recipientName = page.locator(".recipientOrderForm__group--recipient input");
   const recipientPhone = page.getByRole("textbox", { name: "Телефон другого получателя" });
 
-  await expect(page.getByText("Город", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("combobox", { name: "Город получения" })).toHaveValue(/Красноярск/);
   await page.getByPlaceholder("ФИО").fill("Иванов Иван Иванович");
   await page.getByPlaceholder("Номер телефона").fill("+7 999 123-45-67");
   await page.locator(".recipientOrderForm__group--pickup button").click();

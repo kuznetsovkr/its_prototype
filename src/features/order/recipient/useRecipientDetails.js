@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IS_DEMO_MODE, IS_TURNSTILE_E2E } from "../../../config/demoMode";
 import { MEDIA_QUERIES } from "../../../config/breakpoints";
@@ -21,6 +21,8 @@ import {
 import { buildOrderFormData } from "./recipientOrderPayload";
 import { useTurnstileChallenge } from "./useTurnstileChallenge";
 import { useOrderCertificate } from "./useOrderCertificate";
+import { demoDeliveryCity, deliveryCityCoordinates, normalizeDeliveryCity } from "./deliveryCity";
+import { resolveOfficeCity } from "./deliveryCityApi";
 import {
   formatPhoneNumber,
   hasFullManualAddress,
@@ -99,6 +101,12 @@ export const useRecipientDetails = () => {
   const [deliveryComment, setDeliveryComment] = useState(recipientState.deliveryComment || "");
   const [privacyConsent, setPrivacyConsent] = useState(Boolean(recipientState.privacyConsent));
   const [isCdekPickerOpen, setIsCdekPickerOpen] = useState(false);
+  const [deliveryCity, setDeliveryCity] = useState(() => normalizeDeliveryCity(recipientState.deliveryCity) || (IS_DEMO_MODE ? demoDeliveryCity() : null));
+  const [citySyncing, setCitySyncing] = useState(false);
+  const [cityNotice, setCityNotice] = useState("");
+  const cityRequestRef = useRef(null);
+  const mapLocation = useMemo(() => deliveryCityCoordinates(deliveryCity), [deliveryCity]);
+  useEffect(() => () => cityRequestRef.current?.abort(), []);
   const [isMobileLayout, setIsMobileLayout] = useState(() =>
     typeof window !== "undefined" &&
     typeof window.matchMedia === "function" &&
@@ -237,6 +245,7 @@ export const useRecipientDetails = () => {
       isNoCdek: Boolean(recipientState.isNoCdek),
       deliveryMethod: restoreDeliveryMethod(recipientState),
       postalPoint: recipientState.postalPoint || "",
+      deliveryCity: recipientState.deliveryCity || null,
       cdek: recipientState.cdek,
       email: recipientState.email || "",
       preferredContact: recipientState.preferredContact || "",
@@ -258,6 +267,7 @@ export const useRecipientDetails = () => {
       isNoCdek: Boolean(isNoCdek),
       deliveryMethod,
       postalPoint,
+      deliveryCity,
       cdek: cdekData,
       email,
       preferredContact,
@@ -284,6 +294,7 @@ export const useRecipientDetails = () => {
       local.isNoCdek === stored.isNoCdek &&
       local.deliveryMethod === stored.deliveryMethod &&
       local.postalPoint === stored.postalPoint &&
+      JSON.stringify(local.deliveryCity) === JSON.stringify(stored.deliveryCity) &&
       JSON.stringify(local.cdek ?? null) === JSON.stringify(stored.cdek ?? null) &&
       local.email === stored.email &&
       local.preferredContact === stored.preferredContact &&
@@ -305,6 +316,7 @@ export const useRecipientDetails = () => {
     isNoCdek,
     deliveryMethod,
     postalPoint,
+    deliveryCity,
     cdekData,
     email,
     preferredContact,
@@ -328,6 +340,7 @@ export const useRecipientDetails = () => {
       isNoCdek,
       deliveryMethod,
       postalPoint,
+      deliveryCity,
       cdek: cdekData,
       email,
       preferredContact,
@@ -350,6 +363,7 @@ export const useRecipientDetails = () => {
     isNoCdek,
     deliveryMethod,
     postalPoint,
+    deliveryCity,
     cdekData,
     email,
     preferredContact,
@@ -402,10 +416,21 @@ export const useRecipientDetails = () => {
   };
 
   const handleDeliveryMethodChange = (method) => {
-    if (draftOrder || isPaying || !DELIVERY_METHODS.includes(method) || (cart.isGroup && method !== "cdek")) return;
+    if (draftOrder || isPaying || !deliveryCity || citySyncing || !DELIVERY_METHODS.includes(method)
+      || (method === "pickup" && !deliveryCity.pickup) || (cart.isGroup && method !== "cdek")) return;
     setDeliveryMethod(method);
     setError("");
     setIsCdekPickerOpen(false);
+  };
+
+  const handleDeliveryCityChange = (next) => {
+    if (draftOrder || isPaying || cart.busy) return;
+    cityRequestRef.current?.abort();
+    const selected = normalizeDeliveryCity(next);
+    setDeliveryCity(selected); setCitySyncing(false); setCityNotice("");
+    setPickupPoint(""); setCdekData(null); setDeliveryPrice(null); setPostalPoint(""); setManualAddress(null);
+    setCheckoutQuote(null); setCheckoutQuoteError(""); setCheckoutQuoteLoading(false); setError(""); setIsCdekPickerOpen(false);
+    if (deliveryMethod === "pickup" && !selected?.pickup) setDeliveryMethod("cdek");
   };
 
   const handleInputChange = (e) => {
@@ -566,6 +591,7 @@ export const useRecipientDetails = () => {
     manualAddress,
     isCdekPickupSelected,
     privacyConsent,
+    deliveryCity,
   });
   const embroideryCountError = getEmbroideryCountError({
     type: selectedType,
@@ -573,7 +599,7 @@ export const useRecipientDetails = () => {
     petFaceCount,
     patronusLimit: getPatronusLimit(clothing.profile),
   });
-  const isFormValid = recipientValidation.isValid;
+  const isFormValid = draftOrder && draftMatchesCheckout ? true : recipientValidation.isValid && !citySyncing;
   const getMissingFieldsMessage = () => recipientValidation.message;
   const hasCheckoutTotal = checkoutQuote?.totalPrice != null && Number.isFinite(Number(checkoutQuote.totalPrice));
   const canSubmit = cart.isGroup && draftOrder?.isCartOrder
@@ -591,6 +617,7 @@ export const useRecipientDetails = () => {
     if (certificate.hasUnappliedCode) return "Примените или удалите код сертификата";
     if (isManualCheckout && certificate.appliedCode) return "Сертификат можно применить после расчёта стоимости менеджером. Удалите код, чтобы отправить заявку";
     if (!selectedType && !cart.isGroup) return "Выберите тип вышивки";
+    if (citySyncing) return "Дождитесь подтверждения города выбранного ПВЗ";
     if (!isFormValid) return getMissingFieldsMessage();
     if (embroideryCountError) return embroideryCountError;
     if (checkoutQuoteLoading) return "Дождитесь итогового расчёта стоимости";
@@ -602,7 +629,10 @@ export const useRecipientDetails = () => {
     return "";
   };
 
-  const handleCdekSelect = (payload) => {
+  const handleCdekSelect = async (payload) => {
+    if (draftOrder || isPaying || cart.busy) return;
+    cityRequestRef.current?.abort();
+    const controller = new AbortController(); cityRequestRef.current = controller;
     const label =
       payload?.addressLabel ||
       payload?.address?.address ||
@@ -615,6 +645,19 @@ export const useRecipientDetails = () => {
     setDeliveryMethod("cdek");
     setManualAddress(null);
     setIsCdekPickerOpen(false);
+    setCitySyncing(true); setCityNotice("");
+    try {
+      const code = payload?.address?.code || payload?.address?.office_code;
+      const next = IS_DEMO_MODE && code === "DEMO-PVZ" ? deliveryCity || demoDeliveryCity()
+        : normalizeDeliveryCity(await resolveOfficeCity(code, controller.signal));
+      if (!next) throw new Error("Не удалось подтвердить город выбранного ПВЗ");
+      if (!controller.signal.aborted) {
+        setDeliveryCity(next);
+        if (deliveryCity?.name !== next.name) setCityNotice(`Город получения изменён на «${next.name}» по выбранному ПВЗ`);
+      }
+    } catch (reason) {
+      if (!controller.signal.aborted) { setDeliveryCity(null); setError(reason.message); setCityNotice(reason.message); }
+    } finally { if (!controller.signal.aborted) setCitySyncing(false); }
   };
 
   const applyDemoPickup = () => {
@@ -662,6 +705,7 @@ export const useRecipientDetails = () => {
         patronusCount, petFaceCount, customText, customTextFont, customOption, pickupPoint,
         manualAddress, isNoCdek, cdekData, uploadedImage, turnstileToken: turnstile.token,
         deliveryMethod, postalPoint,
+        deliveryCity,
         certificateCode: certificate.appliedCode,
       }));
       setOrderId(data.orderId);
@@ -840,6 +884,8 @@ export const useRecipientDetails = () => {
     isCdekPickerOpen, setIsCdekPickerOpen,
     pickupPoint, setPickupPoint, setDeliveryPrice, isNoCdek,
     deliveryMethod, postalPoint, setPostalPoint, handleDeliveryMethodChange,
+    deliveryCity, handleDeliveryCityChange, citySyncing, cityNotice, mapLocation,
+    cityFixedLabel: draftOrder?.deliveryCity || "",
     isCdekPickupSelected, deliveryRecipient, setDeliveryRecipient, recipientPhone, handleRecipientPhoneChange,
     deliveryComment, setDeliveryComment, privacyConsent, setPrivacyConsent,
     error, handlePayment, isFormValid, canSubmit, getMissingFieldsMessage,

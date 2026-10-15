@@ -31,6 +31,7 @@ const RecipientDetails = () => {
     pickupPoint, setPickupPoint, setDeliveryPrice, isNoCdek,
     isCdekPickupSelected, deliveryRecipient, setDeliveryRecipient,
     deliveryMethod, postalPoint, setPostalPoint, handleDeliveryMethodChange,
+    deliveryCity, handleDeliveryCityChange, citySyncing, cityNotice, mapLocation, cityFixedLabel,
     recipientPhone, handleRecipientPhoneChange,
     deliveryComment, setDeliveryComment, privacyConsent, setPrivacyConsent,
     error, handlePayment, canSubmit, getSubmitDisabledMessage,
@@ -123,6 +124,7 @@ const RecipientDetails = () => {
                 />
 
                 <RecipientDeliveryFields
+                  city={deliveryCity} onCityChange={handleDeliveryCityChange} citySyncing={citySyncing} cityNotice={cityNotice} cityFixedLabel={cityFixedLabel}
                   deliveryMethod={deliveryMethod} onMethodChange={handleDeliveryMethodChange}
                   disabled={formDisabled || (cart.isGroup && !cart.items.length)} cdekOnly={cart.isGroup}
                   pickupPoint={pickupPoint} isCdekPickupSelected={isCdekPickupSelected} onOpenCdek={() => setIsCdekPickerOpen(true)}
@@ -271,6 +273,7 @@ const RecipientDetails = () => {
             {!IS_DEMO_MODE && isCdekPickerOpen && !isNoCdek && (
               <Suspense fallback={<p className="cdek-map__loading">Загружаем карту…</p>}>
                 <MyCdekWidget
+                  initialLocation={mapLocation}
                   clothingProfile={clothingProfile}
                   shippingPackages={shippingPackages}
                   onAddressSelect={setPickupPoint}

@@ -144,7 +144,7 @@ const closeInfoPopup = (widgetInstance) => {
   }
 };
 
-const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingProfile, shippingPackages }) => {
+const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingProfile, shippingPackages, initialLocation }) => {
   const servicePath = resolveServicePath();
   const ymapsKey = String(APP_ENV.ymapsKey)
     .trim()
@@ -206,7 +206,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingPro
       }
 
       const tariffCode = Number(cdekConfig?.tariffCode);
-      const defaultLocation = cdekConfig?.defaultLocation;
+      const defaultLocation = initialLocation || cdekConfig?.defaultLocation;
       const defaultZoom = Number(cdekConfig?.defaultZoom);
       const from = cdekConfig?.from;
       const packageProfile = clothingProfile?.package;
@@ -321,7 +321,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingPro
       });
       try { instance?.destroy?.(); } catch {}
     };
-  }, [servicePath, ymapsKey, clothingProfile, shippingPackages, cdekConfig]);
+  }, [servicePath, ymapsKey, clothingProfile, shippingPackages, cdekConfig, initialLocation]);
 
   return null;
 };
