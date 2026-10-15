@@ -3,11 +3,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useOrder } from "../../context/OrderContext";
 import { buildCartItemFormData } from "./cartItem";
-import { cartPaymentBlocked, currentCartItem } from "./cartPresentation";
+import { cartPaymentBlocked, constructorCartItem, currentCartItem } from "./cartPresentation";
+import { confirmDiscardConstructor } from "./ConstructorDraftNotice";
 
 export const useRecipientCart = ({ turnstile, privacyConsent, isCheckoutLocked, isPaying }) => {
   const cart = useCart();
-  const { order, resetCurrentItem } = useOrder();
+  const { order, resetCurrentItem, constructorDraftError } = useOrder();
   const navigate = useNavigate();
   const location = useLocation();
   const cartOnly = new URLSearchParams(location.search).get("cart") === "1";
@@ -68,9 +69,11 @@ export const useRecipientCart = ({ turnstile, privacyConsent, isCheckoutLocked, 
     try { await cart.cancelCartCheckout(); } catch (cancelError) { setError(cancelError.message); }
   };
   const current = cartOnly || alreadySaved ? null : currentCartItem(order);
-  return { ...cart, isGroup, activeCheckout, cartOnly, alreadySaved, current, busy, saving, addError, canAdd: !addError && !busy && cart.initialized,
+  const draftItem = cartOnly && !alreadySaved && !activeCheckout ? constructorCartItem(order) : null;
+  return { ...cart, isGroup, activeCheckout, cartOnly, alreadySaved, current, draftItem, constructorDraftError, busy, saving, addError, canAdd: !addError && !busy && cart.initialized,
+    discardDraft: () => { if (confirmDiscardConstructor(order)) resetCurrentItem(); },
     requiresCurrentSave: isGroup && Boolean(current) && !activeCheckout,
     addCurrentItem: () => saveCurrentItem(false), confirmCurrentItem: () => saveCurrentItem(true),
     changeQuantity, removeItem, reloadCart, cancelCheckout, uiError: error || cart.error,
-    paymentBlocked: cartPaymentBlocked(cart, { cartOnly, isCustom: order.embroidery.type === "custom" }) || saving };
+    paymentBlocked: cartPaymentBlocked(cart, { cartOnly, isCustom: order.embroidery.type === "custom" }) || saving || Boolean(draftItem) };
 };

@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
 import RecipientCartList from "./RecipientCartList";
-import { cartEmbroideryLabel, cartPaymentBlocked, currentCartItem } from "./cartPresentation";
+import { cartEmbroideryLabel, cartPaymentBlocked, constructorCartItem, currentCartItem } from "./cartPresentation";
 
 vi.mock("../../utils/url", () => ({ buildImgSrc: (value) => value }));
 
@@ -35,5 +35,16 @@ describe("cart presentation and staged checkout safety", () => {
     expect(html).toMatch(/aria-label="Уменьшить количество: Худи" disabled/);
     expect(html.match(/Увеличить количество:/g)).toHaveLength(1);
     expect(html).toContain("Текущее изделие — ещё не в корзине");
+  });
+  it("unfinished garments are explicitly marked and never show a price or quantity control", () => {
+    const draftItem = constructorCartItem({ clothing: { type: "Худи", color: "Чёрный", size: "M" }, embroidery: {}, recipient: {} });
+    expect(draftItem.draft).toBe(true);
+    expect(cartEmbroideryLabel(draftItem)).toBe("Вышивка ещё не выбрана");
+    const html = renderToStaticMarkup(React.createElement(MemoryRouter, null,
+      React.createElement(RecipientCartList, { cart: { ...ready, items: [], draftItem } })));
+    expect(html).toContain("Незавершённое изделие — не входит в сумму");
+    expect(html).toContain("Продолжить оформление");
+    expect(html).not.toMatch(/Количество:|Стоимость уточняется|₽/);
+    expect(constructorCartItem({ clothing: { type: "Худи" }, embroidery: {} })).toBeNull();
   });
 });

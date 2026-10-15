@@ -117,6 +117,15 @@ const seed = async (page) => {
   await expect(page.getByRole("heading", { name: "Введите свои данные" })).toBeVisible();
 };
 const add = (page) => page.getByRole("button", { name: "Добавить в корзину", exact: true });
+const constructorKey = "its_constructor_draft_v1";
+const constructorRecord = (page) => page.evaluate((key) => JSON.parse(localStorage.getItem(key)), constructorKey);
+const selectGarment = async (page) => {
+  await page.locator('.selectorType__item:has(input[value="Hoodie"])').click();
+  await page.getByRole("button", { name: "White", exact: true }).click();
+  await page.locator('.sizeSelector__item:has(input[value="M"]) .sizeSelector__box').click();
+  await expect(page.locator('.orderNavigation .orderActionButton--next')).toBeEnabled();
+  await expect.poll(async () => (await constructorRecord(page))?.draft?.clothing).toEqual({ type: "Hoodie", color: "White", size: "M" });
+};
 
 test("save current item, retain buyer/delivery, reset only the constructor and restore basket after browser restart", async ({ page, context, browser }) => {
   const server = await setup(context);
@@ -315,4 +324,144 @@ test("one certificate discounts all merchandise, not delivery, and zero-due orde
   expect(server.invoices()).toBe(0);
   expect(server.checkouts()).toBe(1);
   expect([...server.orders.values()][0].paymentProvider).toBe("certificate");
+});
+
+test("unfinished garment and text survive a browser restart without storing contacts or cached prices", async ({ page, context, browser }) => {
+  const server = await setup(context);
+  await page.goto(`${fixture}?order=1`);
+  expect(await constructorRecord(page)).toBeNull();
+  await selectGarment(page);
+  await page.locator('.orderNavigation .orderActionButton--next').click();
+  await page.locator('.embroideryDesktopTabs button').nth(1).click();
+  await page.getByPlaceholder("Введите надпись").fill("Мой новый черновик");
+  await expect.poll(async () => (await constructorRecord(page)).draft.embroidery.customText).toBe("Мой новый черновик");
+  const before = await constructorRecord(page);
+  expect(before.draft).not.toHaveProperty("recipient");
+  expect(before.draft.clothing).not.toHaveProperty("profile");
+  expect(before.draft.embroidery).not.toHaveProperty("price");
+  const reopened = await browser.newContext({ storageState: await context.storageState() });
+  try {
+    await server.mount(reopened); const restored = await reopened.newPage();
+    await restored.goto(`${fixture}?order=1`);
+    await expect(restored.locator('input[name="clothing"][value="Hoodie"]')).toBeChecked();
+    await expect(restored.locator('input[name="size"][value="M"]')).toBeChecked();
+    await expect(restored.getByRole("button", { name: "White", exact: true })).toHaveClass(/active/);
+    expect((await constructorRecord(restored)).expiresAt).toBe(before.expiresAt);
+    await restored.locator('.orderNavigation .orderActionButton--next').click();
+    await expect(restored.getByPlaceholder("Введите надпись")).toHaveValue("Мой новый черновик");
+    expect(server.items).toHaveLength(0);
+  } finally { await reopened.close(); }
+});
+
+test("a restored photo draft explains missing Files; discarding requires consent and never changes saved cart rows", async ({ page, context, browser }) => {
+  const server = await setup(context);
+  await page.goto(`${fixture}?order=1`); await selectGarment(page);
+  await page.getByLabel("Фото для теста").setInputFiles({ name: "car.png", mimeType: "image/png", buffer: png });
+  await page.getByRole("button", { name: "Добавить фото в черновик" }).click();
+  await expect.poll(async () => (await constructorRecord(page)).draft.uploadFiles.length).toBe(1);
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page.getByRole("button", { name: "Удалить черновик", exact: true }).click();
+  expect((await state(page)).files).toEqual(["car.png"]);
+  const reopened = await browser.newContext({ storageState: await context.storageState() });
+  try {
+    await server.mount(reopened); const restored = await reopened.newPage();
+    await restored.goto(`${fixture}?order=1`);
+    await expect(restored.locator('input[name="size"][value="M"]')).toBeChecked();
+    await restored.locator('.orderNavigation .orderActionButton--next').click();
+    await expect(restored.locator('.embroideryRestoreNotice')).toContainText("Загрузите фотографии повторно");
+    expect((await state(restored)).files).toEqual([]);
+    await restored.getByRole("button", { name: "Удалить черновик", exact: true }).click();
+    await expect.poll(async () => (await constructorRecord(restored)).draft).toBeNull();
+    expect((await state(restored)).missingUploadFiles).toEqual([]);
+  } finally { await reopened.close(); }
+  expect(server.items).toHaveLength(0);
+});
+
+test("unfinished cart row blocks payment until continued or explicitly removed, without charging or deleting ready garments", async ({ page, context }) => {
+  const server = await setup(context);
+  await savedBasket(page);
+  await page.getByRole("button", { name: "Создать ещё одно изделие", exact: true }).click();
+  await selectGarment(page);
+  await page.getByRole("button", { name: "Открыть сохранённую корзину" }).click();
+  const list = page.getByRole("list", { name: "Изделия в корзине" });
+  await expect(list.locator("li")).toHaveCount(2);
+  await expect(list).toContainText("Незавершённое изделие — не входит в сумму");
+  await expect(page.locator('.recipientCart__total')).toContainText("9 000");
+  await expect(page.locator('.recipientOrderNavigation__submit')).toBeDisabled();
+  await expect(page.getByRole("link", { name: "Продолжить оформление", exact: true })).toHaveAttribute("href", "/order");
+  await page.getByRole("button", { name: "Удалить изделие: Hoodie, White, M", exact: true }).click();
+  await expect(list.locator("li")).toHaveCount(1);
+  await expect(page.locator('.recipientOrderNavigation__submit')).toBeEnabled();
+  expect(server.items).toHaveLength(1); expect(server.invoices()).toBe(0);
+  expect((await constructorRecord(page)).draft).toBeNull();
+});
+
+test("expired constructors do not return from an old session draft", async ({ page, context }) => {
+  await setup(context); await page.goto(`${fixture}?order=1`); await selectGarment(page);
+  await page.evaluate(() => {
+    const legacy = JSON.parse(sessionStorage.getItem("its_order_draft_v1"));
+    delete legacy.constructorRevision;
+    legacy.order.clothing = { type: "T-shirt", color: "Blue", size: "M" };
+    sessionStorage.setItem("its_order_draft_v1", JSON.stringify(legacy));
+  });
+  await page.reload();
+  await expect(page.locator('input[name="clothing"][value="Hoodie"]')).toBeChecked();
+  await expect.poll(async () => (await constructorRecord(page)).draft.clothing.color).toBe("White");
+  await page.evaluate((key) => {
+    const record = JSON.parse(localStorage.getItem(key));
+    record.updatedAt = Date.now() - 30 * 24 * 60 * 60 * 1000 - 1000;
+    record.expiresAt = record.updatedAt + 30 * 24 * 60 * 60 * 1000;
+    localStorage.setItem(key, JSON.stringify(record));
+  }, constructorKey);
+  await page.reload();
+  await expect(page.locator('input[name="size"]:checked')).toHaveCount(0);
+  await expect(page.locator('.orderNavigation .orderActionButton--next')).toBeDisabled();
+  await expect.poll(async () => (await constructorRecord(page)).draft).toBeNull();
+});
+
+test("an older open tab cannot overwrite or resurrect a newer constructor", async ({ page, context }) => {
+  await setup(context); await page.goto(`${fixture}?order=1`); await selectGarment(page);
+  const newer = await context.newPage(); await newer.goto(`${fixture}?order=1`);
+  await expect(newer.locator('input[name="size"][value="M"]')).toBeChecked();
+  await newer.getByRole("button", { name: "Black", exact: true }).click();
+  await newer.locator('.sizeSelector__item:has(input[value="L"]) .sizeSelector__box').click();
+  await expect.poll(async () => (await constructorRecord(newer)).draft.clothing.size).toBe("L");
+  await expect(page.locator('.orderDraftNotice')).toContainText("другой вкладке");
+  await page.getByRole("button", { name: "Удалить черновик", exact: true }).click();
+  expect((await constructorRecord(newer)).draft.clothing).toEqual({ type: "Hoodie", color: "Black", size: "L" });
+});
+
+test("blocked persistent storage explains the limitation but does not prevent in-memory ordering", async ({ page, context }) => {
+  await setup(context);
+  await page.addInitScript(() => {
+    const original = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key, value) {
+      if (this === window.localStorage) throw new DOMException("blocked", "QuotaExceededError");
+      return original.call(this, key, value);
+    };
+  });
+  await page.goto(`${fixture}?order=1`);
+  await page.locator('.selectorType__item:has(input[value="Hoodie"])').click();
+  await page.locator('.sizeSelector__item:has(input[value="M"]) .sizeSelector__box').click();
+  await expect(page.locator('.orderDraftNotice')).toContainText("Не удалось сохранить черновик");
+  await expect(page.locator('.orderNavigation .orderActionButton--next')).toBeEnabled();
+  expect((await state(page)).clothing.size).toBe("M");
+});
+
+test("accepted uploads are reconciled after a browser restart without resurrecting a duplicate unfinished garment", async ({ page, context, browser }) => {
+  const server = await setup(context);
+  await page.goto(`${fixture}?resume=1`); await seed(page);
+  await page.locator('.recipientOrderForm__consent input').check();
+  server.loseNextResponse(); await add(page).click();
+  await expect(page.getByRole("alert")).toContainText("недоступна");
+  const reopened = await browser.newContext({ storageState: await context.storageState() });
+  try {
+    await server.mount(reopened); const restored = await reopened.newPage();
+    await restored.goto(`${fixture}?order=1`);
+    await expect(restored.getByRole("link", { name: /Открыть корзину/ })).toBeVisible();
+    await expect.poll(async () => (await constructorRecord(restored)).draft).toBeNull();
+    expect((await state(restored)).files).toEqual([]);
+    expect((await state(restored)).clothing.size).toBe("");
+    expect(server.items).toHaveLength(1); expect(server.keys).toHaveLength(1);
+  } finally { await reopened.close(); }
 });

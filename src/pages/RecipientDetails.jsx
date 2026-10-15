@@ -136,7 +136,7 @@ const RecipientDetails = () => {
                 <OrderCertificateField certificate={certificate} disabled={formDisabled || cart.paymentBlocked} manual={isManualCheckout} demo={!isCertificateAvailable} quoteError={checkoutQuoteError} />
                 <div className="recipientOrderSummary" aria-live="polite">
                   {cart.paymentBlocked || cart.requiresCurrentSave ? (
-                    <span>{GROUP_PAYMENT_NOTICE}</span>
+                    <span>{cart.draftItem ? getSubmitDisabledMessage() : GROUP_PAYMENT_NOTICE}</span>
                   ) : isManualCheckout ? (
                     <>
                       <strong>Стоимость рассчитает менеджер после отправки заявки</strong>

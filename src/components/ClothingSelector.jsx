@@ -14,7 +14,7 @@ const ClothingSelector = () => {
   const {
     selectedClothing, selectedColor, selectedSize,
     setSelectedSize, baseTypeOptions,
-    colorOptions, sizeOptions, availableSizes, canProceed,
+    colorOptions, sizeOptions, availableSizes, canProceed, catalogError,
     displayPreviewSrc, displayPreviewAlt, isPreviewLoading,
     selectedTypeProfile, sizeGuideOptions,
     handleSelectClothing, handleSelectColor,
@@ -50,6 +50,7 @@ const ClothingSelector = () => {
         </div>
 
         <div className="clothingControls">
+          {catalogError && <p className="recipientCart__error" role="alert">{catalogError}</p>}
           <div className="blockSelection">
             <div className="selectorGroup selectorGroup--type">
               <p className="title">Выберите изделие</p>

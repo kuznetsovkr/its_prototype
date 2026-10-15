@@ -16,6 +16,19 @@
 .orderCartShortcut a,
 .recipientCart__continue { color: #bc5823; }
 
+.orderDraftNotice { max-width: 900px; font-size: 14px; line-height: 1.45; }
+.orderDraftNotice button {
+  flex: 0 0 auto;
+  align-self: center;
+  padding: 8px 14px;
+  border: 1px solid #4b4b4b;
+  border-radius: 24px;
+  color: #161616;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
 .recipientOrderPage.has-cart .recipientOrderCard__preview {
   height: auto;
   padding-top: scale.px(76);
@@ -145,7 +158,8 @@
 .recipientCart__remove:disabled { opacity: .4; cursor: default; }
 
 .recipientCart button:focus-visible,
-.recipientCart a:focus-visible { outline: 2px solid #bc5823; outline-offset: 2px; }
+.recipientCart a:focus-visible,
+.orderDraftNotice button:focus-visible { outline: 2px solid #bc5823; outline-offset: 2px; }
 
 .recipientCart__total {
   margin: scale.px(28) 0 scale.px(4);

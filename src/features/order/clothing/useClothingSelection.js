@@ -19,6 +19,7 @@ export const useClothingSelection = () => {
   const [clothingTypes, setClothingTypes] = useState([]);
   const [colorCatalog, setColorCatalog] = useState([]);
   const [inventoryLoaded, setInventoryLoaded] = useState(false);
+  const [catalogError, setCatalogError] = useState("");
   const [selectedClothing, setSelectedClothing] = useState(clothing.type || "");
   const [selectedColor, setSelectedColor] = useState(clothing.color || "");
   const [selectedSize, setSelectedSize] = useState(clothing.size || "");
@@ -90,6 +91,7 @@ export const useClothingSelection = () => {
 
   const canProceed = Boolean(
     selectedClothing && selectedColor && selectedSize &&
+    inventoryLoaded && !catalogError &&
     filteredByType.some((item) => hasStock(item) &&
       normalizeKey(item.color) === normalizeKey(selectedColor) && item.size === selectedSize)
   );
@@ -106,13 +108,16 @@ export const useClothingSelection = () => {
       })
       .catch((error) => {
         console.error("Error loading inventory:", error);
-        if (!cancelled) setInventoryLoaded(true);
+        if (!cancelled) {
+          setCatalogError("Не удалось загрузить каталог. Обновите страницу, чтобы проверить наличие. Ваш выбор сохранён.");
+          setInventoryLoaded(true);
+        }
       });
     return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
-    if (!inventoryLoaded) return;
+    if (!inventoryLoaded || catalogError) return;
     const firstAvailable = baseTypeOptions.find((option) => option.isAvailable)?.label || "";
     const currentAvailable = baseTypeOptions.some((option) =>
       normalizeKey(option.label) === normalizeKey(selectedClothing) && option.isAvailable);
@@ -121,10 +126,10 @@ export const useClothingSelection = () => {
       setSelectedColor("");
       setSelectedSize("");
     }
-  }, [inventoryLoaded, baseTypeOptions, selectedClothing]);
+  }, [inventoryLoaded, catalogError, baseTypeOptions, selectedClothing]);
 
   useEffect(() => {
-    if (!inventoryLoaded) return;
+    if (!inventoryLoaded || catalogError) return;
     const availableColors = colorOptions.filter((option) => option.isAvailable);
     const hasSelected = availableColors.some((option) =>
       normalizeKey(option.label) === normalizeKey(selectedColor));
@@ -135,13 +140,14 @@ export const useClothingSelection = () => {
       if (selectedColor) setSelectedColor("");
       if (selectedSize) setSelectedSize("");
     }
-  }, [inventoryLoaded, colorOptions, selectedColor, selectedSize]);
+  }, [inventoryLoaded, catalogError, colorOptions, selectedColor, selectedSize]);
 
   useEffect(() => {
-    if (inventoryLoaded && selectedSize && !availableSizes.includes(selectedSize)) setSelectedSize("");
-  }, [inventoryLoaded, availableSizes, selectedSize]);
+    if (inventoryLoaded && !catalogError && selectedSize && !availableSizes.includes(selectedSize)) setSelectedSize("");
+  }, [inventoryLoaded, catalogError, availableSizes, selectedSize]);
 
   useEffect(() => {
+    if (!inventoryLoaded || catalogError) return;
     const next = {
       type: selectedClothing,
       color: selectedColor,
@@ -155,7 +161,7 @@ export const useClothingSelection = () => {
       JSON.stringify(clothing.profile ?? null) === JSON.stringify(next.profile ?? null);
     if (isSame) return;
     setClothing(next);
-  }, [selectedClothing, selectedColor, selectedSize, selectedTypeProfile, setClothing,
+  }, [inventoryLoaded, catalogError, selectedClothing, selectedColor, selectedSize, selectedTypeProfile, setClothing,
     clothing.type, clothing.color, clothing.size, clothing.profile]);
 
   const previewItem = useMemo(() => {
@@ -192,12 +198,12 @@ export const useClothingSelection = () => {
   }, [previewSrc, previewAlt, stablePreview.src, stablePreview.alt]);
 
   useEffect(() => {
-    if (!inventoryLoaded) return;
+    if (!inventoryLoaded || catalogError) return;
     setClothing({
       previewSrc: previewSrc || "",
       previewAlt: previewSrc ? previewAlt : "",
     });
-  }, [inventoryLoaded, previewSrc, previewAlt, setClothing]);
+  }, [inventoryLoaded, catalogError, previewSrc, previewAlt, setClothing]);
 
   return {
     selectedClothing, selectedColor, selectedSize,
@@ -205,6 +211,7 @@ export const useClothingSelection = () => {
     baseTypeOptions, colorOptions, sizeOptions, availableSizes,
     selectedTypeProfile, sizeGuideOptions,
     canProceed,
+    catalogError,
     isPreviewLoading: !inventoryLoaded,
     displayPreviewSrc: stablePreview.src || previewSrc || clothing.previewSrc || "",
     displayPreviewAlt: stablePreview.alt || previewAlt || clothing.previewAlt || "Одежда",

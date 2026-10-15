@@ -6,7 +6,7 @@ import { APP_ENV } from "../../../config/env";
 import { DELIVERY_METHODS, restoreDeliveryMethod } from "../../../config/delivery";
 import { useOrder } from "../../../context/OrderContext";
 import { useRecipientCart } from "../../cart/useRecipientCart";
-import { GROUP_PAYMENT_NOTICE } from "../../cart/cartPresentation";
+import { GROUP_PAYMENT_NOTICE, UNFINISHED_CART_NOTICE } from "../../cart/cartPresentation";
 import { buildCartBuyer, getCartCheckoutKey, cartWidgetPackages } from "../../cart/cartCheckout";
 import { buildDemoCdekNumber, buildDemoOrderId } from "../../../mocks/demoData";
 import { getEmbroideryCountError, getPatronusLimit } from "../embroidery/embroideryLimits";
@@ -584,6 +584,7 @@ export const useRecipientDetails = () => {
     (Boolean(draftOrder) || turnstile.isSatisfied);
   const getSubmitDisabledMessage = () => {
     if (cart.activeCheckout?.paymentStatus === "review") return "Оплата получена. Заказ требует проверки менеджером; повторно платить не нужно";
+    if (cart.draftItem) return UNFINISHED_CART_NOTICE;
     if (cart.requiresCurrentSave) return GROUP_PAYMENT_NOTICE;
     if (cart.paymentBlocked) return cart.error || (!cart.initialized || cart.busy ? "Дождитесь загрузки корзины" : GROUP_PAYMENT_NOTICE);
     if (certificate.error) return certificate.error;

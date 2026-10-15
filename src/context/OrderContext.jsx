@@ -9,7 +9,8 @@ import {
 import { getOrderAccessToken } from "../utils/orderAccess";
 import { restoreDeliveryMethod } from "../config/delivery";
 import { createCartItemKey } from "../features/cart/cartItem";
-import { isCartId } from "../features/cart/cartStorage";
+import { getCartStorage, isCartId } from "../features/cart/cartStorage";
+import { CONSTRUCTOR_DRAFT_KEY, createConstructorDraftStore } from "../features/cart/constructorDraft";
 
 const ORDER_DRAFT_STORAGE_KEY = "its_order_draft_v1";
 const ORDER_DRAFT_VERSION = 1;
@@ -171,8 +172,13 @@ const normalizeUploadMetadata = (files) => {
     .filter((file) => file.name);
 };
 
-const restoreOrderDraft = () => {
-  const emptyDraft = { order: createInitialState(), missingUploadFiles: [] };
+const restoreOrderDraft = (persistentStore) => {
+  const persistent = persistentStore.initialDraft;
+  const initialOrder = createInitialState();
+  const emptyDraft = { order: persistent ? { ...initialOrder, cartItemKey: persistent.cartItemKey,
+    clothing: { ...initialOrder.clothing, ...persistent.clothing },
+    embroidery: { ...initialOrder.embroidery, ...persistent.embroidery, price: null, uploadedImage: [] } } : initialOrder,
+    missingUploadFiles: persistent?.uploadFiles || [] };
   if (typeof window === "undefined") return emptyDraft;
 
   try {
@@ -181,6 +187,12 @@ const restoreOrderDraft = () => {
 
     const draft = JSON.parse(rawDraft);
     if (draft?.version !== ORDER_DRAFT_VERSION || !draft.order) return emptyDraft;
+    // A completed/removed or changed constructor in another tab must not be
+    // resurrected from an older tab's sessionStorage. Legacy drafts migrate only
+    // when no newer persistent record (including a completion tombstone) exists.
+    if (draft.constructorRevision === undefined && persistentStore.getRevision() !== null) return emptyDraft;
+    if (draft.constructorRevision !== undefined && draft.constructorRevision !== persistentStore.getRevision()) return emptyDraft;
+    if (persistentStore.initialExpired && !draft.order.recipient?.savedOrder) return emptyDraft;
 
     const storedOrder = draft.order;
     const storedEmbroidery = storedOrder.embroidery || {};
@@ -227,16 +239,17 @@ const restoreOrderDraft = () => {
       missingUploadFiles: hasSavedOrder ? [] : normalizeUploadMetadata(draft.uploadFiles),
     };
   } catch {
-    window.sessionStorage.removeItem(ORDER_DRAFT_STORAGE_KEY);
+    try { window.sessionStorage.removeItem(ORDER_DRAFT_STORAGE_KEY); } catch { /* Storage can be blocked. */ }
     return emptyDraft;
   }
 };
 
-const createOrderDraft = (order, missingUploadFiles) => {
+const createOrderDraft = (order, missingUploadFiles, constructorRevision) => {
   const currentFiles = normalizeUploadMetadata(order.embroidery.uploadedImage);
 
   return {
     version: ORDER_DRAFT_VERSION,
+    constructorRevision,
     order: {
       ...order,
       embroidery: {
@@ -251,22 +264,35 @@ const createOrderDraft = (order, missingUploadFiles) => {
 const OrderContext = createContext(null);
 
 export const OrderProvider = ({ children }) => {
-  const restoredDraft = useMemo(restoreOrderDraft, []);
+  const [persistentStore] = useState(() => createConstructorDraftStore({ storage: getCartStorage() }));
+  const restoredDraft = useMemo(() => restoreOrderDraft(persistentStore), [persistentStore]);
   const [order, setOrder] = useState(restoredDraft.order);
+  const [constructorResetCount, setConstructorResetCount] = useState(0);
+  const [constructorDraftError, setConstructorDraftError] = useState("");
   const [missingUploadFiles, setMissingUploadFiles] = useState(
     restoredDraft.missingUploadFiles
   );
 
   useEffect(() => {
+    const result = persistentStore.save(order, missingUploadFiles);
+    setConstructorDraftError(result.error);
     try {
       window.sessionStorage.setItem(
         ORDER_DRAFT_STORAGE_KEY,
-        JSON.stringify(createOrderDraft(order, missingUploadFiles))
+        JSON.stringify(createOrderDraft(order, missingUploadFiles, persistentStore.getRevision()))
       );
     } catch {
       // sessionStorage may be unavailable or full. The in-memory order still works.
     }
-  }, [order, missingUploadFiles]);
+  }, [order, missingUploadFiles, persistentStore]);
+
+  useEffect(() => {
+    const handleStorage = (event) => {
+      if (event.key === null || event.key === CONSTRUCTOR_DRAFT_KEY) setConstructorDraftError(persistentStore.checkConflict());
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, [persistentStore]);
 
   useEffect(() => {
     if (order.embroidery.uploadedImage.length === 0 || order.recipient.savedOrder) return undefined;
@@ -338,6 +364,7 @@ export const OrderProvider = ({ children }) => {
   }, []);
 
   const resetOrder = useCallback(() => {
+    setConstructorResetCount((value) => value + 1);
     setMissingUploadFiles([]);
     setOrder(createInitialState());
     try {
@@ -348,6 +375,7 @@ export const OrderProvider = ({ children }) => {
   }, []);
 
   const resetCurrentItem = useCallback(() => {
+    setConstructorResetCount((value) => value + 1);
     setMissingUploadFiles([]);
     setOrder((prev) => ({ ...createInitialState(), recipient: { ...prev.recipient, savedOrder: null } }));
   }, []);
@@ -362,6 +390,8 @@ export const OrderProvider = ({ children }) => {
       resetCurrentItem,
       missingUploadFiles,
       dismissMissingUploadFiles,
+      constructorResetCount,
+      constructorDraftError,
     }),
     [
       order,
@@ -372,6 +402,8 @@ export const OrderProvider = ({ children }) => {
       resetCurrentItem,
       missingUploadFiles,
       dismissMissingUploadFiles,
+      constructorResetCount,
+      constructorDraftError,
     ]
   );
 

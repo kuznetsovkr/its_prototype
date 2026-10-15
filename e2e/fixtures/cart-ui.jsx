@@ -7,11 +7,12 @@ import RecipientDetails from "../../src/pages/RecipientDetails";
 import OrderPage from "../../src/pages/OrderPage";
 import PaymentSuccess from "../../src/pages/PaymentSuccess";
 import ThankYouPage from "../../src/pages/ThankYouPage";
+import EmbroideryPage from "../../src/pages/EmbroideryPage";
 import { storeOrderAccessToken } from "../../src/utils/orderAccess";
 import "../../src/assets/styles/main.scss";
 
 const Harness = () => {
-  const { order, setClothing, setEmbroidery, setRecipient } = useOrder();
+  const { order, setClothing, setEmbroidery, setRecipient, missingUploadFiles } = useOrder();
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,6 +26,10 @@ const Harness = () => {
     <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: 8 }}>
       <input aria-label="Фото для теста" type="file" onChange={(event) => setFile(event.target.files[0])} />
       <button disabled={!file} onClick={seed}>Подготовить худи</button>
+      <button disabled={!file} onClick={() => {
+        setEmbroidery({ type: "Car", typeSelectionExplicit: true, uploadedImage: [file], comment: "Вид спереди" });
+        navigate("/embroidery");
+      }}>Добавить фото в черновик</button>
       <button onClick={() => navigate("/recipient?cart=1")}>Открыть сохранённую корзину</button>
       <button onClick={() => navigate("/payment-success")}>Вернуться с оплаты</button>
       <button onClick={() => {
@@ -34,17 +39,18 @@ const Harness = () => {
       }}>Подставить прежний одиночный заказ</button>
     </div>
     <output hidden data-testid="draft-state">{JSON.stringify({ path: location.pathname, cartItemKey: order.cartItemKey,
-      clothing: order.clothing, embroideryType: order.embroidery.type, files: order.embroidery.uploadedImage.map((entry) => entry.name), recipient: order.recipient })}</output>
+      clothing: order.clothing, embroidery: order.embroidery, missingUploadFiles, embroideryType: order.embroidery.type,
+      files: order.embroidery.uploadedImage.map((entry) => entry.name), recipient: order.recipient })}</output>
     <Routes>
       <Route path="/recipient" element={<RecipientDetails />} />
       <Route path="/order" element={<OrderPage />} />
       <Route path="/payment-success" element={<PaymentSuccess />} />
       <Route path="/thank-you" element={<ThankYouPage />} />
-      <Route path="/embroidery" element={<p>Нужно повторно загрузить фото</p>} />
+      <Route path="/embroidery" element={<EmbroideryPage />} />
     </Routes>
   </>;
 };
 
 createRoot(document.getElementById("root")).render(
-  <CartProvider><OrderProvider><MemoryRouter initialEntries={[new URLSearchParams(window.location.search).has("resume") ? "/recipient" : "/recipient?cart=1"]}><Harness /></MemoryRouter></OrderProvider></CartProvider>
+  <CartProvider><OrderProvider><MemoryRouter initialEntries={[new URLSearchParams(window.location.search).has("order") ? "/order" : new URLSearchParams(window.location.search).has("resume") ? "/recipient" : "/recipient?cart=1"]}><Harness /></MemoryRouter></OrderProvider></CartProvider>
 );
