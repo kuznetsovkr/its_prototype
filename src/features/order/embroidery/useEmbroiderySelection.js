@@ -4,6 +4,7 @@ import { IS_DEMO_MODE } from "../../../config/demoMode";
 import { useOrder } from "../../../context/OrderContext";
 import { getEmbroideryPrices } from "./embroideryApi";
 import { getEmbroideryCountError, getPatronusLimit } from "./embroideryLimits";
+import { getCustomTextFontError } from "./customTextFonts";
 import {
   isSameFiles,
   isSameOptions,
@@ -114,16 +115,17 @@ export const useEmbroiderySelection = () => {
   const mustUpload = isCustomType && customOption.image;
   const mustText = isCustomType && customOption.text;
   const mustSelectCustom = isCustomType ? customOption.image || customOption.text : true;
+  const fontError = mustText ? getCustomTextFontError(customTextFont, customText) : "";
   const customIsValid = mustSelectCustom && (!mustUpload || hasFiles) && (!mustText || hasCustomText);
-  const canProceed = !countError && (IS_DEMO_MODE
+  const canProceed = !countError && !fontError && (IS_DEMO_MODE
     ? Boolean(selectedType && (isCustomType || selectedPrice != null))
     : isCustomType
       ? customIsValid
       : Boolean(selectedType && hasFiles && selectedPrice != null && !priceLoading));
 
-  let disabledHint = countError || "";
+  let disabledHint = countError || fontError || "";
   if (!selectedType) disabledHint = "Выберите тип вышивки";
-  else if (!countError && !IS_DEMO_MODE) {
+  else if (!countError && !fontError && !IS_DEMO_MODE) {
     if (priceLoading) disabledHint = "Дождитесь расчёта стоимости";
     else if (priceError) disabledHint = priceError;
     else if (!isCustomType && !hasFiles) disabledHint = "Загрузите хотя бы одно изображение";
@@ -251,7 +253,7 @@ export const useEmbroiderySelection = () => {
     clothingPreviewSrc: clothing.previewSrc || "",
     clothingPreviewAlt: clothing.previewAlt || clothing.type || "Одежда",
     selectedType, customText, setCustomText, uploadedImage, setUploadedImage,
-    comment, setComment, error, countError, patronusCount, setPatronusCount,
+    comment, setComment, error, countError, fontError, patronusCount, setPatronusCount,
     petFaceCount, setPetFaceCount, customOption, setCustomOption,
     customTextFont, setCustomTextFont, patronusLimit,
     isCustomType, hasFiles, canProceed, disabledHint, priceError,

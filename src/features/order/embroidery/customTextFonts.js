@@ -1,0 +1,39 @@
+// Values are stored in orders and sent to the API; CSS aliases are local to
+// the constructor so supplied faces cannot replace the site's UI typography.
+export const CUSTOM_TEXT_FONT_OPTIONS = [
+  { value: "Arial", family: "Arial", fallback: "sans-serif" },
+  { value: "Courier New", family: "Courier New", fallback: "monospace" },
+  { value: "Georgia", family: "Georgia", fallback: "serif" },
+  { value: "Times New Roman", family: "Times New Roman", fallback: "serif" },
+  { value: "Comic Sans MS", family: "Comic Sans MS", fallback: "cursive" },
+  { value: "Book Antiqua", family: "ITS Embroidery Book Antiqua", fallback: "serif" },
+  { value: "Century Schoolbook Bold", label: "Century Schoolbook Bold", family: "ITS Embroidery Century", fallback: "serif", weight: 700 },
+  { value: "Lumios Marker", family: "ITS Embroidery Lumios Marker", fallback: "cursive" },
+  { value: "Montserrat Bold", family: "ITS Embroidery Montserrat", fallback: "sans-serif", weight: 700 },
+  { value: "Onest Bold", family: "ITS Embroidery Onest", fallback: "sans-serif", weight: 700 },
+  { value: "Swanky and Moo Moo", label: "Swanky and Moo Moo (без кириллицы)", family: "ITS Embroidery Swanky and Moo Moo", fallback: "cursive", cyrillic: false },
+  { value: "Unbounded", family: "ITS Embroidery Unbounded", fallback: "sans-serif" },
+  { value: "Vasek Italic", family: "ITS Embroidery Vasek", fallback: "cursive", style: "italic" },
+];
+
+export const CUSTOM_TEXT_FONTS = CUSTOM_TEXT_FONT_OPTIONS.map(({ value }) => value);
+export const getCustomTextFont = (value) => CUSTOM_TEXT_FONT_OPTIONS.find(font => font.value === value);
+
+export const getCustomTextFontStyle = (value) => {
+  const font = getCustomTextFont(value) || CUSTOM_TEXT_FONT_OPTIONS[0];
+  return {
+    fontFamily: `"${font.family}", ${font.fallback}`,
+    fontWeight: font.weight || 400,
+    fontStyle: font.style || "normal",
+    fontSynthesis: "none",
+  };
+};
+
+export const getCustomTextFontError = (value, text = "") => {
+  const font = getCustomTextFont(value);
+  if (!font) return "Выберите шрифт из списка";
+  if (font.cyrillic === false && /\p{Script=Cyrillic}/u.test(text)) {
+    return `Шрифт «${font.value}» не поддерживает кириллицу. Выберите другой шрифт или используйте латиницу.`;
+  }
+  return "";
+};

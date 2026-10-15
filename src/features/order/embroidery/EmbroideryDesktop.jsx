@@ -13,12 +13,12 @@ import orderBackIcon from "../../../images/order/order-back.svg";
 import orderBackIconMobile from "../../../images/order/order-back-mobile.svg";
 import orderBackIconTablet from "../../../images/order/order-back-tablet.svg";
 import {
-  CUSTOM_TEXT_FONTS,
   EMBROIDERY_TYPES as desktopEmbroideryTypes,
   MAX_UPLOAD_MB as MAX_MB,
   getUploadInstructions,
 } from "./embroideryConfig";
 import { MAX_PET_FACE_COUNT } from "./embroideryLimits";
+import { CUSTOM_TEXT_FONT_OPTIONS, getCustomTextFontStyle } from "./customTextFonts";
 
 const EmbroideryDesktop = ({
   selection,
@@ -36,7 +36,7 @@ const EmbroideryDesktop = ({
   const {
     clothingPreviewSrc, clothingPreviewAlt,
     selectedType, customText, setCustomText, uploadedImage, comment, setComment,
-    error, countError, patronusCount, setPatronusCount, petFaceCount, setPetFaceCount,
+    error, countError, fontError, patronusCount, setPatronusCount, petFaceCount, setPetFaceCount,
     customTextFont, setCustomTextFont, patronusLimit, hasFiles,
     canProceed, disabledHint, priceError, desktopPriceLabel, handleFileChange,
     handleFileDragOver, handleFileDrop, handleRemoveImage,
@@ -302,7 +302,9 @@ const EmbroideryDesktop = ({
                     value={customText}
                     onChange={(event) => setCustomText(event.target.value)}
                     placeholder="Введите надпись"
-                    style={{ fontFamily: customTextFont }}
+                    style={getCustomTextFontStyle(customTextFont)}
+                    aria-invalid={Boolean(fontError)}
+                    aria-describedby={fontError ? "embroidery-font-error" : undefined}
                   />
                 </label>
 
@@ -311,10 +313,13 @@ const EmbroideryDesktop = ({
                   <select
                     value={customTextFont}
                     onChange={(event) => setCustomTextFont(event.target.value)}
+                    aria-invalid={Boolean(fontError)}
+                    aria-describedby={fontError ? "embroidery-font-error" : undefined}
                   >
-                    {CUSTOM_TEXT_FONTS.map((font) => <option value={font} key={font}>{font}</option>)}
+                    {CUSTOM_TEXT_FONT_OPTIONS.map(({ value, label }) => <option value={value} key={value}>{label || value}</option>)}
                   </select>
                 </label>
+                {fontError && <p className="embroideryDesktopDetails__error" id="embroidery-font-error" role="alert">{fontError}</p>}
 
                 <label className="embroideryDesktopDetails__field">
                   <span>Комментарий</span>
@@ -340,7 +345,7 @@ const EmbroideryDesktop = ({
               type="button"
               className="is-next"
               onClick={handleDesktopNext}
-              disabled={!selectedType}
+              disabled={!selectedType || Boolean(fontError)}
               title={!canProceed ? disabledHint : undefined}
             >
               далее

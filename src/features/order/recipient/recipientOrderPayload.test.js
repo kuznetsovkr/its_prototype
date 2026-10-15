@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { buildOrderFormData } from "./recipientOrderPayload";
+import { CUSTOM_TEXT_FONTS } from "../embroidery/customTextFonts";
 
 const deliveryBase = {
   userData: { firstName: "Иван", lastName: "Иванов", phone: "+7 (999) 123-45-67" },
@@ -9,6 +10,14 @@ const deliveryBase = {
 };
 
 describe("recipient order payload", () => {
+  test("keeps each font's canonical value rather than its CSS alias or label", () => {
+    for (const customTextFont of CUSTOM_TEXT_FONTS) {
+      const payload = buildOrderFormData({ ...deliveryBase, selectedType: "custom", customTextFont,
+        customOption: { image: false, text: true }, customText: "Love" });
+      expect(payload.get("customTextFont")).toBe(customTextFont);
+      expect(payload.get("customText")).toBe("Love");
+    }
+  });
   test("keeps checkout contact details and the selected custom font", () => {
     const payload = buildOrderFormData({
       userData: {

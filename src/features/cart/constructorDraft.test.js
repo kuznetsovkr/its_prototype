@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CONSTRUCTOR_DRAFT_KEY, CONSTRUCTOR_DRAFT_TTL, constructorSnapshot, createConstructorDraftStore } from "./constructorDraft";
+import { CUSTOM_TEXT_FONTS } from "../order/embroidery/customTextFonts";
 
 const id = "11111111-1111-4111-8111-111111111111";
 const order = () => ({ cartItemKey: id, clothing: { type: "Худи", color: "Чёрный", size: "M", previewSrc: "blob:private", profile: { price: 999 } },
@@ -7,6 +8,17 @@ const order = () => ({ cartItemKey: id, clothing: { type: "Худи", color: "Ч
   recipient: { email: "buyer@example.com", phone: "79999999999", certificateCode: "secret", privacyConsent: true } });
 const memory = () => { const map = new Map(); return { getItem: (key) => map.get(key) || null, setItem: (key, value) => map.set(key, value), removeItem: (key) => map.delete(key) }; };
 describe("unfinished constructor persistence", () => {
+  it("restores the exact selected inscription font with its text after restarting the browser", () => {
+    for (const customTextFont of CUSTOM_TEXT_FONTS) {
+      const storage = memory();
+      const input = { ...order(), embroidery: { type: "custom", typeSelectionExplicit: true,
+        customOption: { text: true, image: false }, customText: "Love", customTextFont } };
+      createConstructorDraftStore({ storage }).save(input);
+      const restored = createConstructorDraftStore({ storage }).initialDraft;
+      expect(restored.embroidery.customTextFont).toBe(customTextFont);
+      expect(restored.embroidery.customText).toBe("Love");
+    }
+  });
   it("starts only after all garment choices and stores an explicit privacy-safe allowlist", () => {
     const input = order();
     expect(constructorSnapshot({ ...input, clothing: { type: "Худи", color: "Чёрный" } })).toBeNull();

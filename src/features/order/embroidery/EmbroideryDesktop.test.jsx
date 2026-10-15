@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import EmbroideryDesktop from "./EmbroideryDesktop";
 
 const noop = () => {};
-const renderInstructions = (selectedType, desktopTab = "image") => {
+const renderPanel = (selectedType, desktopTab = "image", overrides = {}) => {
   const selection = {
     clothingPreviewSrc: "",
     clothingPreviewAlt: "",
@@ -32,6 +32,7 @@ const renderInstructions = (selectedType, desktopTab = "image") => {
     handleRemoveImage: noop,
     missingUploadFiles: [],
     dismissMissingUploadFiles: noop,
+    ...overrides,
   };
   const markup = renderToStaticMarkup(
     <EmbroideryDesktop
@@ -47,8 +48,28 @@ const renderInstructions = (selectedType, desktopTab = "image") => {
       onNext={noop}
     />
   );
-  return markup.match(/<div class="embroideryUploadStage__instructions">([\s\S]*?)<\/div>/)?.[1] || "";
+  return markup;
 };
+const renderInstructions = (selectedType, desktopTab = "image") => renderPanel(selectedType, desktopTab)
+  .match(/<div class="embroideryUploadStage__instructions">([\s\S]*?)<\/div>/)?.[1] || "";
+
+describe("inscription font preview", () => {
+  test("renders supplied choices and the actual selected face", () => {
+    const bold = renderPanel("custom", "text", { customTextFont: "Montserrat Bold", customText: "Привет" });
+    expect(bold.match(/<option /g)).toHaveLength(13);
+    expect(bold).toContain("ITS Embroidery Montserrat");
+    expect(bold).toContain("font-weight:700");
+    expect(bold).toContain('value="Montserrat Bold" selected=""');
+    expect(bold).toContain("Swanky and Moo Moo (без кириллицы)");
+    expect(renderPanel("custom", "text", { customTextFont: "Vasek Italic" })).toContain("font-style:italic");
+  });
+  test("makes an invalid font/text combination visible and disables proceeding", () => {
+    const markup = renderPanel("custom", "text", { customTextFont: "Swanky and Moo Moo", customText: "Привет", fontError: "Не поддерживает кириллицу" });
+    expect(markup).toContain('aria-describedby="embroidery-font-error"');
+    expect(markup).toContain('id="embroidery-font-error" role="alert"');
+    expect(markup).toContain('disabled="" title=""');
+  });
+});
 
 describe("embroidery upload instructions", () => {
   test("custom image instructions replace the previous type's text and do not leak to other types", () => {

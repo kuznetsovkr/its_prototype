@@ -1,0 +1,65 @@
+// Kept separate from UI font families. Browsers request a file only when its
+// face is actually used, not when opening the homepage or the font menu.
+@font-face {
+  font-family: "ITS Embroidery Book Antiqua";
+  src: url("../../fonts/embroidery/book-antiqua.woff") format("woff");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ITS Embroidery Century";
+  src: url("../../fonts/embroidery/century.woff") format("woff");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ITS Embroidery Lumios Marker";
+  src: url("../../fonts/embroidery/Lumios-Marker.woff") format("woff");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ITS Embroidery Montserrat";
+  src: url("../../fonts/embroidery/montserrat-bold.woff") format("woff");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ITS Embroidery Onest";
+  src: url("../../fonts/embroidery/Onest-Bold.woff") format("woff");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ITS Embroidery Swanky and Moo Moo";
+  src: url("../../fonts/embroidery/SwankyandMooMoo.woff") format("woff");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ITS Embroidery Unbounded";
+  src: url("../../fonts/embroidery/Unbounded-Regular.woff") format("woff");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ITS Embroidery Vasek";
+  src: url("../../fonts/embroidery/Vasek-Italic_0.woff") format("woff");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}

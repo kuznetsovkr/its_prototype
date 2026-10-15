@@ -5,13 +5,7 @@ export const EMBROIDERY_TYPES = [
   { value: "custom", label: "другая", hasExample: false },
 ];
 
-export const CUSTOM_TEXT_FONTS = [
-  "Arial",
-  "Courier New",
-  "Georgia",
-  "Times New Roman",
-  "Comic Sans MS",
-];
+export { CUSTOM_TEXT_FONTS } from "./customTextFonts";
 
 export const UPLOAD_INSTRUCTIONS = [
   "Отправьте, пожалуйста, фото вашего питомца:",
