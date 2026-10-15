@@ -1,34 +1,14 @@
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useId,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from "react";
-
+import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import HomeButton from "./HomeButton";
+import { closestReviewPage, wrapReviewPosition } from "./reviewsLoop";
 
-
-const getDefaultReviewKey = (review, index) => (
-  review && typeof review === "object" && review.id !== undefined
-    ? review.id
-    : index
-);
-
-const pagesAreEqual = (firstPages, secondPages) => (
-  firstPages.length === secondPages.length
-  && firstPages.every((page, index) => (
-    Math.abs(page.position - secondPages[index].position) < 1
-    && page.itemIndex === secondPages[index].itemIndex
-  ))
-);
+const getDefaultReviewKey = (review, index) => review?.id ?? index;
 
 const ReviewsCarousel = forwardRef(({
   ariaLabel = "Отзывы клиентов",
   className = "",
   getReviewKey = getDefaultReviewKey,
+  loop = false,
   nextIcon,
   nextLabel = "Следующие отзывы",
   onActiveIndexChange,
@@ -40,252 +20,179 @@ const ReviewsCarousel = forwardRef(({
   showControls = true,
   showDots = false,
 }, forwardedRef) => {
-  const generatedId = useId().replace(/:/g, "");
-  const viewportId = `home-reviews-carousel-${generatedId}`;
+  const viewportId = `home-reviews-carousel-${useId().replace(/:/g, "")}`;
   const viewportRef = useRef(null);
-  const [pages, setPages] = useState([{ itemIndex: 0, position: 0 }]);
+  const geometry = useRef({ start: 0, span: 0, loop: false, pages: [] });
+  const activeIndexRef = useRef(0);
+  const settleTimer = useRef(0);
+  const touching = useRef(false);
+  const changeCallback = useRef(onActiveIndexChange);
+  const [renderLoop, setRenderLoop] = useState(loop && reviews.length > 1);
+  const [pages, setPages] = useState([]);
   const [activePageIndex, setActivePageIndex] = useState(0);
-  const [canScrollPrevious, setCanScrollPrevious] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(reviews.length > 1);
-  const lastReportedItemIndex = useRef(null);
+  const [scrollable, setScrollable] = useState(false);
+  changeCallback.current = onActiveIndexChange;
 
-  const getResolvedScrollBehavior = useCallback(() => {
-    if (
-      typeof window !== "undefined"
-      && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
-    ) {
-      return "auto";
-    }
-
-    return scrollBehavior;
+  const scrollToPosition = useCallback((left, instant = false) => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    viewport.scrollTo({ left, behavior: instant || reduced ? "instant" : scrollBehavior });
   }, [scrollBehavior]);
 
-  const scrollToPosition = useCallback((position) => {
+  const updatePosition = useCallback(() => {
     const viewport = viewportRef.current;
+    const metrics = geometry.current;
+    if (!viewport || !metrics.pages.length) return;
+    const index = closestReviewPage(viewport.scrollLeft, metrics);
+    const changed = activeIndexRef.current !== index;
+    activeIndexRef.current = index;
+    setActivePageIndex(index);
+    if (changed) changeCallback.current?.(metrics.pages[index].itemIndex);
+  }, []);
 
-    if (!viewport) {
-      return;
-    }
-
-    if (typeof viewport.scrollTo === "function") {
-      viewport.scrollTo({
-        behavior: getResolvedScrollBehavior(),
-        left: position,
-      });
-    } else {
-      viewport.scrollLeft = position;
-    }
-  }, [getResolvedScrollBehavior]);
-
-  const scrollToItem = useCallback((itemIndex) => {
-    const viewport = viewportRef.current;
-    const track = viewport?.querySelector(".home-reviews-carousel__track");
-    const items = track ? Array.from(track.children) : [];
-    const item = items[itemIndex];
-    const firstItem = items[0];
-
-    if (!viewport || !item || !firstItem) {
-      return;
-    }
-
-    const maximumScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
-    const targetPosition = Math.min(
-      Math.max(0, item.offsetLeft - firstItem.offsetLeft),
-      maximumScroll,
-    );
-    scrollToPosition(targetPosition);
+  const settle = useCallback(() => {
+    // Keep gestures native; rebase copies only after the gesture/snap finishes.
+    clearTimeout(settleTimer.current);
+    settleTimer.current = window.setTimeout(() => {
+      const viewport = viewportRef.current;
+      const metrics = geometry.current;
+      if (!viewport || touching.current || !metrics.loop) return;
+      const canonical = wrapReviewPosition(viewport.scrollLeft, metrics.start, metrics.span);
+      if (Math.abs(canonical - viewport.scrollLeft) > 1) scrollToPosition(canonical, true);
+    }, 180);
   }, [scrollToPosition]);
 
-  const scrollToPage = useCallback((pageIndex) => {
-    if (pages.length === 0) {
-      return;
-    }
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return undefined;
+    const recalculate = () => {
+      const items = [...viewport.querySelectorAll(".home-reviews-carousel__item")];
+      const firstSlide = viewport.querySelector(".home-reviews-carousel__slide");
+      if (!items.length || !firstSlide) return;
+      const contentWidth = items.at(-1).offsetLeft + items.at(-1).offsetWidth - items[0].offsetLeft;
+      const canScroll = contentWidth > viewport.clientWidth + 1;
+      const shouldLoop = loop && items.length > 1 && canScroll;
+      if (renderLoop !== shouldLoop) {
+        setRenderLoop(shouldLoop);
+        return;
+      }
+      const start = items[0].offsetLeft - firstSlide.offsetLeft;
+      const stride = items.length > 1 ? items[1].offsetLeft - items[0].offsetLeft : 0;
+      const span = stride * items.length;
+      const maximum = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+      const nextPages = [];
+      items.forEach((item, itemIndex) => {
+        const position = shouldLoop ? item.offsetLeft - firstSlide.offsetLeft : Math.min(item.offsetLeft - firstSlide.offsetLeft, maximum);
+        if (!nextPages.length || Math.abs(nextPages.at(-1).position - position) >= 1) nextPages.push({ itemIndex, position });
+      });
+      const previous = geometry.current;
+      const changed = previous.loop !== shouldLoop || previous.start !== start || previous.span !== span || previous.maximum !== maximum;
+      geometry.current = { start, span, pages: nextPages, loop: shouldLoop, maximum };
+      setPages((current) => JSON.stringify(current) === JSON.stringify(nextPages) ? current : nextPages);
+      setScrollable(canScroll);
+      if (changed) scrollToPosition(nextPages[Math.min(activeIndexRef.current, nextPages.length - 1)]?.position ?? 0, true);
+      updatePosition();
+    };
+    recalculate();
+    const observer = new ResizeObserver(recalculate);
+    observer.observe(viewport);
+    observer.observe(viewport.querySelector(".home-reviews-carousel__track"));
+    return () => { observer.disconnect(); clearTimeout(settleTimer.current); };
+  }, [loop, renderLoop, reviews.length, scrollToPosition, updatePosition]);
 
-    const boundedIndex = Math.min(Math.max(pageIndex, 0), pages.length - 1);
-    scrollToPosition(pages[boundedIndex].position);
-  }, [pages, scrollToPosition]);
+  useEffect(() => { changeCallback.current?.(geometry.current.pages[activeIndexRef.current]?.itemIndex ?? 0); }, []);
+
+  const scrollToPage = useCallback((requestedIndex) => {
+    const metrics = geometry.current;
+    if (!metrics.pages.length) return;
+    let index = requestedIndex;
+    let shift = 0;
+    if (metrics.loop) {
+      const viewport = viewportRef.current;
+      const canonical = wrapReviewPosition(viewport.scrollLeft, metrics.start, metrics.span);
+      if (Math.abs(canonical - viewport.scrollLeft) > 1) scrollToPosition(canonical, true);
+      index = ((index % metrics.pages.length) + metrics.pages.length) % metrics.pages.length;
+      if (requestedIndex < 0) shift = -metrics.span;
+      if (requestedIndex >= metrics.pages.length) shift = metrics.span;
+    } else index = Math.min(Math.max(index, 0), metrics.pages.length - 1);
+    scrollToPosition(metrics.pages[index].position + shift);
+  }, [scrollToPosition]);
 
   useImperativeHandle(forwardedRef, () => ({
     getViewport: () => viewportRef.current,
-    next: () => scrollToPage(activePageIndex + 1),
-    previous: () => scrollToPage(activePageIndex - 1),
-    scrollToIndex: scrollToItem,
-  }), [activePageIndex, scrollToItem, scrollToPage]);
-
-  const updatePosition = useCallback((availablePages = pages) => {
-    const viewport = viewportRef.current;
-
-    if (!viewport) {
-      return;
-    }
-
-    const maximumScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
-    const currentPosition = viewport.scrollLeft;
-    let closestPageIndex = 0;
-
-    availablePages.forEach((page, index) => {
-      const closestDistance = Math.abs(
-        availablePages[closestPageIndex].position - currentPosition,
-      );
-      const candidateDistance = Math.abs(page.position - currentPosition);
-
-      if (candidateDistance < closestDistance) {
-        closestPageIndex = index;
+    next: () => scrollToPage(activeIndexRef.current + 1),
+    previous: () => scrollToPage(activeIndexRef.current - 1),
+    scrollToIndex: (index, { instant = false } = {}) => {
+      const found = geometry.current.pages.findIndex((page) => page.itemIndex === index);
+      if (found >= 0) {
+        if (instant) scrollToPosition(geometry.current.pages[found].position, true);
+        else scrollToPage(found);
       }
-    });
+    },
+  }), [scrollToPage, scrollToPosition]);
 
-    setActivePageIndex(closestPageIndex);
-    setCanScrollPrevious(currentPosition > 1);
-    setCanScrollNext(currentPosition < maximumScroll - 1);
-
-    const activeItemIndex = availablePages[closestPageIndex]?.itemIndex ?? 0;
-    if (activeItemIndex !== lastReportedItemIndex.current) {
-      lastReportedItemIndex.current = activeItemIndex;
-      onActiveIndexChange?.(activeItemIndex);
-    }
-  }, [onActiveIndexChange, pages]);
-
-  const recalculatePages = useCallback(() => {
-    const viewport = viewportRef.current;
-    const track = viewport?.querySelector(".home-reviews-carousel__track");
-    const items = track ? Array.from(track.children) : [];
-
-    if (!viewport || items.length === 0) {
-      const emptyPages = [{ itemIndex: 0, position: 0 }];
-      setPages((currentPages) => (
-        pagesAreEqual(currentPages, emptyPages) ? currentPages : emptyPages
-      ));
-      setCanScrollPrevious(false);
-      setCanScrollNext(false);
-      return;
-    }
-
-    const firstItemOffset = items[0].offsetLeft;
-    const maximumScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
-    const nextPages = [];
-
-    items.forEach((item, itemIndex) => {
-      const position = Math.min(
-        Math.max(0, item.offsetLeft - firstItemOffset),
-        maximumScroll,
-      );
-      const previousPage = nextPages[nextPages.length - 1];
-
-      if (!previousPage || Math.abs(previousPage.position - position) >= 1) {
-        nextPages.push({ itemIndex, position });
-      }
-    });
-
-    setPages((currentPages) => (
-      pagesAreEqual(currentPages, nextPages) ? currentPages : nextPages
-    ));
-    updatePosition(nextPages);
-  }, [updatePosition]);
-
-  useEffect(() => {
-    recalculatePages();
-    const viewport = viewportRef.current;
-    const track = viewport?.querySelector(".home-reviews-carousel__track");
-    let resizeObserver;
-
-    if (typeof ResizeObserver !== "undefined" && viewport && track) {
-      resizeObserver = new ResizeObserver(recalculatePages);
-      resizeObserver.observe(viewport);
-      resizeObserver.observe(track);
-    } else if (typeof window !== "undefined") {
-      window.addEventListener("resize", recalculatePages);
-    }
-
-    return () => {
-      resizeObserver?.disconnect();
-      window.removeEventListener?.("resize", recalculatePages);
-    };
-  }, [recalculatePages, reviews.length]);
-
-  const classes = ["home-reviews-carousel", className].filter(Boolean).join(" ");
+  const onKeyDown = (event) => {
+    if (event.target !== event.currentTarget) return;
+    const targets = { ArrowLeft: activeIndexRef.current - 1, ArrowRight: activeIndexRef.current + 1, Home: 0, End: pages.length - 1 };
+    if (targets[event.key] === undefined) return;
+    event.preventDefault();
+    scrollToPage(targets[event.key]);
+  };
+  const renderItems = (copy) => reviews.map((review, index) => (
+    <li
+      aria-hidden={copy !== "original" ? true : undefined}
+      aria-label={copy === "original" ? `${index + 1} из ${reviews.length}` : undefined}
+      aria-roledescription={copy === "original" ? "слайд" : undefined}
+      className={`home-reviews-carousel__slide home-reviews-carousel__${copy === "original" ? "item" : "clone"}`}
+      data-review-index={index}
+      key={`${copy}-${getReviewKey(review, index)}`}
+      role="group"
+    >
+      {renderReview ? renderReview(review, index, { clone: copy !== "original" }) : review}
+    </li>
+  ));
 
   return (
-    <section
-      aria-label={ariaLabel}
-      aria-roledescription="карусель"
-      className={classes}
-    >
+    <section aria-label={ariaLabel} aria-roledescription="карусель" className={["home-reviews-carousel", className].filter(Boolean).join(" ")}>
       <div
         className="home-reviews-carousel__viewport"
+        data-active-index={activePageIndex}
+        data-loop={renderLoop}
         id={viewportId}
-        onScroll={() => updatePosition()}
+        onKeyDown={onKeyDown}
+        onScroll={() => { updatePosition(); settle(); }}
+        onTouchStart={() => { touching.current = true; clearTimeout(settleTimer.current); }}
+        onTouchEnd={() => { touching.current = false; settle(); }}
+        onTouchCancel={() => { touching.current = false; settle(); }}
         ref={viewportRef}
         tabIndex={0}
       >
         <ul className="home-reviews-carousel__track">
-          {reviews.map((review, index) => (
-            <li
-              aria-label={`${index + 1} из ${reviews.length}`}
-              aria-roledescription="слайд"
-              className="home-reviews-carousel__item"
-              key={getReviewKey(review, index)}
-              role="group"
-            >
-              {renderReview ? renderReview(review, index) : review}
-            </li>
-          ))}
+          {renderLoop && renderItems("before")}
+          {renderItems("original")}
+          {renderLoop && renderItems("after")}
         </ul>
       </div>
-
       {showControls && (
         <div className="home-reviews-carousel__controls">
-          <HomeButton
-            aria-controls={viewportId}
-            aria-label={previousLabel}
-            className="home-reviews-carousel__previous"
-            disabled={!canScrollPrevious}
-            onClick={() => scrollToPage(activePageIndex - 1)}
-            size="icon"
-            variant="carousel"
-          >
-            {previousIcon
-              ? <img src={previousIcon} alt="" aria-hidden="true" />
-              : <span aria-hidden="true">←</span>}
+          <HomeButton aria-controls={viewportId} aria-label={previousLabel} className="home-reviews-carousel__previous" disabled={!scrollable || (!renderLoop && activePageIndex === 0)} onClick={() => scrollToPage(activeIndexRef.current - 1)} size="icon" variant="carousel">
+            {previousIcon ? <img src={previousIcon} alt="" aria-hidden="true" /> : <span aria-hidden="true">←</span>}
           </HomeButton>
-          <HomeButton
-            aria-controls={viewportId}
-            aria-label={nextLabel}
-            className="home-reviews-carousel__next"
-            disabled={!canScrollNext}
-            onClick={() => scrollToPage(activePageIndex + 1)}
-            size="icon"
-            variant="carousel"
-          >
-            {nextIcon
-              ? <img src={nextIcon} alt="" aria-hidden="true" />
-              : <span aria-hidden="true">→</span>}
+          <HomeButton aria-controls={viewportId} aria-label={nextLabel} className="home-reviews-carousel__next" disabled={!scrollable || (!renderLoop && activePageIndex === pages.length - 1)} onClick={() => scrollToPage(activeIndexRef.current + 1)} size="icon" variant="carousel">
+            {nextIcon ? <img src={nextIcon} alt="" aria-hidden="true" /> : <span aria-hidden="true">→</span>}
           </HomeButton>
         </div>
       )}
-
       {showDots && pages.length > 1 && (
         <div aria-label="Навигация по отзывам" className="home-reviews-carousel__dots">
-          {pages.map((page, pageIndex) => (
-            <button
-              aria-label={`Перейти к странице ${pageIndex + 1}`}
-              aria-pressed={pageIndex === activePageIndex}
-              className={[
-                "home-reviews-carousel__dot",
-                pageIndex === activePageIndex
-                  ? "home-reviews-carousel__dot--active"
-                  : "",
-              ].filter(Boolean).join(" ")}
-              key={`${page.itemIndex}-${page.position}`}
-              onClick={() => scrollToPage(pageIndex)}
-              type="button"
-            />
+          {pages.map((page, index) => (
+            <button aria-label={`Перейти к странице ${index + 1}`} aria-pressed={index === activePageIndex} className={`home-reviews-carousel__dot${index === activePageIndex ? " home-reviews-carousel__dot--active" : ""}`} key={page.itemIndex} onClick={() => scrollToPage(index)} type="button" />
           ))}
         </div>
       )}
     </section>
   );
 });
-
 ReviewsCarousel.displayName = "ReviewsCarousel";
-
 export default ReviewsCarousel;

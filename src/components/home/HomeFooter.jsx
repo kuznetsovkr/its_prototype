@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { homeNavigation, legalLinks, socialLinks } from "../../data/homeContent";
+import { homeNavigation, legalLinks, socialLinks, siteCredits } from "../../data/homeContent";
 import ResponsiveAsset from "./ResponsiveAsset";
 
 const HomeFooter = ({ assets, navigationBase = "", onOrder, variant = "home" }) => {
@@ -96,12 +96,12 @@ const HomeFooter = ({ assets, navigationBase = "", onOrder, variant = "home" }) 
             ? <Link to={item.href} key={item.href}>{item.label}</Link>
             : <a href={item.href} key={item.href}>{item.label}</a>
         ))}
-        <span className="home-footer__legal-design">
+        <a className="home-footer__legal-design" href={siteCredits.design} target="_blank" rel="noreferrer">
           Дизайн сайта<span className="home-footer__compact-label"> — Илья Погудин</span>
-        </span>
-        <span className="home-footer__legal-development">
-          Разработка сайта<span className="home-footer__compact-label"> — ............. ...............</span>
-        </span>
+        </a>
+        <a className="home-footer__legal-development" href={siteCredits.development} target="_blank" rel="noreferrer">
+          Разработка сайта
+        </a>
       </div>
     </footer>
   );

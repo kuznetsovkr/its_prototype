@@ -47,6 +47,7 @@ const HomePage = () => {
   const aboutPhotos = [
     { kind: "woman", src: homeAssets.mobile.about.photoLayers[1] },
     { kind: "dog", src: homeAssets.desktop.about.photo },
+    { kind: "man", src: homeAssets.desktop.about.thirdPhoto },
   ];
 
   const worksAssets = {
@@ -76,6 +77,7 @@ const HomePage = () => {
         <AboutSection photos={aboutPhotos} onOrder={handleOrder} />
 
         <ProcessSection
+          breakpoint={breakpoint}
           assets={{
             desktop: homeAssets.desktop.process.items,
             tablet: homeAssets.tablet.process.items,

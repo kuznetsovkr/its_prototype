@@ -12,7 +12,10 @@ const wheel = (overrides = {}) => ({
 describe("desktop smooth scroll", () => {
   it("uses the desktop boundary, mouse capability and reference duration", () => {
     expect(DESKTOP_SCROLL_QUERY).toBe("(min-width: 1200px) and (hover: hover) and (pointer: fine)");
-    expect(DESKTOP_SCROLL_OPTIONS.duration).toBe(0.8);
+    expect(DESKTOP_SCROLL_OPTIONS.duration).toBe(1);
+    expect(DESKTOP_SCROLL_OPTIONS.easing(0)).toBe(0);
+    expect(DESKTOP_SCROLL_OPTIONS.easing(1)).toBe(1);
+    expect(DESKTOP_SCROLL_OPTIONS.easing(0.5)).toBeCloseTo(0.875);
     expect(DESKTOP_SCROLL_OPTIONS.wheelMultiplier * 120).toBe(75);
     expect(DESKTOP_SCROLL_OPTIONS.syncTouch).toBe(false);
     expect(DESKTOP_SCROLL_OPTIONS.anchors).toBe(false);

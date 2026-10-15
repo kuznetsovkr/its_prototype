@@ -1,6 +1,14 @@
 @use "../base/compactScale" as scale;
 @use "../base/breakpoints" as bp;
 
+.home-footer__navigation a,
+.home-footer__navigation button,
+.home-footer__social-link,
+.home-footer__legal a {
+  transition: opacity 300ms ease, scale 300ms ease;
+  transform-origin: left center;
+}
+
 /* Shared 2026 footer. Desktop has home/internal variants; compact layouts are common. */
 .home-footer {
   @include scale.container;
@@ -624,4 +632,27 @@
 .home-footer button:focus-visible {
   outline: scale.px(3) solid #479ceb;
   outline-offset: scale.px(3);
+}
+
+.home-footer__social-link { transform-origin: center; }
+.home-footer__legal .home-footer__legal-design,
+.home-footer__legal .home-footer__legal-development { text-decoration: underline; text-underline-position: from-font; }
+
+@media (min-width: bp.$desktop-min) and (hover: hover) and (pointer: fine) {
+  .home-footer__navigation a:hover,
+  .home-footer__navigation button:hover,
+  .home-footer__social-link:hover,
+  .home-footer__legal a:hover { opacity: 0.7; }
+}
+
+@media (min-width: bp.$desktop-min) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .home-footer__navigation a:hover,
+  .home-footer__navigation button:hover,
+  .home-footer__social-link:hover,
+  .home-footer__legal a:hover { scale: 0.95; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-footer a,
+  .home-footer button { transition: none; }
 }

@@ -47,6 +47,25 @@ for (const viewport of viewports) {
     await expect.poll(() => readScale(page)).toBeCloseTo(0.8, 2);
 
     expect(await section.evaluate((element) => element.offsetHeight)).toBe(originalHeight);
+    const items = section.locator(".home-process__visual, .home-process__description");
+    await expect(items).toHaveCount(8);
+    for (let index = 0; index < 8; index += 1) {
+      const item = items.nth(index);
+      // Use layout offsets: transformed bounds must not feed back into the animation.
+      const scrollItemTo = async (entry) => item.evaluate((element, distance) => {
+        const section = element.closest(".home-process");
+        let top = 0;
+        for (let current = element; current && current !== section; current = current.offsetParent) top += current.offsetTop;
+        window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY + top - window.innerHeight + distance, behavior: "instant" });
+      }, entry);
+      const scale = () => item.evaluate((element) => Number(getComputedStyle(element).scale));
+      await scrollItemTo(0);
+      await expect.poll(scale).toBeCloseTo(0.8, 2);
+      await scrollItemTo(900);
+      await expect.poll(scale).toBeCloseTo(1, 2);
+      await scrollItemTo(0);
+      await expect.poll(scale).toBeCloseTo(0.8, 2);
+    }
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(viewport.width);
   });
 }
@@ -59,4 +78,7 @@ test("при уменьшенном движении блок «Процесс»
   await expect.poll(() => readScale(page)).toBe(1);
   await scrollToProgress(page, 280);
   await expect.poll(() => readScale(page)).toBe(1);
+  for (const item of await page.locator(".home-process__visual, .home-process__description").all()) {
+    await expect(item).toHaveCSS("scale", "1");
+  }
 });

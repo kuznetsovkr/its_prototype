@@ -3,7 +3,10 @@ import { MEDIA_QUERIES } from "./breakpoints";
 export const DESKTOP_SCROLL_QUERY = `${MEDIA_QUERIES.desktop} and (hover: hover) and (pointer: fine)`;
 
 export const DESKTOP_SCROLL_OPTIONS = Object.freeze({
-  duration: 0.8,
+  duration: 1,
+  // A cubic tail keeps the final part of a wheel gesture visible instead of
+  // completing almost all motion in the first fraction of the animation.
+  easing: (progress) => 1 - (1 - progress) ** 3,
   // The designer's reference uses a 75px step for a 120-unit wheel tick.
   wheelMultiplier: 75 / 120,
   smoothWheel: true,

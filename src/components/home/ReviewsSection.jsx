@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import LayeredAsset from "./LayeredAsset";
 import ReviewModal from "./ReviewModal";
 import { HomeButton, ReviewsCarousel } from "./primitives";
@@ -10,6 +10,7 @@ const getReviewImage = (review) => (typeof review === "string"
 
 const ReviewsSection = ({ assets, breakpoint, onOrder }) => {
   const sectionRef = useScrollZoom();
+  const carouselRef = useRef(null);
   const [selectedReview, setSelectedReview] = useState(null);
 
   return (
@@ -18,19 +19,27 @@ const ReviewsSection = ({ assets, breakpoint, onOrder }) => {
         <div className="home-section__inner home-reviews__inner">
           <h2 className="home-section__title" id="home-reviews-title">отзывы</h2>
           <ReviewsCarousel
+            ref={carouselRef}
             className="home-reviews__carousel"
+            loop
             reviews={assets.items}
             nextIcon={assets.nextArrow}
             previousIcon={assets.previousArrow}
             showControls={breakpoint === "desktop"}
             showDots={breakpoint === "desktop"}
-            renderReview={(review, index) => (
+            renderReview={(review, index, { clone }) => (
               <button
-                className="home-reviews__card-button"
+                className={`home-reviews__card-control home-reviews__${clone ? "clone-button" : "card-button"}`}
+                tabIndex={clone ? -1 : undefined}
                 type="button"
                 aria-haspopup="dialog"
                 aria-label={`Открыть отзыв клиента ${index + 1}`}
-                onClick={(event) => setSelectedReview({ index, src: getReviewImage(review), trigger: event.currentTarget })}
+                onClick={(event) => {
+                  const trigger = clone
+                    ? event.currentTarget.closest(".home-reviews-carousel").querySelectorAll(".home-reviews__card-button")[index]
+                    : event.currentTarget;
+                  setSelectedReview({ index, src: getReviewImage(review), trigger, clone });
+                }}
               >
                 <LayeredAsset className="home-reviews__card" layers={review.layers || [getReviewImage(review)]} />
               </button>
@@ -50,7 +59,12 @@ const ReviewsSection = ({ assets, breakpoint, onOrder }) => {
         <ReviewModal
           index={selectedReview.index}
           src={selectedReview.src}
-          onClose={() => setSelectedReview(null)}
+          onClose={() => {
+            // The modal restores focus without scrolling. Make the canonical
+            // button visible before returning focus from a clicked loop copy.
+            if (selectedReview.clone) carouselRef.current?.scrollToIndex(selectedReview.index, { instant: true });
+            setSelectedReview(null);
+          }}
           returnFocusTo={selectedReview.trigger}
         />
       )}

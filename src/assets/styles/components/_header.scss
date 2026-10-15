@@ -88,6 +88,7 @@
   line-height: normal;
   text-decoration: none;
   text-transform: uppercase;
+  transition: background-color 300ms ease, color 300ms ease;
 }
 
 .home-header__link.is-active {
@@ -114,6 +115,17 @@
   height: scale.px(56);
   font-size: scale.px(13);
   line-height: 1.4;
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+@media (min-width: bp.$desktop-min) and (hover: hover) and (pointer: fine) {
+  .home-header__link:hover,
+  .home-header__order:not(:disabled):hover { color: var(--home-white); background: var(--home-orange); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-header__link,
+  .home-header__order { transition: none; }
 }
 
 .home-header__burger,

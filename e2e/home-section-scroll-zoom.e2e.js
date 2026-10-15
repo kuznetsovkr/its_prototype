@@ -10,7 +10,7 @@ const viewports = [
 
 const sections = [
   { selector: ".home-about", layers: [".home-about__surface", ".home-about__card", ".home-about__photo"] },
-  { selector: ".home-process", layers: [".home-process__inner", ".home-process__visual"] },
+  { selector: ".home-process", layers: [".home-process__inner"] },
   { selector: ".home-works", layers: [".home-works__surface", ".home-works__inner"] },
   { selector: ".home-reviews", layers: [".home-reviews__surface", ".home-reviews__inner"] },
   { selector: ".home-customers", layers: [".home-customers__surface", ".home-customers__inner", ".home-customers__photo"] },

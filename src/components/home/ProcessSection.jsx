@@ -1,9 +1,11 @@
 import { processSteps } from "../../data/homeContent";
 import ResponsiveAsset from "./ResponsiveAsset";
 import useScrollZoom from "./useScrollZoom";
+import useProcessItemZoom from "./useProcessItemZoom";
 
-const ProcessSection = ({ assets, onOrder }) => {
+const ProcessSection = ({ assets, onOrder, breakpoint }) => {
   const sectionRef = useScrollZoom();
+  useProcessItemZoom(sectionRef, breakpoint);
 
   return (
     <section className="home-section home-process" id="process" aria-labelledby="home-process-title" ref={sectionRef}>

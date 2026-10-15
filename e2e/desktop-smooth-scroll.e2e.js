@@ -5,6 +5,8 @@ const startDesktop = async (page) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   await expect(page.locator("html")).toHaveClass(/\blenis\b/);
+  await expect(page.locator(".home-hero__desktop-subject")).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
 };
 
 const monitorWheel = async (page) => {
@@ -23,7 +25,7 @@ test.describe("desktop smooth scrolling", () => {
 
   test("wheel movement is animated and scroll-driven blocks keep updating", async ({ page }) => {
     await startDesktop(page);
-    await page.evaluate(() => window.scrollTo(0, 800));
+    await page.evaluate(() => window.scrollTo({ top: 800, behavior: "instant" }));
     await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(800);
     await page.mouse.move(10, 450);
     await monitorWheel(page);
@@ -55,6 +57,7 @@ test.describe("desktop smooth scrolling", () => {
     await carousel.scrollIntoViewIfNeeded();
     await carousel.hover();
     await monitorWheel(page);
+    const startLeft = await carousel.evaluate(el => el.scrollLeft);
     // Move a full card: a fixed 180px delta can snap back to the first card.
     const scrollStep = await carousel.evaluate(element => {
       const cards = element.querySelectorAll(".home-reviews-carousel__item");
@@ -62,7 +65,7 @@ test.describe("desktop smooth scrolling", () => {
     });
     await page.mouse.wheel(scrollStep, 0);
     await expect.poll(() => page.evaluate(() => window.lastWheelPrevented)).toBe(false);
-    await expect.poll(() => carousel.evaluate(el => el.scrollLeft)).toBeGreaterThan(0);
+    await expect.poll(() => carousel.evaluate(el => el.scrollLeft)).toBeGreaterThan(startLeft + 100);
   });
 
   test("modal locks cancel inertia and keep the modal scrollable", async ({ page }) => {

@@ -7,7 +7,7 @@ const viewports = [
 ];
 
 for (const viewport of viewports) {
-  test(`оба фото блока «О бренде» заполняют кадр: ${viewport.name}`, async ({ page }, testInfo) => {
+  test(`все фото блока «О бренде» заполняют кадр: ${viewport.name}`, async ({ page }, testInfo) => {
     test.skip(
       viewport.name === "mobile"
         ? testInfo.project.name !== "mobile-chromium"
@@ -38,7 +38,7 @@ for (const viewport of viewports) {
       });
     });
 
-    expect(geometry).toHaveLength(2);
+    expect(geometry).toHaveLength(3);
     for (const image of geometry) {
       expect(image.naturalWidth).toBeGreaterThan(0);
       expect(image.aspectRatioError).toBeLessThan(0.01);
@@ -80,6 +80,8 @@ test("фото меняются через пять секунд с появле
   expect(animationFrames.start.x).toBeCloseTo(30, 0);
   expect(animationFrames.end.opacity).toBe(1);
   expect(animationFrames.end.x).toBe(0);
+  await expect(page.locator(".home-about__photo-slide--man")).toHaveClass(/is-active/, { timeout: 7000 });
+  await expect(woman).toHaveClass(/is-active/, { timeout: 7000 });
 });
 
 test("при уменьшенном движении фото не меняются автоматически", async ({ page }, testInfo) => {

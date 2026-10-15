@@ -1,4 +1,5 @@
 @use "../../base/compactScale" as scale;
+@use "../../base/breakpoints" as bp;
 /* Responsive overrides intentionally restate component selectors by breakpoint. */
 /* stylelint-disable no-descending-specificity */
 
@@ -131,11 +132,8 @@
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
-  transition: transform 180ms ease, filter 180ms ease;
+  transition: background-color 300ms ease, color 300ms ease, opacity 300ms ease;
 }
-
-.home-button:hover { filter: brightness(1.05); transform: translateY(scale.px(-1)); }
-.home-button:active { transform: translateY(0); }
 
 .home-button:focus-visible,
 .home-tabs__tab:focus-visible,
@@ -263,6 +261,13 @@
   height: auto;
 }
 
+.home-about__photo-slide--man .home-about__photo-image {
+  top: -1%;
+  left: -1%;
+  width: 102%;
+  height: auto;
+}
+
 @keyframes home-about-photo-enter {
   from { opacity: 0; transform: translateX(scale.px(30)); }
   to { opacity: 1; transform: translateX(0); }
@@ -286,6 +291,10 @@
 .home-process__image-picture,
 .home-process__image { width: 100%; height: 100%; }
 .home-process__image { object-fit: cover; }
+.home-process__step--1 .home-process__image,
+.home-process__step--3 .home-process__image { object-position: center bottom; }
+.home-process__visual,
+.home-process__description { scale: var(--home-process-item-scale, 1); transform-origin: center; }
 
 .home-process__label {
   position: absolute;
@@ -450,7 +459,7 @@
 .home-reviews-carousel__viewport::-webkit-scrollbar { display: none; }
 .home-reviews-carousel__track { display: flex; width: max-content; padding: 0; margin: 0; gap: scale.px(12); list-style: none; }
 
-.home-reviews-carousel__item {
+.home-reviews-carousel__slide {
   width: scale.px(360);
   height: scale.px(492);
   flex: 0 0 scale.px(360);
@@ -460,7 +469,7 @@
 }
 
 .home-reviews__card { width: 100%; height: 100%; }
-.home-reviews__card-button {
+.home-reviews__card-control {
   display: block;
   width: 100%;
   height: 100%;
@@ -471,12 +480,12 @@
   cursor: zoom-in;
 }
 .home-reviews__card-button:focus-visible { outline: scale.px(3) solid #479ceb; outline-offset: scale.px(-4); }
-.home-reviews-carousel__item:nth-child(5) .home-layered-asset__layer { object-position: center top; }
+.home-reviews-carousel__slide[data-review-index="4"] .home-layered-asset__layer { object-position: center top; }
 
 @media (hover: hover) and (pointer: fine) {
   .home-reviews-carousel__viewport { padding-top: scale.px(10); margin-top: scale.px(-10); }
-  .home-reviews-carousel__item { transition: translate 200ms ease; }
-  .home-reviews-carousel__item:hover { translate: 0 scale.px(-10); }
+  .home-reviews-carousel__slide { transition: translate 200ms ease; }
+  .home-reviews-carousel__slide:hover { translate: 0 scale.px(-10); }
 }
 
 .home-reviews-carousel__controls {
@@ -519,6 +528,7 @@
   font-size: scale.px(13);
   font-weight: 600;
   text-transform: uppercase;
+  transition: background-color 300ms ease, color 300ms ease;
 }
 
 .home-tabs__tab--active { color: var(--home-white); background: var(--home-orange); }
@@ -595,6 +605,7 @@
   font-weight: 400;
   line-height: 1.4;
   text-align: center;
+  transition: background-color 300ms ease;
 }
 
 .home-accordion__trigger[aria-expanded="true"] { background: var(--home-orange); }
@@ -706,7 +717,7 @@
   .home-page .home-hero__order { animation: none; opacity: 1; }
   .home-page .home-about__photo-slide.is-entering { animation: none; }
   .home-page .home-works__item { scale: 1; }
-  .home-page .home-reviews-carousel__item:hover { translate: 0 0; }
+  .home-page .home-reviews-carousel__slide:hover { translate: 0 0; }
   .home-page .home-faq__accordion .home-accordion__panel:not([hidden]) { animation: none; }
   .home-page .home-customers__content { animation: none; }
   .home-page .home-questions__dog--1-picture,
@@ -740,6 +751,14 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+@media (min-width: bp.$desktop-min) and (hover: hover) and (pointer: fine) {
+  .home-button--dark:not(:disabled, .home-button--disabled):hover,
+  .home-button--primary:not(:disabled, .home-button--disabled):hover,
+  .home-tabs__tab:not(:disabled):hover { color: var(--home-white); background: var(--home-orange); }
+  .home-button--accent:not(:disabled, .home-button--disabled):hover { color: var(--home-white); background: var(--home-black); }
+  .home-accordion__trigger:hover { background: var(--home-orange); }
 }
 
 /* stylelint-enable no-descending-specificity */

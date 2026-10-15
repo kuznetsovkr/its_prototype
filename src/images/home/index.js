@@ -4,10 +4,11 @@ import desktopHeroSubject from './desktop/hero-subject.webp';
 import desktopHeroLogoGraphite from './desktop/hero-logo-graphite.png';
 import desktopHeroLogoMilk from './desktop/hero-logo-milk.webp';
 import desktopAboutPhoto from './desktop/about-photo.webp';
-import desktopProcessStep01Photo from './desktop/process-step-01-photo.jpg';
-import desktopProcessStep02Photo from './desktop/process-step-02-photo.webp';
-import desktopProcessStep03Photo from './desktop/process-step-03-photo.webp';
-import desktopProcessStep04Photo from './desktop/process-step-04-photo.jpg';
+import desktopProcessStep01Photo from './desktop/process-step-01-clean.webp';
+import desktopProcessStep02Photo from './desktop/process-step-02-clean.webp';
+import desktopProcessStep03Photo from './desktop/process-step-03-clean.webp';
+import desktopProcessStep04Photo from './desktop/process-step-04-clean.webp';
+import desktopAboutPhotoThird from './desktop/about-photo-third.webp';
 import desktopWorksHeadingSticker from './desktop/works-heading-sticker.png';
 import desktopWorksHeadingAvatar from './desktop/works-heading-avatar.webp';
 import desktopReviewsItem03 from './desktop/reviews-item-03.jpg';
@@ -53,10 +54,10 @@ import mobileHeroBackground from './mobile/hero-background.webp';
 import mobileHeroLogoGraphite from './desktop/hero-logo-graphite.png';
 import mobileAboutPhotoLayer01 from './desktop/about-photo.webp';
 import mobileAboutPhotoLayer02 from './mobile/about-photo-layer-02.webp';
-import mobileProcessStep01Photo from './desktop/process-step-03-photo.webp';
-import mobileProcessStep02Photo from './desktop/process-step-02-photo.webp';
-import mobileProcessStep03Photo from './desktop/process-step-01-photo.jpg';
-import mobileProcessStep04Photo from './desktop/process-step-04-photo.jpg';
+import mobileProcessStep01Photo from './desktop/process-step-01-clean.webp';
+import mobileProcessStep02Photo from './desktop/process-step-02-clean.webp';
+import mobileProcessStep03Photo from './desktop/process-step-03-clean.webp';
+import mobileProcessStep04Photo from './desktop/process-step-04-clean.webp';
 import mobileReviewsItem01 from './desktop/reviews-item-02.webp';
 import mobileReviewsItem02 from './desktop/reviews-item-03.jpg';
 import mobileQuestionsDogOn from './desktop/questions-dog-on.webp';
@@ -91,12 +92,13 @@ export const homeAssets = {
     },
     about: {
       photo: desktopAboutPhoto,
+      thirdPhoto: desktopAboutPhotoThird,
     },
     process: {
       items: [
-        desktopProcessStep03Photo,
-        desktopProcessStep02Photo,
         desktopProcessStep01Photo,
+        desktopProcessStep02Photo,
+        desktopProcessStep03Photo,
         desktopProcessStep04Photo,
       ],
       connector: desktopProcessConnector,
@@ -148,9 +150,9 @@ export const homeAssets = {
     },
     process: {
       items: [
-        desktopProcessStep03Photo,
-        desktopProcessStep02Photo,
         desktopProcessStep01Photo,
+        desktopProcessStep02Photo,
+        desktopProcessStep03Photo,
         desktopProcessStep04Photo,
       ],
       connector: tabletProcessConnector,

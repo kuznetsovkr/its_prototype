@@ -141,3 +141,8 @@ export const legalLinks = [
   { label: "Политика конфиденциальности", href: "/privacy" },
   { label: "Публичная оферта", href: "/offer" },
 ];
+
+export const siteCredits = {
+  design: "https://t.me/tommyravana",
+  development: "https://t.me/krkuznetsov",
+};

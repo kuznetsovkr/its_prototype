@@ -435,7 +435,7 @@
   }
   .home-reviews-carousel__track { padding-left: 0; gap: scale.px(5); }
 
-  .home-reviews-carousel__item {
+  .home-reviews-carousel__slide {
     width: scale.px(270);
     height: scale.px(350);
     flex-basis: scale.px(270);
@@ -445,7 +445,7 @@
     border-radius: scale.px(30);
   }
 
-  .home-reviews-carousel__item:first-child .home-layered-asset__layer {
+  .home-reviews-carousel__slide[data-review-index="0"] .home-layered-asset__layer {
     inset: auto;
     top: -0.06%;
     left: 0;
@@ -455,7 +455,7 @@
     object-fit: fill;
   }
 
-  .home-reviews-carousel__item:nth-child(2) .home-layered-asset__layer {
+  .home-reviews-carousel__slide[data-review-index="1"] .home-layered-asset__layer {
     inset: auto;
     top: 0.06%;
     left: -5.85%;
