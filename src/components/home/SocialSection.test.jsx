@@ -36,6 +36,20 @@ describe("approved social animations", () => {
     expect(homeAssets.mobile.social.items).toEqual(compactSocialItems);
   });
 
+  it("ends each loop with the moving clip instead of the source's frozen 15-second tail", () => {
+    const durationBounds = [[6.1, 6.3], [4.5, 4.6], [4.0, 4.3], [3.0, 3.2], [4.0, 4.2]];
+    for (const [index, item] of homeSocialItems.entries()) {
+      const video = readFileSync(new URL(`../../images/home/social/${item.id}.mp4`, import.meta.url));
+      const moov = video.readUInt32BE(0);
+      const header = video.indexOf(Buffer.from("mvhd"), moov + 8);
+      expect(header).toBeGreaterThan(moov);
+      expect(video[header + 4]).toBe(0); // Version 0 movie header in these assets.
+      const duration = video.readUInt32BE(header + 20) / video.readUInt32BE(header + 16);
+      expect(duration, item.id).toBeGreaterThanOrEqual(durationBounds[index][0]);
+      expect(duration, item.id).toBeLessThanOrEqual(durationBounds[index][1]);
+    }
+  });
+
   it.each(["desktop", "tablet", "mobile"])("renders posters without requesting video on initial %s render", (breakpoint) => {
     const items = homeAssets[breakpoint].social.items;
     const html = renderToStaticMarkup(<SocialSection items={items} />);

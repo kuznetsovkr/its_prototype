@@ -14,8 +14,13 @@ const SocialVideoCard = ({ item, index, enabled }) => {
     let wantsPlayback = false;
 
     const updatePlayback = () => {
+      // A native loop event can arrive before IntersectionObserver reports a
+      // recent scroll. Check the current bounds before resuming that video.
+      const bounds = card.getBoundingClientRect();
+      const isOnscreen = bounds.bottom > 0 && bounds.top < window.innerHeight
+        && bounds.right > 0 && bounds.left < window.innerWidth;
       wantsPlayback = enabled && isVisible && !document.hidden
-        && !reducedMotion.matches && !failedRef.current;
+        && isOnscreen && !reducedMotion.matches && !failedRef.current;
       if (!wantsPlayback) {
         video.pause();
         return;
@@ -35,6 +40,15 @@ const SocialVideoCard = ({ item, index, enabled }) => {
       isVisible = entry.isIntersecting;
       updatePlayback();
     }, { threshold: 0.15 });
+    // Some native players pause while `loop` seeks back to the first frame.
+    // Resume only that boundary, never a deliberate pause/offscreen video.
+    const resumeLoop = () => {
+      if (wantsPlayback && video.loop && video.paused && video.currentTime < 0.1 && !video.error) {
+        updatePlayback();
+      }
+    };
+    video.addEventListener("seeking", resumeLoop);
+    video.addEventListener("seeked", resumeLoop);
     observer.observe(card);
     document.addEventListener("visibilitychange", updatePlayback);
     reducedMotion.addEventListener("change", updatePlayback);
@@ -43,6 +57,8 @@ const SocialVideoCard = ({ item, index, enabled }) => {
       wantsPlayback = false;
       video.pause();
       observer.disconnect();
+      video.removeEventListener("seeking", resumeLoop);
+      video.removeEventListener("seeked", resumeLoop);
       document.removeEventListener("visibilitychange", updatePlayback);
       reducedMotion.removeEventListener("change", updatePlayback);
     };
