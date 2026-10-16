@@ -99,6 +99,14 @@ export const useRecipientDetails = () => {
     ) ? recipientState.deliveryRecipient : ""
   );
   const [recipientPhone, setRecipientPhone] = useState(recipientState.recipientPhone || "");
+  const [hasOtherRecipient, setHasOtherRecipient] = useState(() => Boolean(
+    recipientState.hasOtherRecipient || deliveryRecipient.trim() || recipientPhone.trim()
+  ));
+  const handleOtherRecipientToggle = (event) => {
+    const checked = event.target.checked;
+    setHasOtherRecipient(checked);
+    if (!checked) { setDeliveryRecipient(""); setRecipientPhone(""); }
+  };
   const [deliveryComment, setDeliveryComment] = useState(recipientState.deliveryComment || "");
   const [privacyConsent, setPrivacyConsent] = useState(Boolean(recipientState.privacyConsent));
   const [isCdekPickerOpen, setIsCdekPickerOpen] = useState(false);
@@ -190,6 +198,7 @@ export const useRecipientDetails = () => {
         setUserData(nextUser); setFullNameInput(joinFullName(nextUser)); setHasNoMiddleName(!nextUser.middleName);
         setEmail(buyer.email || ""); setPreferredContact(buyer.preferredContact || ""); setOrderComment(buyer.comment || "");
         const sameRecipient = buyer.recipientFullName === joinFullName(nextUser) && buyer.recipientPhone === buyer.phone;
+        setHasOtherRecipient(!sameRecipient);
         setDeliveryRecipient(sameRecipient ? "" : buyer.recipientFullName || "");
         setRecipientPhone(sameRecipient ? "" : formatPhoneNumber(buyer.recipientPhone));
         setDeliveryComment(buyer.deliveryComment || ""); setPrivacyConsent(true);
@@ -237,6 +246,7 @@ export const useRecipientDetails = () => {
     const stored = {
       userData: recipientState.userData,
       hasNoMiddleName: Boolean(recipientState.hasNoMiddleName),
+      hasOtherRecipient: Boolean(recipientState.hasOtherRecipient),
       pickupPoint: recipientState.pickupPoint,
       deliveryPrice: recipientState.deliveryPrice ?? null,
       manualAddressValue: recipientState.manualAddress?.value || "",
@@ -259,6 +269,7 @@ export const useRecipientDetails = () => {
     const local = {
       userData,
       hasNoMiddleName,
+      hasOtherRecipient,
       pickupPoint,
       deliveryPrice: deliveryPrice ?? null,
       manualAddressValue: manualAddress?.value || "",
@@ -286,6 +297,7 @@ export const useRecipientDetails = () => {
     return (
       sameUser &&
       local.hasNoMiddleName === stored.hasNoMiddleName &&
+      local.hasOtherRecipient === stored.hasOtherRecipient &&
       local.pickupPoint === stored.pickupPoint &&
       local.deliveryPrice === stored.deliveryPrice &&
       local.manualAddressValue === stored.manualAddressValue &&
@@ -308,6 +320,7 @@ export const useRecipientDetails = () => {
   }, [
     userData,
     hasNoMiddleName,
+    hasOtherRecipient,
     pickupPoint,
     deliveryPrice,
     manualAddress?.value,
@@ -335,6 +348,7 @@ export const useRecipientDetails = () => {
     setRecipient({
       userData,
       hasNoMiddleName,
+      hasOtherRecipient,
       pickupPoint,
       deliveryPrice,
       manualAddress: manualAddressNormalized,
@@ -354,6 +368,7 @@ export const useRecipientDetails = () => {
   }, [
     userData,
     hasNoMiddleName,
+    hasOtherRecipient,
     pickupPoint,
     deliveryPrice,
     manualAddress?.value,
@@ -583,6 +598,7 @@ export const useRecipientDetails = () => {
 
   const recipientValidation = validateRecipient({
     userData,
+    hasOtherRecipient: deliveryMethod !== "pickup" && hasOtherRecipient,
     deliveryRecipient: deliveryMethod === "pickup" ? "" : deliveryRecipient,
     recipientPhone: deliveryMethod === "pickup" ? "" : recipientPhone,
     hasNoMiddleName,
@@ -880,6 +896,7 @@ export const useRecipientDetails = () => {
     clothingPreviewAlt: clothing.previewAlt || clothing.type || "Одежда",
     fullNameInput, handleFullNameChange, isPaying,
     hasNoMiddleName, handleNoMiddleNameToggle,
+    hasOtherRecipient, handleOtherRecipientToggle,
     userData, handleInputChange, email, setEmail, isMobileLayout,
     preferredContact, setPreferredContact, orderComment, setOrderComment,
     isCdekPickerOpen, setIsCdekPickerOpen,

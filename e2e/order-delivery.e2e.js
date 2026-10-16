@@ -101,6 +101,7 @@ test("переключение и обновление сохраняют отд
   await page.getByRole("textbox", { name: "Отделение Почты России", exact: true }).fill(postalPoint);
   await expect(submit).toBeEnabled();
   await expect(page.locator(".recipientOrderSummary")).not.toContainText(/9\s*242/);
+  await page.getByRole("checkbox", { name: "Получатель — другой человек" }).check();
   await page.locator(".recipientOrderForm__group--recipient input").fill("Петров Пётр");
   await expect(submit).toBeDisabled();
   await page.getByRole("radio", { name: "Самовывоз", exact: true }).check();

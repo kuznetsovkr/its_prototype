@@ -87,6 +87,28 @@
 .recipientDeliveryMethods:disabled { opacity: .6; }
 .recipientDeliveryMethods:disabled .recipientOrderForm__deliveryMethod { cursor: default; }
 
+.recipientOtherToggle {
+  display: flex;
+  align-items: center;
+  gap: scale.px(10);
+  color: #2b2b2b;
+  font-size: max(12px, #{scale.px(13)});
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.recipientOtherToggle input {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border: 1px solid #bc5823;
+  border-radius: 3px;
+  cursor: inherit;
+}
+
+.recipientOtherFields { display: grid; min-width: 0; gap: scale.px(20); }
+
 .recipientCity {
   position: relative;
   display: grid;

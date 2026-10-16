@@ -71,6 +71,7 @@ const isSameRecipient = (a, b) =>
   (a?.userData?.middleName || "") === (b?.userData?.middleName || "") &&
   (a?.userData?.phone || "") === (b?.userData?.phone || "") &&
   Boolean(a?.hasNoMiddleName) === Boolean(b?.hasNoMiddleName) &&
+  Boolean(a?.hasOtherRecipient) === Boolean(b?.hasOtherRecipient) &&
   (a?.email || "") === (b?.email || "") &&
   (a?.preferredContact || "") === (b?.preferredContact || "") &&
   (a?.orderComment || "") === (b?.orderComment || "") &&
@@ -130,6 +131,7 @@ const initialState = {
   recipient: {
     userData: { firstName: "", lastName: "", middleName: "", phone: "" },
     hasNoMiddleName: false,
+    hasOtherRecipient: false,
     email: "",
     preferredContact: "",
     orderComment: "",

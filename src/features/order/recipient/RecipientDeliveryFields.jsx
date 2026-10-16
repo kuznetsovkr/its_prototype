@@ -15,10 +15,11 @@ const RecipientDeliveryFields = ({
   deliveryMethod, onMethodChange, disabled, pickupPoint, isCdekPickupSelected, onOpenCdek,
   postalPoint, onPostalPointChange, manualAddress,
   deliveryRecipient, onRecipientChange, recipientPhone, onRecipientPhoneChange,
+  hasOtherRecipient = Boolean(deliveryRecipient.trim() || recipientPhone.trim()), onOtherRecipientChange,
   deliveryComment, onCommentChange, cdekOnly = false,
   city, onCityChange, citySyncing = false, cityNotice = "", cityFixedLabel = "",
 }) => {
-  const recipientPhoneInvalid = Boolean(deliveryRecipient.trim()) && !/^7\d{10}$/.test(normalizePhoneDigits(recipientPhone));
+  const recipientPhoneInvalid = hasOtherRecipient && !/^7\d{10}$/.test(normalizePhoneDigits(recipientPhone));
   const isManual = deliveryMethod === "manual";
   return (
     <div className="recipientOrderForm__delivery">
@@ -74,18 +75,25 @@ const RecipientDeliveryFields = ({
         )}
 
         {deliveryMethod !== "pickup" && <>
-          <label className="recipientOrderForm__group recipientOrderForm__group--recipient">
-            <span>Другой получатель (ФИО, если отличается)</span>
-            <input type="text" autoComplete="shipping name" placeholder="Иванов Иван Иванович" value={deliveryRecipient}
-              onChange={(event) => onRecipientChange(event.target.value)} disabled={disabled} />
+          <label className="recipientOtherToggle">
+            <input type="checkbox" checked={hasOtherRecipient} onChange={onOtherRecipientChange} disabled={disabled}
+              aria-controls="other-recipient-fields" aria-expanded={hasOtherRecipient} />
+            <span>Получатель — другой человек</span>
           </label>
-          <label className="recipientOrderForm__group recipientOrderForm__group--recipientPhone">
-            <span>Телефон другого получателя</span>
-            <input type="tel" autoComplete="shipping tel" placeholder="+7 (999) 123-45-67" value={recipientPhone}
-              onChange={onRecipientPhoneChange} disabled={disabled} maxLength={18} required={Boolean(deliveryRecipient.trim())}
-              aria-invalid={recipientPhoneInvalid} aria-describedby={recipientPhoneInvalid ? "recipient-phone-validation" : undefined} />
-            {recipientPhoneInvalid && <small className="recipientOrderForm__validation" id="recipient-phone-validation">Укажите корректный телефон получателя</small>}
-          </label>
+          {hasOtherRecipient && <div className="recipientOtherFields" id="other-recipient-fields">
+            <label className="recipientOrderForm__group recipientOrderForm__group--recipient">
+              <span>ФИО другого получателя</span>
+              <input type="text" autoComplete="shipping name" placeholder="Иванов Иван Иванович" value={deliveryRecipient}
+                onChange={(event) => onRecipientChange(event.target.value)} disabled={disabled} required />
+            </label>
+            <label className="recipientOrderForm__group recipientOrderForm__group--recipientPhone">
+              <span>Телефон другого получателя</span>
+              <input type="tel" autoComplete="shipping tel" placeholder="+7 (999) 123-45-67" value={recipientPhone}
+                onChange={onRecipientPhoneChange} disabled={disabled} maxLength={18} required
+                aria-invalid={recipientPhoneInvalid} aria-describedby={recipientPhoneInvalid ? "recipient-phone-validation" : undefined} />
+              {recipientPhoneInvalid && <small className="recipientOrderForm__validation" id="recipient-phone-validation">Укажите корректный телефон получателя</small>}
+            </label>
+          </div>}
           <label className="recipientOrderForm__group recipientOrderForm__group--deliveryComment">
             <span>Комментарий</span>
             <input type="text" placeholder="Комментарий к доставке" value={deliveryComment}

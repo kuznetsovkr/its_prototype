@@ -35,8 +35,20 @@ describe("RecipientDeliveryFields", () => {
     expect(html).toContain("Индекс и адрес отделения");
     expect(html).toContain("Пока укажите отделение вручную");
     expect(html).toContain('maxLength="241"');
-    expect(html).toContain("Телефон другого получателя");
+    expect(html).toContain("Получатель — другой человек");
+    expect(html).not.toContain("Телефон другого получателя");
     expect(html).not.toContain("Выберите пункт получения СДЭК");
     expect(html).not.toContain("от 300");
+  });
+  it("shows required recipient fields only when the checkbox is enabled; restores legacy filled fields", () => {
+    const shown = renderToStaticMarkup(<RecipientDeliveryFields {...props} hasOtherRecipient />);
+    expect(shown).toContain('id="other-recipient-fields"');
+    expect(shown.match(/required=""/g)).toHaveLength(2);
+    expect(shown).toContain("Укажите корректный телефон получателя");
+    const legacy = renderToStaticMarkup(<RecipientDeliveryFields {...props} deliveryRecipient="Петров Пётр" />);
+    expect(legacy).toContain("Телефон другого получателя");
+    expect(legacy).toContain('checked=""');
+    const pickup = renderToStaticMarkup(<RecipientDeliveryFields {...props} deliveryMethod="pickup" hasOtherRecipient />);
+    expect(pickup).not.toContain("other-recipient-fields");
   });
 });

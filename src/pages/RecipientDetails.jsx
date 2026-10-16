@@ -33,6 +33,7 @@ const RecipientDetails = () => {
     deliveryMethod, postalPoint, setPostalPoint, handleDeliveryMethodChange,
     deliveryCity, handleDeliveryCityChange, citySyncing, cityNotice, mapLocation, cityFixedLabel,
     recipientPhone, handleRecipientPhoneChange,
+    hasOtherRecipient, handleOtherRecipientToggle,
     deliveryComment, setDeliveryComment, privacyConsent, setPrivacyConsent,
     error, handlePayment, canSubmit, getSubmitDisabledMessage,
     handleCdekSelect, applyDemoPickup, handleNoCdekToggle,
@@ -131,6 +132,7 @@ const RecipientDetails = () => {
                   postalPoint={postalPoint} onPostalPointChange={setPostalPoint} manualAddress={manualAddress}
                   deliveryRecipient={deliveryRecipient} onRecipientChange={setDeliveryRecipient}
                   recipientPhone={recipientPhone} onRecipientPhoneChange={handleRecipientPhoneChange}
+                  hasOtherRecipient={hasOtherRecipient} onOtherRecipientChange={handleOtherRecipientToggle}
                   deliveryComment={deliveryComment} onCommentChange={setDeliveryComment}
                 />
 

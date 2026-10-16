@@ -67,6 +67,10 @@ describe("recipient validation", () => {
   });
 
   test("requires a valid phone and name together for another recipient", () => {
+    const empty = validateRecipient({ ...validData, hasOtherRecipient: true });
+    expect(empty.message).toContain("ФИО другого получателя");
+    expect(empty.message).toContain("телефон другого получателя");
+    expect(empty.isValid).toBe(false);
     expect(validateRecipient({ ...validData, deliveryRecipient: "Петров Пётр", recipientPhone: "" }).message)
       .toContain("телефон другого получателя");
     expect(validateRecipient({ ...validData, deliveryRecipient: "", recipientPhone: "89001234567" }).message)

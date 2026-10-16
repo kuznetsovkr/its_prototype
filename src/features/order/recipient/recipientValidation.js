@@ -45,6 +45,7 @@ export const validateRecipient = ({
   userData,
   deliveryRecipient = "",
   recipientPhone = "",
+  hasOtherRecipient = false,
   hasNoMiddleName = false,
   isNoCdek,
   deliveryMethod = isNoCdek ? "manual" : "cdek",
@@ -78,9 +79,9 @@ export const validateRecipient = ({
   const phoneDigits = cleanPhone(userData.phone);
   const isPhoneValid = phoneDigits.length === 11 && phoneDigits.startsWith("7");
   if (!isPhoneValid) missing.push("корректный телефон");
-  const hasOtherRecipient = Boolean(deliveryRecipient.trim() || recipientPhone.trim());
-  if (hasOtherRecipient && !deliveryRecipient.trim()) missing.push("ФИО другого получателя");
-  if (hasOtherRecipient) {
+  const needsRecipient = hasOtherRecipient || Boolean(deliveryRecipient.trim() || recipientPhone.trim());
+  if (needsRecipient && !deliveryRecipient.trim()) missing.push("ФИО другого получателя");
+  if (needsRecipient) {
     const otherPhoneDigits = normalizePhoneDigits(recipientPhone);
     if (!/^7\d{10}$/.test(otherPhoneDigits)) missing.push("корректный телефон другого получателя");
   }

@@ -223,6 +223,7 @@ test("другой получатель требует телефон, горо�
   const submitButton = page.locator(".recipientOrderNavigation__submit");
   const recipientName = page.locator(".recipientOrderForm__group--recipient input");
   const recipientPhone = page.getByRole("textbox", { name: "Телефон другого получателя" });
+  const otherRecipient = page.getByRole("checkbox", { name: "Получатель — другой человек" });
 
   await expect(page.getByRole("combobox", { name: "Город получения" })).toHaveValue(/Красноярск/);
   await page.getByPlaceholder("ФИО").fill("Иванов Иван Иванович");
@@ -232,9 +233,14 @@ test("другой получатель требует телефон, горо�
   await page.getByRole("checkbox", { name: /Я даю своё согласие/ }).check();
   await expect(page.getByTestId("turnstile-panel")).toHaveClass(/is-verified/, { timeout: 20_000 });
 
+  await expect(recipientName).toHaveCount(0);
+  await expect(recipientPhone).toHaveCount(0);
+  await expect(submitButton).toBeEnabled();
+
+  await otherRecipient.check();
   await expect(recipientName).toHaveValue("");
   await expect(recipientPhone).toHaveValue("");
-  await expect(submitButton).toBeEnabled();
+  await expect(submitButton).toBeDisabled();
 
   await recipientName.fill("Петров Пётр Петрович");
   await expect(submitButton).toBeDisabled();
@@ -242,6 +248,7 @@ test("другой получатель требует телефон, горо�
 
   await recipientPhone.fill("89123456789");
   await expect(recipientPhone).toHaveValue("+7 (912) 345-67-89");
+  await expect(otherRecipient).toBeChecked();
   await expect(submitButton).toBeEnabled();
 
   const expectFormSpacing = async () => {
@@ -270,7 +277,14 @@ test("другой получатель требует телефон, горо�
   await recipientPhone.fill("");
   await recipientName.fill("");
   await expect(recipientPhone).toHaveValue("");
+  await expect(submitButton).toBeDisabled();
+  await otherRecipient.uncheck();
+  await expect(recipientName).toHaveCount(0);
+  await expect(recipientPhone).toHaveCount(0);
   await expect(submitButton).toBeEnabled();
+  await page.reload();
+  await expect(otherRecipient).not.toBeChecked();
+  await expect(recipientName).toHaveCount(0);
 });
 
 test("мобильная шапка сохраняет корзину и центр логотипа без избранного", async ({ page }, testInfo) => {

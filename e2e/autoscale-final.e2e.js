@@ -104,6 +104,7 @@ test("rotation keeps text, focus, recipient phone and manual-address modal usabl
   await page.locator(".embroiderySelectorDesktop__navigation .is-next").click();
   const recipient = page.locator(".recipientOrderForm__group--recipient input");
   const phone = page.locator(".recipientOrderForm__group--recipientPhone input");
+  await page.getByRole("checkbox", { name: "Получатель — другой человек" }).check();
   await recipient.fill("Петров Пётр Петрович");
   await phone.fill("+7 999 234-56-78");
   const phoneValue = await phone.inputValue();
