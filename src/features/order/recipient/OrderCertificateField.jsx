@@ -1,4 +1,9 @@
-const OrderCertificateField = ({ certificate, disabled, manual, demo, quoteError }) => (
+export const isCertificateConfirmed = ({ certificate, quote, loading, quoteError, manual, demo }) => Boolean(
+  certificate.appliedCode && !certificate.hasUnappliedCode && !certificate.error && !loading && !quoteError && !manual && !demo
+  && quote?.appliedCertificateCode === certificate.appliedCode && quote.certificateDiscount > 0
+);
+
+const OrderCertificateField = ({ certificate, disabled, manual, demo, quoteError, quote, loading }) => (
   <div className="orderCertificate">
     <label htmlFor="order-certificate-code">Промокод</label>
     <div className="orderCertificate__entry">
@@ -25,6 +30,9 @@ const OrderCertificateField = ({ certificate, disabled, manual, demo, quoteError
         <button type="button" disabled={disabled || !certificate.input.trim()} onClick={certificate.apply}>Применить</button>
       )}
     </div>
+    {isCertificateConfirmed({ certificate, quote, loading, quoteError, manual, demo }) && (
+      <p className="orderCertificate__success" role="status">Промокод применён. Стоимость заказа пересчитана.</p>
+    )}
     <small id="order-certificate-help" aria-live="polite">
       {certificate.error || (demo ? "В демонстрационном режиме сертификаты не применяются" : manual
         ? "Сертификат можно применить после расчёта стоимости менеджером"

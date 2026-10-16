@@ -482,7 +482,7 @@ export const useRecipientDetails = () => {
 
   useEffect(() => {
     if (draftOrder && draftMatchesCheckout) {
-      setCheckoutQuote(draftOrder);
+      setCheckoutQuote({ ...draftOrder, appliedCertificateCode: certificate.appliedCode });
       setCheckoutQuoteLoading(false);
       setCheckoutQuoteError("");
       return undefined;
@@ -511,7 +511,7 @@ export const useRecipientDetails = () => {
       setCheckoutQuote(null); setCheckoutQuoteLoading(true); setCheckoutQuoteError("");
       const timer = setTimeout(() => {
         quoteCart({ revision: cartRevision, officeCode: cdekOfficeCode, certificateCode: certificate.appliedCode || "" })
-          .then((quote) => { if (!cancelled) setCheckoutQuote(quote); })
+          .then((quote) => { if (!cancelled) setCheckoutQuote({ ...quote, appliedCertificateCode: certificate.appliedCode }); })
           .catch((quoteError) => { if (!cancelled) setCheckoutQuoteError(quoteError.message || "Не удалось рассчитать стоимость корзины"); })
           .finally(() => { if (!cancelled) setCheckoutQuoteLoading(false); });
       }, 300);
@@ -550,7 +550,7 @@ export const useRecipientDetails = () => {
       cdekAddress: { code: cdekOfficeCode },
       ...(certificate.appliedCode ? { certificateCode: certificate.appliedCode } : {}),
     }).then((quote) => {
-      if (!cancelled) setCheckoutQuote(quote);
+      if (!cancelled) setCheckoutQuote({ ...quote, appliedCertificateCode: certificate.appliedCode });
     }).catch((quoteError) => {
       if (!cancelled) {
         setCheckoutQuoteError(quoteError.message || "Не удалось рассчитать итоговую стоимость");

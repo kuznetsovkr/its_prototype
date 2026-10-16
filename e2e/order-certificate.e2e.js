@@ -52,6 +52,7 @@ test("сертификат применяется, удаляется и не п
   await apply(page);
   await expect(page.locator(".recipientOrderSummary")).toContainText(/Сертификат: −6\s*000 ₽/);
   await expect(page.locator(".recipientOrderSummary")).toContainText("К оплате: 390 ₽");
+  await expect(page.getByRole("status").filter({ hasText: "Промокод применён." })).toBeVisible();
   await expect(page.locator(".recipientOrderSummary")).toContainText(/Останется на сертификате: 1\s*000 ₽/);
   expect(api.quotes[0].certificateCode).toBe(code);
   for (const width of info.project.name === "desktop-chromium" ? [1440, 820] : [320, 390, 428]) {
@@ -87,6 +88,7 @@ test("сертификат применяется, удаляется и не п
   await page.getByRole("button", { name: "Удалить", exact: true }).click();
   await expect(page.locator("#order-certificate-code")).toHaveValue("");
   await expect(page.locator(".recipientOrderSummary")).not.toContainText("Сертификат:");
+  await expect(page.getByText("Промокод применён.", { exact: false })).toHaveCount(0);
 });
 test("незаполненное изделие не добавляется в корзину и не теряет данные сертификата", async ({ page }) => {
   const api = await prepare(page);
@@ -115,6 +117,7 @@ test("некорректный или истёкший код не позвол�
   await expect(page.locator(".recipientOrderNavigation__submit")).toBeDisabled();
   await apply(page);
   await expect(page.getByText("Срок действия сертификата истёк")).toBeVisible();
+  await expect(page.getByText("Промокод применён.", { exact: false })).toHaveCount(0);
   await expect(page.locator(".recipientOrderNavigation__submit")).toBeDisabled();
 });
 test("заказ с нулевой доплатой подтверждается без перехода в банк", async ({ page }) => {

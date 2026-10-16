@@ -135,7 +135,7 @@ const RecipientDetails = () => {
                 />
 
                 <div className="recipientOrderForm__checkoutTail">
-                <OrderCertificateField certificate={certificate} disabled={formDisabled || cart.paymentBlocked} manual={isManualCheckout} demo={!isCertificateAvailable} quoteError={checkoutQuoteError} />
+                <OrderCertificateField certificate={certificate} disabled={formDisabled || cart.paymentBlocked} manual={isManualCheckout} demo={!isCertificateAvailable} quoteError={checkoutQuoteError} quote={checkoutQuote} loading={checkoutQuoteLoading} />
                 <div className="recipientOrderSummary" aria-live="polite">
                   {cart.paymentBlocked || cart.requiresCurrentSave ? (
                     <span>{cart.draftItem ? getSubmitDisabledMessage() : GROUP_PAYMENT_NOTICE}</span>

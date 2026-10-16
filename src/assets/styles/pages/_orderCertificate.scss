@@ -90,6 +90,16 @@
   line-height: 1.4;
 }
 
+.orderCertificate__success {
+  margin: 0;
+  padding: scale.px(10) scale.px(14);
+  border-radius: scale.px(12);
+  color: #2f6038;
+  background: #e6eee5;
+  font-size: max(12px, #{scale.px(13)});
+  line-height: 1.4;
+}
+
 @media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
   .recipientOrderPage.has-certificate .recipientOrderForm.recipientOrderForm--certificate {
     padding: scale.px(612) scale.px(29) scale.px(30);
