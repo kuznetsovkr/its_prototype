@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { CUSTOM_TEXT_FONTS, CUSTOM_TEXT_FONT_OPTIONS, DEFAULT_CUSTOM_TEXT_FONT, normalizeCustomTextFont, getCustomTextFontError, getCustomTextFontStyle } from "./customTextFonts";
+import { CUSTOM_TEXT_FONTS, CUSTOM_TEXT_FONT_OPTIONS, DEFAULT_CUSTOM_TEXT_FONT, normalizeCustomText, normalizeCustomTextFont, getCustomTextFont, getCustomTextFontError, getCustomTextFontStyle } from "./customTextFonts";
 
 describe("шрифты надписи", () => {
   test("offers only the eight supplied faces", () => {
@@ -15,7 +15,7 @@ describe("шрифты надписи", () => {
 
   test("uses real bold/italic faces and does not synthesize or leak an arbitrary CSS family", () => {
     expect(getCustomTextFontStyle("Montserrat Bold")).toEqual({
-      fontFamily: '"ITS Embroidery Montserrat", sans-serif', fontWeight: 700, fontStyle: "normal", fontSynthesis: "none",
+      fontFamily: '"ITS Embroidery Montserrat", sans-serif', fontWeight: 700, fontStyle: "normal", fontSynthesis: "none", letterSpacing: "normal",
     });
     expect(getCustomTextFontStyle("Century Schoolbook Bold").fontWeight).toBe(700);
     expect(getCustomTextFontStyle("Onest Bold").fontWeight).toBe(700);
@@ -31,15 +31,23 @@ describe("шрифты надписи", () => {
     for (const font of CUSTOM_TEXT_FONTS) expect(normalizeCustomTextFont(font)).toBe(font);
   });
 
-  test("reports Cyrillic in the Latin face without changing or transliterating the user's text", () => {
-    expect(getCustomTextFontError("Swanky and Moo Moo", "Love 2026!")).toBe("");
-    expect(getCustomTextFontError("Swanky and Moo Moo", "")).toBe("");
-    for (const text of ["Любовь", "Aя", "Ё", "Ї"]) {
-      expect(getCustomTextFontError("Swanky and Moo Moo", text)).toContain("не поддерживает кириллицу");
-    }
-    for (const font of CUSTOM_TEXT_FONTS.filter(value => value !== "Swanky and Moo Moo")) {
+  test("accepts Cyrillic and Latin in all supplied faces, including replacement Swanky", () => {
+    for (const font of CUSTOM_TEXT_FONTS) {
       expect(getCustomTextFontError(font, "Привет, Ёжик! Love 2026")).toBe("");
     }
+    expect(getCustomTextFont("Swanky and Moo Moo")?.label || "").not.toContain("без кириллицы");
     expect(getCustomTextFontError("CSS family", "Hello")).toBe("Выберите шрифт из списка");
+  });
+
+  test("Onest alone uses lowercase production text and minus five percent tracking", () => {
+    const text = "ПрИвЕт, Ёжик! LOVE 2026\nВторая строка";
+    expect(getCustomTextFontStyle("Onest Bold").letterSpacing).toBe("-0.05em");
+    expect(normalizeCustomText(text, "Onest Bold")).toBe("привет, ёжик! love 2026\nвторая строка");
+    expect(normalizeCustomText(undefined, "Onest Bold")).toBe("");
+    expect(normalizeCustomText("", "Onest Bold")).toBe("");
+    for (const font of CUSTOM_TEXT_FONTS.filter(value => value !== "Onest Bold")) {
+      expect(normalizeCustomText(text, font)).toBe(text);
+      expect(getCustomTextFontStyle(font).letterSpacing).toBe("normal");
+    }
   });
 });

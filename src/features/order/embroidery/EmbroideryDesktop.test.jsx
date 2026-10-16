@@ -61,11 +61,13 @@ describe("inscription font preview", () => {
     expect(bold).toContain("ITS Embroidery Montserrat");
     expect(bold).toContain("font-weight:700");
     expect(bold).toContain('value="Montserrat Bold" selected=""');
-    expect(bold).toContain("Swanky and Moo Moo (без кириллицы)");
+    expect(bold).toContain('value="Swanky and Moo Moo">Swanky and Moo Moo</option>');
+    expect(bold).not.toContain("без кириллицы");
     expect(renderPanel("custom", "text", { customTextFont: "Vasek Italic" })).toContain("font-style:italic");
+    expect(renderPanel("custom", "text")).toContain("letter-spacing:-0.05em");
   });
   test("makes an invalid font/text combination visible and disables proceeding", () => {
-    const markup = renderPanel("custom", "text", { customTextFont: "Swanky and Moo Moo", customText: "Привет", fontError: "Не поддерживает кириллицу" });
+    const markup = renderPanel("custom", "text", { customTextFont: "Unknown Font", customText: "Привет", fontError: "Выберите шрифт из списка" });
     expect(markup).toContain('aria-describedby="embroidery-font-error"');
     expect(markup).toContain('id="embroidery-font-error" role="alert"');
     expect(markup).toContain('disabled="" title=""');

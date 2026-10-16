@@ -13,7 +13,7 @@ describe("unfinished constructor persistence", () => {
       customOption: { text: true, image: false }, customText: "Моя надпись", customTextFont: "Arial" } };
     const snapshot = constructorSnapshot(input);
     expect(snapshot.embroidery.customTextFont).toBe("Onest Bold");
-    expect(snapshot.embroidery.customText).toBe("Моя надпись");
+    expect(snapshot.embroidery.customText).toBe("моя надпись");
   });
   it("restores the exact selected inscription font with its text after restarting the browser", () => {
     for (const customTextFont of CUSTOM_TEXT_FONTS) {
@@ -23,8 +23,16 @@ describe("unfinished constructor persistence", () => {
       createConstructorDraftStore({ storage }).save(input);
       const restored = createConstructorDraftStore({ storage }).initialDraft;
       expect(restored.embroidery.customTextFont).toBe(customTextFont);
-      expect(restored.embroidery.customText).toBe("Love");
+      expect(restored.embroidery.customText).toBe(customTextFont === "Onest Bold" ? "love" : "Love");
     }
+  });
+  it("normalizes an older uppercase Onest draft without changing Swanky Cyrillic or comments", () => {
+    const input = { ...order(), embroidery: { type: "custom", typeSelectionExplicit: true,
+      customOption: { text: true, image: false }, customText: "ПрИвЕт, ЁЖИК! LOVE\n2026", customTextFont: "Onest Bold", comment: "Не менять Комментарий" } };
+    expect(constructorSnapshot(input).embroidery.customText).toBe("привет, ёжик! love\n2026");
+    expect(constructorSnapshot(input).embroidery.comment).toBe("Не менять Комментарий");
+    input.embroidery.customTextFont = "Swanky and Moo Moo";
+    expect(constructorSnapshot(input).embroidery.customText).toBe(input.embroidery.customText);
   });
   it("starts only after all garment choices and stores an explicit privacy-safe allowlist", () => {
     const input = order();

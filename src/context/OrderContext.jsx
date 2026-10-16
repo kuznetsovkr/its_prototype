@@ -9,7 +9,7 @@ import {
 import { getOrderAccessToken } from "../utils/orderAccess";
 import { restoreDeliveryMethod } from "../config/delivery";
 import { normalizeDeliveryCity } from "../features/order/recipient/deliveryCity";
-import { DEFAULT_CUSTOM_TEXT_FONT, normalizeCustomTextFont } from "../features/order/embroidery/customTextFonts";
+import { DEFAULT_CUSTOM_TEXT_FONT, normalizeCustomText, normalizeCustomTextFont } from "../features/order/embroidery/customTextFonts";
 import { createCartItemKey } from "../features/cart/cartItem";
 import { getCartStorage, isCartId } from "../features/cart/cartStorage";
 import { CONSTRUCTOR_DRAFT_KEY, createConstructorDraftStore } from "../features/cart/constructorDraft";
@@ -222,6 +222,7 @@ const restoreOrderDraft = (persistentStore) => {
         embroidery: {
           ...initialState.embroidery,
           ...storedEmbroidery,
+          customText: normalizeCustomText(storedEmbroidery.customText, storedEmbroidery.customTextFont),
           customTextFont: normalizeCustomTextFont(storedEmbroidery.customTextFont),
           type: hasSelectedType ? storedEmbroidery.type : "",
           typeSelectionExplicit: hasSelectedType,
@@ -333,6 +334,8 @@ export const OrderProvider = ({ children }) => {
       const next = {
         ...prev.embroidery,
         ...payload,
+        customText: normalizeCustomText(payload?.customText ?? prev.embroidery.customText,
+          payload?.customTextFont ?? prev.embroidery.customTextFont),
         customTextFont: normalizeCustomTextFont(payload?.customTextFont ?? prev.embroidery.customTextFont),
         customOption: payload?.customOption
           ? { ...prev.embroidery.customOption, ...payload.customOption }

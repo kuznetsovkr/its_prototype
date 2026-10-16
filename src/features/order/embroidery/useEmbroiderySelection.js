@@ -4,7 +4,7 @@ import { IS_DEMO_MODE } from "../../../config/demoMode";
 import { useOrder } from "../../../context/OrderContext";
 import { getEmbroideryPrices } from "./embroideryApi";
 import { getEmbroideryCountError, getPatronusLimit } from "./embroideryLimits";
-import { DEFAULT_CUSTOM_TEXT_FONT, getCustomTextFontError, normalizeCustomTextFont } from "./customTextFonts";
+import { DEFAULT_CUSTOM_TEXT_FONT, getCustomTextFontError, normalizeCustomText, normalizeCustomTextFont } from "./customTextFonts";
 import {
   isSameFiles,
   isSameOptions,
@@ -28,7 +28,7 @@ export const useEmbroiderySelection = () => {
   const previousTypeRef = useRef(null);
   const skipExternalSyncRef = useRef(false);
   const [selectedType, setSelectedType] = useState(embroidery.type || "");
-  const [customText, setCustomText] = useState(embroidery.customText || "");
+  const [customText, setCustomText] = useState(() => normalizeCustomText(embroidery.customText, embroidery.customTextFont));
   const [uploadedImage, setUploadedImage] = useState(embroidery.uploadedImage || []);
   const [comment, setComment] = useState(embroidery.comment || "");
   const [error, setError] = useState("");
@@ -195,7 +195,7 @@ export const useEmbroiderySelection = () => {
   useEffect(() => {
     const next = {
       type: embroidery.type || "",
-      customText: embroidery.customText || "",
+      customText: normalizeCustomText(embroidery.customText, embroidery.customTextFont),
       uploadedImage: embroidery.uploadedImage || [],
       comment: embroidery.comment || "",
       patronusCount: embroidery.patronusCount || 1,
@@ -252,10 +252,14 @@ export const useEmbroiderySelection = () => {
     hasClothingSelection: Boolean(clothing.type && clothing.color && clothing.size),
     clothingPreviewSrc: clothing.previewSrc || "",
     clothingPreviewAlt: clothing.previewAlt || clothing.type || "Одежда",
-    selectedType, customText, setCustomText, uploadedImage, setUploadedImage,
+    selectedType, customText, setCustomText: (text) => setCustomText(normalizeCustomText(text, customTextFont)), uploadedImage, setUploadedImage,
     comment, setComment, error, countError, fontError, patronusCount, setPatronusCount,
     petFaceCount, setPetFaceCount, customOption, setCustomOption,
-    customTextFont, setCustomTextFont, patronusLimit,
+    customTextFont, setCustomTextFont: (font) => {
+      const nextFont = normalizeCustomTextFont(font);
+      setCustomTextFont(nextFont);
+      setCustomText((text) => normalizeCustomText(text, nextFont));
+    }, patronusLimit,
     isCustomType, hasFiles, canProceed, disabledHint, priceError,
     desktopPriceLabel: !selectedType ? "" : isCustomType
       ? "Цена рассчитает менеджер"

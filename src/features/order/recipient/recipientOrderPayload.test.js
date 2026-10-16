@@ -20,8 +20,14 @@ describe("recipient order payload", () => {
       const payload = buildOrderFormData({ ...deliveryBase, selectedType: "custom", customTextFont,
         customOption: { image: false, text: true }, customText: "Love" });
       expect(payload.get("customTextFont")).toBe(customTextFont);
-      expect(payload.get("customText")).toBe("Love");
+      expect(payload.get("customText")).toBe(customTextFont === "Onest Bold" ? "love" : "Love");
     }
+  });
+  test("sends lowercase Onest and unchanged Cyrillic Swanky inscriptions, not a display-only transform", () => {
+    const custom = { ...deliveryBase, selectedType: "custom", customOption: { image: false, text: true }, customText: "ПрИвЕт, ЁЖИК! LOVE\n2026" };
+    expect(buildOrderFormData({ ...custom, customTextFont: "Onest Bold" }).get("customText")).toBe("привет, ёжик! love\n2026");
+    expect(buildOrderFormData({ ...custom, customTextFont: "Swanky and Moo Moo" }).get("customText")).toBe(custom.customText);
+    expect(buildOrderFormData({ ...custom, selectedType: "Car", customTextFont: "Onest Bold" }).get("customText")).toBe(custom.customText);
   });
   test("keeps checkout contact details and the selected custom font", () => {
     const payload = buildOrderFormData({

@@ -19,7 +19,7 @@ for (const viewport of [
   { name: "mobile", width: 390, height: 844, project: "mobile-chromium" },
 ]) {
   test(`все присланные шрифты загружаются и сохраняют выбор: ${viewport.name}`, async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name !== viewport.project, "Соответствующий режим ввода");
+    test.skip(testInfo.project.name.replace("webkit", "chromium") !== viewport.project, "Соответствующий режим ввода");
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
     const fontRequests = [];
     page.on("request", request => { if (request.url().endsWith(".woff")) fontRequests.push(request.url()); });
@@ -58,9 +58,10 @@ for (const viewport of [
       await expect.poll(() => select.evaluate(element => element.matches(":open"))).toBe(false);
     }
     for (const font of suppliedFonts) {
-      const sample = font.cyrillic === false ? "Love 2026" : "Привет, Ёжик! Love 2026";
-      await text.fill(sample);
+      const sample = "Привет, Ёжик! Love 2026";
       await select.selectOption(font.value);
+      await text.fill(sample);
+      await expect(text).toHaveValue(font.value === "Onest Bold" ? sample.toLowerCase() : sample);
       const faces = await page.evaluate(async ({ family, weight = 400, style = "normal", sample }) => {
         const loaded = await document.fonts.load(`${style} ${weight} 16px "${family}"`, sample);
         return loaded.map(face => ({ status: face.status, family: face.family }));
@@ -101,24 +102,64 @@ for (const viewport of [
   });
 }
 
-test("кириллица не подменяется незаметно другим шрифтом в Swanky and Moo Moo", async ({ page }) => {
+test("Swanky and Moo Moo принимает кириллицу и сохраняет её при переходах", async ({ page }, testInfo) => {
   await openInscription(page);
   const text = page.getByRole("textbox", { name: "Текст для вышивки", exact: true });
   const select = page.getByRole("combobox", { name: "Шрифт", exact: true });
   const next = page.locator(".embroiderySelectorDesktop__navigation .is-next");
   await select.selectOption("Swanky and Moo Moo");
-  await text.fill("Моя собака");
-  await expect(page.getByRole("alert")).toContainText("не поддерживает кириллицу");
-  await expect(text).toHaveAttribute("aria-invalid", "true");
-  await expect(next).toBeDisabled();
-  await text.fill("My dog");
+  const sample = "Моя собака, Ёжик! My dog 2026";
+  await text.fill(sample);
+  await expect(text).toHaveValue(sample);
   await expect(page.locator("#embroidery-font-error")).toHaveCount(0);
+  await expect(text).toHaveAttribute("aria-invalid", "false");
   await expect(next).toBeEnabled();
-  await text.fill("Моя собака");
-  await select.selectOption("Lumios Marker");
-  await expect(text).toHaveValue("Моя собака");
-  await expect(page.locator("#embroidery-font-error")).toHaveCount(0);
-  await expect(next).toBeEnabled();
+  await page.reload();
+  await expect(text).toHaveValue(sample);
+  await expect(select).toHaveValue("Swanky and Moo Moo");
+  await next.click();
+  await expect(page).toHaveURL(/\/recipient$/);
+  await page.goBack();
+  await expect(text).toHaveValue(sample);
+  await expect(select).toHaveValue("Swanky and Moo Moo");
+  await page.evaluate(() => document.fonts.ready);
+  await text.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: testInfo.outputPath("swanky-cyrillic.png") });
+});
+
+test("Onest сохраняет строчные буквы, интервал и позицию курсора; другие шрифты и комментарий не меняются", async ({ page }, testInfo) => {
+  await openInscription(page);
+  const text = page.getByRole("textbox", { name: "Текст для вышивки", exact: true });
+  const select = page.getByRole("combobox", { name: "Шрифт", exact: true });
+  const comment = page.getByRole("textbox", { name: "Комментарий", exact: true });
+  await text.fill("ПрИвЕт, ЁЖИК! LOVE 2026\nВторая Строка");
+  await expect(text).toHaveValue("привет, ёжик! love 2026\nвторая строка");
+  expect(await text.evaluate(element => {
+    const style = getComputedStyle(element);
+    return parseFloat(style.letterSpacing) / parseFloat(style.fontSize);
+  })).toBeCloseTo(-0.05, 3);
+  await text.evaluate(element => element.setSelectionRange(4, 4));
+  await page.keyboard.insertText("Я");
+  await expect(text).toHaveValue("привяет, ёжик! love 2026\nвторая строка");
+  expect(await text.evaluate(element => element.selectionStart)).toBe(5);
+  await comment.fill("Комментарий С Заглавными");
+  await select.selectOption("Montserrat Bold");
+  await text.fill("Моя Собака! My Dog");
+  await expect(text).toHaveValue("Моя Собака! My Dog");
+  await expect(text).toHaveCSS("letter-spacing", "normal");
+  await select.selectOption("Onest Bold");
+  await expect(text).toHaveValue("моя собака! my dog");
+  await expect(comment).toHaveValue("Комментарий С Заглавными");
+  await expect.poll(() => page.evaluate(() => JSON.parse(sessionStorage.getItem("its_order_draft_v1"))?.order?.embroidery?.customText))
+    .toBe("моя собака! my dog");
+  await page.reload();
+  await expect(text).toHaveValue("моя собака! my dog");
+  await expect(select).toHaveValue("Onest Bold");
+  await expect(comment).toHaveValue("Комментарий С Заглавными");
+  await text.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: testInfo.outputPath("onest-lowercase.png") });
+  await text.fill("");
+  await expect(text).toHaveValue("");
 });
 
 test("старый шрифт в черновике заменяется доступным без потери текста", async ({ page }) => {
@@ -128,7 +169,17 @@ test("старый шрифт в черновике заменяется дос�
       customText: "Сохранённая надпись", customTextFont: "Arial" },
   } })));
   await page.goto("/embroidery");
-  await expect(page.getByRole("textbox", { name: "Текст для вышивки", exact: true })).toHaveValue("Сохранённая надпись");
+  await expect(page.getByRole("textbox", { name: "Текст для вышивки", exact: true })).toHaveValue("сохранённая надпись");
   await expect(page.getByRole("combobox", { name: "Шрифт", exact: true })).toHaveValue("Onest Bold");
   await expect(page.getByRole("combobox", { name: "Шрифт", exact: true }).locator('option[value="Arial"]')).toHaveCount(0);
+});
+
+test("старый Onest-черновик нормализуется до первого редактирования", async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem("its_order_draft_v1", JSON.stringify({ version: 1, uploadFiles: [], order: {
+    clothing: { type: "Hoodie", color: "Чёрный", size: "M" },
+    embroidery: { type: "custom", typeSelectionExplicit: true, customOption: { image: false, text: true },
+      customText: "Старая НАДПИСЬ ЁЖИК", customTextFont: "Onest Bold" },
+  } })));
+  await page.goto("/embroidery");
+  await expect(page.getByRole("textbox", { name: "Текст для вышивки", exact: true })).toHaveValue("старая надпись ёжик");
 });

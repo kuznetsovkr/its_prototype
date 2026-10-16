@@ -1,5 +1,6 @@
 import { normalizePhoneDigits } from "./recipientValidation";
 import { SELF_PICKUP } from "../../../config/delivery";
+import { normalizeCustomText } from "../embroidery/customTextFonts";
 
 export const buildOrderFormData = ({
   userData, deliveryRecipient, recipientPhone, orderComment, embroideryComment, email,
@@ -37,7 +38,8 @@ export const buildOrderFormData = ({
     embroideryTypeRu,
     patronusCount: String(patronusCount || 0),
     petFaceCount: String(petFaceCount || 0),
-    customText: customText || "",
+    customText: selectedType === "custom" && customOption?.text
+      ? normalizeCustomText(customText, customTextFont) : customText || "",
     customTextFont: customTextFont || "",
     customOption: JSON.stringify(customOption || {}),
     comment,

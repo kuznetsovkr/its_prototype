@@ -129,7 +129,7 @@ test("compact text fields scale above the 16px minimum and preserve their values
     const base = width < 640 ? 320 : 640;
     await expect.poll(() => inscription.evaluate((element) => parseFloat(getComputedStyle(element).fontSize)))
       .toBeCloseTo(Math.max(18, 16 * width / base), 2);
-    await expect(inscription).toHaveValue("Надпись для проверки масштаба");
+    await expect(inscription).toHaveValue("надпись для проверки масштаба");
   }
   await page.locator(".embroiderySelectorDesktop__navigation .is-next").click();
   const name = page.getByPlaceholder("ФИО", { exact: true });

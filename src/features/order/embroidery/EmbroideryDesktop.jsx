@@ -18,7 +18,7 @@ import {
   getUploadInstructions,
 } from "./embroideryConfig";
 import { MAX_PET_FACE_COUNT } from "./embroideryLimits";
-import { CUSTOM_TEXT_FONT_OPTIONS, getCustomTextFontStyle } from "./customTextFonts";
+import { CUSTOM_TEXT_FONT_OPTIONS, getCustomTextFontStyle, normalizeCustomText } from "./customTextFonts";
 
 const EmbroideryDesktop = ({
   selection,
@@ -42,6 +42,21 @@ const EmbroideryDesktop = ({
     handleFileDragOver, handleFileDrop, handleRemoveImage,
     missingUploadFiles, dismissMissingUploadFiles,
   } = selection;
+
+  const handleInscriptionChange = (event) => {
+    const input = event.currentTarget;
+    const text = normalizeCustomText(input.value, customTextFont);
+    if (text !== input.value) {
+      // Preserve the caret when typing/pasting uppercase letters in the middle
+      // of a controlled textarea, including Unicode case mappings of new length.
+      const start = normalizeCustomText(input.value.slice(0, input.selectionStart), customTextFont).length;
+      const end = normalizeCustomText(input.value.slice(0, input.selectionEnd), customTextFont).length;
+      const direction = input.selectionDirection;
+      input.value = text;
+      input.setSelectionRange(start, end, direction);
+    }
+    setCustomText(text);
+  };
 
   const renderDesktopCounter = (value, setValue, limit) => (
     <div className="embroideryDesktopCounter">
@@ -300,7 +315,7 @@ const EmbroideryDesktop = ({
                   <span>Текст для вышивки</span>
                   <textarea
                     value={customText}
-                    onChange={(event) => setCustomText(event.target.value)}
+                    onChange={handleInscriptionChange}
                     placeholder="Введите надпись"
                     style={getCustomTextFontStyle(customTextFont)}
                     aria-invalid={Boolean(fontError)}

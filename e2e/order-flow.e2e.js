@@ -516,11 +516,11 @@ test("order draft survives reloads and temporarily leaving the order flow", asyn
   await expect.poll(() => page.evaluate(() => {
     const draft = JSON.parse(sessionStorage.getItem("its_order_draft_v1"));
     return draft?.order?.embroidery?.customText;
-  })).toBe("Тестовая надпись");
+  })).toBe("тестовая надпись");
 
   await page.reload();
   await expect(page).toHaveURL(/\/embroidery$/);
-  await expect(embroideryText).toHaveValue("Тестовая надпись");
+  await expect(embroideryText).toHaveValue("тестовая надпись");
   await expect(page.locator(".embroiderySelectorDesktop__imageFrame img"))
     .toHaveAttribute("src", /hoodie.*\.webp/i);
 

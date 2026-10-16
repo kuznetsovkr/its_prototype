@@ -339,7 +339,7 @@ test("unfinished garment and text survive a browser restart without storing cont
   await page.locator('.orderNavigation .orderActionButton--next').click();
   await page.locator('.embroideryDesktopTabs button').nth(1).click();
   await page.getByPlaceholder("Введите надпись").fill("Мой новый черновик");
-  await expect.poll(async () => (await constructorRecord(page)).draft.embroidery.customText).toBe("Мой новый черновик");
+  await expect.poll(async () => (await constructorRecord(page)).draft.embroidery.customText).toBe("мой новый черновик");
   const before = await constructorRecord(page);
   expect(before.draft).not.toHaveProperty("recipient");
   expect(before.draft.clothing).not.toHaveProperty("profile");
@@ -353,7 +353,7 @@ test("unfinished garment and text survive a browser restart without storing cont
     await expect(restored.getByRole("button", { name: "White", exact: true })).toHaveClass(/active/);
     expect((await constructorRecord(restored)).expiresAt).toBe(before.expiresAt);
     await restored.locator('.orderNavigation .orderActionButton--next').click();
-    await expect(restored.getByPlaceholder("Введите надпись")).toHaveValue("Мой новый черновик");
+    await expect(restored.getByPlaceholder("Введите надпись")).toHaveValue("мой новый черновик");
     expect(server.items).toHaveLength(0);
   } finally { await reopened.close(); }
 });
