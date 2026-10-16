@@ -353,14 +353,14 @@ test("unfinished garment and text survive a browser restart without storing cont
   } finally { await reopened.close(); }
 });
 
-test("a restored photo draft explains missing Files; discarding requires consent and never changes saved cart rows", async ({ page, context, browser }) => {
+test("a restored photo draft explains missing Files without a standalone discard button", async ({ page, context, browser }) => {
   const server = await setup(context);
   await page.goto(`${fixture}?order=1`); await selectGarment(page);
   await page.getByLabel("Фото для теста").setInputFiles({ name: "car.png", mimeType: "image/png", buffer: png });
   await page.getByRole("button", { name: "Добавить фото в черновик" }).click();
   await expect.poll(async () => (await constructorRecord(page)).draft.uploadFiles.length).toBe(1);
-  page.once("dialog", (dialog) => dialog.dismiss());
-  await page.getByRole("button", { name: "Удалить черновик", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Удалить черновик", exact: true })).toHaveCount(0);
+  await expect(page.locator(".orderDraftNotice")).toHaveCount(0);
   expect((await state(page)).files).toEqual(["car.png"]);
   const reopened = await browser.newContext({ storageState: await context.storageState() });
   try {
@@ -370,9 +370,9 @@ test("a restored photo draft explains missing Files; discarding requires consent
     await restored.locator('.orderNavigation .orderActionButton--next').click();
     await expect(restored.locator('.embroideryRestoreNotice')).toContainText("Загрузите фотографии повторно");
     expect((await state(restored)).files).toEqual([]);
-    await restored.getByRole("button", { name: "Удалить черновик", exact: true }).click();
-    await expect.poll(async () => (await constructorRecord(restored)).draft).toBeNull();
-    expect((await state(restored)).missingUploadFiles).toEqual([]);
+    await expect(restored.getByRole("button", { name: "Удалить черновик", exact: true })).toHaveCount(0);
+    expect((await constructorRecord(restored)).draft.uploadFiles[0].name).toBe("car.png");
+    expect((await state(restored)).missingUploadFiles[0].name).toBe("car.png");
   } finally { await reopened.close(); }
   expect(server.items).toHaveLength(0);
 });
@@ -382,6 +382,8 @@ test("unfinished cart row blocks payment until continued or explicitly removed, 
   await savedBasket(page);
   await page.getByRole("button", { name: "Создать ещё одно изделие", exact: true }).click();
   await selectGarment(page);
+  await page.getByLabel("Фото для теста").setInputFiles({ name: "car.png", mimeType: "image/png", buffer: png });
+  await page.getByRole("button", { name: "Добавить фото в черновик" }).click();
   await page.getByRole("button", { name: "Открыть сохранённую корзину" }).click();
   const list = page.getByRole("list", { name: "Изделия в корзине" });
   await expect(list.locator("li")).toHaveCount(2);
@@ -389,7 +391,13 @@ test("unfinished cart row blocks payment until continued or explicitly removed, 
   await expect(page.locator('.recipientCart__total')).toContainText("9 000");
   await expect(page.locator('.recipientOrderNavigation__submit')).toBeDisabled();
   await expect(page.getByRole("link", { name: "Продолжить оформление", exact: true })).toHaveAttribute("href", "/order");
-  await page.getByRole("button", { name: "Удалить изделие: Hoodie, White, M", exact: true }).click();
+  const removeDraft = page.getByRole("button", { name: "Удалить изделие: Hoodie, White, M", exact: true });
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await removeDraft.click();
+  await expect(list.locator("li")).toHaveCount(2);
+  expect((await state(page)).files).toEqual(["car.png"]);
+  page.once("dialog", (dialog) => dialog.accept());
+  await removeDraft.click();
   await expect(list.locator("li")).toHaveCount(1);
   await expect(page.locator('.recipientOrderNavigation__submit')).toBeEnabled();
   expect(server.items).toHaveLength(1); expect(server.invoices()).toBe(0);
@@ -427,7 +435,8 @@ test("an older open tab cannot overwrite or resurrect a newer constructor", asyn
   await newer.locator('.sizeSelector__item:has(input[value="L"]) .sizeSelector__box').click();
   await expect.poll(async () => (await constructorRecord(newer)).draft.clothing.size).toBe("L");
   await expect(page.locator('.orderDraftNotice')).toContainText("другой вкладке");
-  await page.getByRole("button", { name: "Удалить черновик", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Удалить черновик", exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Black", exact: true }).click();
   expect((await constructorRecord(newer)).draft.clothing).toEqual({ type: "Hoodie", color: "Black", size: "L" });
 });
 

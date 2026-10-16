@@ -34,7 +34,8 @@ for (const viewport of [
     expect(await select.locator("option").evaluateAll(options => options.map(option => option.value))).toEqual(suppliedFonts.map(font => font.value));
     await expect(select).toHaveValue("Onest Bold");
     await expect(page.getByText(/Черновик сохраняется в этом браузере|Фото нужно выбрать заново после закрытия страницы/)).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Удалить черновик", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Удалить черновик", exact: true })).toHaveCount(0);
+    await expect(page.locator(".orderDraftNotice")).toHaveCount(0);
     for (const field of [text, select, page.getByRole("textbox", { name: "Комментарий", exact: true })]) {
       expect(await field.evaluate(element => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(16);
     }
