@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IS_DEMO_MODE } from "../config/demoMode";
 import EmbroideryDesktop from "../features/order/embroidery/EmbroideryDesktop";
 import WorkExamplesModal from "../features/order/embroidery/WorkExamplesModal";
 import { useEmbroiderySelection } from "../features/order/embroidery/useEmbroiderySelection";
+import { scrollMobileOrderStepToTop } from "../features/order/shared/orderStepScroll";
 
 const EmbroiderySelector = () => {
   const navigate = useNavigate();
@@ -79,6 +80,12 @@ const EmbroiderySelector = () => {
   };
 
   const isUploadStage = desktopTab === "image" && desktopDetailsOpen;
+  const previousUploadStage = useRef(isUploadStage);
+  useLayoutEffect(() => {
+    if (previousUploadStage.current !== isUploadStage) scrollMobileOrderStepToTop();
+    previousUploadStage.current = isUploadStage;
+  }, [isUploadStage]);
+
   const handleDesktopBack = () => {
     if (isUploadStage) {
       setDesktopDetailsOpen(false);

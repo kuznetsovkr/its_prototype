@@ -9,6 +9,8 @@ import SeoMetadata from './components/SeoMetadata';
 import DesktopSmoothScroll from './components/DesktopSmoothScroll';
 import CertificatePaymentReturn from './features/certificate/CertificatePaymentReturn';
 import { isOrderStepPath } from './config/routes';
+import { MEDIA_QUERIES } from './config/breakpoints';
+import { scrollMobileOrderStepToTop } from './features/order/shared/orderStepScroll';
 
 const loadHomePage = () => import('./pages/HomePage');
 const loadCertificatePage = () => import('./pages/CertificatePage');
@@ -83,10 +85,21 @@ const ScrollToTop = () => {
     const previousPathname = useRef(null);
 
     useLayoutEffect(() => {
+        if (!isOrderStepPath(pathname) || !window.matchMedia(MEDIA_QUERIES.mobile).matches) return undefined;
+        // Browser Back must not restore the old offset after our step reset.
+        const previousRestoration = window.history.scrollRestoration;
+        window.history.scrollRestoration = "manual";
+        return () => { window.history.scrollRestoration = previousRestoration; };
+    }, [pathname]);
+
+    useLayoutEffect(() => {
         const previous = previousPathname.current;
         previousPathname.current = pathname;
 
-        if (isOrderStepPath(previous) && isOrderStepPath(pathname)) return;
+        if (isOrderStepPath(previous) && isOrderStepPath(pathname)) {
+            scrollMobileOrderStepToTop();
+            return;
+        }
 
         window.scrollTo({ top: 0, left: 0, behavior: "auto" });
         document.documentElement.scrollTop = 0;

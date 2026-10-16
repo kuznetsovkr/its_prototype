@@ -52,6 +52,12 @@ Telegram messages are sent. Fresh-request scenarios are skipped in the ordinary
 demo suite and run in this profile instead. Run it separately from other profiles,
 which share the build directory and preview port.
 
+`order-step-scroll.e2e.js` checks mobile step resets in both directions, including
+Browser Back, while wider layouts retain their position. Field changes must not
+reset scrolling. The completion profile also checks the real upload substep and
+preservation of its comment and files; the optional WebKit profile covers route
+navigation. All requests remain local fixtures.
+
 It also runs `order-delivery.e2e.js`: CDEK/Post/pickup switching, keyboard controls,
 responsive geometry, restoring the postal office, request-only submission and
 retry locks. Unapproved Post/pickup tariffs never create a bank request.
