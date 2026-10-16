@@ -636,23 +636,6 @@
   cursor: pointer;
 }
 
-.recipientOrderForm__noMiddleName input::before {
-  width: 60%;
-  height: 35%;
-  border-bottom: scale.px(1) solid #fff;
-  border-left: scale.px(1) solid #fff;
-  content: '';
-  transform: rotate(-45deg) scale(0);
-}
-
-.recipientOrderForm__noMiddleName input:checked {
-  background: #bc5823;
-}
-
-.recipientOrderForm__noMiddleName input:checked::before {
-  transform: rotate(-45deg) scale(1);
-}
-
 .recipientOrderForm__noMiddleName input:disabled {
   cursor: default;
   opacity: .55;
@@ -780,23 +763,6 @@
   place-content: center;
   background: #fff;
   cursor: pointer;
-}
-
-.recipientOrderForm__consent input::before {
-  width: 60%;
-  height: 35%;
-  border-bottom: scale.px(2) solid #fff;
-  border-left: scale.px(2) solid #fff;
-  content: '';
-  transform: rotate(-45deg) scale(0);
-}
-
-.recipientOrderForm__consent input:checked {
-  background: #bc5823;
-}
-
-.recipientOrderForm__consent input:checked::before {
-  transform: rotate(-45deg) scale(1);
 }
 
 .recipientOrderForm__consent em {
@@ -1195,25 +1161,6 @@
   appearance: none;
   background: #fff;
   place-content: center;
-}
-
-.recipientCdekDialog__manualToggle input::before {
-  width: 10px;
-  height: 6px;
-  border-bottom: 2px solid #fff;
-  border-left: 2px solid #fff;
-  content: '';
-  transform: translateY(-1px) rotate(-45deg) scale(0);
-  transition: transform 0.15s ease;
-}
-
-.recipientCdekDialog__manualToggle input:checked {
-  border-color: #bc5823;
-  background: #bc5823;
-}
-
-.recipientCdekDialog__manualToggle input:checked::before {
-  transform: translateY(-1px) rotate(-45deg) scale(1);
 }
 
 .recipientCdekDialog__content.is-manual .recipientCdekDialog__manualToggle {

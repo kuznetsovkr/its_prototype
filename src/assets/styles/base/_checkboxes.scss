@@ -1,0 +1,22 @@
+// A background icon has real dimensions even when the input has no content box.
+// Percentage-sized pseudo-elements in a grid input collapsed to a white dot.
+input[type="checkbox"] {
+  appearance: none;
+  background-color: #fff;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 75% 75%;
+}
+
+input[type="checkbox"]:checked {
+  border-color: #bc5823;
+  background-color: #bc5823;
+  background-image: url("../../../images/order/checkbox-check.svg");
+}
+
+input[type="checkbox"]:focus-visible {
+  outline: 2px solid #bc5823;
+  outline-offset: 3px;
+}
+
+input[type="checkbox"]:disabled { cursor: default; opacity: .55; }

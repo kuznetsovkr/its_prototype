@@ -32,5 +32,7 @@
 @use "components/footer";
 @use "components/header";
 
+@use "base/checkboxes";
+
 // Keep this last: it is a mobile Safari safeguard for every project-owned form.
 @use "base/mobileFormControls";
