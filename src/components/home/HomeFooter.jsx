@@ -13,7 +13,7 @@ const HomeFooter = ({ assets, navigationBase = "", onOrder, variant = "home" }) 
     }
 
     const href = item.href.startsWith("#") ? `${navigationBase}${item.href}` : item.href;
-    return <a href={href} key={item.id}>{item.label}</a>;
+    return <Link to={href} key={item.id}>{item.label}</Link>;
   };
 
   const socialItems = [
@@ -100,7 +100,7 @@ const HomeFooter = ({ assets, navigationBase = "", onOrder, variant = "home" }) 
           Дизайн сайта<span className="home-footer__compact-label"> — Илья Погудин</span>
         </a>
         <a className="home-footer__legal-development" href={siteCredits.development} target="_blank" rel="noreferrer">
-          Разработка сайта
+          Разработка сайта — Кирилл Кузнецов
         </a>
       </div>
     </footer>

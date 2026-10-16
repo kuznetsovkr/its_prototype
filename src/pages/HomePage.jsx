@@ -15,8 +15,10 @@ import ReviewsSection from "../components/home/ReviewsSection";
 import SocialSection from "../components/home/SocialSection";
 import WorksSection from "../components/home/WorksSection";
 import useHomeBreakpoint from "../components/home/useHomeBreakpoint";
+import useHomeAnchorScroll from "../components/home/useHomeAnchorScroll";
 
 const HomePage = () => {
+  useHomeAnchorScroll();
   const navigate = useNavigate();
   const breakpoint = useHomeBreakpoint();
   const currentAssets = homeAssets[breakpoint];

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { restoreDeliveryMethod } from "./delivery";
+import { restoreDeliveryMethod, restoreCheckoutDeliveryMethod } from "./delivery";
 
 describe("delivery draft compatibility", () => {
   it("restores old CDEK and manual drafts", () => {
@@ -12,5 +12,14 @@ describe("delivery draft compatibility", () => {
   });
   it("does not restore unsupported methods", () => {
     expect(restoreDeliveryMethod({ deliveryMethod: "courier" })).toBe("cdek");
+  });
+  it("retires manual delivery in editable drafts but never changes saved orders", () => {
+    for (const recipient of [{ deliveryMethod: "manual" }, { isNoCdek: true }]) {
+      expect(restoreCheckoutDeliveryMethod(recipient)).toBe("cdek");
+      expect(restoreCheckoutDeliveryMethod(recipient, true)).toBe("manual");
+    }
+    for (const deliveryMethod of ["cdek", "russian_post", "pickup"]) {
+      expect(restoreCheckoutDeliveryMethod({ deliveryMethod })).toBe(deliveryMethod);
+    }
   });
 });

@@ -40,6 +40,7 @@ const AboutSection = ({ photos, onOrder }) => {
   }, [photos.length]);
 
   const activePhoto = photoChangeCount % photos.length;
+  const previousPhoto = photoChangeCount ? (photoChangeCount - 1) % photos.length : -1;
 
   return (
     <section className="home-section home-about" id="about" aria-labelledby="home-about-title" ref={sectionRef}>
@@ -82,7 +83,7 @@ const AboutSection = ({ photos, onOrder }) => {
           <div className="home-about__photo" aria-hidden="true" ref={photoRef}>
             {photos.map(({ kind, src }, index) => (
               <div
-                className={`home-about__photo-slide home-about__photo-slide--${kind}${index === activePhoto ? " is-active" : ""}${index === activePhoto && photoChangeCount ? " is-entering" : ""}`}
+                className={`home-about__photo-slide home-about__photo-slide--${kind}${index === previousPhoto ? " is-previous" : ""}${index === activePhoto ? " is-active" : ""}${index === activePhoto && photoChangeCount ? " is-entering" : ""}`}
                 key={kind}
               >
                 <img className="home-about__photo-image" src={src} alt="" loading="lazy" />

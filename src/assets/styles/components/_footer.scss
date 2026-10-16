@@ -452,23 +452,26 @@
 
   .home-footer__legal {
     top: scale.px(764);
-    height: scale.px(12);
     color: #313131;
     font-family: var(--home-font-body);
     font-size: scale.px(8);
+    left: scale.px(48);
+    display: flex;
+    width: calc(100% - #{scale.px(96)});
+    height: auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: scale.px(12);
   }
 
-  .home-footer__legal a:first-child { left: scale.px(48); }
-  .home-footer__legal a:nth-child(2) { left: scale.px(219); }
+  .home-footer__legal > * { position: static; }
 
   .home-footer__legal-design {
-    left: 50%;
     display: block;
     text-transform: capitalize;
   }
 
   .home-footer__legal-development {
-    left: calc(50% + scale.px(129));
     text-decoration: none;
     text-transform: capitalize;
   }

@@ -55,10 +55,15 @@ test("фото меняются через пять секунд с появле
   await page.locator(".home-about__photo").scrollIntoViewIfNeeded();
   const woman = page.locator(".home-about__photo-slide--woman");
   const dog = page.locator(".home-about__photo-slide--dog");
+  const man = page.locator(".home-about__photo-slide--man");
   await expect(woman).toHaveClass(/is-active/);
+  await expect(man).toHaveCSS("visibility", "hidden");
   await expect(dog).toHaveClass(/is-active/, { timeout: 7000 });
   await expect(dog).toHaveClass(/is-entering/);
   await expect(dog).toHaveCSS("animation-duration", "0.7s");
+  await expect(woman).toHaveClass(/is-previous/);
+  await expect(woman).toHaveCSS("visibility", "visible");
+  await expect(man).toHaveCSS("visibility", "hidden");
 
   const animationFrames = await dog.evaluate((element) => {
     const animation = element.getAnimations().find((item) => item.animationName === "home-about-photo-enter");
@@ -80,8 +85,12 @@ test("фото меняются через пять секунд с появле
   expect(animationFrames.start.x).toBeCloseTo(30, 0);
   expect(animationFrames.end.opacity).toBe(1);
   expect(animationFrames.end.x).toBe(0);
-  await expect(page.locator(".home-about__photo-slide--man")).toHaveClass(/is-active/, { timeout: 7000 });
+  await expect(man).toHaveClass(/is-active/, { timeout: 7000 });
+  await expect(dog).toHaveClass(/is-previous/);
+  await expect(woman).toHaveCSS("visibility", "hidden");
   await expect(woman).toHaveClass(/is-active/, { timeout: 7000 });
+  await expect(man).toHaveClass(/is-previous/);
+  await expect(dog).toHaveCSS("visibility", "hidden");
 });
 
 test("при уменьшенном движении фото не меняются автоматически", async ({ page }, testInfo) => {

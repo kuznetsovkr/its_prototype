@@ -263,15 +263,15 @@ const HomeHeader = ({
     }
 
     return (
-      <a
+      <Link
         className={className}
-        href={item.href.startsWith("#") ? `${navigationBase}${item.href}` : item.href}
+        to={item.href.startsWith("#") ? `${navigationBase}${item.href}` : item.href}
         key={item.id}
         aria-current={isActive ? "page" : undefined}
-        onClick={mobile ? closeMenuForNavigation : undefined}
+        onClick={mobile ? () => closeMenu({ restoreFocus: false }) : undefined}
       >
         {content}
-      </a>
+      </Link>
     );
   };
 
@@ -307,7 +307,7 @@ const HomeHeader = ({
             />
           </Link>
         ) : (
-          <a className="home-header__logo" href="#top" aria-label="И так сойдёт — на главную">
+          <Link className="home-header__logo" to="#top" aria-label="И так сойдёт — на главную">
             <ResponsiveAsset
               desktop={assets.desktopLogo}
               tablet={assets.tabletLogo}
@@ -316,7 +316,7 @@ const HomeHeader = ({
               className="home-header__logo-image"
               loading="eager"
             />
-          </a>
+          </Link>
         )}
 
         <nav className="home-header__navigation" aria-label="Навигация по главной странице">

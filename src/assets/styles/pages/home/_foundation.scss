@@ -242,8 +242,9 @@
 .home-about__order { width: 100%; margin-top: auto; }
 
 .home-about__photo { position: relative; width: 100%; height: scale.px(520); overflow: hidden; border-radius: scale.px(30); }
-.home-about__photo-slide { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
-.home-about__photo-slide.is-active { z-index: 1; }
+.home-about__photo-slide { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; visibility: hidden; opacity: 0; }
+.home-about__photo-slide.is-previous { z-index: 1; visibility: visible; opacity: 1; }
+.home-about__photo-slide.is-active { z-index: 2; visibility: visible; opacity: 1; }
 .home-about__photo-slide.is-entering { animation: home-about-photo-enter 700ms ease-out both; }
 .home-page .home-about__photo-image { position: absolute; max-width: none; }
 

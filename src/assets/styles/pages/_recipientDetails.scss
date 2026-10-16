@@ -822,12 +822,14 @@
   border-radius: 50%;
   background: #161616;
   color: #fff;
-  place-content: center;
+  line-height: 0;
+  place-items: center;
 }
 
 .recipientOrderForm__turnstileShield svg {
-  width: 55%;
-  height: 55%;
+  display: block;
+  width: scale.px(16);
+  height: scale.px(18);
   fill: none;
   stroke: currentcolor;
   stroke-linecap: round;
@@ -2246,7 +2248,7 @@
   }
 
   .recipientOrderForm__noMiddleName {
-    top: scale.px(46);
+    top: scale.px(40);
     right: scale.px(25);
     gap: scale.px(4);
     font-size: scale.px(10);

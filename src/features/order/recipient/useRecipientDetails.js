@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { IS_DEMO_MODE, IS_TURNSTILE_E2E } from "../../../config/demoMode";
 import { MEDIA_QUERIES } from "../../../config/breakpoints";
 import { APP_ENV } from "../../../config/env";
-import { DELIVERY_METHODS, restoreDeliveryMethod } from "../../../config/delivery";
+import { DELIVERY_METHODS, restoreDeliveryMethod, restoreCheckoutDeliveryMethod } from "../../../config/delivery";
 import { useOrder } from "../../../context/OrderContext";
 import { useRecipientCart } from "../../cart/useRecipientCart";
 import { GROUP_PAYMENT_NOTICE, UNFINISHED_CART_NOTICE } from "../../cart/cartPresentation";
@@ -26,7 +26,6 @@ import { demoDeliveryCity, deliveryCityCoordinates, normalizeDeliveryCity } from
 import { resolveOfficeCity } from "./deliveryCityApi";
 import {
   formatPhoneNumber,
-  hasFullManualAddress,
   joinFullName,
   splitFullName,
   validateRecipient,
@@ -55,6 +54,10 @@ export const useRecipientDetails = () => {
   const { order, setRecipient } = useOrder();
   const { clothing, embroidery, recipient: recipientState } = order;
   const isCertificateAvailable = !IS_DEMO_MODE || IS_TURNSTILE_E2E;
+  const savedOrder = recipientState.savedOrder;
+  const resumableSavedOrder = isCertificateAvailable && savedOrder?.orderId && savedOrder.orderToken === getOrderAccessToken(savedOrder.orderId) ? savedOrder : null;
+  const initialDeliveryMethod = restoreCheckoutDeliveryMethod(recipientState, Boolean(resumableSavedOrder));
+  const retiredManualDraft = restoreDeliveryMethod(recipientState) === "manual" && initialDeliveryMethod === "cdek";
   const certificate = useOrderCertificate(isCertificateAvailable ? recipientState.certificateCode : "", setRecipient);
   const locationState = location.state || {};
 
@@ -137,14 +140,14 @@ export const useRecipientDetails = () => {
 
   // Оплата / заказы
   const [pickupPoint, setPickupPoint] = useState(
-    recipientState.pickupPoint || (IS_DEMO_MODE ? DEMO_PICKUP_POINT : "")
+    retiredManualDraft ? "" : recipientState.pickupPoint || (IS_DEMO_MODE ? DEMO_PICKUP_POINT : "")
   ); // address.name
   const [deliveryPrice, setDeliveryPrice] = useState(
-    recipientState.deliveryPrice ?? (IS_DEMO_MODE ? DEMO_DELIVERY_PRICE : null)
+    retiredManualDraft ? null : recipientState.deliveryPrice ?? (IS_DEMO_MODE ? DEMO_DELIVERY_PRICE : null)
   ); // rate.delivery_sum
-  const [manualAddress, setManualAddress] = useState(recipientState.manualAddress || null);
+  const [manualAddress, setManualAddress] = useState(retiredManualDraft ? null : recipientState.manualAddress || null);
   const [cdekData, setCdekData] = useState(
-    recipientState.cdek ||
+    retiredManualDraft ? null : recipientState.cdek ||
       (IS_DEMO_MODE
         ? {
             mode: "office",
@@ -161,11 +164,7 @@ export const useRecipientDetails = () => {
         : null)
   );
   const [isPaying, setIsPaying] = useState(false);
-  const [draftOrder, setDraftOrder] = useState(() => {
-    if (!isCertificateAvailable) return null;
-    const saved = recipientState.savedOrder;
-    return saved?.orderId && saved?.orderToken === getOrderAccessToken(saved.orderId) ? saved : null;
-  });
+  const [draftOrder, setDraftOrder] = useState(() => resumableSavedOrder);
   const [orderId, setOrderId] = useState(draftOrder?.orderId || null);
   const [checkoutQuote, setCheckoutQuote] = useState(null);
   const [checkoutQuoteLoading, setCheckoutQuoteLoading] = useState(false);
@@ -212,17 +211,12 @@ export const useRecipientDetails = () => {
   }, [activeCartOrderId, cart.activeCheckout, cart.isGroup, cart.initialized, cart.pending, draftOrder?.isCartOrder, setRecipient]);
 
   // Dadata
-  const [deliveryMethod, setDeliveryMethod] = useState(() => restoreDeliveryMethod(recipientState));
+  const [deliveryMethod, setDeliveryMethod] = useState(() => initialDeliveryMethod);
   const [postalPoint, setPostalPoint] = useState(recipientState.postalPoint || "");
   const isNoCdek = deliveryMethod !== "cdek";
-  const dadataToken = APP_ENV.dadataToken;
   useEffect(() => {
     if (cart.isGroup && deliveryMethod !== "cdek") setDeliveryMethod("cdek");
   }, [cart.isGroup, deliveryMethod]);
-
-  const isManualAddressFull = useMemo(() => {
-    return hasFullManualAddress(manualAddress);
-  }, [manualAddress]);
 
   const manualAddressNormalized = useMemo(() => {
     const value = manualAddress?.value || "";
@@ -410,29 +404,8 @@ export const useRecipientDetails = () => {
     }
   }, [productType, color, size, selectedType, uploadedImage?.length, customOption.text, customOption.image, customText, navigate, draftOrder, cart.cartOnly, cart.initialized, cart.pending, cart.alreadySaved, cart.error]);
 
-  const handleNoCdekToggle = (event) => {
-    const checked = event.target.checked;
-    setDeliveryMethod(checked ? "manual" : "cdek");
-
-    if (!IS_DEMO_MODE || checked) return;
-    setPickupPoint(DEMO_PICKUP_POINT);
-    setDeliveryPrice(DEMO_DELIVERY_PRICE);
-    setCdekData((prev) => prev || {
-      mode: "office",
-      tariff: {
-        tariff_code: 136,
-        tariff_name: "Demo office pickup",
-        delivery_sum: DEMO_DELIVERY_PRICE,
-        total_sum: DEMO_DELIVERY_PRICE,
-        currency: "RUB",
-      },
-      address: { code: "DEMO-PVZ", address: DEMO_PICKUP_POINT },
-      addressLabel: DEMO_PICKUP_POINT,
-    });
-  };
-
   const handleDeliveryMethodChange = (method) => {
-    if (draftOrder || isPaying || !deliveryCity || citySyncing || !DELIVERY_METHODS.includes(method)
+    if (draftOrder || isPaying || !deliveryCity || citySyncing || method === "manual" || !DELIVERY_METHODS.includes(method)
       || (method === "pickup" && !deliveryCity.pickup) || (cart.isGroup && method !== "cdek")) return;
     setDeliveryMethod(method);
     setError("");
@@ -909,8 +882,8 @@ export const useRecipientDetails = () => {
     error, handlePayment, isFormValid, canSubmit, getMissingFieldsMessage,
     getSubmitDisabledMessage, checkoutQuote, checkoutQuoteLoading, checkoutQuoteError,
     isManualCheckout, isCheckoutLocked: Boolean(draftOrder),
-    handleCdekSelect, applyDemoPickup, handleNoCdekToggle,
-    manualAddress, setManualAddress, dadataToken, isManualAddressFull,
+    handleCdekSelect, applyDemoPickup,
+    manualAddress,
     turnstile,
     certificate,
     isCertificateAvailable,

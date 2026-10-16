@@ -1,7 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { AddressSuggestions } from "react-dadata";
-import "react-dadata/dist/react-dadata.css";
 import { IS_DEMO_MODE } from "../config/demoMode";
 import { MEDIA_QUERIES } from "../config/breakpoints";
 import { useRecipientDetails } from "../features/order/recipient/useRecipientDetails";
@@ -28,7 +26,7 @@ const RecipientDetails = () => {
     userData, handleInputChange, email, setEmail, isMobileLayout,
     preferredContact, setPreferredContact, orderComment, setOrderComment,
     isCdekPickerOpen, setIsCdekPickerOpen,
-    pickupPoint, setPickupPoint, setDeliveryPrice, isNoCdek,
+    pickupPoint, setPickupPoint, setDeliveryPrice,
     isCdekPickupSelected, deliveryRecipient, setDeliveryRecipient,
     deliveryMethod, postalPoint, setPostalPoint, handleDeliveryMethodChange,
     deliveryCity, handleDeliveryCityChange, citySyncing, cityNotice, mapLocation, cityFixedLabel,
@@ -36,8 +34,8 @@ const RecipientDetails = () => {
     hasOtherRecipient, handleOtherRecipientToggle,
     deliveryComment, setDeliveryComment, privacyConsent, setPrivacyConsent,
     error, handlePayment, canSubmit, getSubmitDisabledMessage,
-    handleCdekSelect, applyDemoPickup, handleNoCdekToggle,
-    manualAddress, setManualAddress, dadataToken, isManualAddressFull,
+    handleCdekSelect, applyDemoPickup,
+    manualAddress,
     checkoutQuote, checkoutQuoteLoading, checkoutQuoteError,
     isManualCheckout, isCheckoutLocked,
     turnstile,
@@ -247,32 +245,30 @@ const RecipientDetails = () => {
           aria-label="Закрыть выбор пункта получения"
         />
         <section
-          className={`recipientCdekDialog__surface${isNoCdek ? " is-manual" : ""}`}
+          className="recipientCdekDialog__surface"
           role="dialog"
           aria-modal="true"
-          aria-label={isNoCdek ? "Указание адреса ручной доставки" : "Выбор пункта СДЭК"}
+          aria-label="Выбор пункта СДЭК"
         >
           <div className="recipientCdekDialog__header">
-            <h2>{isNoCdek ? "Укажите адрес доставки" : "Выберите пункт получения"}</h2>
+            <h2>Выберите пункт получения</h2>
             <button type="button" onClick={() => setIsCdekPickerOpen(false)} aria-label="Закрыть">
               <span aria-hidden="true" />
             </button>
           </div>
 
-          <div className={`blockCDEK recipientCdekDialog__content${isNoCdek ? " is-manual" : ""}`}>
-            {!isNoCdek && (
-              <div className="mapBox">
-                <div id="cdek-map">
-                  {IS_DEMO_MODE && (
-                    <div className="cdek-map__demo">
-                      <p className="cdek-map__demo-title">CDEK map placeholder (demo mode)</p>
-                      <p className="cdek-map__demo-text">Use the button below to emulate pickup-point selection.</p>
-                    </div>
-                  )}
-                </div>
+          <div className="blockCDEK recipientCdekDialog__content">
+            <div className="mapBox">
+              <div id="cdek-map">
+                {IS_DEMO_MODE && (
+                  <div className="cdek-map__demo">
+                    <p className="cdek-map__demo-title">CDEK map placeholder (demo mode)</p>
+                    <p className="cdek-map__demo-text">Use the button below to emulate pickup-point selection.</p>
+                  </div>
+                )}
               </div>
-            )}
-            {!IS_DEMO_MODE && isCdekPickerOpen && !isNoCdek && (
+            </div>
+            {!IS_DEMO_MODE && isCdekPickerOpen && (
               <Suspense fallback={<p className="cdek-map__loading">Загружаем карту…</p>}>
                 <MyCdekWidget
                   initialLocation={mapLocation}
@@ -284,65 +280,10 @@ const RecipientDetails = () => {
                 />
               </Suspense>
             )}
-            {IS_DEMO_MODE && !isNoCdek && (
+            {IS_DEMO_MODE && (
               <button type="button" className="demoPickupButton" onClick={applyDemoPickup}>
                 Select demo pickup point
               </button>
-            )}
-            {!cart.isGroup && <label className={`recipientCdekDialog__manualToggle${isNoCdek ? " is-active" : ""}`}>
-              <input type="checkbox" checked={isNoCdek} onChange={handleNoCdekToggle} />
-              <span>В моём городе нет СДЭКа</span>
-            </label>}
-            {isNoCdek && (
-              <div className="manualAddress">
-                <div className="manualAddress__intro">
-                  <span>ручное оформление</span>
-                  <h3>Куда нужно доставить заказ?</h3>
-                  <p>
-                    Начните вводить адрес и выберите вариант с номером дома. Менеджер уточнит способ,
-                    срок и стоимость доставки после отправки заявки.
-                  </p>
-                </div>
-                <span className="manualAddress__label">Адрес с номером дома</span>
-                {IS_DEMO_MODE ? (
-                  <input
-                    type="text"
-                    className="manualAddress__input"
-                    placeholder="Введите адрес доставки"
-                    aria-label="Адрес ручной доставки"
-                    value={manualAddress?.value || ""}
-                    onChange={(event) => {
-                      const value = event.target.value;
-                      setManualAddress({
-                        value,
-                        data: { house: value.trim() ? "1" : "", block: "", flat: "" },
-                      });
-                    }}
-                  />
-                ) : (
-                  <AddressSuggestions
-                    token={dadataToken}
-                    value={manualAddress}
-                    onChange={setManualAddress}
-                    inputProps={{
-                      placeholder: "Например, Красноярск, улица Мира, 10",
-                      "aria-label": "Адрес ручной доставки",
-                    }}
-                  />
-                )}
-                {!IS_DEMO_MODE && !isManualAddressFull && (
-                  <p className="manualAddress__hint">Выберите подходящую подсказку с указанным номером дома.</p>
-                )}
-                {manualAddress?.value && (
-                  <div className={`manualAddress__selected${isManualAddressFull ? " is-complete" : ""}`}>
-                    <span aria-hidden="true">{isManualAddressFull ? "✓" : "!"}</span>
-                    <p>
-                      <small>{isManualAddressFull ? "Адрес выбран" : "Уточните номер дома"}</small>
-                      <strong>{manualAddress.value}</strong>
-                    </p>
-                  </div>
-                )}
-              </div>
             )}
           </div>
         </section>

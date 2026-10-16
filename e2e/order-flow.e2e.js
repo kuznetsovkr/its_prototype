@@ -602,3 +602,23 @@ test("recipient can explicitly place an order without a middle name", async ({ p
   await expect(page.getByRole("textbox", { name: "Телефон другого получателя" }))
     .toHaveCount(0);
 });
+
+test("старый черновик без СДЭК возвращается к выбору актуального способа получения", async ({ page }) => {
+  await startOrder(page);
+  await continueToRecipient(page);
+  await page.evaluate(() => {
+    const draft = JSON.parse(sessionStorage.getItem("its_order_draft_v1"));
+    Object.assign(draft.order.recipient, { deliveryMethod: "manual", isNoCdek: true,
+      pickupPoint: "Старый ручной адрес", deliveryPrice: 999,
+      manualAddress: { value: "Старый ручной адрес", data: { house: "1" } } });
+    sessionStorage.setItem("its_order_draft_v1", JSON.stringify(draft));
+  });
+  await page.reload();
+  await expect(page.getByRole("radio", { name: "СДЭК", exact: true })).toBeChecked();
+  await expect(page.locator(".recipientOrderForm__group--pickup button")).not.toContainText("Старый ручной адрес");
+  await page.locator(".recipientOrderForm__group--pickup button").click();
+  await expect(page.getByRole("dialog", { name: "Выбор пункта СДЭК" })).toBeVisible();
+  await expect(page.getByText("В моём городе нет СДЭКа", { exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Select demo pickup point" }).click();
+  await expect(page.locator(".recipientCdekDialog")).not.toHaveClass(/is-open/);
+});

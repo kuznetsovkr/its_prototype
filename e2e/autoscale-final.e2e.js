@@ -84,7 +84,7 @@ test("all order screens switch layout at 639/640 and 1199/1200 without resetting
   }
 });
 
-test("rotation keeps text, focus, recipient phone and manual-address modal usable", async ({ page }, testInfo) => {
+test("rotation keeps text, focus, recipient phone and postal office usable", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.use.isMobile, "Use the touch browser for rotation");
   await page.setViewportSize({ width: 390, height: 844 });
   await selectClothing(page);
@@ -108,27 +108,20 @@ test("rotation keeps text, focus, recipient phone and manual-address modal usabl
   await recipient.fill("Петров Пётр Петрович");
   await phone.fill("+7 999 234-56-78");
   const phoneValue = await phone.inputValue();
-  await page.locator(".recipientOrderForm__group--pickup button").click();
-  await page.getByRole("checkbox", { name: "В моём городе нет СДЭКа" }).check();
-  const dialog = page.getByRole("dialog", { name: "Указание адреса ручной доставки" });
-  const address = page.locator(".manualAddress__input");
-  const addressText = "Красноярск, улица Ленина, дом 1";
+  await page.getByRole("radio", { name: "Почта России", exact: true }).check();
+  const address = page.getByRole("textbox", { name: "Отделение Почты России" });
+  const addressText = "660000, Красноярск, улица Ленина, дом 1";
   await address.fill(addressText);
-  const documentTop = await page.evaluate(() => window.scrollY);
   for (const viewport of [{ width: 844, height: 390 }, { width: 390, height: 844 }, { width: 1024, height: 768 }]) {
     await page.setViewportSize(viewport);
-    await expectNativeDialog(page, dialog, viewport);
     await address.scrollIntoViewIfNeeded();
     await address.focus();
     await expect(address).toBeInViewport();
     await expect(address).toHaveValue(addressText);
     expect(await address.evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(16);
-    expect(await page.evaluate(() => window.scrollY)).toBe(documentTop);
     await expect(recipient).toHaveValue("Петров Пётр Петрович");
     await expect(phone).toHaveValue(phoneValue);
   }
-  await dialog.getByRole("button", { name: "Закрыть", exact: true }).click();
-  await expect(dialog).toBeHidden();
   await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
   await phone.scrollIntoViewIfNeeded();
   await phone.focus();
