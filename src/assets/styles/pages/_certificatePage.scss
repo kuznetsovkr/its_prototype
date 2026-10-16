@@ -190,25 +190,29 @@
 }
 
 .certificatePage__denomination {
-  @include scale.control-font(14);
+  @include scale.control-font(16);
   position: absolute;
   top: scale.px(196);
   left: scale.px(60);
   width: scale.px(220);
-  height: scale.px(30);
-  overflow: hidden;
-  border-radius: scale.px(10);
+  height: scale.px(40);
+  border: 1px solid #d2d2d2;
+  border-radius: scale.px(28);
   color: var(--certificate-ink);
   background: #fff;
   font-weight: 400;
   line-height: 1.4;
+  transition: border-color .2s ease;
+
+  &:hover { border-color: var(--certificate-orange); }
 }
 
 .certificatePage__denomination select {
   display: block;
   width: 100%;
   height: 100%;
-  padding: 0 scale.px(28) 0 scale.px(12);
+  box-sizing: border-box;
+  padding: 0 scale.px(36) 0 scale.px(14);
   border: 0;
   border-radius: inherit;
   appearance: none;
@@ -220,17 +224,18 @@
 }
 
 .certificatePage__denomination:focus-within {
-  outline: scale.px(2) solid var(--certificate-orange);
+  border-color: var(--certificate-orange);
+  outline: 2px solid var(--certificate-orange);
   outline-offset: scale.px(3);
 }
 
 .certificatePage__arrow {
   position: absolute;
-  top: scale.px(10);
-  right: scale.px(9);
+  top: 50%;
+  right: scale.px(14);
   width: scale.px(10);
   height: scale.px(10);
-  transform: rotate(180deg);
+  transform: translateY(-50%) rotate(180deg);
   pointer-events: none;
 }
 
@@ -364,12 +369,11 @@
   }
 
   .certificatePage__denomination select {
-    padding-left: scale.px(8);
+    padding-left: scale.px(12);
   }
 
   .certificatePage__arrow {
-    top: scale.px(10);
-    right: scale.px(8);
+    right: scale.px(12);
     width: scale.px(8);
     height: scale.px(8);
   }
@@ -487,12 +491,11 @@
   }
 
   .certificatePage__denomination select {
-    padding-left: scale.px(8);
+    padding-left: scale.px(12);
   }
 
   .certificatePage__arrow {
-    top: scale.px(10);
-    right: scale.px(8);
+    right: scale.px(12);
     width: scale.px(8);
     height: scale.px(8);
   }
@@ -528,5 +531,38 @@
     position: absolute;
     left: scale.px(-8);
     content: "-";
+  }
+}
+
+// Keep native keyboard/mobile interaction and enhance the menu where supported.
+@supports (appearance: base-select) {
+  .certificatePage__denomination select,
+  .certificatePage__denomination select::picker(select) { appearance: base-select; }
+
+  .certificatePage__denomination select { display: flex; align-items: center; }
+
+  .certificatePage__denomination select::picker-icon { display: none; }
+
+  .certificatePage__denomination select::picker(select) {
+    max-height: min(360px, 50dvh);
+    padding: 6px;
+    border: 1px solid #e6dfd5;
+    border-radius: 20px;
+    color: #2b2b2b;
+    background: #fff;
+    box-shadow: 0 12px 28px rgb(0 0 0 / 12%);
+    scrollbar-width: thin;
+    scrollbar-color: #4b4b4b transparent;
+  }
+
+  .certificatePage__denomination option {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-family: 'Jost', sans-serif;
+    font-size: 16px;
+
+    &:hover,
+    &:focus { color: #bc5823; background: #f4f0e6; }
+    &:checked { color: #fff; background: #161616; }
   }
 }

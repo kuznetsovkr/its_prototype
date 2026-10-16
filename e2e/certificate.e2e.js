@@ -17,6 +17,23 @@ test("сертификат предлагает согласованные но�
   expect(await select.locator("option").evaluateAll((options) =>
     options.map((option) => Number(option.value)))).toEqual(denominations);
 
+  expect(await select.evaluate(element => parseFloat(getComputedStyle(element).borderTopLeftRadius))).toBeGreaterThanOrEqual(20);
+  await page.locator(".certificatePage__amount").click();
+  await page.keyboard.press("Tab");
+  await expect(select).toBeFocused();
+  await expect(page.locator(".certificatePage__denomination")).toHaveCSS("outline-style", "solid");
+  if (await page.evaluate(() => CSS.supports("appearance", "base-select"))) {
+    await select.click();
+    await expect.poll(() => select.evaluate(element => element.matches(":open"))).toBe(true);
+    expect(await select.evaluate(element => getComputedStyle(element, "::picker(select)").borderTopLeftRadius)).toBe("20px");
+    await page.getByRole("option", { name: /^2\s*000 руб\.$/ }).click();
+    await expect(select).toHaveValue("2000");
+    await expect(amount).toHaveText(/2\s*000 ₽/);
+    await select.click();
+    await select.press("Escape");
+    await expect.poll(() => select.evaluate(element => element.matches(":open"))).toBe(false);
+  }
+
   await select.selectOption("2000");
   await expect(amount).toHaveText(/2\s*000 ₽/);
   await select.selectOption("20000");
@@ -29,6 +46,7 @@ test("сертификат предлагает согласованные но�
   const selectBox = await select.boundingBox();
   const actionBox = await action.boundingBox();
   expect(selectBox.y + selectBox.height).toBeLessThan(actionBox.y);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(await page.evaluate(() => innerWidth));
   if (testInfo.project.name === "mobile-chromium") {
     expect(await select.evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(16);
   }
