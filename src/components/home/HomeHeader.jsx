@@ -7,6 +7,10 @@ import {
 } from "../../data/homeContent";
 import { VIEWPORT_BREAKPOINTS } from "../../config/breakpoints";
 import ResponsiveAsset from "./ResponsiveAsset";
+import { useCart } from "../../context/CartContext";
+import { useOrder } from "../../context/OrderContext";
+import { getCartDraftItem } from "../../features/cart/cartPresentation";
+import CartDrawer from "../../features/cart/CartDrawer";
 
 const focusableSelector = "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])";
 
@@ -34,6 +38,11 @@ const HomeHeader = ({
   standalone = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const cart = useCart();
+  const { order } = useOrder();
+  const hasCart = cart.items.length > 0 || Boolean(getCartDraftItem(cart, order));
+  const cartTriggerRef = useRef(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const headerRef = useRef(null);
   const menuRef = useRef(null);
@@ -56,6 +65,7 @@ const HomeHeader = ({
     if (previousLocationKeyRef.current === locationKey) return;
 
     previousLocationKeyRef.current = locationKey;
+    setIsCartOpen(false);
 
     if (isOpen) {
       setIsOpen(false);
@@ -189,6 +199,14 @@ const HomeHeader = ({
     focusVisibleHeaderControl();
   };
 
+  const openCart = (event) => {
+    cartTriggerRef.current = isOpen
+      ? headerRef.current?.querySelector(".home-header__mobile-actions button")
+      : event.currentTarget;
+    closeMenu({ restoreFocus: false });
+    setIsCartOpen(true);
+  };
+
   const renderNavItem = (item, mobile = false) => {
     const baseClassName = mobile ? "home-header__mobile-link" : "home-header__link";
     const currentActiveNavigationId = mobile ? mobileActiveNavigationId : activeNavigationId;
@@ -256,7 +274,7 @@ const HomeHeader = ({
 
   return (
     <header
-      className={`home-header${standalone ? " home-header--standalone" : ""}${isScrolled ? " home-header--scrolled" : ""}${isOpen ? " home-header--menu-open" : ""}`}
+      className={`home-header${standalone ? " home-header--standalone" : ""}${isScrolled ? " home-header--scrolled" : ""}${isOpen ? " home-header--menu-open" : ""}${hasCart ? " home-header--has-cart" : ""}`}
       ref={headerRef}
     >
       <div className="home-header__bar">
@@ -306,8 +324,13 @@ const HomeHeader = ({
           Сделать заказ
         </button>
 
+        {hasCart && <button type="button" className="home-header__desktop-cart" aria-label="Открыть корзину"
+          aria-haspopup="dialog" aria-expanded={isCartOpen} onClick={openCart}>
+          <img src={assets.bag} alt="" width="24" height="24" />
+        </button>}
+
         <div className="home-header__mobile-actions">
-          <button type="button" aria-label="Перейти к заказу" className="home-header__icon-link" onClick={onOrder}>
+          <button type="button" aria-label="Открыть корзину" aria-haspopup="dialog" aria-expanded={isCartOpen} className="home-header__icon-link" onClick={openCart}>
             <img src={assets.bag} alt="" width="24" height="24" />
           </button>
         </div>
@@ -335,11 +358,10 @@ const HomeHeader = ({
           <button
             className="home-header__menu-bag"
             type="button"
-            aria-label="Перейти к заказу"
-            onClick={() => {
-              closeMenuForNavigation();
-              onOrder();
-            }}
+            aria-label="Открыть корзину"
+            aria-haspopup="dialog"
+            aria-expanded={isCartOpen}
+            onClick={openCart}
           >
             <img src={assets.menu.bag} alt="" width="20" height="19" />
           </button>
@@ -401,6 +423,7 @@ const HomeHeader = ({
           onClick={() => closeMenu()}
         />
       </div>
+      {isCartOpen && <CartDrawer onClose={() => setIsCartOpen(false)} returnFocusTo={cartTriggerRef.current} />}
     </header>
   );
 };

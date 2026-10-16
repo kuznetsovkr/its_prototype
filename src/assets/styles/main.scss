@@ -31,6 +31,8 @@
 // Shared shell styles intentionally come last so legacy page rules cannot hide or restyle it.
 @use "components/footer";
 @use "components/header";
+@use "components/headerCart";
+@use "components/cartDrawer";
 
 @use "base/checkboxes";
 

@@ -4,10 +4,13 @@ export const UNFINISHED_CART_NOTICE = "В корзине есть незавер
 export const constructorCartItem = (order) => {
   const { clothing, embroidery } = order;
   if (!clothing.type || !clothing.color || !clothing.size || order.recipient?.savedOrder) return null;
-  return { id: "constructor-draft", productType: clothing.type, color: clothing.color, size: clothing.size,
+  return { id: "constructor-draft", productType: clothing.profile?.name || clothing.type, color: clothing.color, size: clothing.size,
     embroideryType: embroidery.type, patronusCount: embroidery.patronusCount, petFaceCount: embroidery.petFaceCount,
     imageUrl: clothing.previewSrc, draft: true };
 };
+
+export const getCartDraftItem = (cart, order) => cart.checkout || cart.items.some((item) => item.requestKey === order.cartItemKey)
+  ? null : constructorCartItem(order);
 
 export const currentCartItem = (order) => {
   const { clothing, embroidery } = order;

@@ -7,7 +7,8 @@ import { buildImgSrc } from "../../utils/url";
 
 const money = (value) => `${new Intl.NumberFormat("ru-RU").format(value)} ₽`;
 
-const RecipientCartList = ({ cart, disabled = false }) => {
+const RecipientCartList = ({ cart, disabled = false, variant = "checkout" }) => {
+  const isDrawer = variant === "drawer";
   const items = [...cart.items, ...(cart.current ? [cart.current] : []), ...(cart.draftItem ? [cart.draftItem] : [])];
   return (
     <div className="recipientCart" aria-busy={cart.busy}>
@@ -38,7 +39,7 @@ const RecipientCartList = ({ cart, disabled = false }) => {
                   </button>
                 </div>
               )}
-              {!item.current && !item.draft && <small>{item.pricingError || item.stockWarning || (item.linePrice != null ? money(item.linePrice) : "Стоимость уточняется")}</small>}
+              {!item.current && !item.draft && (!isDrawer || item.pricingError || item.stockWarning) && <small>{item.pricingError || item.stockWarning || (item.linePrice != null ? money(item.linePrice) : "Стоимость уточняется")}</small>}
             </div>
             {!item.current && <button className="recipientCart__remove" type="button"
               aria-label={`Удалить изделие: ${item.productType}, ${item.color}, ${item.size}`}
@@ -49,14 +50,14 @@ const RecipientCartList = ({ cart, disabled = false }) => {
         ))}
       </ul>
       {cart.items.length > 0 && <p className="recipientCart__total" aria-live="polite">
-        {cart.merchandisePrice != null ? `Изделия в корзине: ${money(cart.merchandisePrice)}` : "Не удалось рассчитать стоимость всех изделий"}
-        <small>Без доставки{cart.current ? " и текущего изделия" : ""}. Цена проверяется при оформлении.</small>
+        {cart.merchandisePrice != null ? `${isDrawer ? "Цена" : "Изделия в корзине"}: ${money(cart.merchandisePrice)}` : "Не удалось рассчитать стоимость всех изделий"}
+        {!isDrawer && <small>Без доставки{cart.current ? " и текущего изделия" : ""}. Цена проверяется при оформлении.</small>}
       </p>}
       {cart.uiError && <p className="recipientCart__error" role="alert">{cart.uiError}</p>}
       {cart.draftItem && cart.constructorDraftError && <p className="recipientCart__error" role="alert">{cart.constructorDraftError}</p>}
       {cart.error && <button type="button" className="recipientCart__retry" disabled={cart.busy}
         onClick={() => cart.reloadCart().catch(() => undefined)}>Повторить загрузку корзины</button>}
-      {cart.cartOnly && <Link className="recipientCart__continue" to="/order">Создать ещё одно изделие</Link>}
+      {cart.cartOnly && !isDrawer && <Link className="recipientCart__continue" to="/order">Создать ещё одно изделие</Link>}
     </div>
   );
 };

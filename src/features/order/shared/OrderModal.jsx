@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 
 const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-const OrderModal = ({ children, className = "", closeLabel = "Закрыть окно", label, labelledBy, onClose, returnFocusTo }) => {
+const OrderModal = ({ children, className = "", overlayClassName = "", inertBackground = false, closeLabel = "Закрыть окно", label, labelledBy, onClose, returnFocusTo }) => {
   const dialogRef = useRef(null);
   const closeRef = useRef(null);
   const onCloseRef = useRef(onClose);
@@ -15,6 +15,9 @@ const OrderModal = ({ children, className = "", closeLabel = "Закрыть о�
     const previousFocus = document.activeElement;
     const previousBodyOverflow = document.body.style.overflow;
     const previousRootOverflow = document.documentElement.style.overflow;
+    const background = inertBackground ? document.getElementById("root") : null;
+    const wasInert = background?.hasAttribute("inert");
+    background?.setAttribute("inert", "");
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
     closeRef.current?.focus({ preventScroll: true });
@@ -50,14 +53,15 @@ const OrderModal = ({ children, className = "", closeLabel = "Закрыть о�
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = previousBodyOverflow;
       document.documentElement.style.overflow = previousRootOverflow;
+      if (background && !wasInert) background.removeAttribute("inert");
       const requestedFocus = returnFocusToRef.current;
       const focusTarget = requestedFocus?.isConnected ? requestedFocus : previousFocus;
       if (focusTarget?.isConnected) focusTarget.focus({ preventScroll: true });
     };
-  }, []);
+  }, [inertBackground]);
 
   return createPortal(
-    <div className="modalOverlay" onClick={onClose}>
+    <div className={`modalOverlay${overlayClassName ? ` ${overlayClassName}` : ""}`} onClick={onClose}>
       <div
         ref={dialogRef}
         className={`modalContent${className ? ` ${className}` : ""}`}

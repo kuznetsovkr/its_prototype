@@ -3,13 +3,19 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
 import RecipientCartList from "./RecipientCartList";
-import { cartEmbroideryLabel, cartPaymentBlocked, constructorCartItem, currentCartItem } from "./cartPresentation";
+import { cartEmbroideryLabel, cartPaymentBlocked, constructorCartItem, currentCartItem, getCartDraftItem } from "./cartPresentation";
 
 vi.mock("../../utils/url", () => ({ buildImgSrc: (value) => value }));
 
 const item = { id: "saved", productType: "Худи", color: "Чёрный", size: "M", embroideryType: "Patronus", patronusCount: 4, quantity: 1, linePrice: 9000 };
 const ready = { initialized: true, pending: false, items: [], error: null };
 describe("cart presentation and staged checkout safety", () => {
+  it("does not duplicate a saved item or put an unfinished item into a locked checkout", () => {
+    const order = { cartItemKey: "key", clothing: { type: "Худи", color: "Чёрный", size: "M" }, embroidery: {}, recipient: {} };
+    expect(getCartDraftItem(ready, order)?.draft).toBe(true);
+    expect(getCartDraftItem({ ...ready, items: [{ requestKey: "key" }] }, order)).toBeNull();
+    expect(getCartDraftItem({ ...ready, checkout: { orderId: 1 } }, order)).toBeNull();
+  });
   it("blocks checkout while restoring, after an error or with an empty cart; saved items can now be paid together", () => {
     expect(cartPaymentBlocked(ready)).toBe(false);
     for (const changes of [{ initialized: false }, { pending: true }, { error: "Сеть недоступна" }]) {

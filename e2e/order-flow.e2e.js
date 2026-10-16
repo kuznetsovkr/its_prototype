@@ -279,7 +279,7 @@ test("мобильная шапка сохраняет корзину и цен�
   await page.goto("/");
   const header = page.locator(".home-header").first();
   const logo = header.locator(".home-header__logo");
-  const bag = header.getByRole("button", { name: "Перейти к заказу" }).first();
+  const bag = header.getByRole("button", { name: "Открыть корзину" }).first();
   await expect(header.getByRole("button", { name: "Избранное" })).toHaveCount(0);
   await expect(bag).toBeVisible();
 
@@ -294,7 +294,8 @@ test("мобильная шапка сохраняет корзину и цен�
     .toBeCloseTo(25 * page.viewportSize().width / 320, 0);
 
   await bag.click();
-  await expect(page).toHaveURL(/\/order$/);
+  await expect(page.getByRole("dialog", { name: "Ваш заказ" })).toBeVisible();
+  await expect(page).toHaveURL(/\/$/);
 });
 
 test("выбор изделия сохраняется при возврате с шага вышивки", async ({ page }) => {

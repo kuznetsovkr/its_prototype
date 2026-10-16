@@ -1,0 +1,30 @@
+@use "../base/breakpoints" as bp;
+@use "../base/compactScale" as scale;
+
+.home-header__desktop-cart {
+  position: absolute;
+  top: 0;
+  right: scale.px(37);
+  display: grid;
+  place-items: center;
+  width: scale.px(56);
+  height: scale.px(56);
+  padding: 0;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  background: #f4f0e6;
+  cursor: pointer;
+}
+
+.home-header__desktop-cart img { display: block; width: scale.px(24); height: scale.px(24); }
+.home-header--has-cart .home-header__order { right: scale.px(103); }
+
+@media (min-width: bp.$tablet-min) and (max-width: bp.$tablet-max) {
+  .home-header__desktop-cart { right: 0; width: scale.px(24); height: scale.px(24); }
+  .home-header__desktop-cart img { width: scale.px(14); height: scale.px(14); }
+  .home-header--has-cart .home-header__order { right: scale.px(30); }
+}
+
+@media (max-width: bp.$mobile-max) {
+  .home-header__desktop-cart { display: none; }
+}
