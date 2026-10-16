@@ -595,6 +595,10 @@ test("recipient can explicitly place an order without a middle name", async ({ p
   await expect(page.getByRole("heading", { name: "Введите свои данные" })).toBeVisible({ timeout: 20_000 });
   await expect(noMiddleName).toBeChecked();
   await expect(fullName).toHaveValue("Иванов Иван");
+  await expect(page.getByRole("checkbox", { name: "Получатель — другой человек" }))
+    .not.toBeChecked();
   await expect(page.locator(".recipientOrderForm__group--recipient input"))
-    .toHaveValue("");
+    .toHaveCount(0);
+  await expect(page.getByRole("textbox", { name: "Телефон другого получателя" }))
+    .toHaveCount(0);
 });
