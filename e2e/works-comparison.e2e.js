@@ -1,3 +1,4 @@
+/* global document, window */
 import { expect, test } from "@playwright/test";
 
 test.setTimeout(120_000);
@@ -7,6 +8,23 @@ const approvedIds = [
   "corgi-football", "corgi-pair", "merle-dog", "skyline", "black-dog-green", "chaser",
   "doberman", "shiba", "spaniel", "two-dogs", "volga", "black-dog-purple",
 ];
+// Clean image-node exports supplied with the designer's October feedback.
+// Raw embedded uploads have different proportions and must not replace these.
+const repairedSizes = {
+  "tabby-cat": { photo: [700, 700] },
+  "mark-ii": { work: [700, 700] },
+  "black-cat": { work: [700, 700] },
+  "golden-retriever": { work: [700, 344] },
+  "black-dog-green": { work: [700, 700] },
+  "doberman": { work: [700, 700] },
+};
+const expectRepairedImage = async (button, id, kind) => {
+  if (!repairedSizes[id]?.[kind]) return;
+  const image = button.locator(`.home-work-card__image--${kind === "photo" ? "original" : "work"}`);
+  expect(await image.evaluate(el => [el.naturalWidth, el.naturalHeight]), `${id} ${kind} uses the approved export`)
+    .toEqual(repairedSizes[id][kind]);
+  await expect(image).toHaveCSS("object-fit", "cover");
+};
 const openGallery = async (page, viewport) => {
   if (viewport) await page.setViewportSize(viewport);
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -58,12 +76,14 @@ for (const viewport of [
       await button.scrollIntoViewIfNeeded();
       await expect.poll(() => button.locator(".home-work-card__image--work")
         .evaluate((image) => image.complete && image.naturalWidth > 0)).toBe(true);
+      await expectRepairedImage(button, id, "work");
       if (viewport.name === "mobile") {
         await button.tap();
       } else {
         await button.hover();
       }
       await expectOriginal(button, id);
+      await expectRepairedImage(button, id, "photo");
       const fits = await button.evaluate((element) => {
         const card = element.getBoundingClientRect();
         const original = element.querySelector(".home-work-card__image--original").getBoundingClientRect();
