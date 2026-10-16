@@ -11,6 +11,8 @@
   --home-black: #0c0c0c;
   --home-dark: #1d1d1d;
   --home-font-body: "Jost", "Arial", sans-serif;
+  // Symmetric desktop edges; leave room for navigation near the 1200px breakpoint.
+  --home-header-edge-inset: clamp(20px, calc(50vw - 580px), 51px);
 
   position: fixed;
   z-index: 20;
@@ -37,7 +39,7 @@
 .home-header__logo {
   position: absolute;
   top: 0;
-  left: scale.px(51);
+  left: var(--home-header-edge-inset);
   display: block;
   width: scale.px(127);
   height: scale.px(56);
@@ -110,7 +112,7 @@
 .home-header__order {
   position: absolute;
   top: 0;
-  right: scale.px(37);
+  right: var(--home-header-edge-inset);
   width: scale.px(150);
   height: scale.px(56);
   font-size: scale.px(13);

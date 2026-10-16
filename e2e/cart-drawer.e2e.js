@@ -139,13 +139,13 @@ test("корзина открывается из мобильного меню �
   await expect(page.getByRole("dialog", { name: "Мобильное меню" })).not.toBeVisible();
 });
 
-test("иконка и счётчик не перекрывают навигацию на границах планшета и десктопа", async ({ page }, info) => {
+test("иконка и кнопка симметричны логотипу и не перекрывают навигацию", async ({ page }, info) => {
   test.skip(info.project.name !== "desktop-chromium", "Матрица ширин");
   await seed(page);
   await page.goto("/");
   const bag = page.locator(".home-header__desktop-cart");
-  await expect(bag).toBeVisible();
-  for (const width of [640, 820, 1199, 1200, 1280, 1920, 2560]) {
+  await expect(bag).toBeVisible({ timeout: 20_000 });
+  for (const width of [640, 820, 1199, 1200, 1230, 1262, 1280, 1440, 1881, 1920, 2560]) {
     await page.setViewportSize({ width, height: 900 });
     const [logo, nav, order, button] = await Promise.all([
       page.locator(".home-header__logo").boundingBox(), page.locator(".home-header__navigation").boundingBox(),
@@ -157,12 +157,40 @@ test("иконка и счётчик не перекрывают навигац�
     expect(Math.abs(order.x + order.width - button.x)).toBeLessThanOrEqual(1);
     expect(await bag.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgb(188, 88, 35)");
     expect(await bag.locator("img").evaluate((element) => getComputedStyle(element).filter)).toContain("invert(1)");
+    if (width >= 1200) {
+      expect(Math.abs(logo.x - (width - button.x - button.width))).toBeLessThanOrEqual(1);
+      expect(order.x - nav.x - nav.width).toBeGreaterThanOrEqual(13);
+      const counter = await bag.locator(".home-header__cart-count").boundingBox();
+      const header = await page.locator(".home-header__bar").boundingBox();
+      expect(counter.x + counter.width).toBeLessThan(header.x + header.width);
+    }
     if (width === 1920) {
-      expect(order.x).toBeCloseTo(1670, 0);
+      expect(order.x).toBeCloseTo(1603, 0);
       expect(order.width).toBe(150);
-      expect(button.x).toBeCloseTo(1820, 0);
+      expect(button.x).toBeCloseTo(1753, 0);
       expect(button.width).toBe(56);
     }
+    if (width === 1881) await page.screenshot({ path: info.outputPath("header-cart-aligned.png") });
+  }
+  await page.goto("/certificate");
+  await expect(bag).toBeVisible({ timeout: 20_000 });
+  const [internalLogo, internalBag] = await Promise.all([
+    page.locator(".home-header__logo").boundingBox(), bag.boundingBox(),
+  ]);
+  expect(Math.abs(internalLogo.x - (page.viewportSize().width - internalBag.x - internalBag.width))).toBeLessThanOrEqual(1);
+});
+
+test("без корзины кнопка заказа сохраняет симметричный десктопный отступ", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop-chromium", "Десктопная шапка");
+  await page.goto("/");
+  await expect(page.locator(".home-header__order")).toBeVisible({ timeout: 20_000 });
+  for (const width of [1200, 1230, 1280, 1920, 2560]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect(page.locator(".home-header__desktop-cart")).toHaveCount(0);
+    const [logo, order] = await Promise.all([
+      page.locator(".home-header__logo").boundingBox(), page.locator(".home-header__order").boundingBox(),
+    ]);
+    expect(Math.abs(logo.x - (width - order.x - order.width))).toBeLessThanOrEqual(1);
   }
 });
 

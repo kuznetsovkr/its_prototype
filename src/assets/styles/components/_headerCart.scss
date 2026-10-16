@@ -4,7 +4,7 @@
 .home-header__desktop-cart {
   position: absolute;
   top: 0;
-  right: scale.px(-16);
+  right: var(--home-header-edge-inset);
   display: grid;
   place-items: center;
   width: scale.px(56);
@@ -17,7 +17,7 @@
 }
 
 .home-header__desktop-cart img { display: block; width: scale.px(24); height: scale.px(24); filter: brightness(0) invert(1); }
-.home-header--has-cart .home-header__order { right: scale.px(40); }
+.home-header--has-cart .home-header__order { right: calc(var(--home-header-edge-inset) + #{scale.px(56)}); }
 
 .home-header__icon-link { position: relative; }
 .home-header__cart-count {
