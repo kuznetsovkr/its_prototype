@@ -1,3 +1,4 @@
+/* global document, window, performance, requestAnimationFrame */
 import { expect, test } from "@playwright/test";
 
 const startDesktop = async (page) => {
@@ -19,6 +20,7 @@ const monitorWheel = async (page) => {
 };
 
 test.describe("desktop smooth scrolling", () => {
+  // eslint-disable-next-line no-empty-pattern -- Playwright requires fixture destructuring.
   test.beforeEach(({}, testInfo) => {
     test.skip(testInfo.project.name !== "desktop-chromium", "Desktop input checks");
   });
@@ -124,7 +126,7 @@ test.describe("desktop smooth scrolling", () => {
     expect(await page.evaluate(() => window.scrollY)).toBe(0);
   });
 
-  test("keyboard and text fields retain their native behavior", async ({ page }) => {
+  test("keyboard editing stays native while page scrolling over a plain input stays smooth", async ({ page }) => {
     await startDesktop(page);
     await page.keyboard.press("PageDown");
     await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
@@ -139,7 +141,42 @@ test.describe("desktop smooth scrolling", () => {
     await input.hover();
     await monitorWheel(page);
     await page.mouse.wheel(0, 120);
+    await expect.poll(() => page.evaluate(() => window.lastWheelPrevented)).toBe(true);
+  });
+
+  test("empty textareas scroll the page smoothly; overflowing textareas, selects and number fields stay native", async ({ page }) => {
+    await startDesktop(page);
+    await page.evaluate(() => {
+      const form = document.createElement("div");
+      form.id = "scroll-control-fixture";
+      form.style.cssText = "position:fixed;top:180px;left:100px;z-index:10000;background:white;padding:20px;display:grid;gap:10px";
+      form.innerHTML = '<textarea id="scroll-area" aria-label="Scroll test" style="width:220px;height:70px;overflow:auto"></textarea>'
+        + '<select id="scroll-select"><option>A</option><option>B</option></select>'
+        + '<input id="scroll-number" type="number" value="5">';
+      document.body.append(form);
+      window.scrollTo({ top: 800, behavior: "instant" });
+    });
+    const area = page.locator("#scroll-area");
+    await area.hover();
+    await monitorWheel(page);
+    await page.mouse.wheel(0, 120);
+    await expect.poll(() => page.evaluate(() => window.lastWheelPrevented)).toBe(true);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(875);
+    await area.fill(Array.from({ length: 40 }, (_, i) => `Line ${i}`).join("\n"));
+    await area.evaluate(el => { el.scrollTop = 0; });
+    await area.hover();
+    await monitorWheel(page);
+    const pageTop = await page.evaluate(() => window.scrollY);
+    await page.mouse.wheel(0, 120);
     await expect.poll(() => page.evaluate(() => window.lastWheelPrevented)).toBe(false);
+    await expect.poll(() => area.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+    expect(await page.evaluate(() => window.scrollY)).toBe(pageTop);
+    for (const selector of ["#scroll-select", "#scroll-number"]) {
+      await page.locator(selector).hover();
+      await monitorWheel(page);
+      await page.mouse.wheel(0, 120);
+      await expect.poll(() => page.evaluate(() => window.lastWheelPrevented)).toBe(false);
+    }
   });
 });
 

@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import {
   DESKTOP_SCROLL_OPTIONS,
   DESKTOP_SCROLL_QUERY,
-  NATIVE_SCROLL_SELECTOR,
+  shouldKeepNativeScroll,
   shouldSmoothWheel,
 } from "../config/desktopScroll";
 
@@ -49,7 +49,7 @@ const DesktopSmoothScroll = () => {
         if (!isEnabled()) return;
         instance = new Lenis({
           ...DESKTOP_SCROLL_OPTIONS,
-          prevent: (element) => element.matches(NATIVE_SCROLL_SELECTOR),
+          prevent: shouldKeepNativeScroll,
           virtualScroll: ({ event }) => {
             const smooth = shouldSmoothWheel(event);
             if (!smooth) cancelInertia();

@@ -1,8 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   DESKTOP_SCROLL_OPTIONS,
   DESKTOP_SCROLL_QUERY,
   shouldSmoothWheel,
+  shouldKeepNativeScroll,
 } from "./desktopScroll";
 
 const wheel = (overrides = {}) => ({
@@ -10,6 +11,7 @@ const wheel = (overrides = {}) => ({
 });
 
 describe("desktop smooth scroll", () => {
+  afterEach(() => vi.unstubAllGlobals());
   it("uses the desktop boundary, mouse capability and reference duration", () => {
     expect(DESKTOP_SCROLL_QUERY).toBe("(min-width: 1200px) and (hover: hover) and (pointer: fine)");
     expect(DESKTOP_SCROLL_OPTIONS.duration).toBe(1);
@@ -38,5 +40,32 @@ describe("desktop smooth scroll", () => {
 
   it.each([1, 2])("supports wheel events in delta mode %i", (deltaMode) => {
     expect(shouldSmoothWheel(wheel({ deltaMode, deltaY: 3 }))).toBe(true);
+  });
+
+  it.each(["text", "tel", "email", "password", "search", "url"])("smooths page scrolling over %s inputs", (type) => {
+    expect(shouldKeepNativeScroll({ tagName: "INPUT", type, matches: () => false })).toBe(false);
+  });
+
+  it.each(["number", "range", "date", "time", "checkbox", "radio", "file"])("preserves native %s input semantics", (type) => {
+    expect(shouldKeepNativeScroll({ tagName: "INPUT", type, matches: () => false })).toBe(true);
+  });
+
+  it("only excludes a textarea when it actually has a native scrollable area", () => {
+    let style = { overflowX: "hidden", overflowY: "auto" };
+    vi.stubGlobal("getComputedStyle", () => style);
+    const area = { tagName: "TEXTAREA", matches: () => false, scrollHeight: 80, clientHeight: 80, scrollWidth: 200, clientWidth: 200 };
+    expect(shouldKeepNativeScroll(area)).toBe(false);
+    area.scrollHeight = 400;
+    expect(shouldKeepNativeScroll(area)).toBe(true);
+    style = { overflowX: "hidden", overflowY: "hidden" };
+    expect(shouldKeepNativeScroll(area)).toBe(false);
+    style = { overflowX: "auto", overflowY: "hidden" };
+    area.scrollWidth = 400;
+    expect(shouldKeepNativeScroll(area)).toBe(true);
+  });
+
+  it("keeps explicit native regions even if the target is an ordinary text input", () => {
+    expect(shouldKeepNativeScroll({ tagName: "INPUT", type: "text", matches: () => true })).toBe(true);
+    expect(shouldKeepNativeScroll({ tagName: "DIV", matches: () => false })).toBe(false);
   });
 });
