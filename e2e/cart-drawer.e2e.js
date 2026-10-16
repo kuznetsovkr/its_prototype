@@ -1,3 +1,4 @@
+/* global document, getComputedStyle, innerWidth, localStorage, sessionStorage, URL */
 import { test, expect } from "@playwright/test";
 
 test.setTimeout(60_000);
@@ -29,6 +30,10 @@ const open = async (page) => {
   await button.click();
   const dialog = page.getByRole("dialog", { name: "Ваш заказ", exact: true });
   await expect(dialog).toBeVisible();
+  await expect.poll(async () => {
+    const box = await dialog.boundingBox();
+    return Math.round(box.x + box.width);
+  }).toBe(page.viewportSize().width);
   await expect(dialog.getByRole("button", { name: "Закрыть корзину" })).toBeFocused();
   return { button, dialog };
 };
@@ -149,5 +154,81 @@ test("иконка и счётчик не перекрывают навигац�
     expect(logo.x + logo.width).toBeLessThanOrEqual(nav.x + 1);
     expect(nav.x + nav.width).toBeLessThanOrEqual(order.x + 1);
     expect(order.x + order.width).toBeLessThanOrEqual(button.x + 1);
+    expect(Math.abs(order.x + order.width - button.x)).toBeLessThanOrEqual(1);
+    expect(await bag.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgb(188, 88, 35)");
+    expect(await bag.locator("img").evaluate((element) => getComputedStyle(element).filter)).toContain("invert(1)");
+    if (width === 1920) {
+      expect(order.x).toBeCloseTo(1670, 0);
+      expect(order.width).toBe(150);
+      expect(button.x).toBeCloseTo(1820, 0);
+      expect(button.width).toBe(56);
+    }
   }
+});
+
+test("мобильная корзина соответствует макету 320px и пропорционально адаптируется", async ({ page }, info) => {
+  test.skip(!info.project.use.isMobile, "Мобильный макет");
+  await seed(page, 3);
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto("/");
+  const { button, dialog } = await open(page);
+  await expect(dialog.getByRole("listitem")).toHaveCount(3);
+  const back = dialog.getByRole("button", { name: "Вернуться к странице" });
+  const close = dialog.getByRole("button", { name: "Закрыть корзину" });
+  const header = dialog.locator("h1");
+  const body = dialog.locator(".cartDrawer__body");
+  const card = dialog.locator(".recipientCart");
+  const checkout = dialog.getByRole("button", { name: "Оформить заказ" });
+  await expect(checkout).toBeEnabled();
+  await page.evaluate(() => document.fonts.ready);
+  for (const width of [320, 360, 390, 430, 639]) {
+    await page.setViewportSize({ width, height: 900 });
+    await body.evaluate((element) => { element.scrollTop = 0; });
+    const ratio = width / 320;
+    const boxes = await Promise.all([header, back, close, card, checkout, card.locator(".recipientCart__image").first()].map((item) => item.boundingBox()));
+    const [headingBox, backBox, closeBox, cardBox, checkoutBox, imageBox] = boxes;
+    expect(Math.abs(headingBox.x + headingBox.width / 2 - width / 2)).toBeLessThan(1);
+    expect(headingBox.y).toBeCloseTo(37 * ratio, 0);
+    expect(backBox.x).toBeCloseTo(23 * ratio, 0);
+    expect(closeBox.x + closeBox.width).toBeCloseTo(width - 23 * ratio, 0);
+    expect(backBox.y).toBeCloseTo(30 * ratio, 0);
+    expect(backBox.width).toBeCloseTo(40 * ratio, 0);
+    expect(cardBox.x).toBeCloseTo(6 * ratio, 0);
+    expect(cardBox.y).toBeCloseTo(86 * ratio, 0);
+    expect(cardBox.width).toBeCloseTo(308 * ratio, 0);
+    expect(cardBox.height).toBeCloseTo(411 * ratio, 0);
+    expect(imageBox.width).toBeCloseTo(100 * ratio, 0);
+    expect(imageBox.height).toBeCloseTo(imageBox.width, 0);
+    expect(checkoutBox.x).toBeCloseTo(23 * ratio, 0);
+    expect(checkoutBox.width).toBeCloseTo(274 * ratio, 0);
+    expect(checkoutBox.y).toBeCloseTo(513 * ratio, 0);
+    expect(checkoutBox.height).toBeCloseTo(40 * ratio, 0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    if (width === 320 || width === 390) await page.screenshot({ path: info.outputPath(`cart-mobile-design-${width}.png`) });
+  }
+  await back.click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page).toHaveURL(/\/$/);
+  await expect(button).toBeFocused();
+});
+
+test("мобильная корзина остаётся доступной в низком окне и при повороте", async ({ page }, info) => {
+  test.skip(!info.project.use.isMobile, "Мобильные жесты и ориентация");
+  await seed(page, 8);
+  await page.goto("/");
+  const { dialog } = await open(page);
+  const body = dialog.locator(".cartDrawer__body");
+  for (const viewport of [{ width: 390, height: 500 }, { width: 568, height: 320 }, { width: 844, height: 390 }]) {
+    await page.setViewportSize(viewport);
+    expect((await dialog.boundingBox()).height).toBe(viewport.height);
+    expect(await body.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
+    const checkout = dialog.getByRole("button", { name: "Оформить заказ" });
+    await checkout.scrollIntoViewIfNeeded();
+    await expect(checkout).toBeInViewport();
+    await expect(dialog.getByRole("button", { name: "Закрыть корзину" })).toBeInViewport();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  expect(await page.locator("#root").evaluate((element) => element.inert)).toBe(false);
 });

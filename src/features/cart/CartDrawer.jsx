@@ -6,6 +6,7 @@ import OrderModal from "../order/shared/OrderModal";
 import RecipientCartList from "./RecipientCartList";
 import { confirmDiscardConstructor } from "./ConstructorDraftNotice";
 import { getCartDraftItem } from "./cartPresentation";
+import backIcon from "../../images/certificate/checkout-back.svg";
 
 const CartDrawer = ({ onClose, returnFocusTo }) => {
   const cart = useCart();
@@ -29,6 +30,9 @@ const CartDrawer = ({ onClose, returnFocusTo }) => {
   return (
     <OrderModal className="cartDrawer" overlayClassName="cartDrawerOverlay" inertBackground
       labelledBy="cart-drawer-title" closeLabel="Закрыть корзину" onClose={onClose} returnFocusTo={returnFocusTo} fallbackFocusSelector=".home-header__logo">
+      <button className="cartDrawer__back" type="button" onClick={onClose} aria-label="Вернуться к странице">
+        <img src={backIcon} alt="" width="40" height="40" aria-hidden="true" />
+      </button>
       <h1 id="cart-drawer-title">Ваш заказ</h1>
       <div className="cartDrawer__body" data-lenis-prevent>
         <RecipientCartList cart={preview} variant="drawer" />

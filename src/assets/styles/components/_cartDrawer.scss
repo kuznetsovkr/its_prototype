@@ -1,7 +1,10 @@
 @use "../base/breakpoints" as bp;
+@use "../base/compactScale" as scale;
 
 .modalOverlay.cartDrawerOverlay {
+  align-items: stretch;
   justify-content: flex-end;
+  height: 100dvh;
   background: rgb(0 0 0 / 20%);
 }
 
@@ -25,6 +28,7 @@
 }
 
 .cartDrawer h1 { flex: 0 0 auto; margin: 0 0 26px; font-size: 24px; font-weight: 400; line-height: 1; }
+.cartDrawer__back { display: none; }
 .cartDrawer .modalClose { top: max(30px, env(safe-area-inset-top)); right: 20px; width: 40px; height: 40px; padding: 9px; border: 2px solid #433f3c; }
 .cartDrawer .modalClose svg { width: 100%; height: 100%; }
 .cartDrawer .modalClose path { stroke-width: 2.5; }
@@ -51,9 +55,64 @@
 @media (prefers-reduced-motion: reduce) { .modalContent.cartDrawer { animation: none; } }
 
 @media (max-width: bp.$mobile-max) {
-  .modalContent.cartDrawer { padding: max(77px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); }
-  .cartDrawer .recipientCart { padding: 12px; border-radius: 24px; }
-  .cartDrawer .recipientCart__item { grid-template-columns: clamp(64px, 22vw, 100px) minmax(0, 1fr); min-height: 64px; gap: 8px; }
-  .cartDrawer .recipientCart__image { border-radius: 14px; }
-  .cartDrawer .recipientCart__quantity { font-size: 12px; }
+  .modalContent.cartDrawer {
+    // Scale the 320px design inside a native, viewport-sized dialog.
+    --compact-layout-pixel: max(1px, calc(100vw / #{scale.$mobile-design-width}));
+
+    width: 100%;
+    padding: calc(env(safe-area-inset-top) + #{scale.px(86)}) scale.px(6) max(#{scale.px(30)}, env(safe-area-inset-bottom));
+  }
+
+  .cartDrawer h1 {
+    position: absolute;
+    top: calc(env(safe-area-inset-top) + #{scale.px(37)});
+    left: 50%;
+    width: calc(100% - #{scale.px(126)});
+    margin: 0;
+    font-size: scale.px(24);
+    text-align: center;
+    text-transform: lowercase;
+    transform: translateX(-50%);
+  }
+
+  .cartDrawer .modalClose {
+    top: calc(env(safe-area-inset-top) + #{scale.px(30)});
+    right: scale.px(23);
+    width: scale.px(40);
+    height: scale.px(40);
+    padding: scale.px(9);
+    border-width: scale.px(2);
+    border-color: #313131;
+  }
+
+  .cartDrawer__back {
+    position: absolute;
+    top: calc(env(safe-area-inset-top) + #{scale.px(30)});
+    left: scale.px(23);
+    display: grid;
+    place-items: center;
+    width: scale.px(40);
+    height: scale.px(40);
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .cartDrawer__back img { display: block; width: 100%; height: 100%; }
+  .cartDrawer__back:focus-visible { outline: 2px solid #bc5823; outline-offset: 2px; }
+  .cartDrawer .recipientCart { display: flex; flex-direction: column; padding: scale.px(16); border-radius: scale.px(30); font-size: scale.px(10); }
+  .cartDrawer .recipientCart:has(.recipientCart__item) { min-height: scale.px(411); }
+  .cartDrawer .recipientCart__item { grid-template-columns: scale.px(100) minmax(0, 1fr); min-height: scale.px(100); gap: scale.px(10); }
+  .cartDrawer .recipientCart__details h2 { min-height: scale.px(20); margin-top: scale.px(6); gap: scale.px(7); padding-right: scale.px(28); }
+  .cartDrawer .recipientCart__details p { margin: scale.px(10) 0 scale.px(4); }
+  .cartDrawer .recipientCart__image { padding: scale.px(6); border-radius: scale.px(20); }
+  .cartDrawer .recipientCart__quantity { font-size: scale.px(10); }
+  .cartDrawer .recipientCart__quantity button,
+  .cartDrawer .recipientCart__remove { width: scale.px(32); height: scale.px(32); }
+  .cartDrawer .recipientCart__remove img,
+  .cartDrawer .recipientCart__quantity button img { width: scale.px(20); height: scale.px(20); }
+  .cartDrawer .recipientCart__total { margin: auto scale.px(4) scale.px(4); padding-top: scale.px(39); font-size: scale.px(12); line-height: 1; }
+  .cartDrawer__checkout { display: block; width: calc(100% - #{scale.px(34)}); min-height: scale.px(40); margin: scale.px(16) auto 0; padding: scale.px(10) scale.px(16); border-radius: scale.px(40); font-size: scale.px(12); }
 }
