@@ -25,7 +25,7 @@ const seed = async (page, count = 2) => {
   return { updates, reject: () => { fail = true; } };
 };
 const open = async (page) => {
-  const button = page.getByRole("button", { name: "Открыть корзину", exact: true });
+  const button = page.getByRole("button", { name: /^Открыть корзину/ });
   await button.click();
   const dialog = page.getByRole("dialog", { name: "Ваш заказ", exact: true });
   await expect(dialog).toBeVisible();
@@ -37,6 +37,7 @@ test("корзина выезжает справа, управляется кл�
   const api = await seed(page);
   await page.goto("/");
   const { button, dialog } = await open(page);
+  await expect(button).toHaveAccessibleName("Открыть корзину, изделий: 2");
   await expect(dialog.getByRole("listitem")).toHaveCount(2);
   await expect(dialog).toContainText(/Цена: 12\s*000 ₽/);
   expect(await page.locator("#root").evaluate((element) => element.inert)).toBe(true);
@@ -53,8 +54,13 @@ test("корзина выезжает справа, управляется кл�
   await expect(dialog).toContainText("2 шт");
   await expect(dialog).toContainText(/Цена: 18\s*000 ₽/);
   expect(api.updates).toEqual([{ quantity: 2 }]);
+  await expect(button).toHaveAccessibleName("Открыть корзину, изделий: 3");
+  await expect(button.locator(".home-header__cart-count")).toHaveText("3");
+  await page.screenshot({ path: info.outputPath("cart-drawer.png") });
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
+  await expect(page.getByText("У вас есть сохранённые изделия.", { exact: true })).toHaveCount(0);
+  await expect(page.locator(".orderCartShortcut").filter({ hasText: "Открыть корзину" })).toHaveCount(0);
   await expect(button).toBeFocused();
   expect(await page.locator("#root").evaluate((element) => element.inert)).toBe(false);
   expect(await page.evaluate(() => document.body.style.overflow)).not.toBe("hidden");
@@ -80,9 +86,14 @@ test("ошибка количества не меняет корзину, уда
   await dialog.getByRole("button", { name: "Увеличить количество: Худи" }).click();
   await expect(dialog.getByRole("alert")).toHaveText("Недостаточно изделий на складе");
   await expect(dialog).toContainText("1 шт");
+  await dialog.getByRole("button", { name: "Повторить загрузку корзины" }).click();
+  await expect(dialog.getByRole("alert")).toHaveCount(0);
   await dialog.getByRole("button", { name: "Удалить изделие: Худи, Чёрный, M" }).click();
   await expect(dialog).toContainText("В корзине пока нет изделий.");
   await expect(dialog.getByRole("button", { name: "Оформить заказ" })).toBeDisabled();
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".home-header__cart-count")).toHaveCount(0);
+  expect(await page.evaluate(() => document.activeElement.matches('.home-header__logo, .home-header__icon-link'))).toBe(true);
 });
 
 test("длинная корзина прокручивается внутри панели, не расширяя страницу", async ({ page }) => {
@@ -121,4 +132,22 @@ test("корзина открывается из мобильного меню �
   await page.keyboard.press("Escape");
   await expect(page.locator(".home-header__mobile-actions button")).toBeFocused();
   await expect(page.getByRole("dialog", { name: "Мобильное меню" })).not.toBeVisible();
+});
+
+test("иконка и счётчик не перекрывают навигацию на границах планшета и десктопа", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop-chromium", "Матрица ширин");
+  await seed(page);
+  await page.goto("/");
+  const bag = page.locator(".home-header__desktop-cart");
+  await expect(bag).toBeVisible();
+  for (const width of [640, 820, 1199, 1200, 1280, 1920, 2560]) {
+    await page.setViewportSize({ width, height: 900 });
+    const [logo, nav, order, button] = await Promise.all([
+      page.locator(".home-header__logo").boundingBox(), page.locator(".home-header__navigation").boundingBox(),
+      page.locator(".home-header__order").boundingBox(), bag.boundingBox(),
+    ]);
+    expect(logo.x + logo.width).toBeLessThanOrEqual(nav.x + 1);
+    expect(nav.x + nav.width).toBeLessThanOrEqual(order.x + 1);
+    expect(order.x + order.width).toBeLessThanOrEqual(button.x + 1);
+  }
 });

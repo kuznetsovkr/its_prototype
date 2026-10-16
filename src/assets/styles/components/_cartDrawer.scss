@@ -14,6 +14,7 @@
   height: 100dvh;
   max-height: none;
   padding: max(77px, env(safe-area-inset-top)) 20px max(30px, env(safe-area-inset-bottom));
+  gap: 0;
   border-radius: 0;
   overflow: hidden;
   background: #fff;

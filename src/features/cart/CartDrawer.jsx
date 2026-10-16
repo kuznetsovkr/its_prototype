@@ -21,13 +21,14 @@ const CartDrawer = ({ onClose, returnFocusTo }) => {
     try { await operation(); } catch (failure) { setError(failure.message); }
   };
   const preview = { ...cart, busy: cart.pending, draftItem, constructorDraftError, uiError: error || cart.error,
+    reloadCart: () => { setError(""); return reloadCart(); },
     changeQuantity: (id, quantity) => change(() => cart.setQuantity(id, quantity)),
     removeItem: (id) => change(() => cart.removeItem(id)),
     discardDraft: () => { if (confirmDiscardConstructor(order)) resetCurrentItem(); } };
   const canCheckout = cart.initialized && !cart.pending && (!cart.error || cart.checkout) && cart.items.length > 0 && !draftItem;
   return (
     <OrderModal className="cartDrawer" overlayClassName="cartDrawerOverlay" inertBackground
-      labelledBy="cart-drawer-title" closeLabel="Закрыть корзину" onClose={onClose} returnFocusTo={returnFocusTo}>
+      labelledBy="cart-drawer-title" closeLabel="Закрыть корзину" onClose={onClose} returnFocusTo={returnFocusTo} fallbackFocusSelector=".home-header__logo">
       <h1 id="cart-drawer-title">Ваш заказ</h1>
       <div className="cartDrawer__body" data-lenis-prevent>
         <RecipientCartList cart={preview} variant="drawer" />

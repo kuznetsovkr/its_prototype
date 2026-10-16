@@ -293,7 +293,7 @@ test("мобильная шапка сохраняет корзину и цен�
   await page.goto("/");
   const header = page.locator(".home-header").first();
   const logo = header.locator(".home-header__logo");
-  const bag = header.getByRole("button", { name: "Открыть корзину" }).first();
+  const bag = header.getByRole("button", { name: /^Открыть корзину/ }).first();
   await expect(header.getByRole("button", { name: "Избранное" })).toHaveCount(0);
   await expect(bag).toBeVisible();
 

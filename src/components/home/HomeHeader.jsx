@@ -9,7 +9,7 @@ import { VIEWPORT_BREAKPOINTS } from "../../config/breakpoints";
 import ResponsiveAsset from "./ResponsiveAsset";
 import { useCart } from "../../context/CartContext";
 import { useOrder } from "../../context/OrderContext";
-import { getCartDraftItem } from "../../features/cart/cartPresentation";
+import { getCartItemCount } from "../../features/cart/cartPresentation";
 import CartDrawer from "../../features/cart/CartDrawer";
 
 const focusableSelector = "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])";
@@ -41,7 +41,10 @@ const HomeHeader = ({
   const [isCartOpen, setIsCartOpen] = useState(false);
   const cart = useCart();
   const { order } = useOrder();
-  const hasCart = cart.items.length > 0 || Boolean(getCartDraftItem(cart, order));
+  const cartCount = getCartItemCount(cart, order);
+  const hasCart = cartCount > 0 || Boolean(cart.checkout || cart.error);
+  const cartLabel = cartCount ? `Открыть корзину, изделий: ${cartCount}` : "Открыть корзину";
+  const cartBadge = cartCount > 0 ? <span className="home-header__cart-count" aria-hidden="true">{cartCount}</span> : null;
   const cartTriggerRef = useRef(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const headerRef = useRef(null);
@@ -324,14 +327,16 @@ const HomeHeader = ({
           Сделать заказ
         </button>
 
-        {hasCart && <button type="button" className="home-header__desktop-cart" aria-label="Открыть корзину"
+        {hasCart && <button type="button" className="home-header__desktop-cart" aria-label={cartLabel}
           aria-haspopup="dialog" aria-expanded={isCartOpen} onClick={openCart}>
           <img src={assets.bag} alt="" width="24" height="24" />
+          {cartBadge}
         </button>}
 
         <div className="home-header__mobile-actions">
-          <button type="button" aria-label="Открыть корзину" aria-haspopup="dialog" aria-expanded={isCartOpen} className="home-header__icon-link" onClick={openCart}>
+          <button type="button" aria-label={cartLabel} aria-haspopup="dialog" aria-expanded={isCartOpen} className="home-header__icon-link" onClick={openCart}>
             <img src={assets.bag} alt="" width="24" height="24" />
+            {cartBadge}
           </button>
         </div>
       </div>
@@ -358,12 +363,13 @@ const HomeHeader = ({
           <button
             className="home-header__menu-bag"
             type="button"
-            aria-label="Открыть корзину"
+            aria-label={cartLabel}
             aria-haspopup="dialog"
             aria-expanded={isCartOpen}
             onClick={openCart}
           >
             <img src={assets.menu.bag} alt="" width="20" height="19" />
+            {cartBadge}
           </button>
 
           <nav className="home-header__mobile-navigation" aria-label="Мобильная навигация">

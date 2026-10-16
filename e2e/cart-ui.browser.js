@@ -117,6 +117,11 @@ const seed = async (page) => {
   await expect(page.getByRole("heading", { name: "Введите свои данные" })).toBeVisible();
 };
 const add = (page) => page.getByRole("button", { name: "Добавить в корзину", exact: true });
+const cartBadge = (page) => page.locator(".home-header button:visible > .home-header__cart-count");
+const openSavedCart = async (page) => {
+  await page.getByRole("button", { name: /^Открыть корзину/ }).click();
+  await page.getByRole("dialog", { name: "Ваш заказ" }).getByRole("button", { name: "Оформить заказ" }).click();
+};
 const constructorKey = "its_constructor_draft_v1";
 const constructorRecord = (page) => page.evaluate((key) => JSON.parse(localStorage.getItem(key)), constructorKey);
 const selectGarment = async (page) => {
@@ -136,7 +141,7 @@ test("save current item, retain buyer/delivery, reset only the constructor and r
   await page.locator(".recipientOrderForm__consent input").check();
   await expect(add(page)).toBeEnabled();
   await add(page).click();
-  await expect(page.getByRole("link", { name: /Открыть корзину/ })).toBeVisible();
+  await expect(cartBadge(page)).toHaveText("1");
   const draft = await state(page);
   expect(draft.embroideryType).toBe("");
   expect(draft.files).toEqual([]);
@@ -144,7 +149,7 @@ test("save current item, retain buyer/delivery, reset only the constructor and r
   expect(draft.recipient.privacyConsent).toBe(true);
   expect(draft.recipient.pickupPoint).toContain("Krasnoyarsk");
   expect(server.items).toHaveLength(1);
-  await page.getByRole("link", { name: /Открыть корзину/ }).click();
+  await openSavedCart(page);
   await expect(page.getByRole("list", { name: "Изделия в корзине" })).toContainText("Патронус × 4");
   await expect(page.locator(".recipientOrderNavigation__submit")).toBeEnabled();
   const persisted = await context.storageState();
@@ -165,7 +170,7 @@ test("quantity and delete use real cart rows; keyboard works and black dots neve
   await seed(page);
   await page.locator(".recipientOrderForm__consent input").check();
   await add(page).click();
-  await page.getByRole("link", { name: /Открыть корзину/ }).click();
+  await openSavedCart(page);
   const increase = page.getByRole("button", { name: "Увеличить количество: Худи" });
   await increase.focus();
   await page.keyboard.press("Enter");
@@ -206,7 +211,7 @@ test("lost save response keeps files and key; retry cannot duplicate or lose a g
   expect((await state(page)).files).toEqual(["pet.png"]);
   expect((await state(page)).cartItemKey).toBe(key);
   await add(page).click();
-  await expect(page.getByRole("link", { name: /Открыть корзину/ })).toBeVisible();
+  await expect(cartBadge(page)).toHaveText("1");
   expect(server.keys).toEqual([key, key]);
   expect(server.items).toHaveLength(1);
 });
@@ -235,7 +240,7 @@ test("reload reconciles an accepted upload without asking for the lost File agai
   await expect(page.getByRole("alert")).toContainText("недоступна");
   page.on("dialog", (dialog) => dialog.accept());
   await page.reload();
-  await expect(page.getByRole("link", { name: /Открыть корзину/ })).toBeVisible();
+  await expect(cartBadge(page)).toHaveText("1");
   expect((await state(page)).files).toEqual([]);
   expect((await state(page)).embroideryType).toBe("");
   expect(server.items).toHaveLength(1);
@@ -246,7 +251,7 @@ const savedBasket = async (page) => {
   await page.goto(fixture); await seed(page);
   await page.locator(".recipientOrderForm__consent input").check();
   await add(page).click();
-  await page.getByRole("link", { name: /Открыть корзину/ }).click();
+  await openSavedCart(page);
   await expect(page.getByText(/Все изделия и вышивка:/)).toBeVisible();
 };
 
@@ -467,7 +472,7 @@ test("accepted uploads are reconciled after a browser restart without resurrecti
   try {
     await server.mount(reopened); const restored = await reopened.newPage();
     await restored.goto(`${fixture}?order=1`);
-    await expect(restored.getByRole("link", { name: /Открыть корзину/ })).toBeVisible();
+    await expect(cartBadge(restored)).toHaveText("1");
     await expect.poll(async () => (await constructorRecord(restored)).draft).toBeNull();
     expect((await state(restored)).files).toEqual([]);
     expect((await state(restored)).clothing.size).toBe("");

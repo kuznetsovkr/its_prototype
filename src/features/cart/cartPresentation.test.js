@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
 import RecipientCartList from "./RecipientCartList";
-import { cartEmbroideryLabel, cartPaymentBlocked, constructorCartItem, currentCartItem, getCartDraftItem } from "./cartPresentation";
+import { cartEmbroideryLabel, cartPaymentBlocked, constructorCartItem, currentCartItem, getCartDraftItem, getCartItemCount } from "./cartPresentation";
 
 vi.mock("../../utils/url", () => ({ buildImgSrc: (value) => value }));
 
@@ -15,6 +15,10 @@ describe("cart presentation and staged checkout safety", () => {
     expect(getCartDraftItem(ready, order)?.draft).toBe(true);
     expect(getCartDraftItem({ ...ready, items: [{ requestKey: "key" }] }, order)).toBeNull();
     expect(getCartDraftItem({ ...ready, checkout: { orderId: 1 } }, order)).toBeNull();
+    expect(getCartItemCount(ready, order)).toBe(1);
+    expect(getCartItemCount({ ...ready, items: [{ ...item, quantity: 3 }] }, order)).toBe(4);
+    expect(getCartItemCount({ ...ready, items: [{ ...item, quantity: 3, requestKey: "key" }] }, order)).toBe(3);
+    expect(getCartItemCount(ready, { clothing: {}, embroidery: {} })).toBe(0);
   });
   it("blocks checkout while restoring, after an error or with an empty cart; saved items can now be paid together", () => {
     expect(cartPaymentBlocked(ready)).toBe(false);

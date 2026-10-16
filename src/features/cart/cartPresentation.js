@@ -12,6 +12,9 @@ export const constructorCartItem = (order) => {
 export const getCartDraftItem = (cart, order) => cart.checkout || cart.items.some((item) => item.requestKey === order.cartItemKey)
   ? null : constructorCartItem(order);
 
+export const getCartItemCount = (cart, order) => cart.items.reduce((sum, item) => sum + item.quantity, 0)
+  + (getCartDraftItem(cart, order) ? 1 : 0);
+
 export const currentCartItem = (order) => {
   const { clothing, embroidery } = order;
   if (!clothing.type || !clothing.color || !clothing.size || !embroidery.type) return null;

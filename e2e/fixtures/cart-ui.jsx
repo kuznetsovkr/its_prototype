@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { MemoryRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { CartProvider } from "../../src/context/CartContext";
 import { OrderProvider, useOrder } from "../../src/context/OrderContext";
+import Header from "../../src/components/Header";
 import RecipientDetails from "../../src/pages/RecipientDetails";
 import OrderPage from "../../src/pages/OrderPage";
 import PaymentSuccess from "../../src/pages/PaymentSuccess";
@@ -41,6 +42,7 @@ const Harness = () => {
     <output hidden data-testid="draft-state">{JSON.stringify({ path: location.pathname, cartItemKey: order.cartItemKey,
       clothing: order.clothing, embroidery: order.embroidery, missingUploadFiles, embroideryType: order.embroidery.type,
       files: order.embroidery.uploadedImage.map((entry) => entry.name), recipient: order.recipient })}</output>
+    <Header />
     <Routes>
       <Route path="/recipient" element={<RecipientDetails />} />
       <Route path="/order" element={<OrderPage />} />

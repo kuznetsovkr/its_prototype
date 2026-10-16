@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 
 const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-const OrderModal = ({ children, className = "", overlayClassName = "", inertBackground = false, closeLabel = "Закрыть окно", label, labelledBy, onClose, returnFocusTo }) => {
+const OrderModal = ({ children, className = "", overlayClassName = "", inertBackground = false, closeLabel = "Закрыть окно", label, labelledBy, onClose, returnFocusTo, fallbackFocusSelector }) => {
   const dialogRef = useRef(null);
   const closeRef = useRef(null);
   const onCloseRef = useRef(onClose);
@@ -55,10 +55,11 @@ const OrderModal = ({ children, className = "", overlayClassName = "", inertBack
       document.documentElement.style.overflow = previousRootOverflow;
       if (background && !wasInert) background.removeAttribute("inert");
       const requestedFocus = returnFocusToRef.current;
-      const focusTarget = requestedFocus?.isConnected ? requestedFocus : previousFocus;
-      if (focusTarget?.isConnected) focusTarget.focus({ preventScroll: true });
+      const fallback = fallbackFocusSelector ? document.querySelector(fallbackFocusSelector) : null;
+      const focusTarget = [requestedFocus, previousFocus, fallback].find((element) => element?.isConnected && element.getClientRects().length > 0);
+      focusTarget?.focus({ preventScroll: true });
     };
-  }, [inertBackground]);
+  }, [inertBackground, fallbackFocusSelector]);
 
   return createPortal(
     <div className={`modalOverlay${overlayClassName ? ` ${overlayClassName}` : ""}`} onClick={onClose}>
