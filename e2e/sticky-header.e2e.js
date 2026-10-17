@@ -1,3 +1,4 @@
+/* global window -- Playwright browser callbacks */
 import { expect, test } from "@playwright/test";
 
 const viewports = [
@@ -35,15 +36,19 @@ for (const viewport of viewports) {
       await expect(page.getByRole("dialog", { name: "Мобильное меню" })).toBeHidden();
       await header.getByRole("button", { name: "Открыть меню" }).click();
       await header.locator(".home-header__mobile-link--about").click();
-      const sectionTop = (await page.locator("#about").boundingBox()).y;
-      const headerBottom = (await header.boundingBox()).y + (await header.boundingBox()).height;
-      expect(sectionTop).toBeGreaterThanOrEqual(headerBottom);
     } else {
       await header.locator(".home-header__link--about").click();
-      const sectionTop = (await page.locator("#about").boundingBox()).y;
-      const headerBottom = (await header.boundingBox()).y + (await header.boundingBox()).height;
-      expect(sectionTop).toBeGreaterThanOrEqual(headerBottom);
     }
+
+    // Clicking an anchor starts an asynchronous smooth scroll. Measure the
+    // final position, not the browser's intermediate hash-navigation frame.
+    await expect.poll(async () => {
+      const [sectionBox, headerBox] = await Promise.all([
+        page.locator("#about").boundingBox(),
+        header.boundingBox(),
+      ]);
+      return sectionBox.y - (headerBox.y + headerBox.height);
+    }, { timeout: 15_000 }).toBeGreaterThanOrEqual(0);
   });
 }
 

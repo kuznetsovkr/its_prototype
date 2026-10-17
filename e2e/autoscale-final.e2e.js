@@ -91,12 +91,15 @@ test("rotation keeps text, focus, recipient phone and postal office usable", asy
   await page.getByRole("button", { name: "надпись", exact: true }).click();
   const inscription = page.getByPlaceholder("Введите надпись");
   await inscription.fill("Сохранить эту надпись при повороте экрана");
+  // The default Onest face deliberately normalizes the saved text to lowercase.
+  const inscriptionValue = "сохранить эту надпись при повороте экрана";
+  await expect(inscription).toHaveValue(inscriptionValue);
   await inscription.focus();
   for (const viewport of [{ width: 844, height: 390 }, { width: 390, height: 844 }]) {
     await page.setViewportSize(viewport);
     await inscription.scrollIntoViewIfNeeded();
     await expect(inscription).toBeFocused();
-    await expect(inscription).toHaveValue("Сохранить эту надпись при повороте экрана");
+    await expect(inscription).toHaveValue(inscriptionValue);
     expect(await inscription.evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(16);
     await expect(inscription).toBeInViewport();
     await expectNoHorizontalOverflow(page, viewport.width);
