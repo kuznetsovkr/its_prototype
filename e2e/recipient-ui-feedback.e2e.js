@@ -29,10 +29,11 @@ test("чекбокс отчества отделён от ФИО, щит вид�
   await expect(page.locator(".recipientCdekDialog")).not.toHaveClass(/is-open/);
   const credit = page.locator(".home-footer__legal-development");
   await expect(credit).toHaveText("Разработка сайта — Кирилл Кузнецов");
+  await expect(credit).toHaveAccessibleName(info.project.use.isMobile ? "Разработка сайта — Кирилл Кузнецов" : "Разработка сайта");
   await expect(credit).toHaveAttribute("href", "https://t.me/krkuznetsov");
 });
 
-test("полная подпись разработчика не выходит за футер и не перекрывает ссылки", async ({ page }, info) => {
+test("подпись разработчика скрывает имя только на десктопе и не перекрывает ссылки", async ({ page }, info) => {
   test.skip(info.project.name !== "desktop-chromium", "Матрица всех ширин");
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
@@ -40,6 +41,10 @@ test("полная подпись разработчика не выходит �
   await page.evaluate(() => document.fonts.ready);
   for (const width of [320, 390, 640, 820, 1199, 1200, 1440, 2560]) {
     await page.setViewportSize({ width, height: 900 });
+    const credit = page.locator(".home-footer__legal-development");
+    await expect(credit).toHaveAccessibleName(width >= 1200 ? "Разработка сайта" : "Разработка сайта — Кирилл Кузнецов");
+    await expect(credit).toHaveAttribute("href", "https://t.me/krkuznetsov");
+    await expect(credit).toHaveAttribute("target", "_blank");
     const links = page.locator(".home-footer__legal > a");
     const boxes = await links.evaluateAll(elements => elements.map(element => {
       const rect = element.getBoundingClientRect();

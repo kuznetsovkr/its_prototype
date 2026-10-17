@@ -100,7 +100,7 @@ const HomeFooter = ({ assets, navigationBase = "", onOrder, variant = "home" }) 
           Дизайн сайта<span className="home-footer__compact-label"> — Илья Погудин</span>
         </a>
         <a className="home-footer__legal-development" href={siteCredits.development} target="_blank" rel="noreferrer">
-          Разработка сайта — Кирилл Кузнецов
+          Разработка сайта<span className="home-footer__compact-label"> — Кирилл Кузнецов</span>
         </a>
       </div>
     </footer>
