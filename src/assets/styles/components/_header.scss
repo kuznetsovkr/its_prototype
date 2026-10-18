@@ -53,8 +53,7 @@
 }
 
 .home-header__logo-image {
-  object-fit: fill;
-  filter: brightness(0);
+  object-fit: contain;
 }
 
 .home-header__navigation {
@@ -336,7 +335,7 @@
     display: block;
     width: scale.px(100);
     height: scale.px(44);
-    object-fit: fill;
+    object-fit: contain;
   }
 
   .home-header__menu-bag {

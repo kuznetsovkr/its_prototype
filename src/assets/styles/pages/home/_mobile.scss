@@ -78,7 +78,7 @@
 
   .home-hero__brand-picture,
   .home-hero__brand { width: 100%; height: 100%; }
-  .home-hero__brand { object-fit: fill; }
+  .home-hero__brand { object-fit: contain; }
 
   .home-hero__subtitle {
     position: absolute;

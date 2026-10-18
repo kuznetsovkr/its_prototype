@@ -1,8 +1,7 @@
 import desktopHeroBackground from './desktop/hero-background.webp';
 import desktopHeroBackgroundAvif from './desktop/hero-background.avif';
 import desktopHeroSubject from './desktop/hero-subject.webp';
-import desktopHeroLogoGraphite from './desktop/hero-logo-graphite.png';
-import desktopHeroLogoMilk from './desktop/hero-logo-milk.webp';
+import { brandLogos } from '../brand';
 import desktopAboutPhoto from './desktop/about-photo.webp';
 import desktopProcessStep01Photo from './desktop/process-step-01-clean.webp';
 import desktopProcessStep02Photo from './desktop/process-step-02-clean.webp';
@@ -19,7 +18,6 @@ import desktopReviewsItem05 from './desktop/reviews-item-05.webp';
 import desktopReviewsItem06 from './desktop/reviews-item-06.webp';
 import desktopQuestionsDogTwo from './desktop/questions-dog-two.webp';
 import desktopQuestionsDogOn from './desktop/questions-dog-on.webp';
-import desktopFooterLogoMilk from './desktop/footer-logo-milk.webp';
 import desktopFooterIllustration from './desktop/footer-illustration.webp';
 import desktopProcessConnector from './desktop/process-connector.svg';
 import desktopReviewsArrowPrevious from './desktop/reviews-arrow-previous.svg';
@@ -34,12 +32,9 @@ import desktopFooterVkInternal from './desktop/footer-vk-internal.svg';
 import desktopFooterInstagramInternal from './desktop/footer-instagram-internal.svg';
 import tabletHeroBackground from './desktop/hero-background.webp';
 import tabletHeroSubject from './tablet/hero-subject.webp';
-import tabletHeroLogoGraphite from './desktop/hero-logo-graphite.png';
-import tabletHeroLogoMilk from './desktop/hero-logo-milk.webp';
 import tabletAboutPhoto from './mobile/about-photo-layer-02.webp';
 import tabletProcessConnector from './tablet/process-connector.svg';
 import tabletFooterIllustration from './desktop/footer-illustration.webp';
-import tabletFooterLogoMilk from './desktop/footer-logo-milk.webp';
 import tabletReviewsItem03 from './desktop/reviews-item-03.jpg';
 import tabletReviewsItem02 from './desktop/reviews-item-02.webp';
 import tabletReviewsItem01 from './desktop/reviews-item-01.webp';
@@ -49,9 +44,7 @@ import tabletFooterGlow from './tablet/footer-glow.svg';
 import tabletFooterTelegram from './tablet/footer-telegram.svg';
 import tabletFooterVk from './tablet/footer-vk.svg';
 import tabletFooterInstagram from './tablet/footer-instagram.svg';
-import mobileHeaderLogoGraphite from './desktop/hero-logo-graphite.png';
 import mobileHeroBackground from './mobile/hero-background.webp';
-import mobileHeroLogoGraphite from './desktop/hero-logo-graphite.png';
 import mobileAboutPhotoLayer01 from './desktop/about-photo.webp';
 import mobileAboutPhotoLayer02 from './mobile/about-photo-layer-02.webp';
 import mobileProcessStep01Photo from './desktop/process-step-01-clean.webp';
@@ -62,13 +55,11 @@ import mobileReviewsItem01 from './desktop/reviews-item-02.webp';
 import mobileReviewsItem02 from './desktop/reviews-item-03.jpg';
 import mobileQuestionsDogOn from './desktop/questions-dog-on.webp';
 import mobileQuestionsDogTwo from './desktop/questions-dog-two.webp';
-import mobileFooterLogoMilk from './desktop/footer-logo-milk.webp';
 import mobileFooterIllustration from './desktop/footer-illustration.webp';
 import mobileHeaderBag from './mobile/header-bag.svg';
 import mobileMenuActiveDot from './mobile/menu-active-dot.svg';
 import mobileMenuBag from './mobile/menu-bag.svg';
 import mobileMenuInstagram from './mobile/menu-instagram.svg';
-import mobileMenuLogoGraphite from './mobile/menu-logo-graphite.webp';
 import mobileMenuTelegram from './mobile/menu-telegram.svg';
 import mobileMenuVk from './mobile/menu-vk.svg';
 import mobileFaqGlow from './mobile/faq-glow.svg';
@@ -87,8 +78,8 @@ export const homeAssets = {
       background: desktopHeroBackground,
       backgroundAvif: desktopHeroBackgroundAvif,
       subject: desktopHeroSubject,
-      logoGraphite: desktopHeroLogoGraphite,
-      logoMilk: desktopHeroLogoMilk,
+      logoGraphite: brandLogos.header,
+      logoMilk: brandLogos.cover,
     },
     about: {
       photo: desktopAboutPhoto,
@@ -120,7 +111,7 @@ export const homeAssets = {
       items: homeSocialItems,
     },
     footer: {
-      logoMilk: desktopFooterLogoMilk,
+      logoMilk: brandLogos.footer,
       illustration: desktopFooterIllustration,
       glow: desktopFooterGlow,
       telegram: desktopFooterTelegram,
@@ -142,8 +133,8 @@ export const homeAssets = {
       background: tabletHeroBackground,
       backgroundAvif: desktopHeroBackgroundAvif,
       subject: tabletHeroSubject,
-      logoGraphite: tabletHeroLogoGraphite,
-      logoMilk: tabletHeroLogoMilk,
+      logoGraphite: brandLogos.header,
+      logoMilk: brandLogos.cover,
     },
     about: {
       photo: tabletAboutPhoto,
@@ -167,7 +158,7 @@ export const homeAssets = {
       items: compactSocialItems,
     },
     footer: {
-      logoMilk: tabletFooterLogoMilk,
+      logoMilk: brandLogos.footer,
       illustration: tabletFooterIllustration,
       glow: tabletFooterGlow,
       telegram: tabletFooterTelegram,
@@ -183,9 +174,9 @@ export const homeAssets = {
   },
   mobile: {
     hero: {
-      headerLogo: mobileHeaderLogoGraphite,
+      headerLogo: brandLogos.header,
       background: mobileHeroBackground,
-      logoGraphite: mobileHeroLogoGraphite,
+      logoGraphite: brandLogos.header,
     },
     about: {
       photo: { layers: mobileAboutPhotoLayers },
@@ -207,7 +198,7 @@ export const homeAssets = {
       items: compactSocialItems,
     },
     footer: {
-      logoMilk: mobileFooterLogoMilk,
+      logoMilk: brandLogos.footer,
       illustration: mobileFooterIllustration,
       glow: mobileFooterGlow,
       telegram: mobileFooterTelegram,
@@ -226,14 +217,14 @@ export const homeAssets = {
 };
 
 export const siteHeaderAssets = {
-  desktopLogo: homeAssets.desktop.footer.logoMilk,
-  tabletLogo: homeAssets.tablet.footer.logoMilk,
-  mobileLogo: homeAssets.mobile.footer.logoMilk,
+  desktopLogo: brandLogos.header,
+  tabletLogo: brandLogos.header,
+  mobileLogo: brandLogos.header,
   bag: homeAssets.mobile.icons.bag,
   menu: {
     activeDot: mobileMenuActiveDot,
     bag: mobileMenuBag,
-    logo: mobileMenuLogoGraphite,
+    logo: brandLogos.header,
     instagram: mobileMenuInstagram,
     telegram: mobileMenuTelegram,
     vk: mobileMenuVk,
