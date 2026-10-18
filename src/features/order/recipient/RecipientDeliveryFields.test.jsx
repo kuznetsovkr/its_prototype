@@ -33,12 +33,24 @@ describe("RecipientDeliveryFields", () => {
   it("clearly marks postal selection as manual and preserves the other-recipient phone", () => {
     const html = renderToStaticMarkup(<RecipientDeliveryFields {...props} deliveryMethod="russian_post" />);
     expect(html).toContain("Индекс и адрес отделения");
-    expect(html).toContain("Пока укажите отделение вручную");
+    expect(html).toContain("Укажите индекс и адрес отделения");
+    expect(html).toContain("Доставка оплачивается отдельно после изготовления заказа");
+    expect(html).toContain("Менеджер сообщит фактическую стоимость и отправит чек");
+    expect(html).not.toContain("стоимость доставки перед оплатой");
     expect(html).toContain('maxLength="241"');
     expect(html).toContain("Получатель — другой человек");
     expect(html).not.toContain("Телефон другого получателя");
     expect(html).not.toContain("Выберите пункт получения СДЭК");
     expect(html).not.toContain("от 300");
+  });
+  it("does not show postal payment terms for the other delivery methods", () => {
+    for (const deliveryMethod of ["cdek", "pickup"]) {
+      const html = renderToStaticMarkup(<RecipientDeliveryFields {...props} deliveryMethod={deliveryMethod} />);
+      // The method choice stays informative, but the detailed postal notice is
+      // only shown when the customer actually selects Russian Post.
+      expect(html).not.toContain("Менеджер сообщит фактическую стоимость и отправит чек");
+      expect(html).not.toContain('id="recipient-postal-help"');
+    }
   });
   it("shows required recipient fields only when the checkbox is enabled; restores legacy filled fields", () => {
     const shown = renderToStaticMarkup(<RecipientDeliveryFields {...props} hasOtherRecipient />);

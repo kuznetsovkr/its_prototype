@@ -7,7 +7,7 @@ import radioActive from "../../../images/order/delivery-radio-active.svg";
 
 const options = [
   { value: "cdek", label: "СДЭК", description: "Доставка до пункта выдачи заказов", detail: "срок и стоимость — после выбора ПВЗ" },
-  { value: "russian_post", label: "Почта России", description: "Доставка до отделения", detail: "срок и стоимость уточнит менеджер" },
+  { value: "russian_post", label: "Почта России", description: "Доставка до отделения", detail: "доставка оплачивается отдельно после изготовления" },
   { value: "pickup", label: "Самовывоз" },
 ];
 
@@ -58,7 +58,7 @@ const RecipientDeliveryFields = ({
               aria-label="Отделение Почты России" aria-describedby="recipient-postal-help" maxLength={POSTAL_POINT_MAX_LENGTH}
               placeholder="Индекс и адрес отделения" />
             <small className="recipientDeliveryDetails__hint" id="recipient-postal-help">
-              Пока укажите отделение вручную. Менеджер проверит его и уточнит стоимость доставки перед оплатой.
+              Укажите индекс и адрес отделения. Доставка оплачивается отдельно после изготовления заказа. Менеджер сообщит фактическую стоимость и отправит чек.
             </small>
           </label>
         ) : (

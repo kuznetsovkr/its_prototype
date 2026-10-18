@@ -59,6 +59,8 @@ test("новые способы адаптивны, переключаются �
   await expect(page.getByRole("radio", { name: "Почта России", exact: true })).toBeChecked();
   const postal = page.getByRole("textbox", { name: "Отделение Почты России", exact: true });
   await expect(postal).toHaveAttribute("maxlength", "241");
+  await expect(page.locator("#recipient-postal-help")).toContainText("Доставка оплачивается отдельно после изготовления заказа");
+  await expect(page.locator("#recipient-postal-help")).toContainText("отправит чек");
   await postal.fill(postalPoint);
   const widths = info.project.name.startsWith("desktop") ? [1920, 1440, 1200, 1199, 820, 640] : [320, 390, 428, 639];
   for (const width of widths) {
