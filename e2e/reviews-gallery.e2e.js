@@ -1,3 +1,4 @@
+/* global document, window */
 import { expect, test } from "@playwright/test";
 
 test("отзывы циклически листаются стрелками и с клавиатуры", async ({ page }, testInfo) => {
@@ -28,6 +29,42 @@ test("отзывы циклически листаются стрелками и
   await expect(viewport).toHaveAttribute("data-active-index", "0");
   await expect(next).toBeEnabled();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1440);
+});
+
+test("задержка плавной прокрутки не возвращает предыдущий отзыв к первому", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium", "Десктопная плавная прокрутка");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  const section = page.locator(".home-reviews");
+  await section.evaluate(element => window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - 150, behavior: "instant" }));
+  await expect.poll(() => section.evaluate(element => Number(element.style.getPropertyValue("--home-scroll-zoom-scale")))).toBe(1);
+  const viewport = section.locator(".home-reviews-carousel__viewport");
+  await viewport.evaluate(element => {
+    const nativeScrollTo = element.scrollTo.bind(element);
+    const state = { target: null, rebases: 0, release: null };
+    window.reviewScrollPause = state;
+    // Hold native scrolling between two frames, beyond the 180ms settle debounce.
+    // Disable browser snapping only in this fixture so that it cannot finish it.
+    element.style.scrollSnapType = "none";
+    element.scrollTo = options => {
+      if (options.behavior === "smooth" && state.target === null) {
+        state.target = options.left;
+        state.release = () => nativeScrollTo({ left: state.target, behavior: "instant" });
+        nativeScrollTo({ left: (element.scrollLeft + state.target) / 2, behavior: "instant" });
+      } else {
+        state.rebases += 1;
+        nativeScrollTo(options);
+      }
+    };
+  });
+  await section.getByRole("button", { name: "Предыдущие отзывы" }).click();
+  await page.waitForTimeout(350);
+  expect(await page.evaluate(() => window.reviewScrollPause.rebases)).toBe(0);
+  await page.evaluate(() => window.reviewScrollPause.release());
+  await expect(viewport).toHaveAttribute("data-active-index", "5");
+  await expect.poll(() => page.evaluate(() => window.reviewScrollPause.rebases)).toBeGreaterThan(0);
+  await expect(viewport).toHaveAttribute("data-active-index", "5");
 });
 
 for (const viewport of [

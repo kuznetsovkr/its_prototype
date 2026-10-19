@@ -25,6 +25,7 @@ const ReviewsCarousel = forwardRef(({
   const geometry = useRef({ start: 0, span: 0, loop: false, pages: [] });
   const activeIndexRef = useRef(0);
   const settleTimer = useRef(0);
+  const pendingScrollTarget = useRef(null);
   const touching = useRef(false);
   const changeCallback = useRef(onActiveIndexChange);
   const [renderLoop, setRenderLoop] = useState(loop && reviews.length > 1);
@@ -37,7 +38,9 @@ const ReviewsCarousel = forwardRef(({
     const viewport = viewportRef.current;
     if (!viewport) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    viewport.scrollTo({ left, behavior: instant || reduced ? "instant" : scrollBehavior });
+    const behavior = instant || reduced ? "instant" : scrollBehavior;
+    pendingScrollTarget.current = behavior === "smooth" ? left : null;
+    viewport.scrollTo({ left, behavior });
   }, [scrollBehavior]);
 
   const updatePosition = useCallback(() => {
@@ -58,6 +61,12 @@ const ReviewsCarousel = forwardRef(({
       const viewport = viewportRef.current;
       const metrics = geometry.current;
       if (!viewport || touching.current || !metrics.loop) return;
+      // A busy browser can pause scroll events for longer than the debounce.
+      // Rebasing a copy before native smooth scrolling reaches its destination
+      // cancels that animation and can send the previous arrow back to index 0.
+      if (pendingScrollTarget.current !== null
+        && Math.abs(viewport.scrollLeft - pendingScrollTarget.current) > 1) return;
+      pendingScrollTarget.current = null;
       const canonical = wrapReviewPosition(viewport.scrollLeft, metrics.start, metrics.span);
       if (Math.abs(canonical - viewport.scrollLeft) > 1) scrollToPosition(canonical, true);
     }, 180);
@@ -137,6 +146,7 @@ const ReviewsCarousel = forwardRef(({
     const targets = { ArrowLeft: activeIndexRef.current - 1, ArrowRight: activeIndexRef.current + 1, Home: 0, End: pages.length - 1 };
     if (targets[event.key] === undefined) return;
     event.preventDefault();
+    pendingScrollTarget.current = null;
     scrollToPage(targets[event.key]);
   };
   const renderItems = (copy) => reviews.map((review, index) => (
@@ -162,7 +172,9 @@ const ReviewsCarousel = forwardRef(({
         id={viewportId}
         onKeyDown={onKeyDown}
         onScroll={() => { updatePosition(); settle(); }}
-        onTouchStart={() => { touching.current = true; clearTimeout(settleTimer.current); }}
+        onPointerDown={() => { pendingScrollTarget.current = null; }}
+        onWheel={() => { pendingScrollTarget.current = null; }}
+        onTouchStart={() => { pendingScrollTarget.current = null; touching.current = true; clearTimeout(settleTimer.current); }}
         onTouchEnd={() => { touching.current = false; settle(); }}
         onTouchCancel={() => { touching.current = false; settle(); }}
         ref={viewportRef}

@@ -1,3 +1,4 @@
+/* global document, window, sessionStorage, queueMicrotask */
 import { expect, test } from "@playwright/test";
 
 const TURNSTILE_TEST_SITE_KEY = "1x00000000000000000000AA";
@@ -285,6 +286,7 @@ test("другой получатель требует телефон, горо�
   await expect(recipientPhone).toHaveCount(0);
   await expect(submitButton).toBeEnabled();
   await page.reload();
+  await expect(page.getByRole("heading", { name: "Введите свои данные" })).toBeVisible({ timeout: 20_000 });
   await expect(otherRecipient).not.toBeChecked();
   await expect(recipientName).toHaveCount(0);
 });
