@@ -1,0 +1,49 @@
+@use "../base/compactScale" as scale;
+
+.embroideryPage .embroiderySelectorDesktop--car { height: auto; }
+
+.embroideryPage .embroiderySelectorDesktop--car .embroiderySelectorDesktop__panel {
+  height: auto;
+}
+
+.embroideryPage .embroiderySelectorDesktop--car .embroiderySelectorDesktop__price {
+  position: static;
+  width: auto;
+  margin: scale.px(24) 0 0;
+}
+
+.carDesignSelector {
+  display: grid;
+  min-width: 0;
+  gap: scale.px(10);
+  margin: scale.px(24) 0 0;
+  padding: 0;
+  border: 0;
+  color: #2b2b2b;
+  font: 400 max(12px, #{scale.px(13)}) / 1.4 'Jost', sans-serif;
+}
+
+.carDesignSelector legend { padding: 0; font-size: max(14px, #{scale.px(16)}); font-weight: 500; }
+.carDesignSelector > p { margin: scale.px(6) 0 scale.px(4); color: #4b4b4b; }
+
+.carDesignSelector__option {
+  display: grid;
+  grid-template-columns: 16px scale.px(72) minmax(0, 1fr);
+  align-items: center;
+  gap: scale.px(10);
+  min-width: 0;
+  padding: scale.px(10);
+  border: 1px solid transparent;
+  border-radius: scale.px(18);
+  background: #fff;
+  cursor: pointer;
+}
+
+.carDesignSelector__option img { display: block; width: 100%; height: auto; border-radius: scale.px(10); }
+.carDesignSelector__option input { width: 16px; height: 16px; margin: 0; accent-color: #bc5823; }
+.carDesignSelector__option:focus-within { outline: 2px solid #bc5823; outline-offset: 2px; }
+.carDesignSelector__option.is-selected { border-color: #bc5823; background: #fff8f2; }
+.carDesignSelector__option.is-unavailable { cursor: default; opacity: .6; }
+.carDesignSelector__text { display: grid; min-width: 0; gap: scale.px(5); overflow-wrap: anywhere; }
+.carDesignSelector__text strong { font-weight: 600; }
+.carDesignSelector__text em { color: #bc5823; font-style: normal; font-weight: 600; }

@@ -1,3 +1,5 @@
+import { getCarDesignLabel } from "../order/embroidery/carDesigns";
+
 export const GROUP_PAYMENT_NOTICE = "Добавьте текущее изделие в корзину, чтобы подтвердить общий состав и рассчитать доставку перед оплатой.";
 export const UNFINISHED_CART_NOTICE = "В корзине есть незавершённое изделие. Продолжите его оформление или удалите черновик перед оплатой.";
 
@@ -6,6 +8,7 @@ export const constructorCartItem = (order) => {
   if (!clothing.type || !clothing.color || !clothing.size || order.recipient?.savedOrder) return null;
   return { id: "constructor-draft", productType: clothing.profile?.name || clothing.type, color: clothing.color, size: clothing.size,
     embroideryType: embroidery.type, patronusCount: embroidery.patronusCount, petFaceCount: embroidery.petFaceCount,
+    carDesign: embroidery.carDesign,
     imageUrl: clothing.previewSrc, draft: true };
 };
 
@@ -20,12 +23,14 @@ export const currentCartItem = (order) => {
   if (!clothing.type || !clothing.color || !clothing.size || !embroidery.type) return null;
   return { id: "current", productType: clothing.profile?.name || clothing.type, color: clothing.color, size: clothing.size,
     embroideryType: embroidery.type, patronusCount: embroidery.patronusCount, petFaceCount: embroidery.petFaceCount,
+    carDesign: embroidery.carDesign,
     imageUrl: clothing.previewSrc, quantity: 1, current: true };
 };
 
 export const cartEmbroideryLabel = (item) => {
   if (!item.embroideryType) return "Вышивка ещё не выбрана";
   const names = { Patronus: "Патронус", Car: "Автомобиль", petFace: "Мордочка питомца", custom: "Индивидуальная вышивка" };
+  if (item.embroideryType === "Car" && getCarDesignLabel(item.carDesign)) return `Автомобиль — ${getCarDesignLabel(item.carDesign).toLowerCase()}`;
   const count = item.embroideryType === "Patronus" ? item.patronusCount : item.embroideryType === "petFace" ? item.petFaceCount : 1;
   return `${names[item.embroideryType] || item.embroideryTypeRu || item.embroideryType}${count > 1 ? ` × ${count}` : ""}`;
 };

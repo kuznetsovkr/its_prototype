@@ -60,10 +60,10 @@ test("upload substeps reset mobile scrolling without resetting fields or files",
   await page.addInitScript(() => {
     window.sessionStorage.setItem("its_order_draft_v1", JSON.stringify({ version: 1, uploadFiles: [], order: {
       clothing: { type: "Hoodie", color: "Чёрный", size: "M" },
-      embroidery: { type: "Car", typeSelectionExplicit: true, uploadedImage: [] },
+      embroidery: { type: "Car", carDesign: "simple", typeSelectionExplicit: true, uploadedImage: [] },
     } }));
   });
-  await page.route("**/api/pricing/quote", (route) => route.fulfill({ json: { prices: { Car: 7000 } } }));
+  await page.route("**/api/pricing/quote", (route) => route.fulfill({ json: { prices: { Car: 7000 }, carDesignPrices: { simple: 7000, medium: 8500, complex: 11500 } } }));
   await page.goto("/embroidery");
   const next = page.locator(".embroiderySelectorDesktop__navigation .is-next");
   const back = page.locator(".embroiderySelectorDesktop__navigation .is-back");

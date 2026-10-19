@@ -127,6 +127,7 @@ export const createCartRepository = ({ client, storage, lock = (callback) => cal
       return {
         clothing: { type: item.productType, color: item.color, size: item.size, previewSrc: item.imageUrl || "", previewAlt: item.productType },
         embroidery: { type: item.embroideryType, typeSelectionExplicit: true, patronusCount: item.patronusCount,
+            carDesign: item.carDesign || "",
           petFaceCount: item.petFaceCount, comment: item.comment, uploadedImage, price: null, customOption: { image: false, text: false } },
       };
     }),

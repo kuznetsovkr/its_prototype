@@ -18,6 +18,7 @@ import {
   getUploadInstructions,
 } from "./embroideryConfig";
 import { MAX_PET_FACE_COUNT } from "./embroideryLimits";
+import CarDesignSelector from "./CarDesignSelector";
 import { CUSTOM_TEXT_FONT_OPTIONS, getCustomTextFontStyle, normalizeCustomText } from "./customTextFonts";
 
 const EmbroideryDesktop = ({
@@ -41,6 +42,7 @@ const EmbroideryDesktop = ({
     canProceed, disabledHint, priceError, desktopPriceLabel, handleFileChange,
     handleFileDragOver, handleFileDrop, handleRemoveImage,
     missingUploadFiles, dismissMissingUploadFiles,
+    carDesign, setCarDesign, carDesignError, carDesignPrices, carDesignLoading, clothingCode,
   } = selection;
 
   const handleInscriptionChange = (event) => {
@@ -83,7 +85,7 @@ const EmbroideryDesktop = ({
 
   return (
       <div
-        className={`embroiderySelectorDesktop${isUploadStage ? " embroiderySelectorDesktop--upload" : ""}${desktopTab === "text" ? " embroiderySelectorDesktop--text" : ""}`}
+        className={`embroiderySelectorDesktop${isUploadStage ? " embroiderySelectorDesktop--upload" : ""}${desktopTab === "text" ? " embroiderySelectorDesktop--text" : ""}${selectedType === "Car" && !isUploadStage ? " embroiderySelectorDesktop--car" : ""}`}
       >
         {missingUploadFiles.length > 0 && (
           <div className="embroideryRestoreNotice" role="alert">
@@ -222,6 +224,9 @@ const EmbroideryDesktop = ({
               </div>
             )}
 
+            {selectedType === "Car" && desktopTab === "image" && !desktopDetailsOpen && <CarDesignSelector
+              value={carDesign} onChange={setCarDesign} prices={carDesignPrices} loading={carDesignLoading} clothingCode={clothingCode} />}
+
             {desktopTab === "image" && desktopDetailsOpen && (
               <div
                 className="embroideryUploadStage"
@@ -347,7 +352,7 @@ const EmbroideryDesktop = ({
               </div>
             )}
 
-            {selectedType && <p className="embroiderySelectorDesktop__price">{desktopPriceLabel}</p>}
+            {selectedType && desktopPriceLabel && <p className="embroiderySelectorDesktop__price">{desktopPriceLabel}</p>}
             {countError && <p className="embroideryUploadStage__error" role="alert">{countError}</p>}
             {selectedType && priceError && <p className="embroideryUploadStage__error" role="alert">{priceError}</p>}
           </section>
@@ -360,7 +365,7 @@ const EmbroideryDesktop = ({
               type="button"
               className="is-next"
               onClick={handleDesktopNext}
-              disabled={!selectedType || Boolean(fontError)}
+              disabled={!selectedType || Boolean(fontError) || Boolean(carDesignError)}
               title={!canProceed ? disabledHint : undefined}
             >
               далее

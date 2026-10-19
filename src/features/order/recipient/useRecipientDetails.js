@@ -67,6 +67,7 @@ export const useRecipientDetails = () => {
 
   const selectedType = embroidery.type || locationState.selectedType;
   const isCustomType = selectedType === "custom";
+  const carDesign = embroidery.carDesign || "";
   const customText = embroidery.customText || locationState.customText;
   const customTextFont = normalizeCustomTextFont(embroidery.customTextFont || locationState.customTextFont);
   const customOption = embroidery.customOption || locationState.customOption || { image: false, text: false };
@@ -396,13 +397,13 @@ export const useRecipientDetails = () => {
             : customOption.image
               ? (uploadedImage?.length || 0) > 0
               : false)
-        : Boolean(selectedType && (uploadedImage?.length || 0) > 0);
+        : Boolean(selectedType && (selectedType !== "Car" || carDesign) && (uploadedImage?.length || 0) > 0);
     if (!hasClothing) {
       navigate("/order", { replace: true });
     } else if (!hasEmbroidery) {
       navigate("/embroidery", { replace: true });
     }
-  }, [productType, color, size, selectedType, uploadedImage?.length, customOption.text, customOption.image, customText, navigate, draftOrder, cart.cartOnly, cart.initialized, cart.pending, cart.alreadySaved, cart.error]);
+  }, [productType, color, size, selectedType, carDesign, uploadedImage?.length, customOption.text, customOption.image, customText, navigate, draftOrder, cart.cartOnly, cart.initialized, cart.pending, cart.alreadySaved, cart.error]);
 
   const handleDeliveryMethodChange = (method) => {
     if (draftOrder || isPaying || !deliveryCity || citySyncing || method === "manual" || !DELIVERY_METHODS.includes(method)
@@ -532,6 +533,7 @@ export const useRecipientDetails = () => {
       color,
       size,
       embroideryType: selectedType,
+      ...(selectedType === "Car" ? { carDesign } : {}),
       patronusCount,
       petFaceCount,
       cdekMode: "office",
@@ -554,6 +556,7 @@ export const useRecipientDetails = () => {
     size,
     selectedType,
     isCdekPickupSelected,
+    carDesign,
     cdekOfficeCode,
     patronusCount,
     petFaceCount,
@@ -583,7 +586,7 @@ export const useRecipientDetails = () => {
     privacyConsent,
     deliveryCity,
   });
-  const embroideryCountError = getEmbroideryCountError({
+  const embroideryCountError = (!cart.isGroup && selectedType === "Car" && !carDesign ? "Выберите сложность дизайна автомобиля" : "") || getEmbroideryCountError({
     type: selectedType,
     patronusCount,
     petFaceCount,
@@ -693,6 +696,7 @@ export const useRecipientDetails = () => {
         email, preferredContact, deliveryComment, privacyConsent,
         productType, color, size, selectedType, embroideryTypeRu,
         patronusCount, petFaceCount, customText, customTextFont, customOption, pickupPoint,
+        carDesign,
         manualAddress, isNoCdek, cdekData, uploadedImage, turnstileToken: turnstile.token,
         deliveryMethod, postalPoint,
         deliveryCity,

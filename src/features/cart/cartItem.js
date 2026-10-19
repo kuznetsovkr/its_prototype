@@ -1,6 +1,7 @@
 import { MAX_PATRONUS_COUNT, MAX_PET_FACE_COUNT } from "../order/embroidery/embroideryLimits";
 import { ALLOWED_IMAGE_TYPES, MAX_UPLOAD_MB } from "../order/embroidery/embroideryConfig";
 import { isCartId } from "./cartStorage";
+import { normalizeCarDesign } from "../order/embroidery/carDesigns";
 
 export const createCartItemKey = () => crypto.randomUUID();
 
@@ -15,6 +16,8 @@ export const buildCartItemFormData = (draft, { requestKey, turnstileToken = "" }
     throw new Error("Выберите тип вышивки");
   }
   const patronusCount = embroidery.type === "Patronus" ? Number(embroidery.patronusCount ?? 1) : 1;
+  if (embroidery.type === "Car" && !normalizeCarDesign(embroidery.carDesign)) throw new Error("Выберите сложность дизайна автомобиля");
+  if (embroidery.type === "Car" && embroidery.carDesign === "complex" && clothing.profile?.code === "tshirt") throw new Error("Сложный дизайн автомобиля не предлагается для футболки");
   const petFaceCount = embroidery.type === "petFace" ? Number(embroidery.petFaceCount ?? 1) : 1;
   const patronusLimit = Math.min(MAX_PATRONUS_COUNT, Number(clothing.profile?.patronusLimit ?? MAX_PATRONUS_COUNT));
   if (!Number.isInteger(patronusCount) || patronusCount < 1 || patronusCount > patronusLimit) {
@@ -36,6 +39,7 @@ export const buildCartItemFormData = (draft, { requestKey, turnstileToken = "" }
   const formData = new FormData();
   Object.entries({ productType, color: clothing.color, size: clothing.size, embroideryType: embroidery.type,
     patronusCount, petFaceCount, comment, turnstileToken, privacyConsent: true }).forEach(([key, value]) => formData.append(key, String(value)));
+  if (embroidery.type === "Car") formData.append("carDesign", embroidery.carDesign);
   files.forEach((file, index) => formData.append("images", file, file.name || `image-${index + 1}`));
   return formData;
 };

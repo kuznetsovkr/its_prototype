@@ -4,6 +4,7 @@ import { IS_DEMO_MODE } from "../../../config/demoMode";
 import { useOrder } from "../../../context/OrderContext";
 import { getEmbroideryPrices } from "./embroideryApi";
 import { getEmbroideryCountError, getPatronusLimit } from "./embroideryLimits";
+import { normalizeCarDesign, getCarDesignPrice } from "./carDesigns";
 import { DEFAULT_CUSTOM_TEXT_FONT, getCustomTextFontError, normalizeCustomText, normalizeCustomTextFont } from "./customTextFonts";
 import {
   isSameFiles,
@@ -28,6 +29,7 @@ export const useEmbroiderySelection = () => {
   const previousTypeRef = useRef(null);
   const skipExternalSyncRef = useRef(false);
   const [selectedType, setSelectedType] = useState(embroidery.type || "");
+  const [carDesign, setCarDesign] = useState(() => normalizeCarDesign(embroidery.carDesign));
   const [customText, setCustomText] = useState(() => normalizeCustomText(embroidery.customText, embroidery.customTextFont));
   const [uploadedImage, setUploadedImage] = useState(embroidery.uploadedImage || []);
   const [comment, setComment] = useState(embroidery.comment || "");
@@ -95,6 +97,7 @@ export const useEmbroiderySelection = () => {
     if (!type) return null;
     const prices = IS_DEMO_MODE ? clothing.profile?.prices :
       serverPrices?.key === priceRequestKey ? serverPrices.prices : null;
+    if (type === "Car") return getCarDesignPrice(IS_DEMO_MODE ? clothing.profile?.carDesignPrices : prices?.carDesignPrices, carDesign, clothing.profile?.code);
     const basePrice = prices?.[type];
     if (basePrice == null || !Number.isFinite(Number(basePrice))) return null;
     if (IS_DEMO_MODE && type === "Patronus") {
@@ -104,9 +107,11 @@ export const useEmbroiderySelection = () => {
       return Number(basePrice) + Math.max(0, petFaceCount - 1) * 2000;
     }
     return Number(basePrice);
-  }, [clothing.profile, patronusCount, petFaceCount, priceRequestKey, serverPrices]);
+  }, [clothing.profile, carDesign, patronusCount, petFaceCount, priceRequestKey, serverPrices]);
 
   const selectedPrice = calcPrice(selectedType);
+  const carDesignError = selectedType === "Car" && (!carDesign || (!priceLoading && selectedPrice == null))
+    ? "Выберите доступную сложность дизайна автомобиля" : "";
   const countError = getEmbroideryCountError({
     type: selectedType, patronusCount, petFaceCount, patronusLimit,
   });
@@ -117,15 +122,15 @@ export const useEmbroiderySelection = () => {
   const mustSelectCustom = isCustomType ? customOption.image || customOption.text : true;
   const fontError = mustText ? getCustomTextFontError(customTextFont, customText) : "";
   const customIsValid = mustSelectCustom && (!mustUpload || hasFiles) && (!mustText || hasCustomText);
-  const canProceed = !countError && !fontError && (IS_DEMO_MODE
+  const canProceed = !countError && !fontError && !carDesignError && (IS_DEMO_MODE
     ? Boolean(selectedType && (isCustomType || selectedPrice != null))
     : isCustomType
       ? customIsValid
       : Boolean(selectedType && hasFiles && selectedPrice != null && !priceLoading));
 
-  let disabledHint = countError || fontError || "";
+  let disabledHint = countError || fontError || carDesignError || "";
   if (!selectedType) disabledHint = "Выберите тип вышивки";
-  else if (!countError && !fontError && !IS_DEMO_MODE) {
+  else if (!countError && !fontError && !carDesignError && !IS_DEMO_MODE) {
     if (priceLoading) disabledHint = "Дождитесь расчёта стоимости";
     else if (priceError) disabledHint = priceError;
     else if (!isCustomType && !hasFiles) disabledHint = "Загрузите хотя бы одно изображение";
@@ -160,6 +165,7 @@ export const useEmbroiderySelection = () => {
   useEffect(() => {
     const nextEmbroidery = {
       type: selectedType,
+      carDesign: selectedType === "Car" ? carDesign : "",
       typeSelectionExplicit: Boolean(selectedType),
       customText,
       customTextFont,
@@ -173,6 +179,7 @@ export const useEmbroiderySelection = () => {
     const currentOption = embroidery.customOption || emptyCustomOption();
     const sameState =
       (embroidery.type || "") === nextEmbroidery.type &&
+      (embroidery.carDesign || "") === nextEmbroidery.carDesign &&
       Boolean(embroidery.typeSelectionExplicit) === nextEmbroidery.typeSelectionExplicit &&
       (embroidery.customText || "") === nextEmbroidery.customText &&
       normalizeCustomTextFont(embroidery.customTextFont) === nextEmbroidery.customTextFont &&
@@ -186,7 +193,7 @@ export const useEmbroiderySelection = () => {
       skipExternalSyncRef.current = true;
       setEmbroidery(nextEmbroidery);
     }
-  }, [selectedType, customText, customTextFont, comment, uploadedImage, patronusCount,
+  }, [selectedType, carDesign, embroidery.carDesign, customText, customTextFont, comment, uploadedImage, patronusCount,
     petFaceCount, customOption, embroidery.type, embroidery.typeSelectionExplicit, embroidery.customText,
     embroidery.customTextFont, embroidery.comment, embroidery.uploadedImage,
     embroidery.patronusCount, embroidery.petFaceCount, embroidery.customOption,
@@ -195,6 +202,7 @@ export const useEmbroiderySelection = () => {
   useEffect(() => {
     const next = {
       type: embroidery.type || "",
+      carDesign: normalizeCarDesign(embroidery.carDesign),
       customText: normalizeCustomText(embroidery.customText, embroidery.customTextFont),
       uploadedImage: embroidery.uploadedImage || [],
       comment: embroidery.comment || "",
@@ -203,7 +211,7 @@ export const useEmbroiderySelection = () => {
       customOption: embroidery.customOption || emptyCustomOption(),
       customTextFont: normalizeCustomTextFont(embroidery.customTextFont),
     };
-    const inSync = selectedType === next.type && customText === next.customText &&
+    const inSync = selectedType === next.type && carDesign === next.carDesign && customText === next.customText &&
       isSameFiles(uploadedImage, next.uploadedImage) && comment === next.comment &&
       patronusCount === next.patronusCount && petFaceCount === next.petFaceCount &&
       isSameOptions(customOption, next.customOption) && customTextFont === next.customTextFont;
@@ -216,6 +224,7 @@ export const useEmbroiderySelection = () => {
       return;
     }
     if (selectedType !== next.type) setSelectedType(next.type);
+    if (carDesign !== next.carDesign) setCarDesign(next.carDesign);
     if (customText !== next.customText) setCustomText(next.customText);
     if (!isSameFiles(uploadedImage, next.uploadedImage)) setUploadedImage(next.uploadedImage);
     if (comment !== next.comment) setComment(next.comment);
@@ -223,7 +232,7 @@ export const useEmbroiderySelection = () => {
     if (petFaceCount !== next.petFaceCount) setPetFaceCount(next.petFaceCount);
     if (!isSameOptions(customOption, next.customOption)) setCustomOption(next.customOption);
     if (customTextFont !== next.customTextFont) setCustomTextFont(next.customTextFont);
-  }, [embroidery.type, embroidery.customText, embroidery.uploadedImage, embroidery.comment,
+  }, [embroidery.type, embroidery.carDesign, carDesign, embroidery.customText, embroidery.uploadedImage, embroidery.comment,
     embroidery.patronusCount, embroidery.petFaceCount, embroidery.customOption,
     embroidery.customTextFont, selectedType, customText, uploadedImage, comment,
     patronusCount, petFaceCount, customOption, customTextFont]);
@@ -244,6 +253,7 @@ export const useEmbroiderySelection = () => {
   const handleSelectType = (type) => {
     if (type !== selectedType) setError("");
     setSelectedType(type);
+    if (type !== selectedType) setCarDesign("");
     setPatronusCount(1);
     setPetFaceCount(1);
   };
@@ -253,6 +263,9 @@ export const useEmbroiderySelection = () => {
     clothingPreviewSrc: clothing.previewSrc || "",
     clothingPreviewAlt: clothing.previewAlt || clothing.type || "Одежда",
     selectedType, customText, setCustomText: (text) => setCustomText(normalizeCustomText(text, customTextFont)), uploadedImage, setUploadedImage,
+    carDesign, setCarDesign, carDesignError, carDesignLoading: priceLoading,
+    carDesignPrices: IS_DEMO_MODE ? clothing.profile?.carDesignPrices : serverPrices?.key === priceRequestKey ? serverPrices.prices.carDesignPrices : null,
+    clothingCode: clothing.profile?.code || serverPrices?.prices.clothingTypeCode,
     comment, setComment, error, countError, fontError, patronusCount, setPatronusCount,
     petFaceCount, setPetFaceCount, customOption, setCustomOption,
     customTextFont, setCustomTextFont: (font) => {
@@ -261,7 +274,7 @@ export const useEmbroiderySelection = () => {
       setCustomText((text) => normalizeCustomText(text, nextFont));
     }, patronusLimit,
     isCustomType, hasFiles, canProceed, disabledHint, priceError,
-    desktopPriceLabel: !selectedType ? "" : isCustomType
+    desktopPriceLabel: !selectedType || (selectedType === "Car" && (!carDesign || carDesignError)) ? "" : isCustomType
       ? "Цена рассчитает менеджер"
       : selectedPrice == null ? "Цена рассчитывается…" : `Цена: ${priceFormatter.format(selectedPrice)} руб`,
     priceLabel: (type) => {

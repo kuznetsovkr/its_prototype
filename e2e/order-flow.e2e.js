@@ -181,6 +181,8 @@ test("цена появляется только после выбора тип�
 
   await page.locator('.embroideryDesktopChoice:has(input[value="Car"]) .embroideryDesktopChoice__select').click();
   await expect(counter).toHaveCount(0);
+  await expect(price).toHaveCount(0);
+  await page.getByRole("radio", { name: "Средний дизайн, 23 см", exact: true }).check();
   await expect(price).toContainText(/8\s*500 руб/);
 });
 

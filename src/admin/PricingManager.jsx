@@ -3,7 +3,6 @@ import { MAX_PATRONUS_COUNT } from "../features/order/embroidery/embroideryLimit
 
 const EMBROIDERY_ROWS = [
   { key: "Patronus", label: "Патронусы" },
-  { key: "Car", label: "Автомобиль" },
   { key: "petFace", label: "Мордочка питомца" },
 ];
 
@@ -21,6 +20,7 @@ const cloneConfig = (config) => config ? {
   types: (config.types || []).map((type) => ({
     ...type,
     prices: { ...type.prices },
+    carDesignPrices: { ...type.carDesignPrices },
     package: { ...type.package },
   })),
   additional: { ...config.additional },
@@ -39,7 +39,10 @@ const PricingManager = ({ config, isSaving, onSave }) => {
       const prices = EMBROIDERY_ROWS.map(({ key }) => Number(type.prices?.[key]));
       const packageValues = ["width", "height", "length", "weight"]
         .map((key) => Number(type.package?.[key]));
-      return prices.every((value) => Number.isInteger(value) && value > 0) &&
+      const carPrices = type.carDesignPrices || {};
+      const validCar = Number.isInteger(Number(carPrices.simple)) && Number(carPrices.simple) > 0 &&
+        [carPrices.medium, type.code === "tshirt" ? null : carPrices.complex].every((value) => value == null || value === "" || (Number.isInteger(Number(value)) && Number(value) > 0));
+      return validCar && prices.every((value) => Number.isInteger(value) && value > 0) &&
         packageValues.every((value) => Number.isInteger(value) && value > 0) &&
         Number.isInteger(Number(type.displayOrder)) && Number(type.displayOrder) > 0 &&
         Number.isInteger(Number(type.patronusLimit)) &&
@@ -94,8 +97,10 @@ const PricingManager = ({ config, isSaving, onSave }) => {
         sizeGuideKey: type.sizeGuideKey || null,
         patronusLimit: Number(type.patronusLimit),
         prices: Object.fromEntries(
-          EMBROIDERY_ROWS.map(({ key }) => [key, Number(type.prices[key])])
+          [...EMBROIDERY_ROWS.map(({ key }) => [key, Number(type.prices[key])]), ["Car", Number(type.carDesignPrices.simple)]]
         ),
+        carDesignPrices: Object.fromEntries(["simple", "medium", "complex"].map((key) => [key,
+          type.code === "tshirt" && key === "complex" ? null : type.carDesignPrices[key] === "" || type.carDesignPrices[key] == null ? null : Number(type.carDesignPrices[key])])),
         package: Object.fromEntries(
           ["width", "height", "length", "weight"].map((key) => [key, Number(type.package[key])])
         ),
@@ -145,6 +150,24 @@ const PricingManager = ({ config, isSaving, onSave }) => {
                       />
                     </label>
                   ))}
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="admin-pricing__grid">
+            {[["simple", "Автомобиль — простой"], ["medium", "Автомобиль — средний"], ["complex", "Автомобиль — сложный"]].map(([key, label]) => (
+              <article className="admin-price-card" key={key}>
+                <div className="admin-price-card__heading"><h3>{label}</h3><span>изделие и вышивка</span></div>
+                <div className="admin-price-card__fields">
+                  {draft.types.map((type) => <label className="field" key={type.id}>
+                    <span className="label">{type.name}, ₽</span>
+                    <input className="input" type="number" min="1" max="1000000" step="1"
+                      disabled={type.code === "tshirt" && key === "complex"}
+                      placeholder={type.code === "tshirt" && key === "complex" ? "Не предлагается" : key === "simple" ? "Обязательно" : "Недоступно"}
+                      value={type.carDesignPrices?.[key] ?? ""}
+                      onChange={(event) => updateType(type.id, (current) => ({ ...current, carDesignPrices: { ...current.carDesignPrices, [key]: onlyDigits(event.target.value) } }))} />
+                  </label>)}
                 </div>
               </article>
             ))}

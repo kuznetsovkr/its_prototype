@@ -11,6 +11,7 @@ import { restoreDeliveryMethod } from "../config/delivery";
 import { normalizeDeliveryCity } from "../features/order/recipient/deliveryCity";
 import { DEFAULT_CUSTOM_TEXT_FONT, normalizeCustomText, normalizeCustomTextFont } from "../features/order/embroidery/customTextFonts";
 import { createCartItemKey } from "../features/cart/cartItem";
+import { normalizeCarDesign } from "../features/order/embroidery/carDesigns";
 import { getCartStorage, isCartId } from "../features/cart/cartStorage";
 import { CONSTRUCTOR_DRAFT_KEY, createConstructorDraftStore } from "../features/cart/constructorDraft";
 
@@ -55,6 +56,7 @@ const isSameClothing = (a, b) =>
 const isSameEmbroidery = (a, b) =>
   (a?.type || "") === (b?.type || "") &&
   Boolean(a?.typeSelectionExplicit) === Boolean(b?.typeSelectionExplicit) &&
+  (a?.carDesign || "") === (b?.carDesign || "") &&
   (a?.customText || "") === (b?.customText || "") &&
   (a?.customTextFont || "") === (b?.customTextFont || "") &&
   (a?.comment || "") === (b?.comment || "") &&
@@ -116,6 +118,7 @@ const initialState = {
   embroidery: {
     type: "",
     typeSelectionExplicit: false,
+    carDesign: "",
     customText: "",
     customTextFont: DEFAULT_CUSTOM_TEXT_FONT,
     comment: "",
@@ -226,6 +229,7 @@ const restoreOrderDraft = (persistentStore) => {
           customTextFont: normalizeCustomTextFont(storedEmbroidery.customTextFont),
           type: hasSelectedType ? storedEmbroidery.type : "",
           typeSelectionExplicit: hasSelectedType,
+          carDesign: normalizeCarDesign(storedEmbroidery.carDesign),
           price: null,
           uploadedImage: [],
           customOption: {
@@ -321,6 +325,7 @@ export const OrderProvider = ({ children }) => {
       if (isSameClothing(next, prev.clothing)) return prev;
       const selectionChanged = next.type !== prev.clothing.type || next.color !== prev.clothing.color || next.size !== prev.clothing.size;
       return { ...prev, clothing: next, cartItemKey: selectionChanged ? createCartItemKey() : prev.cartItemKey,
+        embroidery: next.type !== prev.clothing.type ? { ...prev.embroidery, carDesign: "", price: null } : prev.embroidery,
         recipient: { ...prev.recipient, savedOrder: null } };
     });
   }, []);
@@ -343,6 +348,7 @@ export const OrderProvider = ({ children }) => {
       };
       if (isSameEmbroidery(next, prev.embroidery)) return prev;
       const selectionChanged = next.type !== prev.embroidery.type || next.customText !== prev.embroidery.customText ||
+        next.carDesign !== prev.embroidery.carDesign ||
         next.patronusCount !== prev.embroidery.patronusCount || next.petFaceCount !== prev.embroidery.petFaceCount ||
         next.customTextFont !== prev.embroidery.customTextFont || next.comment !== prev.embroidery.comment ||
         !isSameFiles(next.uploadedImage, prev.embroidery.uploadedImage) ||

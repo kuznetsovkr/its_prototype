@@ -6,6 +6,7 @@ export const buildOrderFormData = ({
   userData, deliveryRecipient, recipientPhone, orderComment, embroideryComment, email,
   preferredContact, deliveryComment, privacyConsent, productType,
   color, size, selectedType, embroideryTypeRu, patronusCount, petFaceCount,
+  carDesign,
   customText, customTextFont, customOption, pickupPoint, manualAddress, isNoCdek, cdekData,
   uploadedImage, turnstileToken, certificateCode,
   deliveryCity,
@@ -51,6 +52,7 @@ export const buildOrderFormData = ({
     turnstileToken: turnstileToken || "",
   }).forEach(([key, value]) => formData.append(key, value));
   if (certificateCode) formData.append("certificateCode", certificateCode);
+  if (selectedType === "Car") formData.append("carDesign", carDesign || "");
 
   if (deliveryMethod === "cdek" && cdekData) {
     formData.append("cdekMode", cdekData.mode || "");

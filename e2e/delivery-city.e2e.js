@@ -24,12 +24,12 @@ const prepare = async (page, { failSuggestions = false, slowOffice = false } = {
     if (sessionStorage.getItem("its_order_draft_v1")) return;
     sessionStorage.setItem("its_order_draft_v1", JSON.stringify({ version: 1, uploadFiles: [], order: {
       clothing: { type: "Hoodie", color: "Чёрный", size: "M", previewAlt: "Худи" },
-      embroidery: { type: "Car", typeSelectionExplicit: true, uploadedImage: [] },
+      embroidery: { type: "Car", carDesign: "medium", typeSelectionExplicit: true, uploadedImage: [] },
       recipient: { userData: { firstName: "Иван", lastName: "Иванов", middleName: "", phone: "+7 (999) 123-45-67" }, hasNoMiddleName: true, privacyConsent: true },
     } }));
   });
   await page.route("**/api/public-config", route => route.fulfill({ json: { turnstile: { enabled: false } } }));
-  await page.route("**/api/pricing/quote", route => route.fulfill({ json: { prices: { Car: 8500, Patronus: 15000, petFace: 8000 } } }));
+  await page.route("**/api/pricing/quote", route => route.fulfill({ json: { prices: { Car: 6500, Patronus: 15000, petFace: 8000 }, carDesignPrices: { simple: 6500, medium: 8500, complex: 11500 } } }));
   await page.route("**/api/pricing/checkout", route => {
     calls.quotes.push(route.request().postDataJSON());
     return route.fulfill({ json: { merchandisePrice: 8500, deliveryPrice: 742, totalPrice: 9242, paymentAmount: 9242 } });
