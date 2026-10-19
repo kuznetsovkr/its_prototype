@@ -5,6 +5,12 @@ import { demoDeliveryCity } from "./deliveryCity";
 
 const props = { city: demoDeliveryCity(), deliveryMethod: "cdek", postalPoint: "", deliveryRecipient: "", recipientPhone: "", deliveryComment: "" };
 describe("RecipientDeliveryFields", () => {
+  it("allows postal checkout for a cart while keeping unapproved pickup disabled", () => {
+    const html = renderToStaticMarkup(<RecipientDeliveryFields {...props} cartCheckout deliveryMethod="russian_post" />);
+    expect(html).toMatch(/aria-label="Почта России" checked/);
+    expect(html).toMatch(/aria-label="Самовывоз" disabled/);
+    expect(html).toContain("Для корзины доступны СДЭК и Почта России");
+  });
   it("provides a city combobox and three accessible choices for Krasnoyarsk", () => {
     const html = renderToStaticMarkup(<RecipientDeliveryFields {...props} />);
     expect(html.match(/type="radio"/g)).toHaveLength(3);

@@ -125,7 +125,7 @@ const RecipientDetails = () => {
                 <RecipientDeliveryFields
                   city={deliveryCity} onCityChange={handleDeliveryCityChange} citySyncing={citySyncing} cityNotice={cityNotice} cityFixedLabel={cityFixedLabel}
                   deliveryMethod={deliveryMethod} onMethodChange={handleDeliveryMethodChange}
-                  disabled={formDisabled || (cart.isGroup && !cart.items.length)} cdekOnly={cart.isGroup}
+                  disabled={formDisabled || (cart.isGroup && !cart.items.length)} cartCheckout={cart.isGroup}
                   pickupPoint={pickupPoint} isCdekPickupSelected={isCdekPickupSelected} onOpenCdek={() => setIsCdekPickerOpen(true)}
                   postalPoint={postalPoint} onPostalPointChange={setPostalPoint} manualAddress={manualAddress}
                   deliveryRecipient={deliveryRecipient} onRecipientChange={setDeliveryRecipient}
@@ -151,7 +151,7 @@ const RecipientDetails = () => {
                   ) : checkoutQuote ? (
                     <>
                       <span>{cart.isGroup ? "Все изделия и вышивка" : "Изделие и вышивка"}: {formatPrice(checkoutQuote.merchandisePrice)}</span>
-                      <span>Доставка: {formatPrice(checkoutQuote.deliveryPrice)}</span>
+                      <span>{checkoutQuote.deliveryPayLater ? "Доставка Почтой России оплачивается отдельно после изготовления" : `Доставка: ${formatPrice(checkoutQuote.deliveryPrice)}`}</span>
                       {checkoutQuote.certificateDiscount > 0 && <span>Сертификат: −{formatPrice(checkoutQuote.certificateDiscount)}</span>}
                       {checkoutQuote.certificate && <span>Останется на сертификате: {formatPrice(checkoutQuote.certificate.remaining)}</span>}
                       <strong>

@@ -9,10 +9,10 @@ const ThankYouPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { resetOrder } = useOrder();
-  const { orderNumber, manual, requestKind, receiptEmailProvided, cdekNumber } = location.state || {};
+  const { orderNumber, manual, requestKind, receiptEmailProvided, cdekNumber, deliveryPayLater } = location.state || {};
   const titleRef = useRef(null);
   const [copyState, setCopyState] = useState("idle");
-  const content = getOrderCompletionContent({ manual, requestKind, receiptEmailProvided });
+  const content = getOrderCompletionContent({ manual, requestKind, receiptEmailProvided, deliveryPayLater });
 
   useEffect(() => {
     if (!orderNumber) {

@@ -123,7 +123,7 @@ export default function PaymentSuccess() {
             sessionStorage.removeItem('pay_cdek_number');
           }
           navigate('/thank-you', {
-            state: { orderNumber: orderId, cdekNumber: data.cdekNumber || null, receiptEmailProvided: data.hasBuyerEmail === true && data.paymentProvider === 'paykeeper' },
+            state: { orderNumber: orderId, cdekNumber: data.cdekNumber || null, deliveryPayLater: data.deliveryMode === 'russian_post', receiptEmailProvided: data.hasBuyerEmail === true && data.paymentProvider === 'paykeeper' },
           });
           return;
         }

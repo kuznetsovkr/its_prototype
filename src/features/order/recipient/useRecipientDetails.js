@@ -7,7 +7,7 @@ import { DELIVERY_METHODS, restoreDeliveryMethod, restoreCheckoutDeliveryMethod 
 import { useOrder } from "../../../context/OrderContext";
 import { useRecipientCart } from "../../cart/useRecipientCart";
 import { GROUP_PAYMENT_NOTICE, UNFINISHED_CART_NOTICE } from "../../cart/cartPresentation";
-import { buildCartBuyer, getCartCheckoutKey, cartWidgetPackages } from "../../cart/cartCheckout";
+import { buildCartBuyer, buildCartDelivery, getCartCheckoutKey, cartWidgetPackages } from "../../cart/cartCheckout";
 import { buildDemoCdekNumber, buildDemoOrderId } from "../../../mocks/demoData";
 import { getEmbroideryCountError, getPatronusLimit } from "../embroidery/embroideryLimits";
 import { normalizeCustomTextFont } from "../embroidery/customTextFonts";
@@ -203,9 +203,11 @@ export const useRecipientDetails = () => {
         setRecipientPhone(sameRecipient ? "" : formatPhoneNumber(buyer.recipientPhone));
         setDeliveryComment(buyer.deliveryComment || ""); setPrivacyConsent(true);
       }
-      setPickupPoint(saved.deliveryAddress || "");
-      setCdekData({ mode: "office", address: { code: saved.officeCode }, addressLabel: saved.deliveryAddress });
-      setDeliveryMethod("cdek");
+      const postal = saved.deliveryMode === "russian_post";
+      setPickupPoint(postal ? "" : saved.deliveryAddress || "");
+      setCdekData(postal ? null : { mode: "office", address: { code: saved.officeCode }, addressLabel: saved.deliveryAddress });
+      if (postal) setPostalPoint(saved.postalPoint || "");
+      setDeliveryMethod(postal ? "russian_post" : "cdek");
     } else if (draftOrder?.isCartOrder) {
       setDraftOrder(null); setOrderId(null); setRecipient({ savedOrder: null });
     }
@@ -216,7 +218,7 @@ export const useRecipientDetails = () => {
   const [postalPoint, setPostalPoint] = useState(recipientState.postalPoint || "");
   const isNoCdek = deliveryMethod !== "cdek";
   useEffect(() => {
-    if (cart.isGroup && deliveryMethod !== "cdek") setDeliveryMethod("cdek");
+    if (cart.isGroup && !["cdek", "russian_post"].includes(deliveryMethod)) setDeliveryMethod("cdek");
   }, [cart.isGroup, deliveryMethod]);
 
   const manualAddressNormalized = useMemo(() => {
@@ -407,7 +409,7 @@ export const useRecipientDetails = () => {
 
   const handleDeliveryMethodChange = (method) => {
     if (draftOrder || isPaying || !deliveryCity || citySyncing || method === "manual" || !DELIVERY_METHODS.includes(method)
-      || (method === "pickup" && !deliveryCity.pickup) || (cart.isGroup && method !== "cdek")) return;
+      || (method === "pickup" && !deliveryCity.pickup) || (cart.isGroup && !["cdek", "russian_post"].includes(method))) return;
     setDeliveryMethod(method);
     setError("");
     setIsCdekPickerOpen(false);
@@ -467,7 +469,13 @@ export const useRecipientDetails = () => {
   const isCdekPickupSelected = Boolean(
     String(pickupPoint || "").trim() && cdekData?.mode === "office" && cdekOfficeCode
   );
-  const isManualCheckout = !cart.isGroup && (isCustomType || isNoCdek);
+  const isManualCheckout = !cart.isGroup && (isCustomType || !["cdek", "russian_post"].includes(deliveryMethod));
+  const postalCheckout = deliveryMethod === "russian_post";
+  const postalAddress = postalCheckout ? postalPoint.trim() : "";
+  const postalCityToken = postalCheckout ? deliveryCity?.token || "" : "";
+  const cartDelivery = useMemo(() => buildCartDelivery({ deliveryMethod, postalPoint: postalAddress,
+    deliveryCity: { token: postalCityToken }, officeCode: cdekOfficeCode }),
+    [deliveryMethod, postalAddress, postalCityToken, cdekOfficeCode]);
 
   useEffect(() => {
     if (draftOrder && draftMatchesCheckout) {
@@ -488,7 +496,8 @@ export const useRecipientDetails = () => {
       setCheckoutQuoteError("");
       return undefined;
     }
-    if ((!cart.isGroup && (!productType || !color || !size || !selectedType)) || !isCdekPickupSelected) {
+    if ((!cart.isGroup && (!productType || !color || !size || !selectedType)) ||
+      (postalCheckout ? !postalCityToken || !postalAddress : !isCdekPickupSelected)) {
       setCheckoutQuote(null);
       setCheckoutQuoteLoading(false);
       setCheckoutQuoteError("");
@@ -499,7 +508,7 @@ export const useRecipientDetails = () => {
       let cancelled = false;
       setCheckoutQuote(null); setCheckoutQuoteLoading(true); setCheckoutQuoteError("");
       const timer = setTimeout(() => {
-        quoteCart({ revision: cartRevision, officeCode: cdekOfficeCode, certificateCode: certificate.appliedCode || "" })
+        quoteCart({ revision: cartRevision, ...cartDelivery, certificateCode: certificate.appliedCode || "" })
           .then((quote) => { if (!cancelled) setCheckoutQuote({ ...quote, appliedCertificateCode: certificate.appliedCode }); })
           .catch((quoteError) => { if (!cancelled) setCheckoutQuoteError(quoteError.message || "Не удалось рассчитать стоимость корзины"); })
           .finally(() => { if (!cancelled) setCheckoutQuoteLoading(false); });
@@ -509,12 +518,13 @@ export const useRecipientDetails = () => {
 
     if (IS_DEMO_MODE && (!IS_TURNSTILE_E2E || !certificate.appliedCode)) {
       const merchandisePrice = Number(embroidery.price);
-      const normalizedDeliveryPrice = Number(deliveryPrice);
+      const normalizedDeliveryPrice = postalCheckout ? 0 : Number(deliveryPrice);
       const hasDemoPrice = Number.isFinite(merchandisePrice) && Number.isFinite(normalizedDeliveryPrice);
       setCheckoutQuote(hasDemoPrice ? {
         manual: false,
         merchandisePrice,
-        deliveryPrice: normalizedDeliveryPrice,
+        deliveryPrice: postalCheckout ? null : normalizedDeliveryPrice,
+        deliveryPayLater: postalCheckout,
         totalPrice: merchandisePrice + normalizedDeliveryPrice,
       } : null);
       setCheckoutQuoteLoading(false);
@@ -526,7 +536,7 @@ export const useRecipientDetails = () => {
     setCheckoutQuote(null);
     setCheckoutQuoteLoading(true);
     setCheckoutQuoteError("");
-    getCheckoutQuote({
+    const timer = setTimeout(() => getCheckoutQuote({
       productType: typeof productType === "object"
         ? productType.name || productType.type || String(productType)
         : productType,
@@ -536,8 +546,8 @@ export const useRecipientDetails = () => {
       ...(selectedType === "Car" ? { carDesign } : {}),
       patronusCount,
       petFaceCount,
-      cdekMode: "office",
-      cdekAddress: { code: cdekOfficeCode },
+      ...(postalCheckout ? { deliveryMethod: "russian_post", postalPoint: postalAddress, deliveryCityToken: postalCityToken }
+        : { cdekMode: "office", cdekAddress: { code: cdekOfficeCode } }),
       ...(certificate.appliedCode ? { certificateCode: certificate.appliedCode } : {}),
     }).then((quote) => {
       if (!cancelled) setCheckoutQuote({ ...quote, appliedCertificateCode: certificate.appliedCode });
@@ -547,10 +557,11 @@ export const useRecipientDetails = () => {
       }
     }).finally(() => {
       if (!cancelled) setCheckoutQuoteLoading(false);
-    });
-    return () => { cancelled = true; };
+    }), postalCheckout ? 300 : 0);
+    return () => { cancelled = true; clearTimeout(timer); };
   }, [
     isManualCheckout,
+    postalCheckout, postalAddress, postalCityToken, cartDelivery,
     productType,
     color,
     size,
@@ -684,7 +695,7 @@ export const useRecipientDetails = () => {
   async function createDraftOrder() {
     if (draftMatchesCheckout && draftOrder?.orderId && draftOrder?.orderToken) return draftOrder;
     try {
-      const cartPayload = cart.isGroup ? { revision: cart.revision, officeCode: cdekOfficeCode, certificateCode: certificate.appliedCode || "",
+      const cartPayload = cart.isGroup ? { revision: cart.revision, ...cartDelivery, certificateCode: certificate.appliedCode || "",
         quoteHash: checkoutQuote?.quoteHash, turnstileToken: turnstile.token,
         buyer: buildCartBuyer({ userData, deliveryRecipient, recipientPhone, email, preferredContact, orderComment, deliveryComment, privacyConsent }) } : null;
       const data = cart.isGroup
@@ -744,6 +755,7 @@ export const useRecipientDetails = () => {
           orderNumber: demoOrderId,
           manual: isManualCheckout,
           requestKind: isCustomType ? "individual" : "delivery",
+          deliveryPayLater: postalCheckout,
           cdekNumber: demoCdekNumber,
         },
       });
@@ -769,7 +781,7 @@ export const useRecipientDetails = () => {
       setOrderId(oid);
       if (activeDraft.paymentStatus === "paid") {
         await cart.reloadCart(); setIsPaying(false);
-        navigate("/thank-you", { state: { orderNumber: oid, cdekNumber: cdekNum || null } });
+        navigate("/thank-you", { state: { orderNumber: oid, cdekNumber: cdekNum || null, deliveryPayLater: activeDraft.deliveryPayLater } });
         return;
       }
 
@@ -782,6 +794,7 @@ export const useRecipientDetails = () => {
           paymentAmount,
           paymentTestMode,
           certificateDiscount, amountDue, requiresBankPayment,
+          deliveryPayLater: activeDraft.deliveryPayLater,
         });
       }
 
@@ -796,7 +809,7 @@ export const useRecipientDetails = () => {
         await completeCertificateOrder(oid, orderToken);
         if (cart.isGroup) await cart.reloadCart();
         setIsPaying(false);
-        navigate("/thank-you", { state: { orderNumber: oid, cdekNumber: cdekNum || null } });
+        navigate("/thank-you", { state: { orderNumber: oid, cdekNumber: cdekNum || null, deliveryPayLater: activeDraft.deliveryPayLater } });
         return;
       }
 
@@ -840,7 +853,7 @@ export const useRecipientDetails = () => {
           APP_ENV.isDevelopment ? "manual" : "fallback";
         await confirmOrder(orderId, confirmProvider);
         const storedCdek = sessionStorage.getItem("pay_cdek_number") || null;
-        navigate('/thank-you', { state: { orderNumber: orderId, cdekNumber: storedCdek || null } });
+        navigate('/thank-you', { state: { orderNumber: orderId, cdekNumber: storedCdek || null, deliveryPayLater: postalCheckout } });
       } catch (err) {
         const status = err.response?.status;
         const body = err.response?.data;
@@ -852,7 +865,7 @@ export const useRecipientDetails = () => {
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [orderId, navigate]);
+  }, [orderId, navigate, postalCheckout]);
 
   useEffect(() => {
     if (!isNoCdek) {

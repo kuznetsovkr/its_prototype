@@ -2,6 +2,13 @@ import { describe, expect, it } from "vitest";
 import { getOrderCompletionContent } from "./orderCompletionContent";
 
 describe("order completion content", () => {
+  it("does not claim that prepaid postal merchandise includes the carrier charge", () => {
+    const content = getOrderCompletionContent({ deliveryPayLater: true });
+    expect(content.manual).toBe(false);
+    expect(content.paragraphs.join(" ")).toContain("Доставка Почтой России оплачивается отдельно после изготовления");
+    expect(content.paragraphs.join(" ")).not.toContain("бесплатно");
+    expect(getOrderCompletionContent({ manual: true, deliveryPayLater: true }).paragraphs.join(" ")).not.toContain("успешно оплачен");
+  });
   it("shows the paid design and receipt text when a buyer email was provided", () => {
     expect(getOrderCompletionContent({ receiptEmailProvided: true })).toEqual({
       title: "спасибо за заказ",

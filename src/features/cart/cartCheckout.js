@@ -2,6 +2,9 @@ import { normalizePhoneDigits } from "../order/recipient/recipientValidation";
 import { isCartId } from "./cartStorage";
 
 const ATTEMPT_KEY = "its_cart_checkout_attempt_v1";
+export const buildCartDelivery = ({ deliveryMethod, postalPoint, deliveryCity, officeCode }) => deliveryMethod === "russian_post"
+  ? { deliveryMethod: "russian_post", postalPoint: String(postalPoint || "").trim(), deliveryCityToken: deliveryCity?.token || "" }
+  : { officeCode };
 export const buildCartBuyer = ({ userData, deliveryRecipient, recipientPhone, email, preferredContact, orderComment, deliveryComment, privacyConsent }) => ({
   firstName: userData.firstName || "", lastName: userData.lastName || "", middleName: userData.middleName || "", phone: userData.phone || "",
   recipientFullName: String(deliveryRecipient || "").trim(),
@@ -16,6 +19,9 @@ export const getCartCheckoutKey = async (cartId, payload, storage) => {
   // Store only a digest and a random attempt ID, never another copy of contact
   // details or the certificate code. Keep the attempt stable across reloads.
   const fingerprint = { cartId, revision: payload.revision, officeCode: payload.officeCode, certificateCode: payload.certificateCode, buyer: payload.buyer };
+  if (payload.deliveryMethod === "russian_post") Object.assign(fingerprint, {
+    deliveryMethod: payload.deliveryMethod, postalPoint: payload.postalPoint, deliveryCityToken: payload.deliveryCityToken,
+  });
   const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(JSON.stringify(fingerprint)));
   const signature = Array.from(new Uint8Array(hash), (value) => value.toString(16).padStart(2, "0")).join("");
   try {

@@ -1,4 +1,4 @@
-export const getOrderCompletionContent = ({ manual = false, requestKind, receiptEmailProvided = false } = {}) => {
+export const getOrderCompletionContent = ({ manual = false, requestKind, receiptEmailProvided = false, deliveryPayLater = false } = {}) => {
   if (manual) {
     return {
       title: "заявка оформлена",
@@ -16,6 +16,7 @@ export const getOrderCompletionContent = ({ manual = false, requestKind, receipt
         ? "Заказ успешно оплачен! Чек придёт вам на почту"
         : "Заказ успешно оплачен!",
       "В ближайшее время мы свяжемся с вами и пришлём эскиз на утверждение",
+      ...(deliveryPayLater === true ? ["Доставка Почтой России оплачивается отдельно после изготовления заказа. Менеджер сообщит фактическую стоимость и отправит чек."] : []),
     ],
   };
 };

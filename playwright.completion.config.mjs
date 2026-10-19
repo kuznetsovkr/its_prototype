@@ -4,7 +4,7 @@ import baseConfig from "./playwright.config.mjs";
 // Exercise the real create/confirm flow against intercepted local APIs, not the demo shortcut.
 export default defineConfig({
   ...baseConfig,
-  testMatch: ["**/order-completion.e2e.js", "**/order-delivery.e2e.js", "**/delivery-city.e2e.js", "**/order-step-scroll.e2e.js", "**/car-designs.e2e.js"],
+  testMatch: ["**/order-completion.e2e.js", "**/order-delivery.e2e.js", "**/delivery-city.e2e.js", "**/order-step-scroll.e2e.js", "**/car-designs.e2e.js", "**/postal-cart.e2e.js"],
   workers: 1,
   webServer: {
     ...baseConfig.webServer,
