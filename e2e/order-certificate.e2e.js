@@ -7,7 +7,7 @@ const seedOrder = async (page) => {
     if (sessionStorage.getItem("its_order_draft_v1")) return;
     sessionStorage.setItem("its_order_draft_v1", JSON.stringify({ version: 1, uploadFiles: [], order: {
       clothing: { type: "T-shirt", color: "Чёрный", size: "M" },
-      embroidery: { type: "Car", typeSelectionExplicit: true, uploadedImage: [], patronusCount: 1, petFaceCount: 1 },
+      embroidery: { type: "Car", carDesign: "simple", typeSelectionExplicit: true, uploadedImage: [], patronusCount: 1, petFaceCount: 1 },
       recipient: { userData: { firstName: "Иван", lastName: "Иванов", middleName: "", phone: "+7 (999) 123-45-67" },
         deliveryCity: { id: "cdek:278", name: "Красноярск", label: "г Красноярск", longitude: 92.868, latitude: 56.0106, pickup: true, token: "fixture-city", expiresAt: Date.now() + 86400000 },
         hasNoMiddleName: true, privacyConsent: true, pickupPoint: "ПВЗ Красноярск", cdek: { mode: "office", address: { code: "KRS1" } } },
