@@ -144,7 +144,7 @@ const closeInfoPopup = (widgetInstance) => {
   }
 };
 
-const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingProfile, shippingPackages, initialLocation }) => {
+const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, shippingItems, initialLocation }) => {
   const servicePath = resolveServicePath();
   const ymapsKey = String(APP_ENV.ymapsKey)
     .trim()
@@ -156,27 +156,29 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingPro
   const autoTariffRef = useRef(null);
   const hasLoggedMapErrorRef = useRef(false);
   const [cdekConfig, setCdekConfig] = useState(null);
+  const [shippingContext, setShippingContext] = useState(null);
 
   useEffect(() => {
     let active = true;
-    api.get("/public-config")
-      .then(({ data }) => {
-        if (!data?.cdek) throw new Error("CDEK config is missing");
-        if (active) setCdekConfig(data.cdek);
+    setShippingContext(null);
+    Promise.all([api.get("/public-config"), api.post("/pricing/shipping-context", { items: shippingItems })])
+      .then(([{ data }, { data: context }]) => {
+        if (!data?.cdek || !context?.token || !context?.packages?.length) throw new Error("CDEK config is missing");
+        if (active) { setCdekConfig(data.cdek); setShippingContext(context); }
       })
       .catch((error) => {
-        if (active) setMapErrorMessage("Не удалось загрузить настройки карты СДЭК.");
-        console.error("[CDEK] Public config error:", error);
+        if (active) setMapErrorMessage("Не удалось подготовить расчёт СДЭК. Закройте карту и попробуйте снова.");
+        console.error("[CDEK] Shipping config error:", error.message);
       });
     return () => { active = false; };
-  }, []);
+  }, [shippingItems]);
 
   useEffect(() => { addressRef.current = onAddressSelect; }, [onAddressSelect]);
   useEffect(() => { rateRef.current = onRateSelect; }, [onRateSelect]);
   useEffect(() => { cdekRef.current = onCdekSelect; }, [onCdekSelect]);
 
   useEffect(() => {
-    if (!cdekConfig) return undefined;
+    if (!cdekConfig || !shippingContext) return undefined;
     let instance;
     const unsubscribeWidgetListeners = [];
 
@@ -209,10 +211,9 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingPro
       const defaultLocation = initialLocation || cdekConfig?.defaultLocation;
       const defaultZoom = Number(cdekConfig?.defaultZoom);
       const from = cdekConfig?.from;
-      const packageProfile = clothingProfile?.package;
-      const packageWeight = Number(packageProfile?.weight);
-      const goods = shippingPackages || [{ width: Number(packageProfile?.width), height: Number(packageProfile?.height),
-        length: Number(packageProfile?.length), weight: packageWeight / 1000 }];
+      const goods = shippingContext.packages.map(parcel => ({ width: parcel.width, height: parcel.height, length: parcel.length, weight: parcel.weight / 1000 }));
+      const insuredServiceUrl = new URL(servicePath, window.location.origin);
+      insuredServiceUrl.searchParams.set("shippingContext", shippingContext.token);
       if (
         !Number.isInteger(tariffCode) || tariffCode <= 0 ||
         !Array.isArray(defaultLocation) || defaultLocation.length !== 2 ||
@@ -235,7 +236,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingPro
           from,
           apiKey: ymapsKey,
           canChoose: true,
-          servicePath,
+          servicePath: insuredServiceUrl.toString(),
           hideFilters: { have_cashless: false, have_cash: false, is_dressing_room: false, type: false },
           hideDeliveryOptions: { office: false, door: true },
           debug: false,
@@ -254,7 +255,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingPro
 
             const addressLabel = formatAddressLabel(address);
             addressRef.current?.(addressLabel);
-            rateRef.current?.(normalizedTariff.delivery_sum ?? normalizedTariff.total_sum ?? null);
+            rateRef.current?.(normalizedTariff.total_sum ?? normalizedTariff.delivery_sum ?? null);
 
             cdekRef.current?.({
               mode,
@@ -321,7 +322,7 @@ const MyCdekWidget = ({ onAddressSelect, onRateSelect, onCdekSelect, clothingPro
       });
       try { instance?.destroy?.(); } catch {}
     };
-  }, [servicePath, ymapsKey, clothingProfile, shippingPackages, cdekConfig, initialLocation]);
+  }, [servicePath, ymapsKey, shippingContext, cdekConfig, initialLocation]);
 
   return null;
 };

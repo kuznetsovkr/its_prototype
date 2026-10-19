@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildCartBuyer, buildCartDelivery, cartWidgetPackages, getCartCheckoutKey } from "./cartCheckout";
+import { buildCartBuyer, buildCartDelivery, getCartCheckoutKey } from "./cartCheckout";
 const memoryStorage = () => { const entries = new Map(); return { getItem: (key) => entries.get(key) || null, setItem: (key, value) => entries.set(key, value), entries }; };
 describe("grouped checkout payload", () => {
   it("postal checkout sends its confirmed city and address instead of a stale CDEK point", async () => {
@@ -18,10 +18,6 @@ describe("grouped checkout payload", () => {
     expect(buyer.privacyConsent).toBe(true);
     expect(buyer).not.toHaveProperty("price");
     expect(buyer).not.toHaveProperty("packages");
-  });
-  it("uses a package per garment unit, converting server grams only for the widget", () => {
-    expect(cartWidgetPackages([{ quantity: 2, parcel: { width: 35, height: 35, length: 7, weight: 800 } }]))
-      .toEqual(Array.from({ length: 2 }, () => ({ width: 35, height: 35, length: 7, weight: .8 })));
   });
   it("keeps retries stable across instances and stores no clear-text contacts or certificate code", async () => {
     const storage = memoryStorage();

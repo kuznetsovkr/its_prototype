@@ -7,7 +7,7 @@ import { DELIVERY_METHODS, restoreDeliveryMethod, restoreCheckoutDeliveryMethod 
 import { useOrder } from "../../../context/OrderContext";
 import { useRecipientCart } from "../../cart/useRecipientCart";
 import { GROUP_PAYMENT_NOTICE, UNFINISHED_CART_NOTICE } from "../../cart/cartPresentation";
-import { buildCartBuyer, buildCartDelivery, getCartCheckoutKey, cartWidgetPackages } from "../../cart/cartCheckout";
+import { buildCartBuyer, buildCartDelivery, getCartCheckoutKey } from "../../cart/cartCheckout";
 import { buildDemoCdekNumber, buildDemoOrderId } from "../../../mocks/demoData";
 import { getEmbroideryCountError, getPatronusLimit } from "../embroidery/embroideryLimits";
 import { normalizeCustomTextFont } from "../embroidery/customTextFonts";
@@ -24,6 +24,7 @@ import { useTurnstileChallenge } from "./useTurnstileChallenge";
 import { useOrderCertificate } from "./useOrderCertificate";
 import { demoDeliveryCity, deliveryCityCoordinates, normalizeDeliveryCity } from "./deliveryCity";
 import { resolveOfficeCity } from "./deliveryCityApi";
+import { buildShippingItems } from "./shippingItems";
 import {
   formatPhoneNumber,
   joinFullName,
@@ -183,7 +184,9 @@ export const useRecipientDetails = () => {
     // vice versa). Its order/token remains valid independently; only detach it.
     setDraftOrder(null); setOrderId(null); setRecipient({ savedOrder: null });
   }, [cart.initialized, draftOrder, draftMatchesCheckout, setRecipient]);
-  const shippingPackages = useMemo(() => cart.isGroup ? cartWidgetPackages(cart.items) : null, [cart.isGroup, cart.items]);
+  const shippingItems = useMemo(() => buildShippingItems(cart.isGroup ? cart.items : [{ productType, color, size,
+    embroideryType: selectedType, carDesign, patronusCount, petFaceCount }]),
+  [cart.isGroup, cart.items, productType, color, size, selectedType, carDesign, patronusCount, petFaceCount]);
   const activeCartOrderId = cart.activeCheckout?.orderId;
   useEffect(() => {
     if (!cart.isGroup || !cart.initialized || cart.pending) return;
@@ -644,7 +647,7 @@ export const useRecipientDetails = () => {
       payload?.address?.name ||
       "";
     setPickupPoint(label);
-    setDeliveryPrice(payload?.tariff?.delivery_sum ?? payload?.tariff?.total_sum ?? null);
+    setDeliveryPrice(payload?.tariff?.total_sum ?? payload?.tariff?.delivery_sum ?? null);
     setCdekData(payload || null);
     setDeliveryMethod("cdek");
     setManualAddress(null);
@@ -880,7 +883,7 @@ export const useRecipientDetails = () => {
 
   return {
     cart,
-    shippingPackages,
+    shippingItems,
     navigate, productType, clothingProfile: clothing.profile, isCustomType,
     clothingPreviewSrc: clothing.previewSrc || "",
     clothingPreviewAlt: clothing.previewAlt || clothing.type || "Одежда",

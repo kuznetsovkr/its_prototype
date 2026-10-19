@@ -19,8 +19,8 @@ const priceFormatter = new Intl.NumberFormat("ru-RU");
 const RecipientDetails = () => {
   const {
     cart,
-    shippingPackages,
-    navigate, clothingProfile, clothingPreviewSrc, clothingPreviewAlt, isCustomType,
+    shippingItems,
+    navigate, clothingPreviewSrc, clothingPreviewAlt, isCustomType,
     fullNameInput, handleFullNameChange, isPaying,
     hasNoMiddleName, handleNoMiddleNameToggle,
     userData, handleInputChange, email, setEmail, isMobileLayout,
@@ -152,6 +152,7 @@ const RecipientDetails = () => {
                     <>
                       <span>{cart.isGroup ? "Все изделия и вышивка" : "Изделие и вышивка"}: {formatPrice(checkoutQuote.merchandisePrice)}</span>
                       <span>{checkoutQuote.deliveryPayLater ? "Доставка Почтой России оплачивается отдельно после изготовления" : `Доставка: ${formatPrice(checkoutQuote.deliveryPrice)}`}</span>
+                      {checkoutQuote.insurancePrice != null && <span>Страховка на полную стоимость изделий включена в доставку</span>}
                       {checkoutQuote.certificateDiscount > 0 && <span>Сертификат: −{formatPrice(checkoutQuote.certificateDiscount)}</span>}
                       {checkoutQuote.certificate && <span>Останется на сертификате: {formatPrice(checkoutQuote.certificate.remaining)}</span>}
                       <strong>
@@ -272,8 +273,7 @@ const RecipientDetails = () => {
               <Suspense fallback={<p className="cdek-map__loading">Загружаем карту…</p>}>
                 <MyCdekWidget
                   initialLocation={mapLocation}
-                  clothingProfile={clothingProfile}
-                  shippingPackages={shippingPackages}
+                  shippingItems={shippingItems}
                   onAddressSelect={setPickupPoint}
                   onRateSelect={setDeliveryPrice}
                   onCdekSelect={handleCdekSelect}

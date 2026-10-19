@@ -33,7 +33,3 @@ export const getCartCheckoutKey = async (cartId, payload, storage) => {
   catch { throw new Error("Для надёжного оформления разрешите сохранение данных сайта в браузере"); }
   return key;
 };
-
-export const cartWidgetPackages = (items) => items.flatMap((item) => item.parcel
-  ? Array.from({ length: item.quantity }, () => ({ width: item.parcel.width, height: item.parcel.height, length: item.parcel.length, weight: item.parcel.weight / 1000 }))
-  : []);

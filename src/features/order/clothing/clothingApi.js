@@ -10,7 +10,7 @@ const DEMO_CLOTHING_TYPES = [
     sizeGuideKey: "tshirt", patronusLimit: 1,
     prices: { Patronus: 8500, Car: 6500, petFace: 6000 },
     carDesignPrices: { simple: 5000, medium: 7000, complex: null },
-    package: { width: 30, height: 20, length: 3, weight: 300 },
+    package: { width: 25, height: 3, length: 30, weight: 300 },
     price: 6000,
   },
   {
@@ -18,7 +18,7 @@ const DEMO_CLOTHING_TYPES = [
     sizeGuideKey: "hoodie", patronusLimit: MAX_PATRONUS_COUNT,
     prices: { Patronus: 10000, Car: 8500, petFace: 8000 },
     carDesignPrices: { simple: 6500, medium: 8500, complex: 11500 },
-    package: { width: 35, height: 35, length: 7, weight: 800 },
+    package: { width: 35, height: 7, length: 35, weight: 800 },
     price: 8000,
   },
   {
@@ -26,7 +26,7 @@ const DEMO_CLOTHING_TYPES = [
     sizeGuideKey: "svitshot", patronusLimit: MAX_PATRONUS_COUNT,
     prices: { Patronus: 9500, Car: 8000, petFace: 7000 },
     carDesignPrices: { simple: 6000, medium: 8000, complex: 11000 },
-    package: { width: 35, height: 35, length: 7, weight: 800 },
+    package: { width: 35, height: 7, length: 35, weight: 800 },
     price: 7000,
   },
 ];
