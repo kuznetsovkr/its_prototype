@@ -159,7 +159,7 @@ test("полученная оплата с проблемой сертифика
 
 test("админка показывает баланс и историю без раскрытия кода сертификата", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("token", "fixture-admin-token"));
-  await page.route("**/api/auth/admin-session", (route) => route.fulfill({ json: { role: "admin" } }));
+  await page.route("**/api/auth/admin-session", (route) => route.fulfill({ json: { role: "super_admin" } }));
   await page.route("**/api/inventory", (route) => route.fulfill({ json: [] }));
   await page.route("**/api/colors", (route) => route.fulfill({ json: [] }));
   await page.route("**/api/clothing-types", (route) => route.fulfill({ json: [] }));

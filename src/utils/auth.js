@@ -1,4 +1,5 @@
 import api from "../api";
+import { isAdminRole } from "../admin/adminAccess";
 
 const extractRole = (payload) => payload?.role ?? null;
 
@@ -16,10 +17,9 @@ export const verifyAdminSession = async () => {
   try {
     const { data } = await api.get("/auth/admin-session");
     const role = extractRole(data);
-    if (role) {
-      localStorage.setItem("role", role);
-    }
-    return role || null;
+    if (!isAdminRole(role)) throw new Error("Недостаточно прав администратора");
+    localStorage.setItem("role", role);
+    return data;
   } catch (err) {
     clearAuth();
     console.warn("Не удалось подтвердить сессию администратора:", err.message || err);

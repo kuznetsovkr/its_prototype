@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { verifyAdminSession } from "../utils/auth";
+import { AdminAccessContext, isAdminRole } from "../admin/adminAccess";
 
 const RequireAdmin = ({ children }) => {
   const location = useLocation();
   const [status, setStatus] = useState("checking");
+  const [session, setSession] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -15,9 +17,10 @@ const RequireAdmin = ({ children }) => {
         return;
       }
 
-      const role = await verifyAdminSession();
+      const account = await verifyAdminSession();
       if (!isMounted) return;
-      setStatus(role === "admin" ? "allowed" : "denied");
+      setSession(account);
+      setStatus(isAdminRole(account?.role) ? "allowed" : "denied");
     };
 
     verify();
@@ -34,7 +37,7 @@ const RequireAdmin = ({ children }) => {
     return <Navigate to="/admin" state={{ from: location.pathname }} replace />;
   }
 
-  return children;
+  return <AdminAccessContext.Provider value={session}>{children}</AdminAccessContext.Provider>;
 };
 
 export default RequireAdmin;

@@ -7,6 +7,7 @@ import WarehouseTable from "../components/WarehouseTable";
 import ColorSelect from "../components/ColorSelect";
 import api from "../api";
 import { clearAuth } from "../utils/auth";
+import { canManageCatalog, useAdminAccess } from "./adminAccess";
 
 const popularSizes = ["XS", "S", "M", "L", "XL", "XXL"];
 const ALL_VALUE = "Все";
@@ -25,6 +26,8 @@ const getErrorMessage = (error, fallback) =>
 
 const AdminInventory = () => {
   const navigate = useNavigate();
+  const account = useAdminAccess();
+  const hasFullAccess = canManageCatalog(account);
   const [inventory, setInventory] = useState([]);
   const [colorOptions, setColorOptions] = useState([]);
   const [clothingTypes, setClothingTypes] = useState([]);
@@ -70,14 +73,14 @@ const AdminInventory = () => {
         fetchInventory(),
         fetchClothingTypes(),
         fetchColors(),
-        fetchPricingConfig(),
+        ...(hasFullAccess ? [fetchPricingConfig()] : []),
       ]);
     } catch (error) {
       showNotice("error", getErrorMessage(error, "Не удалось загрузить данные админки."));
     } finally {
       setIsLoading(false);
     }
-  }, [fetchColors, fetchClothingTypes, fetchInventory, fetchPricingConfig, showNotice]);
+  }, [fetchColors, fetchClothingTypes, fetchInventory, fetchPricingConfig, hasFullAccess, showNotice]);
 
   useEffect(() => {
     loadAdminData();
@@ -281,8 +284,8 @@ const AdminInventory = () => {
     <section className="admin-page">
       <header className="admin-dashboard-header">
         <div className="admin-dashboard-header__copy">
-          <p className="admin-dashboard-header__eyebrow">панель управления</p>
-          <h1>склад и каталог</h1>
+          <p className="admin-dashboard-header__eyebrow">{hasFullAccess ? "суперадминистратор" : "администратор склада"}{account?.name ? ` · ${account.name}` : ""}</p>
+          <h1>{hasFullAccess ? "склад и каталог" : "управление складом"}</h1>
           <p>Добавляйте ассортимент, следите за остатками и обновляйте позиции.</p>
         </div>
 
@@ -308,25 +311,25 @@ const AdminInventory = () => {
         </div>
       )}
 
-      <CatalogManager
+      {hasFullAccess && <CatalogManager
         clothingTypes={clothingTypes}
         colors={colorOptions}
         usedTypeIds={usedTypeIds}
         onAddClothingType={addClothingType}
         onDeleteClothingType={deleteClothingType}
         onAddColor={addColor}
-      />
+      />}
 
-      <PricingManager
+      {hasFullAccess && <PricingManager
         config={pricingConfig}
         isSaving={isSavingPricing}
         onSave={savePricingConfig}
-      />
+      />}
 
       <section className="admin-panel admin-inventory" aria-labelledby="admin-inventory-title">
         <div className="admin-panel__heading admin-inventory__heading">
           <div>
-            <p className="admin-panel__eyebrow">03 · наполнение склада</p>
+            <p className="admin-panel__eyebrow">{hasFullAccess ? "03 · наполнение склада" : "наполнение склада"}</p>
             <h2 id="admin-inventory-title">Складские позиции</h2>
           </div>
           <button
@@ -485,7 +488,7 @@ const AdminInventory = () => {
           />
         )}
       </section>
-      <CertificateManager />
+      {hasFullAccess && <CertificateManager />}
     </section>
   );
 };
