@@ -28,7 +28,7 @@ const CertificateManager = () => {
   return (
     <section className="admin-panel admin-certificates" aria-labelledby="admin-certificates-title">
       <div className="admin-panel__heading">
-        <div><p className="admin-panel__eyebrow">04 · подарочные сертификаты</p><h2 id="admin-certificates-title">Сертификаты</h2></div>
+        <div><p className="admin-panel__eyebrow">подарочные сертификаты</p><h2 id="admin-certificates-title">Сертификаты</h2></div>
         <button className="btn btn-outline" type="button" disabled={loading} onClick={load}>Обновить</button>
       </div>
       <p>Баланс, срок действия и история списаний. Возвраты и отмены разбираются вручную; эта панель не изменяет баланс.</p>

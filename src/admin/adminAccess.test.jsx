@@ -22,9 +22,16 @@ describe("administrative roles", () => {
     expect(html).toContain("Складские позиции");
     expect(html).toContain("Добавить позицию");
     expect(html).toContain("Сотрудник");
-    for (const title of ["Справочники", "Цены и параметры", "Сертификаты"]) {
+    for (const title of ["Справочники", "Цены и параметры", "Сертификаты", "Заказы"]) {
       if (role === "super_admin") expect(html).toContain(title);
       else expect(html).not.toContain(title);
     }
+  });
+
+  it("gives the owner every existing section through the super admin role", () => {
+    const owner = { role: "super_admin", name: "Заказчик" };
+    expect(canManageCatalog(owner)).toBe(true);
+    const html = renderToStaticMarkup(<MemoryRouter><AdminAccessContext.Provider value={owner}><AdminInventory /></AdminAccessContext.Provider></MemoryRouter>);
+    for (const title of ["Складские позиции", "Сертификаты", "Заказы", "Справочники", "Цены и параметры"]) expect(html).toContain(title);
   });
 });

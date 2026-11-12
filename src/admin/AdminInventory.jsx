@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import CatalogManager from "./CatalogManager";
 import PricingManager from "./PricingManager";
 import CertificateManager from "./CertificateManager";
+import OrderManager from "./OrderManager";
 import WarehouseTable from "../components/WarehouseTable";
 import ColorSelect from "../components/ColorSelect";
 import api from "../api";
@@ -286,7 +287,7 @@ const AdminInventory = () => {
         <div className="admin-dashboard-header__copy">
           <p className="admin-dashboard-header__eyebrow">{hasFullAccess ? "суперадминистратор" : "администратор склада"}{account?.name ? ` · ${account.name}` : ""}</p>
           <h1>{hasFullAccess ? "склад и каталог" : "управление складом"}</h1>
-          <p>Добавляйте ассортимент, следите за остатками и обновляйте позиции.</p>
+          <p>{hasFullAccess ? "Управляйте складом и ценами, проверяйте заказы и сертификаты." : "Добавляйте ассортимент, следите за остатками и обновляйте позиции."}</p>
         </div>
 
         <div className="admin-dashboard-header__side">
@@ -488,6 +489,7 @@ const AdminInventory = () => {
           />
         )}
       </section>
+      {hasFullAccess && <OrderManager />}
       {hasFullAccess && <CertificateManager />}
     </section>
   );

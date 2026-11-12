@@ -52,3 +52,26 @@
   padding-inline-start: 20px;
   line-height: 1.8;
 }
+
+.admin-orders summary {
+  padding-block: 12px;
+  color: var(--admin-accent, #c0521f);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.admin-orders__item {
+  padding-block: 12px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-orders__item .btn {
+  max-width: 100%;
+  margin-block: 4px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.admin-orders__comment {
+  white-space: pre-wrap;
+}
