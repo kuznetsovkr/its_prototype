@@ -13,7 +13,9 @@ const openSocial = async (page, options = {}) => {
   await page.emulateMedia({ reducedMotion: options.reducedMotion || "no-preference" });
   await page.goto("/");
   const social = page.locator(".home-social");
-  await expect(social).toBeAttached({ timeout: 15_000 });
+  // Wait for the lazy route, not just DOM load. Playback assertions below
+  // retain their own deadlines and are not relaxed by this readiness wait.
+  await expect(social).toBeAttached({ timeout: 30_000 });
   return social;
 };
 const showFeed = async (social) => {

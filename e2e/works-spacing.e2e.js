@@ -2,11 +2,14 @@
 import { expect, test } from "@playwright/test";
 
 test("галерея и следующий блок разделены одним отступом, компактные версии сохраняют масштабирование", async ({ page }, info) => {
+  test.setTimeout(90_000);
   test.skip(info.project.name !== "desktop-chromium", "One complete breakpoint matrix");
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const works = page.locator(".home-works");
-  await expect(works).toBeAttached();
+  // The route is lazy-loaded. Under a complete parallel browser run, DOM load
+  // can precede the route chunk; start measuring only after it has mounted.
+  await expect(works).toBeAttached({ timeout: 30_000 });
   for (const expanded of [false, true]) {
     if (expanded) await works.locator(".home-works__more").click();
     for (const width of [320, 390, 639, 640, 820, 1024, 1199, 1200, 1440, 1920, 2560]) {
