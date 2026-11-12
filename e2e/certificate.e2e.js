@@ -83,6 +83,7 @@ const fillBuyer = async (page) => {
 };
 
 test("форма сертификата адаптивна, использует локальные ассеты и не принимает оплату без почты", async ({ page }, testInfo) => {
+  test.setTimeout(90_000);
   const api = await setupCertificateApi(page);
   await openCertificateForm(page);
   await fillBuyer(page);
@@ -90,6 +91,11 @@ test("форма сертификата адаптивна, использует
   await expect(page.getByText(/Оплата будет доступна после настройки/)).toBeVisible();
   await expect(page.getByText("Доставка", { exact: true })).toHaveCount(0);
   expect(api.purchases).toHaveLength(0);
+  // Form readiness does not imply that its eager image requests have decoded.
+  // Retain every asset/layout assertion below, but wait for actual image data.
+  await expect.poll(() => page.locator(".certificateCheckout__back img, .certificateCheckout__preview img").evaluateAll((images) => (
+    images.length === 3 && images.every((image) => image.complete && image.naturalWidth > 0)
+  )), { timeout: 30_000 }).toBe(true);
   const assets = await page.locator(".certificateCheckout__back img, .certificateCheckout__preview img").evaluateAll((images) => images.map((image) => ({
     loaded: image.complete && image.naturalWidth > 0,
     local: !image.currentSrc.includes("figma.com"),
