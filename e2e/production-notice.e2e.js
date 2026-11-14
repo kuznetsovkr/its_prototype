@@ -95,6 +95,18 @@ test("админка сохраняет сроки, даёт предпросм�
   await page.goto("/admin/inventory");
   const panel = page.locator(".admin-production-notice");
   await expect(panel.getByLabel("Основной текст", { exact: true })).toBeVisible({ timeout: 20_000 });
+  const mode = panel.getByLabel("Режим сроков");
+  const manualText = panel.getByLabel("Основной текст", { exact: true });
+  const additionalText = panel.getByLabel("Дополнительный текст (необязательно)", { exact: true });
+  for (const field of [mode, manualText, additionalText]) {
+    await expect(field).not.toBeFocused();
+    await expect(field).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await field.focus();
+    await expect(field).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await expect(field).toHaveCSS("border-color", "rgb(188, 88, 35)");
+    await field.blur();
+    await expect(field).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  }
   await panel.getByLabel("Основной текст", { exact: true }).fill("Готовность: 20–22 декабря");
   await panel.getByLabel("Дополнительный текст (необязательно)", { exact: true }).fill("Срок можно уточнить у менеджера.");
   await expect(panel.locator(".productionNoticeCard__text")).toContainText("Готовность: 20–22 декабря");
@@ -102,6 +114,7 @@ test("админка сохраняет сроки, даёт предпросм�
   await expect(panel.getByRole("status")).toContainText("Сроки сохранены");
   expect(draft.manualText).toBe("Готовность: 20–22 декабря");
   await panel.getByLabel("Режим сроков").selectOption("auto");
+  await expect(panel.getByLabel("Текст с автоматической датой", { exact: true })).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await expect(panel.locator(".productionNoticeCard__text")).toContainText("15–17 декабря");
   await panel.getByRole("button", { name: "Сохранить сроки", exact: true }).click();
   await expect(panel.getByRole("status")).toContainText("Сроки сохранены");

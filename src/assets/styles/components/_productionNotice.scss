@@ -88,6 +88,8 @@
 
 .admin-production-notice__layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(290px, 440px); gap: 32px; align-items: start; }
 .admin-production-notice__form { min-width: 0; }
+.admin-production-notice__form .input,
+.admin-production-notice__form .select { background: #fff; }
 .admin-production-notice__form fieldset { display: grid; min-width: 0; margin: 0; padding: 0; gap: 20px; border: 0; }
 .admin-production-notice__form textarea { width: 100%; min-height: 90px; resize: vertical; font: inherit; }
 .admin-production-notice__form .field { display: grid; gap: 8px; }
