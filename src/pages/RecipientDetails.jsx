@@ -6,6 +6,7 @@ import { useRecipientDetails } from "../features/order/recipient/useRecipientDet
 import TurnstilePanel from "../components/TurnstilePanel";
 import RecipientPersonalFields from "../features/order/shared/RecipientPersonalFields";
 import OrderCertificateField from "../features/order/recipient/OrderCertificateField";
+import ProductionNoticeInline from "../features/productionNotice/ProductionNoticeInline";
 import RecipientDeliveryFields from "../features/order/recipient/RecipientDeliveryFields";
 import RecipientCartList from "../features/cart/RecipientCartList";
 import { GROUP_PAYMENT_NOTICE } from "../features/cart/cartPresentation";
@@ -230,6 +231,7 @@ const RecipientDetails = () => {
                     : "к оплате"}
                 </button>
               </div>
+              <ProductionNoticeInline />
             </div>
           </div>
         </div>

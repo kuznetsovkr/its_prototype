@@ -24,6 +24,11 @@ async function mockAdmin(page, role) {
     const request = route.request();
     const url = new URL(request.url());
     if (url.pathname === "/api/auth/admin-session") return route.fulfill({ json: { role, name: "Сотрудник" } });
+    if (url.pathname === "/api/production-notice") return route.fulfill({ json: { enabled: false } });
+    if (url.pathname === "/api/admin/production-notice") {
+      calls.privileged.push(url.pathname);
+      return route.fulfill({ json: { settings: { enabled: false, mode: "manual", manualText: "Сроки изготовления", autoTemplate: "Сроки: {dates}", additionalText: "", revision: 1 }, automaticDates: "15–17 декабря" } });
+    }
     if (url.pathname.startsWith("/api/pricing/config")) {
       calls.privileged.push(url.pathname);
       return route.fulfill({ json: { types: [], additional: {} } });
@@ -58,7 +63,7 @@ test("warehouse admin edits stock without requesting privileged data", async ({ 
   const calls = await mockAdmin(page, "admin");
   await page.goto("/admin/inventory");
   await expect(page.getByRole("heading", { name: "управление складом", exact: true })).toBeVisible();
-  for (const title of ["Справочники", "Цены и параметры", "Сертификаты", "Заказы"]) {
+  for (const title of ["Справочники", "Цены и параметры", "Сертификаты", "Заказы", "Сроки изготовления"]) {
     await expect(page.getByRole("heading", { name: title, exact: true })).toHaveCount(0);
   }
   await page.getByRole("button", { name: "Редактировать", exact: true }).click();
@@ -75,7 +80,7 @@ test("warehouse admin edits stock without requesting privileged data", async ({ 
 test("super admin and owner see catalog, prices, orders and certificates", async ({ page }) => {
   await mockAdmin(page, "super_admin");
   await page.goto("/admin/inventory");
-  for (const title of ["Справочники", "Цены и параметры", "Складские позиции", "Сертификаты", "Заказы"]) {
+  for (const title of ["Справочники", "Цены и параметры", "Складские позиции", "Сертификаты", "Заказы", "Сроки изготовления"]) {
     await expect(page.getByRole("heading", { name: title, exact: true })).toHaveCount(1);
   }
 });

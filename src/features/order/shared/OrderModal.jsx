@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 
 const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-const OrderModal = ({ children, className = "", overlayClassName = "", inertBackground = false, closeLabel = "Закрыть окно", label, labelledBy, onClose, returnFocusTo, fallbackFocusSelector }) => {
+const OrderModal = ({ children, className = "", overlayClassName = "", inertBackground = false, closeLabel = "Закрыть окно", closeIcon, label, labelledBy, onClose, returnFocusTo, fallbackFocusSelector }) => {
   const dialogRef = useRef(null);
   const closeRef = useRef(null);
   const onCloseRef = useRef(onClose);
@@ -73,9 +73,9 @@ const OrderModal = ({ children, className = "", overlayClassName = "", inertBack
         onClick={(event) => event.stopPropagation()}
       >
         <button ref={closeRef} type="button" className="modalClose" aria-label={closeLabel} onClick={onClose}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
+          {closeIcon || <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
             <path d="M16.5 0.5L0.5 16.5M16.5 16.5L0.5 0.5" stroke="#433F3C" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          </svg>}
         </button>
         {children}
       </div>

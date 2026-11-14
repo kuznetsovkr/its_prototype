@@ -8,6 +8,7 @@ import RouteLoader from './components/RouteLoader';
 import SeoMetadata from './components/SeoMetadata';
 import DesktopSmoothScroll from './components/DesktopSmoothScroll';
 import CertificatePaymentReturn from './features/certificate/CertificatePaymentReturn';
+import ProductionNoticePopup from './features/productionNotice/ProductionNoticePopup';
 import { isOrderStepPath } from './config/routes';
 import { MEDIA_QUERIES } from './config/breakpoints';
 import { scrollMobileOrderStepToTop } from './features/order/shared/orderStepScroll';
@@ -157,6 +158,7 @@ const AppShell = () => {
                 <DesktopSmoothScroll />
                 <ScrollToTop />
                 <RoutePreloader />
+                <ProductionNoticePopup />
                 {isHomePage ? routes : <main>{routes}</main>}
                 {!isHomePage && <Footer />}
             </div>

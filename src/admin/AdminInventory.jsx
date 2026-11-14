@@ -4,6 +4,7 @@ import CatalogManager from "./CatalogManager";
 import PricingManager from "./PricingManager";
 import CertificateManager from "./CertificateManager";
 import OrderManager from "./OrderManager";
+import ProductionNoticeManager from "./ProductionNoticeManager";
 import WarehouseTable from "../components/WarehouseTable";
 import ColorSelect from "../components/ColorSelect";
 import api from "../api";
@@ -491,6 +492,7 @@ const AdminInventory = () => {
       </section>
       {hasFullAccess && <OrderManager />}
       {hasFullAccess && <CertificateManager />}
+      {hasFullAccess && <ProductionNoticeManager />}
     </section>
   );
 };
