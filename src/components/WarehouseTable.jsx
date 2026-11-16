@@ -1,6 +1,6 @@
 import { useState } from "react";
 import ColorSelect from "./ColorSelect";
-import api from '../api'
+import { uploadInventoryImage } from "../admin/inventoryImageUpload";
 import { buildImgSrc } from '../utils/url';
 
 const popularSizes  = ["XS", "S", "M", "L", "XL", "XXL"];
@@ -19,12 +19,16 @@ const WarehouseTable = ({
 }) => {
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData]   = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   const arrow = sortDir === "asc" ? "▲" : "▼";
   const typeNameById = (id) =>
     clothingTypes?.find((t) => String(t.id) === String(id))?.name || "";
 
   const startEditing = (row) => {
+    if (isUploading) return;
+    setUploadError("");
     const resolvedTypeId =
       row.clothingTypeId ||
       row.clothingType?.id ||
@@ -40,6 +44,8 @@ const WarehouseTable = ({
   };
 
   const cancelEditing = () => {
+    if (isUploading) return;
+    setUploadError("");
     setEditingId(null);
     setEditData(null);
   };
@@ -50,21 +56,22 @@ const WarehouseTable = ({
 
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    const formData = new FormData();
-    formData.append("image", file);
+    e.target.value = "";
+    if (!file || isUploading) return;
+    setIsUploading(true);
+    setUploadError("");
     try {
-      const res = await api.post('/upload', formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setEditData((prev) => ({ ...prev, imageUrl: res.data.imageUrl }));
+      const imageUrl = await uploadInventoryImage(file);
+      setEditData((prev) => prev ? { ...prev, imageUrl } : prev);
     } catch (err) {
-      console.error("Ошибка загрузки изображения:", err);
+      setUploadError(err.message || "Не удалось загрузить фотографию. Выберите файл ещё раз");
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const saveRow = async () => {
-    if (!editData) return;
+    if (!editData || isUploading || uploadError) return;
     const saved = await updateItem({
       ...editData,
       clothingTypeId: editData.clothingTypeId ? Number(editData.clothingTypeId) : null,
@@ -126,10 +133,12 @@ const WarehouseTable = ({
                             id={`file-${row.id}`}
                             type="file"
                             accept="image/png,image/jpeg,image/webp"
+                            disabled={isUploading}
                             onChange={handleFileUpload}
                             hidden
                           />
-                          <label htmlFor={`file-${row.id}`} className="btn btn-outline">Выберите файл</label>
+                          <label htmlFor={`file-${row.id}`} className="btn btn-outline">{isUploading ? "Загружаем…" : "Выберите файл"}</label>
+                          {uploadError && <p className="admin-notice admin-notice--error" role="alert">{uploadError}</p>}
                         </div>
                       )}
                     </td>
@@ -217,14 +226,14 @@ const WarehouseTable = ({
                       <div className="actions-cell__inner">
                         {isEditing ? (
                           <>
-                            <button className="btn btn-primary" type="button" onClick={saveRow}>Сохранить</button>
-                            <button className="btn btn-outline" type="button" onClick={cancelEditing}>Отмена</button>
-                            <button className="btn btn-danger" type="button" onClick={() => deleteItem(row.id)}>Удалить</button>
+                            <button className="btn btn-primary" type="button" onClick={saveRow} disabled={isUploading || Boolean(uploadError)}>Сохранить</button>
+                            <button className="btn btn-outline" type="button" onClick={cancelEditing} disabled={isUploading}>Отмена</button>
+                            <button className="btn btn-danger" type="button" onClick={() => deleteItem(row.id)} disabled={isUploading}>Удалить</button>
                           </>
                         ) : (
                           <>
-                            <button className="btn btn-outline" type="button" onClick={() => startEditing(row)}>Редактировать</button>
-                            <button className="btn btn-danger" type="button" onClick={() => deleteItem(row.id)}>Удалить</button>
+                            <button className="btn btn-outline" type="button" onClick={() => startEditing(row)} disabled={isUploading}>Редактировать</button>
+                            <button className="btn btn-danger" type="button" onClick={() => deleteItem(row.id)} disabled={isUploading}>Удалить</button>
                           </>
                         )}
                       </div>

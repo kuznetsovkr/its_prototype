@@ -5,6 +5,7 @@ import PricingManager from "./PricingManager";
 import CertificateManager from "./CertificateManager";
 import OrderManager from "./OrderManager";
 import ProductionNoticeManager from "./ProductionNoticeManager";
+import { uploadInventoryImage } from "./inventoryImageUpload";
 import WarehouseTable from "../components/WarehouseTable";
 import ColorSelect from "../components/ColorSelect";
 import api from "../api";
@@ -178,16 +179,13 @@ const AdminInventory = () => {
 
   const handleNewItemUpload = async (event) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    event.target.value = "";
+    if (!file || isUploading) return;
 
     setIsUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("image", file);
-      const response = await api.post("/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setNewItem((current) => ({ ...current, imageUrl: response.data.imageUrl }));
+      const imageUrl = await uploadInventoryImage(file);
+      setNewItem((current) => ({ ...current, imageUrl }));
       showNotice("success", "Изображение загружено.");
     } catch (error) {
       showNotice("error", getErrorMessage(error, "Не удалось загрузить изображение."));
@@ -425,6 +423,7 @@ const AdminInventory = () => {
                     id="admin-file-upload"
                     type="file"
                     accept="image/png,image/jpeg,image/webp"
+                    disabled={isUploading}
                     onChange={handleNewItemUpload}
                     hidden
                   />

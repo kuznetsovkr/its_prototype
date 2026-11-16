@@ -77,6 +77,41 @@ test("warehouse admin edits stock without requesting privileged data", async ({ 
   await expect(page.getByRole("heading", { name: "Новая позиция", exact: true })).toBeVisible();
 });
 
+test("warehouse photo errors are visible; retrying the same file waits for upload before saving", async ({ page }) => {
+  const calls = await mockAdmin(page, "admin");
+  let attempts = 0;
+  let releaseUpload;
+  const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a2ioAAAAASUVORK5CYII=", "base64");
+  await page.route("**/api/uploads/inventory/clothing.png", route => route.fulfill({ contentType: "image/png", body: png }));
+  await page.route("**/api/upload", async route => {
+    attempts++;
+    if (attempts === 1) return route.fulfill({ status: 429, json: { message: "Достигнут лимит загрузки фотографий" } });
+    await new Promise(resolve => { releaseUpload = resolve; });
+    return route.fulfill({ status: 201, json: { imageUrl: "/api/uploads/inventory/clothing.png" } });
+  });
+  await page.goto("/admin/inventory");
+  await page.getByRole("button", { name: "Редактировать", exact: true }).click();
+  const fileInput = page.locator('#file-1');
+  const upload = { name: "clothing.png", mimeType: "image/png", buffer: png };
+  const save = page.getByRole("button", { name: "Сохранить", exact: true });
+  await fileInput.setInputFiles(upload);
+  await expect(page.getByRole("alert")).toContainText("Достигнут лимит");
+  await expect(save).toBeDisabled();
+  await fileInput.setInputFiles(upload);
+  await expect(page.getByText("Загружаем…", { exact: true })).toBeVisible();
+  await expect(save).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Отмена", exact: true })).toBeDisabled();
+  expect(calls.writes).toHaveLength(0);
+  await expect.poll(() => typeof releaseUpload).toBe("function");
+  releaseUpload();
+  await expect(save).toBeEnabled();
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  await save.click();
+  await expect(page.getByText("Складская позиция обновлена.", { exact: true })).toBeVisible();
+  expect(attempts).toBe(2);
+  expect(calls.writes[0].imageUrl).toBe("/api/uploads/inventory/clothing.png");
+});
+
 test("super admin and owner see catalog, prices, orders and certificates", async ({ page }) => {
   await mockAdmin(page, "super_admin");
   await page.goto("/admin/inventory");
