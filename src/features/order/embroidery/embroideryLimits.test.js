@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
+  getEmbroideryAvailabilityError,
   getEmbroideryCountError,
   getPatronusLimit,
   MAX_PATRONUS_COUNT,
@@ -7,6 +8,16 @@ import {
 } from "./embroideryLimits";
 
 describe("embroidery count limits", () => {
+  test("forbids even one T-shirt Patronus without affecting other designs or garments", () => {
+    expect(getEmbroideryCountError({ type: "Patronus", patronusCount: 1, patronusLimit: 1, clothingCode: "tshirt" }))
+      .toContain("недоступна для футболки");
+    for (const type of ["Car", "petFace", "custom", ""]) {
+      expect(getEmbroideryAvailabilityError({ type, clothingCode: "tshirt" })).toBe("");
+    }
+    for (const clothingCode of ["hoodie", "svitshot"]) {
+      expect(getEmbroideryCountError({ type: "Patronus", patronusCount: 4, patronusLimit: 4, clothingCode })).toBe("");
+    }
+  });
   test("caps patronuses at four while preserving smaller product limits", () => {
     expect(MAX_PATRONUS_COUNT).toBe(4);
     expect(getPatronusLimit({ patronusLimit: 5 })).toBe(4);

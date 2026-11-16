@@ -605,6 +605,7 @@ export const useRecipientDetails = () => {
     patronusCount,
     petFaceCount,
     patronusLimit: getPatronusLimit(clothing.profile),
+    clothingCode: cart.isGroup ? undefined : clothing.profile?.code,
   });
   const isFormValid = draftOrder && draftMatchesCheckout ? true : recipientValidation.isValid && !citySyncing;
   const getMissingFieldsMessage = () => recipientValidation.message;

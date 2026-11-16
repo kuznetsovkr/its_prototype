@@ -1,6 +1,11 @@
 export const MAX_PATRONUS_COUNT = 4;
 export const MAX_PET_FACE_COUNT = 5;
 
+export const getEmbroideryAvailabilityError = ({ type, clothingCode }) =>
+  type === "Patronus" && clothingCode === "tshirt"
+    ? "Вышивка патронуса недоступна для футболки. Выберите другой тип дизайна"
+    : "";
+
 export const getPatronusLimit = (profile) => {
   const configured = Number(profile?.patronusLimit);
   return Number.isInteger(configured) && configured > 0
@@ -8,7 +13,9 @@ export const getPatronusLimit = (profile) => {
     : MAX_PATRONUS_COUNT;
 };
 
-export const getEmbroideryCountError = ({ type, patronusCount, petFaceCount, patronusLimit }) => {
+export const getEmbroideryCountError = ({ type, patronusCount, petFaceCount, patronusLimit, clothingCode }) => {
+  const availabilityError = getEmbroideryAvailabilityError({ type, clothingCode });
+  if (availabilityError) return availabilityError;
   if (type === "Patronus") {
     if (!Number.isInteger(patronusCount) || patronusCount < 1) {
       return "Укажите количество патронусов";

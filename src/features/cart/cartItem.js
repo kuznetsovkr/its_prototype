@@ -1,4 +1,4 @@
-import { MAX_PATRONUS_COUNT, MAX_PET_FACE_COUNT } from "../order/embroidery/embroideryLimits";
+import { MAX_PATRONUS_COUNT, MAX_PET_FACE_COUNT, getEmbroideryAvailabilityError } from "../order/embroidery/embroideryLimits";
 import { ALLOWED_IMAGE_TYPES, MAX_UPLOAD_MB } from "../order/embroidery/embroideryConfig";
 import { isCartId } from "./cartStorage";
 import { normalizeCarDesign } from "../order/embroidery/carDesigns";
@@ -15,6 +15,8 @@ export const buildCartItemFormData = (draft, { requestKey, turnstileToken = "" }
   if (!["Patronus", "Car", "petFace"].includes(embroidery.type) || embroidery.typeSelectionExplicit === false) {
     throw new Error("Выберите тип вышивки");
   }
+  const availabilityError = getEmbroideryAvailabilityError({ type: embroidery.type, clothingCode: clothing.profile?.code });
+  if (availabilityError) throw new Error(availabilityError);
   const patronusCount = embroidery.type === "Patronus" ? Number(embroidery.patronusCount ?? 1) : 1;
   if (embroidery.type === "Car" && !normalizeCarDesign(embroidery.carDesign)) throw new Error("Выберите сложность дизайна автомобиля");
   if (embroidery.type === "Car" && embroidery.carDesign === "complex" && clothing.profile?.code === "tshirt") throw new Error("Сложный дизайн автомобиля не предлагается для футболки");

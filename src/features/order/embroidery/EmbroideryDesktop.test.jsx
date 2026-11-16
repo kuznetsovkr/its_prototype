@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import EmbroideryDesktop from "./EmbroideryDesktop";
 
 const noop = () => {};
-const renderPanel = (selectedType, desktopTab = "image", overrides = {}) => {
+const renderPanel = (selectedType, desktopTab = "image", overrides = {}, detailsOpen = desktopTab === "image") => {
   const selection = {
     clothingPreviewSrc: "",
     clothingPreviewAlt: "",
@@ -38,7 +38,7 @@ const renderPanel = (selectedType, desktopTab = "image", overrides = {}) => {
     <EmbroideryDesktop
       selection={selection}
       desktopTab={desktopTab}
-      desktopDetailsOpen={desktopTab === "image"}
+      desktopDetailsOpen={detailsOpen}
       isUploadStage={desktopTab === "image"}
       fileInputRef={{ current: null }}
       onImageTab={noop}
@@ -52,6 +52,15 @@ const renderPanel = (selectedType, desktopTab = "image", overrides = {}) => {
 };
 const renderInstructions = (selectedType, desktopTab = "image") => renderPanel(selectedType, desktopTab)
   .match(/<div class="embroideryUploadStage__instructions">([\s\S]*?)<\/div>/)?.[1] || "";
+
+test("T-shirt choices omit Patronus only; other garments keep it", () => {
+  const tshirt = renderPanel("", "image", { clothingCode: "tshirt" }, false);
+  expect(tshirt).not.toContain('value="Patronus"');
+  for (const type of ["Car", "petFace", "custom"]) expect(tshirt).toContain(`value="${type}"`);
+  for (const clothingCode of ["hoodie", "svitshot"]) {
+    expect(renderPanel("", "image", { clothingCode }, false)).toContain('value="Patronus"');
+  }
+});
 
 describe("inscription font preview", () => {
   test("renders supplied choices and the actual selected face", () => {

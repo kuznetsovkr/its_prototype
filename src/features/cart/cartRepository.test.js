@@ -28,6 +28,13 @@ const fixture = (storage = memoryStorage()) => {
 };
 
 describe("persistent guest cart foundation", () => {
+  it("rejects T-shirt Patronus drafts before contacting the API; keeps other T-shirt designs", () => {
+    const tshirt = (type, extra = {}) => ({ ...draft({ type, patronusCount: 1, petFaceCount: 1, ...extra }),
+      clothing: { type: "Футболка", color: "Чёрный", size: "M", profile: { code: "tshirt", patronusLimit: 1 } } });
+    expect(() => buildCartItemFormData(tshirt("Patronus"), { requestKey })).toThrow("недоступна для футболки");
+    expect(buildCartItemFormData(tshirt("petFace"), { requestKey }).get("embroideryType")).toBe("petFace");
+    expect(buildCartItemFormData(tshirt("Car", { carDesign: "simple" }), { requestKey }).get("carDesign")).toBe("simple");
+  });
   it("does not create a cart or contact the API just by visiting a site with no saved access", async () => {
     const { repository, client } = fixture();
     expect(repository.getSnapshot().initialized).toBe(false);

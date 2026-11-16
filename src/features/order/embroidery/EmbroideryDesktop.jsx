@@ -17,7 +17,7 @@ import {
   MAX_UPLOAD_MB as MAX_MB,
   getUploadInstructions,
 } from "./embroideryConfig";
-import { MAX_PET_FACE_COUNT } from "./embroideryLimits";
+import { MAX_PET_FACE_COUNT, getEmbroideryAvailabilityError } from "./embroideryLimits";
 import CarDesignSelector from "./CarDesignSelector";
 import { CUSTOM_TEXT_FONT_OPTIONS, getCustomTextFontStyle, normalizeCustomText } from "./customTextFonts";
 
@@ -165,7 +165,7 @@ const EmbroideryDesktop = ({
 
             {desktopTab === "image" && !desktopDetailsOpen && (
               <div className="embroideryDesktopChoices">
-                {desktopEmbroideryTypes.map((option) => (
+                {desktopEmbroideryTypes.filter((option) => !getEmbroideryAvailabilityError({ type: option.value, clothingCode })).map((option) => (
                   <React.Fragment key={option.value}>
                     <div className="embroideryDesktopChoice">
                       <label className="embroideryDesktopChoice__select">
