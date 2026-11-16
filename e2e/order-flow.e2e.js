@@ -40,7 +40,7 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-const startOrder = async (page) => {
+const startOrder = async (page, { clothing = "T-shirt" } = {}) => {
   await page.goto("/");
   await page.locator(".home-hero").getByRole("button", { name: "Сделать заказ" }).click();
 
@@ -50,6 +50,10 @@ const startOrder = async (page) => {
   const tShirt = page.locator('input[name="clothing"][value="T-shirt"]');
   const mediumSize = page.locator('input[name="size"][value="M"]');
   await expect(tShirt).toBeChecked();
+  if (clothing !== "T-shirt") {
+    await page.locator(`.selectorType__item:has(input[value="${clothing}"])`).click();
+    await expect(page.locator(`input[name="clothing"][value="${clothing}"]`)).toBeChecked();
+  }
   await expect(mediumSize).toBeEnabled();
   await page.locator('.sizeSelector__item:has(input[value="M"]) .sizeSelector__box').click();
 
@@ -70,7 +74,7 @@ const continueToRecipient = async (page) => {
 };
 
 test("примеры работ открываются с клавиатуры и закрываются без изменения выбора", async ({ page }) => {
-  await startOrder(page);
+  await startOrder(page, { clothing: "Hoodie" });
 
   const choice = page.locator('.embroideryDesktopChoice:has(input[value="Patronus"])');
   const trigger = choice.getByRole("button", { name: "пример работы" });
@@ -188,7 +192,7 @@ test("цена появляется только после выбора тип�
 });
 
 test("покупатель проходит основной путь и начинает новый заказ с чистого состояния", async ({ page }) => {
-  await startOrder(page);
+  await startOrder(page, { clothing: "Hoodie" });
   await continueToRecipient(page);
 
   const submitButton = page.locator(".recipientOrderNavigation__submit");
@@ -220,7 +224,7 @@ test("покупатель проходит основной путь и нач�
 });
 
 test("другой получатель требует телефон, город выбирается отдельным комбобоксом", async ({ page }, testInfo) => {
-  await startOrder(page);
+  await startOrder(page, { clothing: "Hoodie" });
   await continueToRecipient(page);
 
   const submitButton = page.locator(".recipientOrderNavigation__submit");
