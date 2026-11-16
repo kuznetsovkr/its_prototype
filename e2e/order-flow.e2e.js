@@ -66,7 +66,9 @@ const startOrder = async (page, { clothing = "T-shirt" } = {}) => {
 const continueToRecipient = async (page) => {
   await expect(page.getByRole("heading", { name: "Выберите тип вышивки" })).toBeVisible({ timeout: 20_000 });
   if (await page.locator('input[name="embroideryTypeDesktop"]:checked').count() === 0) {
-    await page.locator('.embroideryDesktopChoice:has(input[value="Patronus"]) .embroideryDesktopChoice__select').click();
+    // Recipient-only scenarios use a design available for every garment.
+    // Patronus-specific coverage selects a hoodie explicitly above.
+    await page.locator('.embroideryDesktopChoice:has(input[value="petFace"]) .embroideryDesktopChoice__select').click();
   }
   await page.locator(".embroiderySelectorDesktop__navigation .is-next").click();
   await expect(page).toHaveURL(/\/recipient$/);
